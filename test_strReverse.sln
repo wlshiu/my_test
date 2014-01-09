@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_strReverse", "test_strReverse\test_strReverse.vcproj", "{3182A58A-3DB7-4C3E-B297-309225B333C7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3182A58A-3DB7-4C3E-B297-309225B333C7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3182A58A-3DB7-4C3E-B297-309225B333C7}.Debug|Win32.Build.0 = Debug|Win32
+		{3182A58A-3DB7-4C3E-B297-309225B333C7}.Release|Win32.ActiveCfg = Release|Win32
+		{3182A58A-3DB7-4C3E-B297-309225B333C7}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
