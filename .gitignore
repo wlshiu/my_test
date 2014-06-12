@@ -1,0 +1,14 @@
+*.swp
+*.bak
+*.files
+*.out
+*.ncb
+*.user
+*.suo
+tags
+*.vim
+*.viminfo
+*~
+*.git/*
+Debug/*
+*/Debug/*
