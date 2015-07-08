@@ -10,7 +10,12 @@ extern "C" {
 //=============================================================================
 //                Constant Definition
 //=============================================================================
-
+typedef enum rb_read_type
+{
+    RB_READ_TYPE_PEEK       = 0,
+    RB_READ_TYPE_REMOVE,
+    RB_READ_TYPE_ALL
+}rb_read_type;
 //=============================================================================
 //                Macro Definition
 //=============================================================================
@@ -23,11 +28,11 @@ extern "C" {
  */
 typedef struct rb_operator
 {
-    unsigned char     *pRead_ptr;
+    unsigned char     *pRead_ptr[RB_READ_TYPE_ALL];
     unsigned char     *pWrite_ptr;
     unsigned char     *pBuf_start_ptr;
     unsigned char     *pBuf_end_ptr;
-    unsigned char     *pValid_end_ptr;
+    unsigned char     *pValid_end_ptr[RB_READ_TYPE_ALL];
 }rb_operator_t;
 
 typedef int (*get_item_size)(unsigned char *w_ptr, unsigned char *r_ptr, unsigned int *pItem_size);
@@ -45,11 +50,13 @@ rb_opt_init(
     unsigned int    buf_size)
 {
     if( !pRbOpt )   return -1;
-    pRbOpt->pBuf_start_ptr = pStart_ptr + (buf_size & 0x3);
-    pRbOpt->pRead_ptr      = pRbOpt->pBuf_start_ptr;
-    pRbOpt->pWrite_ptr     = pRbOpt->pBuf_start_ptr;
-    pRbOpt->pBuf_end_ptr   = pStart_ptr + buf_size;
-    pRbOpt->pValid_end_ptr = pRbOpt->pBuf_end_ptr;
+    pRbOpt->pBuf_start_ptr                      = pStart_ptr + (buf_size & 0x3);
+    pRbOpt->pRead_ptr[RB_READ_TYPE_PEEK]        = pRbOpt->pBuf_start_ptr;
+    pRbOpt->pRead_ptr[RB_READ_TYPE_REMOVE]      = pRbOpt->pBuf_start_ptr;
+    pRbOpt->pWrite_ptr                          = pRbOpt->pBuf_start_ptr;
+    pRbOpt->pBuf_end_ptr                        = pStart_ptr + buf_size;
+    pRbOpt->pValid_end_ptr[RB_READ_TYPE_PEEK]   = pRbOpt->pBuf_end_ptr;
+    pRbOpt->pValid_end_ptr[RB_READ_TYPE_REMOVE] = pRbOpt->pBuf_end_ptr;
     return 0;
 }
 
@@ -62,7 +69,7 @@ rb_opt_update_w(
     unsigned int    data_size)
 {
     unsigned char    *w_ptr = pRbOpt->pWrite_ptr;
-    unsigned char    *r_ptr = pRbOpt->pRead_ptr;
+    unsigned char    *r_ptr = pRbOpt->pRead_ptr[RB_READ_TYPE_REMOVE];
     unsigned int     item_size = header_size + data_size;
 
     // 32 bits alignment
@@ -78,7 +85,8 @@ rb_opt_update_w(
                 return -1;
             }
 
-            pRbOpt->pValid_end_ptr = (unsigned char*)(((unsigned int)w_ptr + 0x3) & ~0x3);
+            pRbOpt->pValid_end_ptr[RB_READ_TYPE_PEEK]   = (unsigned char*)(((unsigned int)w_ptr + 0x3) & ~0x3);
+            pRbOpt->pValid_end_ptr[RB_READ_TYPE_REMOVE] = (unsigned char*)(((unsigned int)w_ptr + 0x3) & ~0x3);
             printf("\t!! w-> valid_end 0x%x\n", w_ptr);
             w_ptr = pRbOpt->pBuf_start_ptr;
         }
@@ -111,17 +119,32 @@ rb_opt_update_w(
 static int
 rb_opt_update_r(
     rb_operator_t   *pRbOpt,
+    rb_read_type    read_idx,
     unsigned char   **ppData,
     unsigned int    *pData_size,
     get_item_size   cb_get_item_size)
 {
-    unsigned char     *w_ptr = pRbOpt->pWrite_ptr;
-    unsigned char     *r_ptr = pRbOpt->pRead_ptr;
+    unsigned char     *w_ptr;
+    unsigned char     *r_ptr;
     unsigned int      item_size = 0;
     unsigned int      item_size_align = 0;
 
     if( cb_get_item_size == NULL )
         return  -1;
+
+    switch( read_idx )
+    {
+        case RB_READ_TYPE_PEEK:
+            w_ptr = pRbOpt->pWrite_ptr;
+            r_ptr = pRbOpt->pRead_ptr[RB_READ_TYPE_PEEK];
+            break;
+        case RB_READ_TYPE_REMOVE:
+            w_ptr = pRbOpt->pRead_ptr[RB_READ_TYPE_PEEK];
+            r_ptr = pRbOpt->pRead_ptr[RB_READ_TYPE_REMOVE];
+            break;
+        default:
+            return -1;
+    }
 
     cb_get_item_size(w_ptr, r_ptr, &item_size);
     if( item_size == 0 )
@@ -144,9 +167,9 @@ rb_opt_update_r(
 
         r_ptr += item_size_align;
 
-        if( r_ptr == pRbOpt->pValid_end_ptr )
+        if( r_ptr == pRbOpt->pValid_end_ptr[read_idx] )
         {
-            pRbOpt->pValid_end_ptr = pRbOpt->pBuf_end_ptr;
+            pRbOpt->pValid_end_ptr[read_idx] = pRbOpt->pBuf_end_ptr;
             r_ptr = pRbOpt->pBuf_start_ptr;
 
             printf("!! r_ptr at valid_end 0x%x\n", r_ptr);
@@ -158,7 +181,7 @@ rb_opt_update_r(
         *pData_size = 0;
     }
 
-    pRbOpt->pRead_ptr = r_ptr;
+    pRbOpt->pRead_ptr[read_idx] = r_ptr;
 
     return 0;
 }

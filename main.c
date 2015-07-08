@@ -32,9 +32,9 @@ int main()
     uint32_t        frame_buf_size = (15 << 10);
     uint8_t         *pFrame_buf = 0;
     uint32_t        item_header_size = 0;
-    FILE            *fp_w = 0, *fp_r = 0;
+    FILE            *fp_w = 0, *fp_r = 0, *fp_r1 = 0;
 
-    rb_operator_t   rb_opt = {0};
+    static rb_operator_t   rb_opt = {0};
 
     srand((unsigned int)time(NULL));
 
@@ -52,9 +52,10 @@ int main()
 
     fp_w = fopen("w_info.txt", "wb");
     fp_r = fopen("r_info.txt", "wb");
+    fp_r1 = fopen("r1_info.txt", "wb");
 
 
-    for(i = 1; i < 100000; i++)
+    for(i = 1; i < 3000000; i++)
     {
     	int			rst = 0;
         uint8_t     *pItem_buf = 0, *pItem_addr = 0;
@@ -78,7 +79,7 @@ int main()
             frm_info.frame_size         = tmp_buf_size;
             frm_info.item_size          = tmp_buf_size + item_header_size;
 
-			printf("w: order=%u, item_size=%u, frame_size=%u, data=0x%x \n",
+			printf(" w: order=%u, item_size=%u, frame_size=%u, data=0x%x \n",
 				frm_info.order,
 				frm_info.item_size,
 				frm_info.frame_size,
@@ -100,12 +101,12 @@ int main()
         {
             frame_info_t    *pFrame_info = 0;
 
-            rb_opt_update_r(&rb_opt, &pItem_addr, &item_size, _get_item_size);
+            rb_opt_update_r(&rb_opt, RB_READ_TYPE_PEEK, &pItem_addr, &item_size, _get_item_size);
 
             pFrame_info = (frame_info_t*)pItem_addr;
             if( pFrame_info )
             {
-                printf("R: order=%u, item_size=%u, frame_size=%u, data=0x%x \n",
+                printf(" R: order=%u, item_size=%u, frame_size=%u, data=0x%x \n",
                     pFrame_info->order,
                     pFrame_info->item_size,
                     pFrame_info->frame_size,
@@ -116,6 +117,25 @@ int main()
                     pFrame_info->frame_size,
                     *(pItem_addr + pFrame_info->frame_start_offset) & 0xF);
             }
+
+            {// remove
+                rb_opt_update_r(&rb_opt, RB_READ_TYPE_REMOVE, &pItem_addr, &item_size, _get_item_size);
+
+                pFrame_info = (frame_info_t*)pItem_addr;
+                if( pFrame_info )
+                {
+                    printf("!R: order=%u, item_size=%u, frame_size=%u, data=0x%x \n",
+                        pFrame_info->order,
+                        pFrame_info->item_size,
+                        pFrame_info->frame_size,
+                        *(pItem_addr + pFrame_info->frame_start_offset) & 0xF);
+                    fprintf(fp_r1, "order=%u, item_size=%u, frame_size=%u, data=0x%x \n",
+                        pFrame_info->order,
+                        pFrame_info->item_size,
+                        pFrame_info->frame_size,
+                        *(pItem_addr + pFrame_info->frame_start_offset) & 0xF);
+                }
+            }
         }
 
         if( pItem_buf )  free(pItem_buf);
@@ -123,6 +143,7 @@ int main()
 
     fclose(fp_w);
     fclose(fp_r);
+    fclose(fp_r1);
 
     if( pFrame_buf )    free(pFrame_buf);
     return 0;
