@@ -19,7 +19,7 @@ extern "C" {
 
 #include "stdint.h"
 //=============================================================================
-//				  Constant Definition
+//                Constant Definition
 //=============================================================================
 /**
  *  message global type
@@ -28,21 +28,36 @@ typedef enum msg_global_type
 {
     MSG_GLOBAL_TYPE_EMERGENCY       = 0xBA000000,
 
-}msg_global_type_t;
+} msg_global_type_t;
 //=============================================================================
-//				  Macro Definition
+//                Macro Definition
 //=============================================================================
 
 //=============================================================================
-//				  Structure Definition
+//                Structure Definition
 //=============================================================================
+/**
+ *
+ */
+
 /**
  *  message arguments
  */
 typedef struct msg_arg
 {
     uint32_t    reserved;
-}msg_arg_t;
+
+    struct {
+        uint8_t     *pTunnel_info;
+        uint32_t    value;
+    } rece[2];
+
+    struct {
+        uint8_t     *pTunnel_info;
+        uint32_t    value;
+    } reply[2];
+
+} msg_arg_t;
 
 /**
  *  message node
@@ -55,7 +70,7 @@ typedef struct msg_node
     int     (*destroy_node)(struct msg_node **ppMsg_node);
     int     (*handle_node)(struct msg_node *pMsg_node);
 
-}msg_node_t;
+} msg_node_t;
 
 /**
  *  message info
@@ -71,17 +86,17 @@ typedef struct msg_info
     int     (*create_node)(struct msg_info *pMsg_info);
     int     (*destroy_node)(msg_node_t **ppMsg_node);
     int     (*handle_node)(msg_node_t *pMsg_node);
-}msg_info_t;
+} msg_info_t;
 //=============================================================================
-//				  Global Data Definition
-//=============================================================================
-
-//=============================================================================
-//				  Private Function Definition
+//                Global Data Definition
 //=============================================================================
 
 //=============================================================================
-//				  Public Function Definition
+//                Private Function Definition
+//=============================================================================
+
+//=============================================================================
+//                Public Function Definition
 //=============================================================================
 int
 msg_box_post_node(

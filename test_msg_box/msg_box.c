@@ -23,16 +23,25 @@
 #if (_MSC_VER)
     #include <crtdbg.h>
 #endif
+
+#if 0
+    #include <pthread.h>
+#else
+    typedef int     pthread_mutex_t;
+    #define PTHREAD_MUTEX_INITIALIZER   0
+    #define pthread_mutex_lock(m)
+    #define pthread_mutex_unlock(m)
+#endif
 //=============================================================================
-//				  Constant Definition
+//                Constant Definition
 //=============================================================================
 #define MAX_MSG_QUEUE_NUM       10
 //=============================================================================
-//				  Macro Definition
+//                Macro Definition
 //=============================================================================
 
 //=============================================================================
-//				  Structure Definition
+//                Structure Definition
 //=============================================================================
 /**
  *  message box
@@ -48,19 +57,21 @@ typedef struct msg_box
     int     (*handle_node)(msg_node_t *pMsg_node);
 
     void    *pTunnel_info[2];
-}msg_box_t;
+} msg_box_t;
 //=============================================================================
-//				  Global Data Definition
+//                Global Data Definition
 //=============================================================================
 static msg_box_t       *g_pHead_msg_box = 0;
 static msg_box_t       *g_pCur_msg_box = 0;
 static int              g_msg_box_cnt = 0;
+
+static pthread_mutex_t  g_mutex_msgbox = PTHREAD_MUTEX_INITIALIZER;
 //=============================================================================
-//				  Private Function Definition
+//                Private Function Definition
 //=============================================================================
 
 //=============================================================================
-//				  Public Function Definition
+//                Public Function Definition
 //=============================================================================
 int
 msg_box_post_node(
@@ -68,11 +79,12 @@ msg_box_post_node(
 {
     int     result = -1;
 
-    do{
+    do {
         msg_box_t   *pCur_msg_box = 0;
 
         if( pMsg_info->create_node )
             pMsg_info->create_node(pMsg_info);
+
         if( !pMsg_info->pMsg_node )
             break;
 
@@ -88,7 +100,7 @@ msg_box_post_node(
         pCur_msg_box->destroy_node = pMsg_info->destroy_node;
         pCur_msg_box->handle_node  = pMsg_info->handle_node;
 
-        // mutex lock
+        pthread_mutex_lock(&g_mutex_msgbox);
         if( g_pHead_msg_box == 0 )
         {
             g_pHead_msg_box = g_pCur_msg_box = pCur_msg_box;
@@ -100,8 +112,8 @@ msg_box_post_node(
         }
         g_msg_box_cnt++;
         result = 0;
-        // mutex unlock
-    }while(0);
+        pthread_mutex_unlock(&g_mutex_msgbox);
+    } while(0);
 
     return result;
 }
@@ -113,7 +125,7 @@ msg_box_fetch_node(
 {
     int     result = -1;
 
-    do{
+    do {
         msg_box_t   *pCur_msg_box = 0;
 
         if( ppMsg_node == 0 )
@@ -124,7 +136,7 @@ msg_box_fetch_node(
 
         *ppMsg_node = 0;
 
-        // mutex lock
+        pthread_mutex_lock(&g_mutex_msgbox);
         pCur_msg_box = g_pHead_msg_box;
         if( g_msg_box_cnt > 0 && pCur_msg_box )
         {
@@ -137,8 +149,8 @@ msg_box_fetch_node(
         }
 
         result = 0;
-        // mutex unlock
-    }while(0);
+        pthread_mutex_unlock(&g_mutex_msgbox);
+    } while(0);
 
     return result;
 }
@@ -148,10 +160,10 @@ msg_box_erase_all(void)
 {
     int     result = -1;
 
-    do{
+    do {
         msg_box_t  *pCur_box = 0;
 
-        // mutex lock
+        pthread_mutex_lock(&g_mutex_msgbox);
         pCur_box = g_pHead_msg_box;
         while( pCur_box )
         {
@@ -167,9 +179,10 @@ msg_box_erase_all(void)
         g_pHead_msg_box = g_pCur_msg_box = 0;
 
         result = 0;
-        // mutex unlock
-    }while(0);
+        pthread_mutex_unlock(&g_mutex_msgbox);
+    } while(0);
 
     return result;
 }
+
 
