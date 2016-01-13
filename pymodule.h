@@ -65,7 +65,7 @@ typedef struct arg_unit
 typedef struct pymodule_args
 {
     int         arg_count;
-    arg_unit_t  args[6];
+    arg_unit_t  args[8];
 
 } pymodule_args_t;
 

@@ -23,18 +23,14 @@
 //                Macro Definition
 //=============================================================================
 #if 1
-    #define err_msg(string, args...)    do{ fprintf(stderr, "%s [#%d] => ", __FUNCTION__, __LINE__);\
-                                            fprintf(stderr, string, ## args); \
-                                        }while(0)
+    #define trace()                     fprintf(stderr, "%s[#%d]\n", __FUNCTION__, __LINE__)
 
-    #define dbg_msg(string, args...)    do{ fprintf(stderr, "%s [#%d] => ", __FUNCTION__, __LINE__);\
-                                            fprintf(stderr, string, ## args); \
-                                        }while(0)
+    #define err_msg(string, args...)    do{ fprintf(stderr, "%s [#%d] => " string, __FUNCTION__, __LINE__, ## args);}while(0)
+
+    #define dbg_msg(string, args...)    do{ fprintf(stderr, "%s [#%d] => " string, __FUNCTION__, __LINE__, ## args);}while(0)
 
 #else
-    #define err_msg(string, args...)    do{ fprintf(stderr, "%s [#%d] => ", __FUNCTION__, __LINE__);\
-                                            fprintf(stderr, string, ## args); \
-                                        }while(0)
+    #define err_msg(string, args...)    do{ fprintf(stderr, "%s [#%d] => " string, __FUNCTION__, __LINE__, ## args);}while(0)
 
     #define dbg_msg(string, args...)
 #endif
@@ -95,10 +91,10 @@ pymodule_load(
     char            *pModule_name,
     HPymodule_t     **ppHPymodule)
 {
-    int     result = 0;
+    int             result = -1;
+    pymodule_dev_t  *pDev = 0;
 
     do{
-        pymodule_dev_t      *pDev = 0;
         PyObject            *pObj_name = 0;
 
         if( !ppHPymodule || !pModule_name )
@@ -125,15 +121,25 @@ pymodule_load(
 
         pObj_name       = PyString_FromString(pModule_name);
         pDev->pModule   = PyImport_Import(pObj_name);
+        if( !pDev->pModule )
+        {
+            err_msg("import module \"%s\" fail ! \n ", pModule_name);
+            break;
+        }
+
         pDev->pDict     = PyModule_GetDict(pDev->pModule);
 
         Py_XDECREF(pObj_name);
 
         *ppHPymodule = &pDev->hPymodule;
-
+        result = 0;
     }while(0);
 
-
+    if( result )
+    {
+        HPymodule_t     *pHPymodule = &pDev->hPymodule;
+        pymodule_unload(&pHPymodule);
+    }
     return result;
 }
 
@@ -419,3 +425,6 @@ pymodule_set_attr_double(
 
     return result;
 }
+
+
+
