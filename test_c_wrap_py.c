@@ -25,6 +25,12 @@
 #define QAUDCOPTER_MAV_CMD_WAYPOINT             16
 #define QAUDCOPTER_MAV_CMD_RETURN_TO_LAUNCH     20
 #define QAUDCOPTER_MAV_CMD_TACKOFF              22
+
+#if defined(__MINGW32__)
+    #define WAYPOINT_DUMP_PATH          "./"
+#else
+    #define WAYPOINT_DUMP_PATH          "/tmp/SD0/"
+#endif
 //=============================================================================
 //                Macro Definition
 //=============================================================================
@@ -204,38 +210,38 @@ _report_waypoint(
             break;
         }
 
-        printf("wp: ");
+        msg("wp: ");
         pObj_tmp = PyList_GetItem(pObj_wp, 0);
         if( PyInt_Check(pObj_tmp) )
-            printf("seq: %ld, ", PyInt_AsLong(pObj_tmp));
+            msg("seq: %ld, ", PyInt_AsLong(pObj_tmp));
 
         pObj_tmp = PyList_GetItem(pObj_wp, 1);
         if( PyInt_Check(pObj_tmp) )
-            printf("cur: %ld, ", PyInt_AsLong(pObj_tmp));
+            msg("cur: %ld, ", PyInt_AsLong(pObj_tmp));
 
         pObj_tmp = PyList_GetItem(pObj_wp, 2);
         if( PyInt_Check(pObj_tmp) )
-            printf("mav_frame: %ld, ", PyInt_AsLong(pObj_tmp));
+            msg("mav_frame: %ld, ", PyInt_AsLong(pObj_tmp));
 
         pObj_tmp = PyList_GetItem(pObj_wp, 3);
         if( PyInt_Check(pObj_tmp) )
-            printf("mav_cmd: %ld, ", PyInt_AsLong(pObj_tmp));
+            msg("mav_cmd: %ld, ", PyInt_AsLong(pObj_tmp));
 
         pObj_tmp = PyList_GetItem(pObj_wp, 4);
         if( PyFloat_Check(pObj_tmp) )
-            printf("x: %lf, ", PyFloat_AsDouble(pObj_tmp));
+            msg("x: %lf, ", PyFloat_AsDouble(pObj_tmp));
 
         pObj_tmp = PyList_GetItem(pObj_wp, 5);
         if( PyFloat_Check(pObj_tmp) )
-            printf("y: %lf, ", PyFloat_AsDouble(pObj_tmp));
+            msg("y: %lf, ", PyFloat_AsDouble(pObj_tmp));
 
         pObj_tmp = PyList_GetItem(pObj_wp, 6);
         if( PyFloat_Check(pObj_tmp) )
-            printf("z: %lf, ", PyFloat_AsDouble(pObj_tmp));
+            msg("z: %lf, ", PyFloat_AsDouble(pObj_tmp));
 
         pObj_tmp = PyList_GetItem(pObj_wp, 7);
         if( PyInt_Check(pObj_tmp) )
-            printf("autocontinue: %ld, ", PyInt_AsLong(pObj_tmp));
+            msg("autocontinue: %ld, ", PyInt_AsLong(pObj_tmp));
 
     }while(0);
 
@@ -276,7 +282,7 @@ _report_mission(
             gettimeofday(&g_start_time, NULL);
 
         gettimeofday(&cur_time, NULL);
-        printf("==> druation: %ld sec\n", cur_time.tv_sec - g_start_time.tv_sec);
+        msg("==> druation: %ld sec\n", cur_time.tv_sec - g_start_time.tv_sec);
 
         if( g_test_shift_event == 0 &&
             (cur_time.tv_sec - g_start_time.tv_sec) > 6 /* sec */)
@@ -320,9 +326,25 @@ qaudcopter_create(
 
 static void
 qaudcopter_destroy(
-    void    *pObj_vehicle)
+    HPymodule_t     *pHPymodule,
+    void            **ppObj_vehicle)
 {
-    Py_XDECREF((PyObject*)pObj_vehicle);
+    pymodule_args_t     args = {0};
+    PyObject            *pObj_value = 0;
+    PyObject            *pObj_vehicle = 0;
+
+    if( !ppObj_vehicle )   return;
+
+    pObj_vehicle = (PyObject*)(*ppObj_vehicle);
+    args.arg_count = 1;
+    args.args[0].arg_type  = PYMODULE_ARG_PYOBJ;
+    args.args[0].u.pObj    = pObj_vehicle;
+    pObj_value = pymodule_exec(pHPymodule, (char*)"quadCopter_destory_handle", &args);
+
+    Py_CLEAR(pObj_value);
+    Py_CLEAR(pObj_vehicle);
+    *ppObj_vehicle = 0;
+    return;
 }
 
 static int
@@ -588,6 +610,31 @@ qaudcopter_clear_mission(
 }
 
 static int
+quadCopter_upload_mission(
+    HPymodule_t     *pHPymodule,
+    void            *pObj_vehicle)
+{
+    int                 result = -1;
+    pymodule_args_t     args = {0};
+    PyObject            *pObj_values = 0;
+
+    if( !pHPymodule || !pObj_vehicle )
+        return result;
+
+    args.arg_count = 1;
+    args.args[0].arg_type       = PYMODULE_ARG_PYOBJ;
+    args.args[0].u.pObj         = (PyObject*)pObj_vehicle;
+    pObj_values = pymodule_exec(pHPymodule, (char*)"quadCopter_upload_mission", &args);
+    if( pObj_values )
+        result = 0;
+
+    Py_CLEAR(pObj_values);
+
+    if( result )    err("get error !!\n");
+    return result;
+}
+
+static int
 qaudcopter_add_one_waypoint(
     HPymodule_t     *pHPymodule,
     void            *pObj_vehicle,
@@ -651,7 +698,6 @@ qaudcopter_download_curr_mission(
         pObj_values = pymodule_exec(pHPymodule, (char*)"quadCopter_download_curr_mission", &args);
         if( pObj_values )
         {
-
             if( !PyList_Check(pObj_values) )
             {
                 PyErr_Print();
@@ -758,6 +804,62 @@ qaudcopter_launch_monitor_mission(
     if( result )    err("get error !!\n");
     return result;
 }
+
+static int
+qaudcopter_import_mission(
+    HPymodule_t     *pHPymodule,
+    void            *pObj_vehicle,
+    char            *pFile_path)
+{
+    int                 result = -1;
+    pymodule_args_t     args = {0};
+    PyObject            *pObj_values = 0;
+
+    if( !pHPymodule || !pObj_vehicle || !pFile_path )
+        return result;
+
+    args.arg_count = 2;
+    args.args[0].arg_type       = PYMODULE_ARG_PYOBJ;
+    args.args[0].u.pObj         = (PyObject*)pObj_vehicle;
+    args.args[1].arg_type       = PYMODULE_ARG_STRING;
+    args.args[1].u.pString      = pFile_path;
+    pObj_values = pymodule_exec(pHPymodule, (char*)"quadCopter_import_mission", &args);
+    if( pObj_values )
+        result = 0;
+
+    Py_CLEAR(pObj_values);
+
+    if( result )    err("get error !!\n");
+    return result;
+}
+
+static int
+qaudcopter_export_mission(
+    HPymodule_t     *pHPymodule,
+    void            *pObj_vehicle,
+    char            *pFile_path)
+{
+    int                 result = -1;
+    pymodule_args_t     args = {0};
+    PyObject            *pObj_values = 0;
+
+    if( !pHPymodule || !pObj_vehicle || !pFile_path )
+        return result;
+
+    args.arg_count = 2;
+    args.args[0].arg_type       = PYMODULE_ARG_PYOBJ;
+    args.args[0].u.pObj         = (PyObject*)pObj_vehicle;
+    args.args[1].arg_type       = PYMODULE_ARG_STRING;
+    args.args[1].u.pString      = pFile_path;
+    pObj_values = pymodule_exec(pHPymodule, (char*)"quadCopter_export_mission", &args);
+    if( pObj_values )
+        result = 0;
+
+    Py_CLEAR(pObj_values);
+
+    if( result )    err("get error !!\n");
+    return result;
+}
 //=============================================================================
 //                Public Function Definition
 //=============================================================================
@@ -820,6 +922,8 @@ test_auto_mode(
     // dummy point
     qaudcopter_add_one_waypoint(pHPymodule, pHCopter, -10, -10, 13);
 
+    quadCopter_upload_mission(pHPymodule, pHCopter);
+
     {
         int             waypoint_cnt = 0;
         waypoint_t      *pWaypoints = 0;
@@ -829,7 +933,7 @@ test_auto_mode(
             for(i = 0; i < waypoint_cnt; i++)
             {
                 waypoint_t      *pCur_wp = &pWaypoints[i];
-                printf("%2d, %3d, %3d, %3d, %4.6lf, %4.6lf, %4.6lf, %2d\n",
+                msg("%2d, %3d, %3d, %3d, %4.6lf, %4.6lf, %4.6lf, %2d\n",
                     pCur_wp->seq, pCur_wp->current, pCur_wp->mav_frame, pCur_wp->mav_cmd,
                     pCur_wp->x, pCur_wp->y, pCur_wp->z,
                     pCur_wp->autocontinue);
@@ -837,6 +941,9 @@ test_auto_mode(
             free(pWaypoints);
         }
     }
+
+    qaudcopter_export_mission(pHPymodule, pHCopter, (char*) WAYPOINT_DUMP_PATH "wp_dump.txt");
+    qaudcopter_import_mission(pHPymodule, pHCopter, (char*) WAYPOINT_DUMP_PATH "wp_dump.txt");
 
     if( qaudcopter_takeoff(pHPymodule, pHCopter, 10) < 0 )
         err("tackoff fail !!!\n");
@@ -866,6 +973,7 @@ test_auto_mode(
     return 0;
 }
 
+
 int main(int argc, char **argv)
 {
     int                 ret = 0;
@@ -885,12 +993,14 @@ int main(int argc, char **argv)
             err("init fail !");
             break;
         }
-#if 0
-        pymodule_exec_script((char*)"import sys\n"
-                             "sys.path.append('/home/dronekit_wrapper/')\n");
-#else
+#if defined(__MINGW32__)
         pymodule_exec_script((char*)"import sys\n"
                              "sys.path.append('./home/dronekit_wrapper/')\n");
+#else
+        // pymodule_exec_script("import sys\n"
+        //                      "sys.path.append('/home/dronekit_wrapper/')\n");
+        pymodule_exec_script((char*)"import sys\n"
+                             "sys.path.append('/tmp/SD0/')\n");
 #endif
         pymodule_load((char*)"quad_copter", &pHPymodule);
 
@@ -902,6 +1012,8 @@ int main(int argc, char **argv)
             test_auto_mode(pHPymodule, pHCopter);
         else if( !strcmp(argv[2], "guid") )
             test_guid_mode(pHPymodule, pHCopter);
+        else
+            test_auto_mode(pHPymodule, pHCopter);
 
         qaudcopter_set_flight_mode(pHPymodule, pHCopter, RTL);
         flight_mode = qaudcopter_get_flight_mode(pHPymodule, pHCopter);
@@ -910,8 +1022,7 @@ int main(int argc, char **argv)
         else
             msg("set RTL mode fail (cur=%d) !!\n", flight_mode);
 
-        qaudcopter_destroy(pHCopter);
-        pHCopter = 0;
+        qaudcopter_destroy(pHPymodule, &pHCopter);
 
         pymodule_unload(&pHPymodule);
         msg("\n");
