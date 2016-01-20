@@ -308,25 +308,27 @@ def quadCopter_clear_mission(vehicle):
     """
     clear missions in the vehicle.
     """
-    vehicle.commands.clear()
+    cmds = vehicle.commands
+    cmds.clear()
 
     # MAV_CMD_NAV_TAKEOFF will be ignored if the vehicle is already in the air.
-    vehicle.commands.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
+    cmds.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
                      0, 0, 0, 0, 0, 0, 0, 0, 10))
-    # cmds.upload()
-    # time.sleep(1)
+    cmds.upload()
+    time.sleep(5)
 
 
 def quadCopter_add_relative_waypoint(vehicle, north_metres, east_metres, rise_metres):
     """
     add a waypoint which is relative current position
     """
+    cmds = vehicle.commands
     currentLocation = vehicle.location.global_relative_frame
     currentLocation.alt = rise_metres
     targetLocation = get_location_with_metres(currentLocation, north_metres, east_metres)
 
     print " Add new wp %s" % targetLocation
-    vehicle.commands.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
+    cmds.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
                      0, 0, 0, 0, 0, 0, targetLocation.lat, targetLocation.lon, targetLocation.alt))
 
 
@@ -334,8 +336,9 @@ def quadCopter_upload_mission(vehicle):
     """
     upload missions to the vehicle.
     """
-    vehicle.commands.upload()
-    time.sleep(1)
+    cmds = vehicle.commands
+    cmds.upload()
+    time.sleep(5)
 
 
 def quadCopter_download_curr_mission(vehicle, callback2c_report_waypoint=None):
@@ -455,14 +458,14 @@ def quadCopter_import_mission(vehicle, file_path):
     print "\nUpload mission "
 
     # Clear existing mission from vehicle
-    cmds = vehicle.commands
     cmds.clear()
 
     # Add new mission to vehicle
     for command in missionlist:
         cmds.add(command)
 
-    vehicle.commands.upload()
+    cmds.upload()
+    time.sleep(5)
 
 
 def quadCopter_export_mission(vehicle, file_path):
@@ -491,6 +494,7 @@ def quadCopter_export_mission(vehicle, file_path):
                                                                           cmd.param1, cmd.param2, cmd.param3, cmd.param4,
                                                                           cmd.x, cmd.y, cmd.z, cmd.autocontinue)
         output += commandline
+
     with open(file_path, 'w') as file_:
         print " Write mission to file"
         file_.write(output)
