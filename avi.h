@@ -62,6 +62,14 @@ typedef struct avi_audio_cfg
 
 } avi_audio_cfg_t;
 
+typedef struct avi_update_info
+{
+    uint32_t    total_frames;
+    uint32_t    total_file_size;
+
+    uint32_t    media_data_size;  // movi data size (audio + video data)
+} avi_update_info_t;
+
 /**
  *  I/O handler
  */
@@ -88,7 +96,7 @@ typedef struct avi_io_desc
 //                  Public Function Definition
 //=============================================================================
 int
-avi_mux_init_header(
+avi_mux_reset_header(
     avi_video_cfg_t   *pVid_cfg,
     avi_audio_cfg_t   *pAud_cfg,
     uint32_t          align_pow2_num);
@@ -96,9 +104,16 @@ avi_mux_init_header(
 
 
 int
-avi_mux_get_header(
+avi_mux_gen_header(
     uint8_t     *pHeader_buf,
     uint32_t    *pHeader_buf_len);
+
+
+int
+avi_mux_reload_header(
+    uint32_t    *pHeader_buf,
+    uint32_t    header_buf_len);
+
 
 
 #ifdef __cplusplus

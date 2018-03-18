@@ -29,12 +29,17 @@ typedef enum avi_media_track
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
+#define stringize(s)    #s
+#define to_str(s)       stringize(s)
+
 #define SET_LIST(pStruct, fourCC)   \
         do{ (pStruct)->tag_list = (uint32_t)AVI_FCC_LIST; \
             (pStruct)->fcc = (fourCC);                    \
         }while(0)
 
 
+#define _assert(expression)  \
+    ((void)((expression) ? 0 : printf("%s[%u] err '%s'\n", __func__, __LINE__, to_str(expression))))
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
@@ -84,7 +89,15 @@ typedef struct avi_mux_ctxt
     avi_chunk_t             junk;
 
     uint32_t                header_size;
+    uint32_t                align_pow2_num;
 } avi_mux_ctxt_t;
+
+typedef struct avi_comm_header
+{
+    avi_riff_t              riff;
+    avi_list_t              list_hdrl;
+    avi_avih_t              avih;
+} avi_comm_header_t;
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
@@ -97,8 +110,18 @@ static avi_mux_ctxt_t   g_avi_ctxt = {.is_initialized = false,};
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
+/**
+ *  \brief      new a avi header
+ *
+ *  \param [in] pVid_cfg            video configuration
+ *  \param [in] pAud_cfg            audio configuration
+ *  \param [in] align_pow2_num      alignment number (2 power align_pow2_num)
+ *  \return
+ *
+ *  \details
+ */
 int
-avi_mux_init_header(
+avi_mux_reset_header(
     avi_video_cfg_t   *pVid_cfg,
     avi_audio_cfg_t   *pAud_cfg,
     uint32_t          align_pow2_num)
@@ -109,6 +132,7 @@ avi_mux_init_header(
     memset(&g_avi_ctxt, 0x0, sizeof(avi_mux_ctxt_t));
 
     align_pow2_num = (align_pow2_num < 8) ? 8 : align_pow2_num;
+    g_avi_ctxt.align_pow2_num = align_pow2_num;
 
     do {
         uint32_t            header_size = 0;
@@ -261,13 +285,15 @@ avi_mux_init_header(
 
 
 int
-avi_update_info(uint32_t file_size, uint32_t total_vframe)
+avi_mux_update_info(
+    avi_update_info_t   *pUpdate_info)
 {
+    _assert(pUpdate_info != 0);
     return 0;
 }
 
 int
-avi_add_frame(
+avi_mux_add_frame(
     avi_frm_type_t  frm_type,
     uint32_t        frm_len)
 {
@@ -295,12 +321,25 @@ avi_mux_get_header_size()
     return g_avi_ctxt.header_size;
 }
 
+/**
+ *  \brief      Generate a binary row of avi header
+ *
+ *  \param [in] pHeader_buf         buffer for output binary avi header
+ *  \param [in] pHeader_buf_len     buffer length
+ *  \return
+ *
+ *  \details
+ */
 int
-avi_mux_get_header(
+avi_mux_gen_header(
     uint8_t     *pHeader_buf,
     uint32_t    *pHeader_buf_len)
 {
     int         rval = -1;
+
+    _assert(pHeader_buf != 0);
+    _assert(pHeader_buf_len != 0);
+    _assert(*pHeader_buf_len != 0);
 
     if( !g_avi_ctxt.is_initialized )
         return rval;
@@ -359,5 +398,216 @@ avi_mux_get_header(
     return rval;
 }
 
+/**
+ *  \brief      parse a binary row of avi header
+ *
+ *  \param [in] pHeader_buf         input buffer of binary row of avi header
+ *  \param [in] header_buf_len      input buffer length (it MUST more than 512 bytes)
+ *  \return
+ *
+ *  \details
+ */
+int
+avi_mux_reload_header(
+    uint32_t    *pHeader_buf,
+    uint32_t    header_buf_len)
+{
+    int     rval = 0;
+
+    _assert(pHeader_buf != 0);
+    _assert(header_buf_len > 512);
+
+    do {
+        uint32_t            align_pow2_num = 0;
+        uint8_t             *pCur = (uint8_t*)pHeader_buf;
+        // uint32_t            *pBuf_end = pHeader_buf + header_buf_len;
+        avi_comm_header_t   avi_comm_hdr = {0};
+        avi_comm_header_t   *pAvi_comm_hdr = 0;
+        avi_list_t          *pList = 0;
+        avi_main_hdr_t      *pMain_hdr = 0;
+        uint32_t            verified_size = 0;
+
+        #if 1
+        memcpy(&avi_comm_hdr, pHeader_buf, sizeof(avi_comm_header_t));
+        pAvi_comm_hdr = &avi_comm_hdr;
+        #else
+        pAvi_comm_hdr = pHeader_buf;
+        #endif
+
+        {   // RIFF
+            avi_riff_t          *pRiff = &pAvi_comm_hdr->riff;
+            if( pRiff->tag_riff != (uint32_t)AVI_FCC_RIFF ||
+                pRiff->fcc != (uint32_t)AVI_FCC_AVI )
+            {
+                rval = -1;
+                break;
+            }
+
+            verified_size += sizeof(avi_riff_t);
+        }
+
+        pList = &pAvi_comm_hdr->list_hdrl;
+        if( pList->tag_list != (uint32_t)AVI_FCC_LIST ||
+            pList->fcc != (uint32_t)AVI_FCC_HDRL )
+        {
+            rval = -1;
+            break;
+        }
+        verified_size += sizeof(avi_list_t);
+
+        {   // avih
+            avi_avih_t          *pAvih = &pAvi_comm_hdr->avih;
+
+            pMain_hdr = &pAvih->main_hdr;
+            if( pAvih->tag_avih != (uint32_t)AVI_FCC_AVIH ||
+                pMain_hdr->dwStreams == 0 )
+            {
+                rval = -1;
+                break;
+            }
+
+            verified_size += sizeof(avi_avih_t);
+        }
+
+        pCur += sizeof(avi_comm_header_t);
+
+        {   // check strh/strf exist or not
+            int             stream_cnt = 0;
+            avi_list_t      *pCur_list = (avi_list_t*)pCur;
+
+            do {
+                avi_stream_hdr_box_t    *pStrh = (avi_stream_hdr_box_t*)((uint32_t)pCur_list + sizeof(avi_list_t));
+                avi_stream_hdr_t        *pStrm_hdr = &pStrh->stream_hdr;
+
+                if( pCur_list->tag_list != (uint32_t)AVI_FCC_LIST ||
+                    pCur_list->fcc != (uint32_t)AVI_FCC_STRL )
+                {
+                    rval = -1;
+                    break;
+                }
+
+                if( pStrh->tag_strh != (uint32_t)AVI_FCC_STRH &&
+                    (pStrm_hdr->fccType != (uint32_t)AVI_FCC_AUDS &&
+                     pStrm_hdr->fccType != (uint32_t)AVI_FCC_VIDS) )
+                {
+                    rval = -1;
+                    break;
+                }
+
+                if( *((uint32_t*)((uint32_t)pStrm_hdr + pStrh->size)) != (uint32_t)AVI_FCC_STRF )
+                {
+                    rval = -1;
+                    break;
+                }
+
+                pCur_list = (avi_list_t*)((uint32_t)pCur_list + 8 + pCur_list->size);
+
+            } while( ++stream_cnt < pMain_hdr->dwStreams );
+
+            if( rval )      break;
+        }
+
+        align_pow2_num = g_avi_ctxt.align_pow2_num;
+        memset(&g_avi_ctxt, 0x0, sizeof(avi_mux_ctxt_t));
+        g_avi_ctxt.align_pow2_num = align_pow2_num;
+
+        memcpy(&g_avi_ctxt, pHeader_buf, verified_size);
+
+        {   // strl
+            int             stream_cnt = 0;
+            avi_list_t      *pCur_list = (avi_list_t*)pCur;
+
+            do {
+                avi_stream_hdr_box_t    *pStrh = (avi_stream_hdr_box_t*)((uint32_t)pCur_list + sizeof(avi_list_t));
+                avi_stream_hdr_t        *pStrm_hdr = &pStrh->stream_hdr;
+
+                if( pStrm_hdr->fccType == (uint32_t)AVI_FCC_VIDS )
+                {
+                    avi_bmp_info_hdr_box_t  *pStrf = &g_avi_ctxt.list_hdrl_box.list_strl_vid.strf;
+                    avi_list_strl_vid_t     *pList_strl_v = &g_avi_ctxt.list_hdrl_box.list_strl_vid;
+
+                    g_avi_ctxt.has_video = true;
+                    memcpy(pList_strl_v, pCur_list, sizeof(avi_list_t) + sizeof(avi_stream_hdr_box_t));
+                    memcpy(pStrf, (void*)((uint32_t)pStrm_hdr + pStrh->size), sizeof(avi_bmp_info_hdr_box_t));
+
+                    verified_size += (sizeof(avi_list_t) + sizeof(avi_stream_hdr_box_t) + sizeof(avi_bmp_info_hdr_box_t));
+                }
+                else if( pStrm_hdr->fccType != (uint32_t)AVI_FCC_AUDS )
+                {
+                    avi_wave_fmt_ex_box_t   *pStrf = &g_avi_ctxt.list_hdrl_box.list_strl_aud.strf;
+                    avi_list_strl_aud_t     *pList_strl_a = &g_avi_ctxt.list_hdrl_box.list_strl_aud;
+
+                    g_avi_ctxt.has_audio = true;
+                    memcpy(pList_strl_a, pCur_list, sizeof(avi_list_t) + sizeof(avi_stream_hdr_box_t));
+                    memcpy(pStrf, (void*)((uint32_t)pStrm_hdr + pStrh->size), sizeof(avi_wave_fmt_ex_box_t));
+
+                    verified_size += (sizeof(avi_list_t) + sizeof(avi_stream_hdr_box_t) + sizeof(avi_bmp_info_hdr_box_t));
+                }
+                else
+                {
+                    // un-support type
+                }
+
+                pCur_list = (avi_list_t*)((uint32_t)pCur_list + 8 + pCur_list->size);
+
+            } while( ++stream_cnt < pMain_hdr->dwStreams );
+
+            pCur = (uint8_t*)pCur_list;
+        }
+
+        // update hdrl size
+        pList = &g_avi_ctxt.list_hdrl_box.list_hdrl;
+        pList->size = 4 + sizeof(avi_avih_t);
+        if( g_avi_ctxt.has_video )  pList->size += sizeof(avi_list_strl_vid_t);
+        if( g_avi_ctxt.has_audio )  pList->size += sizeof(avi_list_strl_aud_t);
+
+
+        {   // find movi list
+            avi_list_t      *pCur_list = &pAvi_comm_hdr->list_hdrl;
+
+            pList = &g_avi_ctxt.list_movi;
+
+            do {
+                if( pCur_list->tag_list != (uint32_t)AVI_FCC_LIST )
+                {
+                    // not avi list structure
+                    SET_LIST(pList, (uint32_t)AVI_FCC_MOVI);
+                    pList->size = 4;
+                    break;
+                }
+
+                if( pCur_list->fcc == (uint32_t)AVI_FCC_MOVI )
+                {
+                    memcpy(pList, pCur_list, sizeof(avi_list_t));
+                    break;
+                }
+
+                pCur_list = (avi_list_t*)((uint32_t)pCur_list + 8 + pCur_list->size);
+            } while(1);
+
+            verified_size += sizeof(avi_list_t);
+        }
+
+        {   // check data size alignment, add AVI_FCC_JUNK or not
+            uint32_t    alignment = (1 << align_pow2_num) - 1;
+            uint32_t    padding_size = alignment + 1 - (verified_size & alignment) - 8;
+
+            if( (g_avi_ctxt.has_junk = padding_size) )
+            {
+                avi_chunk_t     *pJunk = &g_avi_ctxt.junk;
+
+                pJunk->fcc  = (uint32_t)AVI_FCC_JUNK;
+                pJunk->size = padding_size;
+
+                verified_size += (sizeof(avi_chunk_t) + padding_size);
+            }
+        }
+
+        g_avi_ctxt.header_size    = verified_size;
+        g_avi_ctxt.is_initialized = true;
+    } while(0);
+
+    return rval;
+}
 
 
