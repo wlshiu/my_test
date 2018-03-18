@@ -40,6 +40,9 @@ typedef enum avi_media_track
 
 #define _assert(expression)  \
     ((void)((expression) ? 0 : printf("%s[%u] err '%s'\n", __func__, __LINE__, to_str(expression))))
+
+#define log_fcc(tagfcc) \
+    printf("%c%c%c%c\n", ((tagfcc) & 0xFF), ((tagfcc) & 0xFF00) >> 8, ((tagfcc) & 0xFF0000) >> 16, ((tagfcc) & 0xFF000000) >> 24);
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
@@ -415,7 +418,7 @@ avi_mux_reload_header(
     int     rval = 0;
 
     _assert(pHeader_buf != 0);
-    _assert(header_buf_len > 512);
+    _assert(header_buf_len >= 512);
 
     do {
         uint32_t            align_pow2_num = 0;
@@ -528,20 +531,29 @@ avi_mux_reload_header(
 
                     g_avi_ctxt.has_video = true;
                     memcpy(pList_strl_v, pCur_list, sizeof(avi_list_t) + sizeof(avi_stream_hdr_box_t));
+
+                    // update list size
+                    pList_strl_v->list_strl.size = sizeof(avi_list_strl_vid_t) - 8;
+
                     memcpy(pStrf, (void*)((uint32_t)pStrm_hdr + pStrh->size), sizeof(avi_bmp_info_hdr_box_t));
 
                     verified_size += (sizeof(avi_list_t) + sizeof(avi_stream_hdr_box_t) + sizeof(avi_bmp_info_hdr_box_t));
                 }
-                else if( pStrm_hdr->fccType != (uint32_t)AVI_FCC_AUDS )
+                else if( pStrm_hdr->fccType == (uint32_t)AVI_FCC_AUDS )
                 {
                     avi_wave_fmt_ex_box_t   *pStrf = &g_avi_ctxt.list_hdrl_box.list_strl_aud.strf;
                     avi_list_strl_aud_t     *pList_strl_a = &g_avi_ctxt.list_hdrl_box.list_strl_aud;
 
                     g_avi_ctxt.has_audio = true;
                     memcpy(pList_strl_a, pCur_list, sizeof(avi_list_t) + sizeof(avi_stream_hdr_box_t));
-                    memcpy(pStrf, (void*)((uint32_t)pStrm_hdr + pStrh->size), sizeof(avi_wave_fmt_ex_box_t));
 
-                    verified_size += (sizeof(avi_list_t) + sizeof(avi_stream_hdr_box_t) + sizeof(avi_bmp_info_hdr_box_t));
+                    // update list size
+                    pList_strl_a->list_strl.size = sizeof(avi_list_strl_aud_t) - 8;
+
+                    memcpy(pStrf, (void*)((uint32_t)pStrm_hdr + pStrh->size), sizeof(avi_wave_fmt_ex_box_t));
+                    pStrf->size = sizeof(avi_wave_fmt_ex_t);
+
+                    verified_size += (sizeof(avi_list_t) + sizeof(avi_stream_hdr_box_t) + sizeof(avi_wave_fmt_ex_box_t));
                 }
                 else
                 {
@@ -563,11 +575,21 @@ avi_mux_reload_header(
 
 
         {   // find movi list
+            #if 0
             avi_list_t      *pCur_list = &pAvi_comm_hdr->list_hdrl;
+            #else
+            avi_list_t      *pCur_list = (avi_list_t*)((uint32_t)pHeader_buf + sizeof(avi_riff_t));
+            #endif // 0
 
             pList = &g_avi_ctxt.list_movi;
 
             do {
+                if( pCur_list->tag_list == (uint32_t)AVI_FCC_JUNK )
+                {
+                    pCur_list = (avi_list_t*)((uint32_t)pCur_list + 8 + pCur_list->size);
+                    continue;
+                }
+
                 if( pCur_list->tag_list != (uint32_t)AVI_FCC_LIST )
                 {
                     // not avi list structure
@@ -583,6 +605,7 @@ avi_mux_reload_header(
                 }
 
                 pCur_list = (avi_list_t*)((uint32_t)pCur_list + 8 + pCur_list->size);
+
             } while(1);
 
             verified_size += sizeof(avi_list_t);

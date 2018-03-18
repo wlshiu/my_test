@@ -20,6 +20,29 @@ int main()
     avi_mux_reset_header(&vid_cfg, 0, 9);
 
     do {
+        FILE        *fin = 0;
+        uint32_t    file_size = 0;
+        uint8_t     buf[1 << 20] = {0};
+
+        if( !(fin = fopen("./test.avi", "r")) )
+        {
+            err("open %s fail \n", "./test.avi");
+            break;
+        }
+        fseek(fin, 0l, SEEK_END);
+        file_size = ftell(fin);
+        fseek(fin, 0l, SEEK_SET);
+
+        fread(buf, 1, file_size, fin);
+        fclose(fin);
+
+        avi_mux_reload_header(buf, file_size);
+
+    } while(0);
+
+    printf("\n");
+
+    do {
         uint8_t     buf[512] = {0};
         uint32_t    hdr_size = 512;
 
