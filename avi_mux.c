@@ -80,6 +80,9 @@ typedef struct avi_mux_ctxt
     bool                    has_video;
     bool                    has_audio;
 
+    uint32_t                has_junk;
+    avi_chunk_t             junk;
+
     uint32_t                header_size;
 } avi_mux_ctxt_t;
 //=============================================================================
@@ -98,12 +101,14 @@ int
 avi_mux_init_header(
     avi_video_cfg_t   *pVid_cfg,
     avi_audio_cfg_t   *pAud_cfg,
-    uint32_t          align_num)
+    uint32_t          align_pow2_num)
 {
     int     rval = 0;
 
     // reset header
     memset(&g_avi_ctxt, 0x0, sizeof(avi_mux_ctxt_t));
+
+    align_pow2_num = (align_pow2_num < 8) ? 8 : align_pow2_num;
 
     do {
         uint32_t            header_size = 0;
@@ -124,7 +129,7 @@ avi_mux_init_header(
             if( pVid_cfg )  pList->size += sizeof(avi_list_strl_vid_t);
             if( pAud_cfg )  pList->size += sizeof(avi_list_strl_aud_t);
 
-            header_size = sizeof(avi_riff_t) + 8 + pList->size + sizeof(g_avi_ctxt.list_movi);
+            header_size = sizeof(avi_riff_t) + 8 + pList->size;
 
             pAvih->tag_avih = (uint32_t)AVI_FCC_AVIH;
             pAvih->size     = sizeof(avi_main_hdr_t);
@@ -143,6 +148,8 @@ avi_mux_init_header(
 
                 pMain_hdr->dwWidth  = pVid_cfg->width;
                 pMain_hdr->dwHeight = pVid_cfg->height;
+
+                // TODO: update info after stopping
                 // pMain_hdr->dwTotalFrames = ;
 
                 pList = &pList_strl_vid->list_strl;
@@ -159,8 +166,11 @@ avi_mux_init_header(
                     pStrm_hdr->fccType = (uint32_t)AVI_FCC_VIDS;
                     pStrm_hdr->dwScale = 1;
                     pStrm_hdr->dwRate  = pVid_cfg->fps;
+
+                    // TODO: update info after stopping
                     // pStrm_hdr->dwLength = total frames
-                    if( pVid_cfg->vid_type == AVI_VID_MJPG )
+
+                    if( pVid_cfg->vcodec == AVI_CODEC_MJPG )
                     {
                         pStrm_hdr->fccHandler = (uint32_t)AVI_FCC_MJPG;
                     }
@@ -180,7 +190,7 @@ avi_mux_init_header(
                     pBmp_info->biBitCount       = 24;
                     // pBmp_info->biSizeImage      =
 
-                    if( pVid_cfg->vid_type == AVI_VID_MJPG )
+                    if( pVid_cfg->vcodec == AVI_CODEC_MJPG )
                     {
                         pBmp_info->biCompression = BI_JPEG;
                     }
@@ -220,14 +230,25 @@ avi_mux_init_header(
 
         }
 
-        {   // check data size alignment
-            // add AVI_FCC_JUNK or not
-
-            // header_size += ailgnment JUNK size
-        }
-
         pList = &g_avi_ctxt.list_movi;
         SET_LIST(pList, (uint32_t)AVI_FCC_MOVI);
+
+        header_size += sizeof(avi_list_t);
+
+        {   // check data size alignment, add AVI_FCC_JUNK or not
+            uint32_t    alignment = (1 << align_pow2_num) - 1;
+            uint32_t    padding_size = alignment + 1 - (header_size & alignment) - 8;
+
+            if( (g_avi_ctxt.has_junk = padding_size) )
+            {
+                avi_chunk_t     *pJunk = &g_avi_ctxt.junk;
+
+                pJunk->fcc  = (uint32_t)AVI_FCC_JUNK;
+                pJunk->size = padding_size;
+
+                header_size += (sizeof(avi_chunk_t) + padding_size);
+            }
+        }
 
         pRiff->size = header_size - 8;
         g_avi_ctxt.header_size = header_size;
@@ -243,6 +264,26 @@ int
 avi_update_info(uint32_t file_size, uint32_t total_vframe)
 {
     return 0;
+}
+
+int
+avi_add_frame(
+    avi_frm_type_t  frm_type,
+    uint32_t        frm_len)
+{
+    int         rval = 0;
+
+    // callback to write frame ???
+
+    if( frm_type == AVI_FRM_VIDEO )
+    {   // video frame AVI_FCC_00DC
+
+    }
+    else
+    {   // audio frame AVI_FCC_00WB
+
+    }
+    return rval;
 }
 
 uint32_t
@@ -298,10 +339,18 @@ avi_mux_get_header(
             }
         }
 
-        // memcpy(pCur, JUNK, alignment);
+        if( g_avi_ctxt.has_junk )
+        {
+            memcpy(pCur, &g_avi_ctxt.junk, sizeof(avi_chunk_t));
+            pCur += sizeof(avi_chunk_t);
 
-        g_avi_ctxt.list_movi.size = 10;
+            memset(pCur, 0xAA, g_avi_ctxt.junk.size);
+            pCur += g_avi_ctxt.junk.size;
+        }
+
+        g_avi_ctxt.list_movi.size = 4;
         memcpy(pCur, &g_avi_ctxt.list_movi, sizeof(avi_list_t));
+        pCur += sizeof(avi_list_t);
 
         *pHeader_buf_len = pCur - pHeader_buf;
         rval = 0;

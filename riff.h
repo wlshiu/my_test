@@ -52,7 +52,11 @@ extern "C" {
 #define AVI_FCC_JUNK        _FOURCC('J', 'U', 'N', 'K') //"KNUJ"
 #define AVI_FCC_FACT        _FOURCC('f', 'a', 'c', 't') //"tcaf"
 #define AVI_FCC_DATA        _FOURCC('d', 'a', 't', 'a') //"atad"
+
+#define AVI_FCC_IDX1        _FOURCC('i', 'd', 'x', '1') //"1xdi"
 #define AVI_FCC_00DC        _FOURCC('0', '0', 'd', 'c') //"cd00"
+#define AVI_FCC_00WB        _FOURCC('0', '0', 'w', 'b') //"bw00"
+#define AVI_FCC_01DC        _FOURCC('0', '1', 'd', 'c') //"cd10"
 #define AVI_FCC_01WB        _FOURCC('0', '1', 'w', 'b') //"bw10"
 
 #define AVI_FCC_INDX        _FOURCC('i', 'n', 'd', 'x') //"xdni"
@@ -94,7 +98,7 @@ typedef struct avi_chunk
 {
     uint32_t    fcc;
     uint32_t    size;
-    //  BYTE* data; // dwSize in length
+
 } avi_chunk_t;
 
 typedef struct avi_list
@@ -233,6 +237,15 @@ typedef struct avi_wave_fmt_ex_box
 /**
  *  Index
  */
+typedef struct avi_idx_entry
+{
+    uint32_t    ckid;
+    uint32_t    dwFlags;
+    uint32_t    dwChunkOffset;
+    uint32_t    dwChunkLength;
+
+} avi_idx_entry_t;
+
 typedef struct avi_super_idx_entry
 {
     uint32_t        wOffset;

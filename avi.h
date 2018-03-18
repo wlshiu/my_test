@@ -21,19 +21,22 @@ extern "C" {
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-typedef enum avi_vid
+typedef enum avi_codec
 {
-    AVI_VID_NONE    = 0,
-    AVI_VID_MJPG,
+    AVI_CODEC_NONE    = 0,
+    AVI_CODEC_MJPG,
+    AVI_CODEC_PCM,
 
-} avi_vid_t;
+} avi_codec_t;
 
-typedef enum avi_aud
+typedef enum avi_frm_type
 {
-    AVI_AUD_NONE    = 0,
-    AVI_AUD_PCM,
+    AVI_FRM_UNKNOWN     = 0,
+    AVI_FRM_VIDEO,
+    AVI_FRM_AUDIO,
 
-} avi_aud_t;
+} avi_frm_type_t;
+
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -44,7 +47,7 @@ typedef enum avi_aud
 
 typedef struct avi_video_cfg
 {
-    avi_vid_t       vid_type;
+    avi_codec_t     vcodec;
     uint32_t        width;
     uint32_t        height;
     uint32_t        fps;
@@ -54,7 +57,7 @@ typedef struct avi_video_cfg
 
 typedef struct avi_audio_cfg
 {
-    avi_aud_t       aud_type;
+    avi_codec_t     acodec;
     uint32_t        sample_rate;
 
 } avi_audio_cfg_t;
@@ -88,7 +91,7 @@ int
 avi_mux_init_header(
     avi_video_cfg_t   *pVid_cfg,
     avi_audio_cfg_t   *pAud_cfg,
-    uint32_t          align_num);
+    uint32_t          align_pow2_num);
 
 
 
