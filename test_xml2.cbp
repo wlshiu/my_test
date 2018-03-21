@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_xml2" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_xml2" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DWIN32_LEAN_AND_MEAN" />
+					<Add directory="inc" />
+					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/include" />
+				</Compiler>
+				<Linker>
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libpthread.a" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_xml2" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/DOCBparser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/HTMLparser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/HTMLtree.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/SAX.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/SAX2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/buf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/c14n.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/catalog.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/chvalid.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/debugXML.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/dict.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/encoding.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/entities.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/error.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/globals.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/hash.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/legacy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/list.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/nanoftp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/nanohttp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/parser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/parserInternals.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/pattern.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/relaxng.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/schematron.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/threads.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/tree.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/uri.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/valid.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xinclude.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xlink.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xmlIO.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xmlmemory.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xmlmodule.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xmlreader.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xmlregexp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xmlsave.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xmlschemas.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xmlschemastypes.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xmlstring.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xmlunicode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xmlwriter.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xpath.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="xml2/xpointer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
