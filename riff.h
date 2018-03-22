@@ -55,6 +55,7 @@ extern "C" {
 
 #define AVI_FCC_IDX1        _FOURCC('i', 'd', 'x', '1') //"1xdi"
 #define AVI_FCC_00DC        _FOURCC('0', '0', 'd', 'c') //"cd00"
+#define AVI_FCC_00DB        _FOURCC('0', '0', 'd', 'b') //"bd00"
 #define AVI_FCC_00WB        _FOURCC('0', '0', 'w', 'b') //"bw00"
 #define AVI_FCC_01DC        _FOURCC('0', '1', 'd', 'c') //"cd10"
 #define AVI_FCC_01WB        _FOURCC('0', '1', 'w', 'b') //"bw10"

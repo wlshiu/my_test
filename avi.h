@@ -67,8 +67,29 @@ typedef struct avi_update_info
     uint32_t    total_frames;
     uint32_t    total_file_size;
 
-    uint32_t    media_data_size;  // movi data size (audio + video data)
+    uint32_t    media_data_size;  // media data size (audio + video data)
 } avi_update_info_t;
+
+
+typedef struct avi_media_info
+{
+    avi_codec_t     codec;
+
+    union {
+        struct {
+            uint32_t        fps;
+        } vid;
+
+        struct {
+            uint32_t        sample_rate;
+        } aud;
+    };
+
+
+} avi_media_info_t;
+
+typedef int (*CB_AVI_COMPLETE_ONE_FRAME)();
+typedef int (*CB_AVI_FILL_BUF)(uint8_t *pBuf, uint32_t *pLen, void *p);
 
 /**
  *  I/O handler
@@ -102,6 +123,14 @@ avi_mux_reset_header(
     uint32_t          align_pow2_num);
 
 
+int
+avi_mux_update_info(
+    avi_update_info_t   *pUpdate_info);
+
+
+uint32_t
+avi_mux_get_header_size(void);
+
 
 int
 avi_mux_gen_header(
@@ -110,9 +139,10 @@ avi_mux_gen_header(
 
 
 int
-avi_mux_reload_header(
+avi_parse_header(
     uint32_t    *pHeader_buf,
-    uint32_t    header_buf_len);
+    uint32_t    header_buf_len,
+    uint32_t    *pMovi_offset);
 
 
 

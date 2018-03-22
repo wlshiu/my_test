@@ -34,10 +34,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="avi.h" />
-		<Unit filename="avi_mux.c">
+		<Unit filename="avi.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="avi.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
