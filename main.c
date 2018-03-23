@@ -41,7 +41,8 @@ typedef struct chunk
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
-static uint8_t     g_bs_buf[BUF_VFRAME_MAX] = {0};
+static uint8_t      g_bs_buf[BUF_VFRAME_MAX] = {0};
+static uint32_t     g_avi_braking = 1;
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -286,10 +287,10 @@ _test_mux(
 
                 *((uint32_t*)g_bs_buf + 1) = bs_buf_len;
 
-                if( bs_buf_len & 0x1 )
+                if( bs_buf_len & 0x3 )
                 {
-                    g_bs_buf[8 + bs_buf_len] = 0;
-                    bs_buf_len += 1;
+                    memset(&g_bs_buf[8 + bs_buf_len], 0, bs_buf_len & 0x3);
+                    bs_buf_len += (bs_buf_len & 0x3);
                 }
 
                 fwrite(g_bs_buf, 1, bs_buf_len + 8, fout);
@@ -308,11 +309,13 @@ _test_mux(
 
                 *((uint32_t*)g_bs_buf + 1) = bs_buf_len;
 
+                #if 0
                 if( bs_buf_len & 0x1 )
                 {
                     g_bs_buf[8 + bs_buf_len] = 0;
-                    bs_buf_len += 1;
+                    bs_buf_len += (bs_buf_len & 0x1);
                 }
+                #endif // 0
 
                 fwrite(g_bs_buf, 1, bs_buf_len + 8, fout);
 
@@ -349,6 +352,39 @@ _test_mux(
     return;
 }
 
+
+static int
+_misc_proc(
+    avi_ctrl_info_t     *pCtrl_info)
+{
+    FILE        *fin = *(FILE**)pCtrl_info->pPrivate_data;
+    printf("fin= x%x\n", (uint32_t)fin);
+    return 0;
+}
+
+
+static int
+_fill_buf(
+    avi_ctrl_info_t     *pCtrl_info,
+    uint8_t             *pBuf,
+    uint32_t            *pLen)
+{
+    FILE        *fin = *(FILE**)pCtrl_info->pPrivate_data;
+    printf("fin= x%x\n", (uint32_t)fin);
+    return 0;
+}
+
+
+static int
+_frame_state(
+    avi_ctrl_info_t     *pCtrl_info,
+    avi_media_info_t    *pMedia_info,
+    avi_frame_info_t    frm_info)
+{
+
+    return 0;
+}
+
 static void
 _test_demux(
     char    *pFile_path)
@@ -377,8 +413,15 @@ _test_demux(
         // fill bs buffer
         fseek(fin, media_data_offset, SEEK_SET);
 
+        {
+            avi_ctrl_info_t     ctrl_info = {0};
 
-//        _decode_one_vframe();
+            ctrl_info.pPrivate_data     = &fin;
+            ctrl_info.cb_frame_state    = _frame_state;
+            ctrl_info.cb_fill_buf       = _fill_buf;
+            ctrl_info.cb_misc_proc      = _misc_proc;
+            avi_demux_media_data(&ctrl_info, &g_avi_braking);
+        }
 
     } while(0);
 

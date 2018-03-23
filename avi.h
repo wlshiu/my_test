@@ -18,6 +18,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -36,6 +37,14 @@ typedef enum avi_frm_type
     AVI_FRM_AUDIO,
 
 } avi_frm_type_t;
+
+typedef enum avi_frame_state
+{
+    AVI_FRAME_NONE       = 0,
+    AVI_FRAME_PARTIAL,
+    AVI_FRAME_END,
+
+} avi_frame_state_t;
 
 //=============================================================================
 //                  Macro Definition
@@ -77,7 +86,7 @@ typedef struct avi_media_info
 
     union {
         struct {
-            uint32_t        fps;
+            float           fps;
         } vid;
 
         struct {
@@ -88,8 +97,71 @@ typedef struct avi_media_info
 
 } avi_media_info_t;
 
-typedef int (*CB_AVI_COMPLETE_ONE_FRAME)();
-typedef int (*CB_AVI_FILL_BUF)(uint8_t *pBuf, uint32_t *pLen, void *p);
+typedef struct avi_frame_info
+{
+    avi_frame_state_t   frm_state;
+    uint8_t             *pFrame_addr;
+    int                 frame_len;
+
+} avi_frame_info_t;
+
+struct avi_ctrl_info;
+
+/**
+ *  \brief  CB_MISC_PROC
+ *
+ *  \param [in] pCtrl_info      pass control info from avi_demux_media_data()
+ *  \return                     0: ok, other: leave braking in avi_demux_media_data() and return from avi_demux_media_data()
+ *
+ *  \details
+ *      Because avi_demux_media_data() will brake flow, use callback to do something which user wants.
+ */
+typedef int (*CB_MISC_PROC)(struct avi_ctrl_info *pCtrl_info);
+
+/**
+ *  \brief  CB_FILL_BUF
+ *
+ *  \param [in] pCtrl_info      pass control info from avi_demux_media_data()
+ *  \param [in] pBuf            the buffer address which need to fill
+ *  \param [in] pLen            the length of buffer and user need to re-assign the real length of filling
+ *  \return                     0: ok, other: leave braking in avi_demux_media_data() and return from avi_demux_media_data()
+ *
+ *  \details
+ */
+typedef int (*CB_FILL_BUF)(struct avi_ctrl_info *pCtrl_info, uint8_t *pBuf, uint32_t *pLen);
+
+/**
+ *  \brief  CB_FRAME_STATE
+ *
+ *  \param [in] pCtrl_info      pass control info from avi_demux_media_data()
+ *  \param [in] pMedia_info     the media info of current avi file
+ *  \param [in] frm_info        current frame parsing info
+ *                                  frame state:
+ *                                      AVI_FRAME_NONE      => no frame
+ *                                      AVI_FRAME_PARTIAL   => get parts of a frame
+ *                                      AVI_FRAME_END       => the last part of a frame
+ *
+ *  \return                     0: ok, other: leave braking in avi_demux_media_data() and return from avi_demux_media_data()
+ *
+ *  \details
+ */
+typedef int (*CB_FRAME_STATE)(struct avi_ctrl_info *pCtrl_info, avi_media_info_t *pMedia_info, avi_frame_info_t *pFrm_info);
+
+typedef struct avi_ctrl_info
+{
+    CB_MISC_PROC        cb_misc_proc;
+    CB_FRAME_STATE      cb_frame_state;
+    CB_FILL_BUF         cb_fill_buf;
+
+    // TODO: Need to give a suggest value (more than 1 frame size)
+    uint8_t             *pRing_buf;
+    int                 ring_buf_size;
+
+    void    *pPrivate_data;
+
+} avi_ctrl_info_t;
+
+
 
 /**
  *  I/O handler
@@ -144,6 +216,11 @@ avi_parse_header(
     uint32_t    header_buf_len,
     uint32_t    *pMovi_offset);
 
+
+int
+avi_demux_media_data(
+    avi_ctrl_info_t     *pCtrl_info,
+    uint32_t            *pIs_braking);
 
 
 #ifdef __cplusplus
