@@ -357,8 +357,6 @@ static int
 _misc_proc(
     avi_ctrl_info_t     *pCtrl_info)
 {
-    FILE        *fin = *(FILE**)pCtrl_info->pPrivate_data;
-    printf("fin= x%x\n", (uint32_t)fin);
     return 0;
 }
 
@@ -369,9 +367,13 @@ _fill_buf(
     uint8_t             *pBuf,
     uint32_t            *pLen)
 {
+    int         rval = 0;
     FILE        *fin = *(FILE**)pCtrl_info->pPrivate_data;
-    printf("fin= x%x\n", (uint32_t)fin);
-    return 0;
+
+    rval = fread(pBuf, 1, *pLen, fin);
+    *pLen = rval;
+
+    return feof(fin) ? 1 : 0;
 }
 
 
@@ -379,8 +381,49 @@ static int
 _frame_state(
     avi_ctrl_info_t     *pCtrl_info,
     avi_media_info_t    *pMedia_info,
-    avi_frame_info_t    frm_info)
+    avi_frame_info_t    *pFrm_info)
 {
+    static int      total_size = 0;
+
+    static int      i = 0;
+    static FILE     *fdump = 0;
+
+#if 0
+    if( !fdump )
+    {
+        char    name[64] = {0};
+        snprintf(name, 64, "%02d.jpg", i++);
+        fdump = fopen(name, "wb");
+    }
+#endif // 0
+
+    if( pFrm_info->frm_state == AVI_FRAME_PARTIAL )
+    {
+        if( fdump )
+            fwrite(pFrm_info->pFrame_addr, 1, pFrm_info->frame_len, fdump);
+
+//        printf("offset = x%04X: %02X %02X %02X %02X\n",
+//               total_size,
+//               pFrm_info->pFrame_addr[0],
+//               pFrm_info->pFrame_addr[1],
+//               pFrm_info->pFrame_addr[2],
+//               pFrm_info->pFrame_addr[3]);
+
+        total_size += pFrm_info->frame_len;
+    }
+    else if( pFrm_info->frm_state == AVI_FRAME_END )
+    {
+        if( fdump )
+        {
+            fwrite(pFrm_info->pFrame_addr, 1, pFrm_info->frame_len, fdump);
+            fclose(fdump);
+            fdump = 0;
+        }
+
+        total_size +=pFrm_info->frame_len;
+        printf("end = %d, total = x%x\n", pFrm_info->frame_len, total_size);
+    }
+
 
     return 0;
 }
@@ -397,6 +440,7 @@ _test_demux(
         uint32_t    bs_buf_len = BUF_VFRAME_MAX;
         uint32_t    section_len = AVI_CACHE_SIZE;
         uint32_t    media_data_offset = 0;
+        uint32_t    movi_data_len = 0;
 
         if( !(fin = fopen(pFile_path, "rb")) )
         {
@@ -420,6 +464,8 @@ _test_demux(
             ctrl_info.cb_frame_state    = _frame_state;
             ctrl_info.cb_fill_buf       = _fill_buf;
             ctrl_info.cb_misc_proc      = _misc_proc;
+            ctrl_info.pRing_buf         = g_bs_buf;
+            ctrl_info.ring_buf_size     = 1 << 10; //BUF_VFRAME_MAX;
             avi_demux_media_data(&ctrl_info, &g_avi_braking);
         }
 

@@ -57,8 +57,7 @@ typedef enum avi_media_track
  */
 typedef struct rb_opt
 {
-    uint32_t    r_ptr[RB_OPT_SUPPORT_NUM];
-    uint32_t    w_ptr;
+    uint32_t    pCur;
     uint32_t    start_ptr;
     uint32_t    end_ptr;
 } rb_opt_t;
@@ -149,11 +148,7 @@ _rb_opt_init(
     uint32_t    start_ptr,
     uint32_t    buf_size)
 {
-    int     i = 0;
-    for(i = 0; i < RB_OPT_SUPPORT_NUM; i++)
-        pRb_opt->r_ptr[i] = start_ptr;
-
-    pRb_opt->w_ptr     = start_ptr;
+    pRb_opt->pCur      = start_ptr;
     pRb_opt->start_ptr = start_ptr;
     pRb_opt->end_ptr   = start_ptr + buf_size;
     return 0;
@@ -689,7 +684,7 @@ avi_parse_header(
         g_avi_ctxt.header_size    = verified_size;
         g_avi_ctxt.is_initialized = true;
 
-        if( pMovi_offset )     *pMovi_offset = movi_offset;
+        if( pMovi_offset )      *pMovi_offset = movi_offset;
 
     } while(0);
 
@@ -702,6 +697,7 @@ avi_demux_media_data(
     avi_ctrl_info_t     *pCtrl_info,
     uint32_t            *pIs_braking)
 {
+#define BUF_RELOAD_THRESHOLD        64
     int                 rval = 0;
     int                 remain_buf_size = 0;
     int                 frame_size = 0;
@@ -731,6 +727,10 @@ avi_demux_media_data(
     _assert(cb_fill_buf != 0);
 
     remain_buf_size = pCtrl_info->ring_buf_size;
+    if( (rval = cb_fill_buf(pCtrl_info, pCtrl_info->pRing_buf, &remain_buf_size)) )
+        return rval;
+
+    _rb_opt_init(&rb_opt, pCtrl_info->pRing_buf, remain_buf_size);
 
     while( *pIs_braking )
     {
@@ -740,27 +740,32 @@ avi_demux_media_data(
                 break;
         }
 
-        if( remain_buf_size == 0 )
+        if( remain_buf_size && remain_buf_size <= BUF_RELOAD_THRESHOLD )
         {
-            remain_buf_size = pCtrl_info->ring_buf_size - 8;
-            if( (rval = cb_fill_buf(pCtrl_info, pCtrl_info->pRing_buf, &remain_buf_size)) )
+            uint32_t    offset = remain_buf_size;
+            // TODO: start position in ring buffer needs to check alignment
+            memcpy(pCtrl_info->pRing_buf, rb_opt.pCur, remain_buf_size);
+            remain_buf_size = pCtrl_info->ring_buf_size - remain_buf_size;
+            if( (rval = cb_fill_buf(pCtrl_info, pCtrl_info->pRing_buf + offset, &remain_buf_size)) )
                 break;
 
-            _rb_opt_init(&rb_opt, pCtrl_info->pRing_buf + 8, remain_buf_size);
+            remain_buf_size += offset;
+            // TODO: start position in ring buffer needs to check alignment
+            _rb_opt_init(&rb_opt, pCtrl_info->pRing_buf, remain_buf_size);
         }
 
         if( cb_frame_state )
         {
-            uint8_t             *pCur = (uint8_t*)rb_opt.start_ptr;
+            uint8_t             *pCur = (uint8_t*)rb_opt.pCur;
             avi_frame_info_t    frame_info = {.frm_state = AVI_FRAME_NONE,};
 
-            // TODO: parsing data in ring buf
             if( frame_size == 0 )
             {
-                uint32_t    end = rb_opt.end_ptr - 8;
+                uint32_t    is_data_end = 0;
+                uint32_t    end = rb_opt.end_ptr - BUF_RELOAD_THRESHOLD;
                 while( (uint32_t)pCur < end )
                 {
-                    #define GET_4BYTES(a, b, c, d)         (((a)) | ((b) << 8) | ((c) << 24) | ((d) << 24))
+                    #define GET_4BYTES(a, b, c, d)         (((a)) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 
                     uint32_t    tag = GET_4BYTES(pCur[0], pCur[1], pCur[2], pCur[3]);
 
@@ -773,35 +778,53 @@ avi_demux_media_data(
                     }
                     else if( tag == (uint32_t)AVI_FCC_01WB || tag == (uint32_t)AVI_FCC_00WB )
                     {
+                        // TODO: assign audio info, e.g. simple rate, ...etc.
                         media_info.codec = AVI_CODEC_PCM;
                         frame_size = GET_4BYTES(pCur[4], pCur[5], pCur[6], pCur[7]);
+                        break;
+                    }
+                    else if( tag == (uint32_t)AVI_FCC_INDX || tag == (uint32_t)AVI_FCC_IDX1 )
+                    {
+                        is_data_end = 1;
                         break;
                     }
 
                     pCur++;
                 }
 
-                if( frame_size == 0 )       continue;
+                if( frame_size == 0 )
+                {
+                    if( pCur != end )   pCur += 8;
+                    if( is_data_end )   break;
+
+                    remain_buf_size = rb_opt.end_ptr - (uint32_t)pCur;
+                    rb_opt.pCur = (uint32_t)pCur;
+                    continue;
+                }
 
                 pCur += 8;
                 remain_buf_size = rb_opt.end_ptr - (uint32_t)pCur;
+                rb_opt.pCur = (uint32_t)pCur;
+
+                if( remain_buf_size <= BUF_RELOAD_THRESHOLD )
+                    continue;
             }
 
 
+            frame_info.pFrame_addr = rb_opt.pCur;
+            frame_info.frame_len   = (frame_size < (remain_buf_size - BUF_RELOAD_THRESHOLD)) ? frame_size : (remain_buf_size - BUF_RELOAD_THRESHOLD);
 
-            frame_info.pFrame_addr = pCur;
-            frame_info.frame_len   = (frame_size < remain_buf_size) ? frame_size : remain_buf_size;
-
+            // calculate remain_buf_size and frame_size relation
             remain_buf_size -= frame_info.frame_len;
             frame_size -= frame_info.frame_len;
 
-
             frame_info.frm_state = (frame_size) ? AVI_FRAME_PARTIAL : AVI_FRAME_END;
+            rb_opt.pCur += frame_info.frame_len;
 
-            // TODO: calculate remain_buf_size and frame_size relation
-
+            // TODO: if it should be alignment (2/4/8/16)
             if( (rval = cb_frame_state(pCtrl_info, &media_info, &frame_info)) )
                 break;
+
         }
     }
 

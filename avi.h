@@ -153,6 +153,8 @@ typedef struct avi_ctrl_info
     CB_FRAME_STATE      cb_frame_state;
     CB_FILL_BUF         cb_fill_buf;
 
+    uint32_t            movi_data_len;
+
     // TODO: Need to give a suggest value (more than 1 frame size)
     uint8_t             *pRing_buf;
     int                 ring_buf_size;
