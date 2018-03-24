@@ -285,13 +285,14 @@ _test_mux(
                 rval = _encode_one_vframe(pFrm_buf, frm_buf_len, &g_bs_buf[8], &bs_buf_len);
                 if( rval )  break;
 
-                *((uint32_t*)g_bs_buf + 1) = bs_buf_len;
-
                 if( bs_buf_len & 0x3 )
                 {
-                    memset(&g_bs_buf[8 + bs_buf_len], 0, bs_buf_len & 0x3);
-                    bs_buf_len += (bs_buf_len & 0x3);
+                    uint32_t    padding = 4 - (bs_buf_len & 0x3);
+                    memset(&g_bs_buf[8 + bs_buf_len], 0, padding);
+                    bs_buf_len += padding;
                 }
+
+                *((uint32_t*)g_bs_buf + 1) = bs_buf_len;
 
                 fwrite(g_bs_buf, 1, bs_buf_len + 8, fout);
 
@@ -307,8 +308,6 @@ _test_mux(
                 rval = _encode_one_aframe(pFrm_buf, frm_buf_len, &g_bs_buf[8], &bs_buf_len);
                 if( rval )  break;
 
-                *((uint32_t*)g_bs_buf + 1) = bs_buf_len;
-
                 #if 0
                 if( bs_buf_len & 0x1 )
                 {
@@ -316,6 +315,8 @@ _test_mux(
                     bs_buf_len += (bs_buf_len & 0x1);
                 }
                 #endif // 0
+
+                *((uint32_t*)g_bs_buf + 1) = bs_buf_len;
 
                 fwrite(g_bs_buf, 1, bs_buf_len + 8, fout);
 
@@ -384,17 +385,24 @@ _frame_state(
     avi_frame_info_t    *pFrm_info)
 {
     static int      total_size = 0;
-
-    static int      i = 0;
     static FILE     *fdump = 0;
-
 #if 0
+    static int      i = 0;
+
     if( !fdump )
     {
         char    name[64] = {0};
         snprintf(name, 64, "%02d.jpg", i++);
         fdump = fopen(name, "wb");
     }
+#endif // 0
+
+#if 0
+    if( pFrm_info->frame_len & 0x3 )
+        printf("len align: %d\n", pFrm_info->frame_len & 0x3);
+
+    if( (uint32_t)pFrm_info->pFrame_addr & 0x3 )
+        printf("addr align: %d\n", (uint32_t)pFrm_info->pFrame_addr & 0x3);
 #endif // 0
 
     if( pFrm_info->frm_state == AVI_FRAME_PARTIAL )
@@ -420,8 +428,8 @@ _frame_state(
             fdump = 0;
         }
 
-        total_size +=pFrm_info->frame_len;
-        printf("end = %d, total = x%x\n", pFrm_info->frame_len, total_size);
+        total_size += pFrm_info->frame_len;
+//        printf("end = %d, total = x%x\n", pFrm_info->frame_len, total_size);
     }
 
 
@@ -482,8 +490,8 @@ _test_demux(
 int main()
 {
     char    *name = "./out.avi";
-    // _test_mux(name);
-    _test_demux("./test.avi");
+    _test_mux(name);
+    _test_demux(name);
 
     return 0;
 }
