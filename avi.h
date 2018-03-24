@@ -6,7 +6,7 @@
  * @author Wei-Lun Hsu
  * @version 0.1
  * @date 2018/03/16
- * @license
+ * @license GNU GENERAL PUBLIC LICENSE Version 3
  * @description
  */
 
@@ -71,6 +71,9 @@ typedef struct avi_audio_cfg
 
 } avi_audio_cfg_t;
 
+/**
+ *  update info
+ */
 typedef struct avi_update_info
 {
     uint32_t    total_frames;
@@ -79,7 +82,9 @@ typedef struct avi_update_info
     uint32_t    media_data_size;  // media data size (audio + video data)
 } avi_update_info_t;
 
-
+/**
+ *  media info (it MUST parse header first)
+ */
 typedef struct avi_media_info
 {
     avi_codec_t     codec;
@@ -97,6 +102,9 @@ typedef struct avi_media_info
 
 } avi_media_info_t;
 
+/**
+ *  frame info
+ */
 typedef struct avi_frame_info
 {
     avi_frame_state_t   frm_state;
@@ -105,7 +113,32 @@ typedef struct avi_frame_info
 
 } avi_frame_info_t;
 
-struct avi_ctrl_info;
+struct avi_mux_ctrl_info;
+typedef int (*CB_ENCODE_ONE_FRAME)(struct avi_mux_ctrl_info *pCtrl_info,
+                                    uint8_t *pFrm_buf, uint32_t frm_buf_len,
+                                    uint8_t *pBS_buf, uint32_t *pBS_len);
+
+typedef int (*CB_EMPTY_BUF)(struct avi_mux_ctrl_info *pCtrl_info, uint8_t *pBS_buf, uint32_t len);
+
+typedef struct avi_mux_ctrl_info
+{
+    avi_frm_type_t          frm_type;
+
+    CB_ENCODE_ONE_FRAME     cb_enc_one_frame;
+    CB_EMPTY_BUF            cb_empty_buf;
+
+    // record bit stream length after encoding
+    uint32_t        bs_len;
+
+    // Need to estimate bitstream size of a frame
+    uint8_t         *pBS_buf;
+
+
+    void    *pPrivate_data;
+
+} avi_mux_ctrl_info_t;
+
+struct avi_demux_ctrl_info;
 
 /**
  *  \brief  CB_MISC_PROC
@@ -116,7 +149,7 @@ struct avi_ctrl_info;
  *  \details
  *      Because avi_demux_media_data() will brake flow, use callback to do something which user wants.
  */
-typedef int (*CB_MISC_PROC)(struct avi_ctrl_info *pCtrl_info);
+typedef int (*CB_MISC_PROC)(struct avi_demux_ctrl_info *pCtrl_info);
 
 /**
  *  \brief  CB_FILL_BUF
@@ -128,7 +161,7 @@ typedef int (*CB_MISC_PROC)(struct avi_ctrl_info *pCtrl_info);
  *
  *  \details
  */
-typedef int (*CB_FILL_BUF)(struct avi_ctrl_info *pCtrl_info, uint8_t *pBuf, uint32_t *pLen);
+typedef int (*CB_FILL_BUF)(struct avi_demux_ctrl_info *pCtrl_info, uint8_t *pBuf, uint32_t *pLen);
 
 /**
  *  \brief  CB_FRAME_STATE
@@ -145,9 +178,9 @@ typedef int (*CB_FILL_BUF)(struct avi_ctrl_info *pCtrl_info, uint8_t *pBuf, uint
  *
  *  \details
  */
-typedef int (*CB_FRAME_STATE)(struct avi_ctrl_info *pCtrl_info, avi_media_info_t *pMedia_info, avi_frame_info_t *pFrm_info);
+typedef int (*CB_FRAME_STATE)(struct avi_demux_ctrl_info *pCtrl_info, avi_media_info_t *pMedia_info, avi_frame_info_t *pFrm_info);
 
-typedef struct avi_ctrl_info
+typedef struct avi_demux_ctrl_info
 {
     CB_MISC_PROC        cb_misc_proc;
     CB_FRAME_STATE      cb_frame_state;
@@ -161,7 +194,7 @@ typedef struct avi_ctrl_info
 
     void    *pPrivate_data;
 
-} avi_ctrl_info_t;
+} avi_demux_ctrl_info_t;
 
 
 
@@ -196,22 +229,64 @@ avi_mux_reset_header(
     avi_audio_cfg_t   *pAud_cfg,
     uint32_t          align_pow2_num);
 
-
+/**
+ *  \brief  update info to avi header
+ *
+ *  \param [in] pUpdate_info    info for updating
+ *  \return                     0: ok, other: fail
+ *
+ *  \details
+ */
 int
 avi_mux_update_info(
     avi_update_info_t   *pUpdate_info);
 
 
+int
+avi_mux_one_frame(
+    avi_mux_ctrl_info_t     *pCtrl_info,
+    uint8_t                 *pFrm_buf,
+    uint32_t                frm_buf_len,
+    avi_frame_state_t       frm_state);
+
+
+/**
+ *  \brief  get avi header length
+ *
+ *  \return     length
+ *
+ *  \details
+ */
 uint32_t
 avi_mux_get_header_size(void);
 
 
+/**
+ *  \brief  generate binary of avi header
+ *
+ *  \param [in] pHeader_buf         output buffer for binary
+ *  \param [in] pHeader_buf_len     valid length in pHeader_buf
+ *  \return                         0: ok, other: fail
+ *
+ *  \details
+ */
 int
 avi_mux_gen_header(
     uint8_t     *pHeader_buf,
     uint32_t    *pHeader_buf_len);
 
 
+/**
+ *  \brief  parsing avi header
+ *
+ *  \param [in] pHeader_buf         binary data of avi
+ *                                      ps. all header MUST in this buffer besides movi data
+ *  \param [in] header_buf_len      valid length in pHeader_buf
+ *  \param [in] pMovi_offset        report movi data offset
+ *  \return                         0: ok, other: fail
+ *
+ *  \details
+ */
 int
 avi_parse_header(
     uint32_t    *pHeader_buf,
@@ -219,10 +294,19 @@ avi_parse_header(
     uint32_t    *pMovi_offset);
 
 
+/**
+ *  \brief  demux media data
+ *
+ *  \param [in] pCtrl_info      demux control info
+ *  \param [in] pIs_braking     braking this function or not
+ *  \return                     0: ok, other: fail
+ *
+ *  \details
+ */
 int
 avi_demux_media_data(
-    avi_ctrl_info_t     *pCtrl_info,
-    uint32_t            *pIs_braking);
+    avi_demux_ctrl_info_t   *pCtrl_info,
+    uint32_t                *pIs_braking);
 
 
 #ifdef __cplusplus

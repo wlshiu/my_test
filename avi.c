@@ -6,7 +6,7 @@
  * @author Wei-Lun Hsu
  * @version 0.1
  * @date 2018/03/16
- * @license
+ * @license GNU GENERAL PUBLIC LICENSE Version 3
  * @description
  */
 
@@ -348,23 +348,67 @@ avi_mux_update_info(
 }
 
 int
-avi_mux_add_frame(
-    avi_frm_type_t  frm_type,
-    uint8_t         *pFrm_buf,
-    uint32_t        frm_len)
+avi_mux_one_frame(
+    avi_mux_ctrl_info_t     *pCtrl_info,
+    uint8_t                 *pFrm_buf,
+    uint32_t                frm_buf_len,
+    avi_frame_state_t       frm_state)
 {
-    int         rval = 0;
+    int                     rval = 0;
+    CB_ENCODE_ONE_FRAME     cb_enc_frm = 0;
+    CB_EMPTY_BUF            cb_empty_buf = 0;
 
-    // callback to write frame ???
+    _assert(pCtrl_info != 0);
 
-    if( frm_type == AVI_FRM_VIDEO )
-    {   // video frame AVI_FCC_00DC
+    cb_enc_frm   = pCtrl_info->cb_enc_one_frame;
+    cb_empty_buf = pCtrl_info->cb_empty_buf;
 
-    }
-    else
-    {   // audio frame AVI_FCC_00WB
+    _assert(cb_enc_frm != 0);
+    _assert(cb_empty_buf != 0);
+    _assert(pCtrl_info->pBS_buf != 0);
 
-    }
+    do {
+        uint32_t    *pCur = (uint32_t*)(((uint32_t)pCtrl_info->pBS_buf + 3) & ~0x3);
+
+        rval = cb_enc_frm(pCtrl_info, pFrm_buf, frm_buf_len,
+                            (uint8_t*)(pCur + 2), &pCtrl_info->bs_len);
+        if( rval )      break;
+
+        if( frm_state != AVI_FRAME_END )
+            break;
+
+        if( pCtrl_info->frm_type == AVI_FRM_VIDEO )
+        {
+            uint32_t    padding = 4 - (pCtrl_info->bs_len & 0x3);
+
+            if( padding )
+            {
+                memset(&pCtrl_info->pBS_buf[8 + pCtrl_info->bs_len], 0, padding);
+                pCtrl_info->bs_len += padding;
+            }
+
+            *pCur = (uint32_t)AVI_FCC_00DB;
+        }
+        else if( pCtrl_info->frm_type == AVI_FRM_AUDIO )
+        {
+            uint32_t    padding = pCtrl_info->bs_len & 0x1;
+
+            if( padding )
+            {
+                pCtrl_info->pBS_buf[8 + pCtrl_info->bs_len] = 0;
+                pCtrl_info->bs_len += padding;
+            }
+
+            *pCur = (uint32_t)AVI_FCC_01WB;
+        }
+
+        *(pCur + 1) = pCtrl_info->bs_len;
+
+        pCtrl_info->bs_len += 8;
+        rval = cb_empty_buf(pCtrl_info, pCtrl_info->pBS_buf, pCtrl_info->bs_len);
+
+    } while(0);
+
     return rval;
 }
 
@@ -694,8 +738,8 @@ avi_parse_header(
 
 int
 avi_demux_media_data(
-    avi_ctrl_info_t     *pCtrl_info,
-    uint32_t            *pIs_braking)
+    avi_demux_ctrl_info_t   *pCtrl_info,
+    uint32_t                *pIs_braking)
 {
 #define BUF_RELOAD_THRESHOLD        64
     int                 rval = 0;
@@ -727,10 +771,10 @@ avi_demux_media_data(
     _assert(cb_fill_buf != 0);
 
     remain_buf_size = pCtrl_info->ring_buf_size;
-    if( (rval = cb_fill_buf(pCtrl_info, pCtrl_info->pRing_buf, &remain_buf_size)) )
+    if( (rval = cb_fill_buf(pCtrl_info, pCtrl_info->pRing_buf, (uint32_t*)&remain_buf_size)) )
         return rval;
 
-    _rb_opt_init(&rb_opt, pCtrl_info->pRing_buf, remain_buf_size);
+    _rb_opt_init(&rb_opt, (uint32_t)pCtrl_info->pRing_buf, (uint32_t)remain_buf_size);
 
     while( *pIs_braking )
     {
@@ -744,14 +788,14 @@ avi_demux_media_data(
         {
             uint32_t    offset = remain_buf_size;
             // TODO: start position in ring buffer needs to check alignment
-            memcpy(pCtrl_info->pRing_buf, rb_opt.pCur, remain_buf_size);
+            memcpy(pCtrl_info->pRing_buf, (void*)rb_opt.pCur, remain_buf_size);
             remain_buf_size = pCtrl_info->ring_buf_size - remain_buf_size;
-            if( (rval = cb_fill_buf(pCtrl_info, pCtrl_info->pRing_buf + offset, &remain_buf_size)) )
+            if( (rval = cb_fill_buf(pCtrl_info, pCtrl_info->pRing_buf + offset, (uint32_t*)&remain_buf_size)) )
                 break;
 
             remain_buf_size += offset;
             // TODO: start position in ring buffer needs to check alignment
-            _rb_opt_init(&rb_opt, pCtrl_info->pRing_buf, remain_buf_size);
+            _rb_opt_init(&rb_opt, (uint32_t)pCtrl_info->pRing_buf, (uint32_t)remain_buf_size);
         }
 
         if( cb_frame_state )
@@ -794,7 +838,7 @@ avi_demux_media_data(
 
                 if( frame_size == 0 )
                 {
-                    if( pCur != end )   pCur += 8;
+                    if( (uint32_t)pCur != end )   pCur += 8;
                     if( is_data_end )   break;
 
                     remain_buf_size = rb_opt.end_ptr - (uint32_t)pCur;
@@ -811,7 +855,7 @@ avi_demux_media_data(
             }
 
 
-            frame_info.pFrame_addr = rb_opt.pCur;
+            frame_info.pFrame_addr = (uint8_t*)rb_opt.pCur;
             frame_info.frame_len   = (frame_size < (remain_buf_size - BUF_RELOAD_THRESHOLD)) ? frame_size : (remain_buf_size - BUF_RELOAD_THRESHOLD);
 
             // calculate remain_buf_size and frame_size relation
