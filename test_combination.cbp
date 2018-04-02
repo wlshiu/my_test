@@ -16,6 +16,7 @@
 					<Add option="-g" />
 					<Add option="-DHAVE_CONFIG_H" />
 					<Add option="-DBUILD_STATIC" />
+					<Add directory="iniparser" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
