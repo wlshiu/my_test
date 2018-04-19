@@ -9,6 +9,8 @@
 #include "ff.h"         /* Declarations of sector size */
 #include "diskio.h"     /* Declarations of disk functions */
 
+#define err(str, args...)    do{printf("%s[%u] " str, __func__, __LINE__, ##args); while(1);}while(0)
+
 
 static
 DWORD pn (		/* Pseudo random number generator */
@@ -294,7 +296,73 @@ int test_diskio (
 
 int main (int argc, char* argv[])
 {
-    int rc;
+    int rc = 0;
+
+    #if 1
+    do {
+        FATFS       fatfs_1 = {0};
+        FRESULT     res = 0;
+        FIL         fil;
+        char        *str = "Hello From FATFS";
+        UINT        len = 0;
+        BYTE        test_wrok[1024];
+
+        res = f_mount(&fatfs_1, _T("0:"), 1);
+        if( FR_NO_FILESYSTEM == res )
+        {
+            res = f_mkfs(_T("0:"), FM_ANY, 0, test_wrok, sizeof(test_wrok));
+            if( res != FR_OK )
+            {
+                err("%s", "err !!!!");
+                break;
+            }
+
+            res = f_mount(&fatfs_1, _T("0:"), 1);
+            if( res != FR_OK )
+            {
+                err("%s", "err !!!!");
+                break;
+            }
+        }
+
+        res = f_open(&fil, _T("0:config.h"), FA_CREATE_NEW | FA_WRITE);
+        if( res != FR_OK )
+        {
+            err("%s", "err !!!!");
+            break;
+        }
+        res = f_write(&fil, str, strlen(str), &len);
+        if( res != FR_OK )
+        {
+            err("%s", "err !!!!");
+            break;
+        }
+
+        f_close(&fil);
+
+        {
+            BYTE msg[128] = {0};
+            res = f_open(&fil, _T("0:config.h"), FA_OPEN_ALWAYS | FA_READ);
+            if( res != FR_OK )
+            {
+                err("%s", "err !!!!");
+                break;
+            }
+
+            res = f_read(&fil, msg, 128, &len);
+            if( res != FR_OK )
+            {
+                err("%s", "err !!!!");
+                break;
+            }
+
+            f_close(&fil);
+        }
+
+        res = f_mount(NULL, _T("0:"), 0);
+    } while(0);
+
+    #else
     DWORD buff[FF_MAX_SS];  /* Working buffer (4 sector in size) */
 
     /* Check function/compatibility of the physical drive #0 */
@@ -305,6 +373,7 @@ int main (int argc, char* argv[])
     } else {
         printf("Congratulations! The disk driver works well.\n");
     }
+    #endif // 1
 
     return rc;
 }
