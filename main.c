@@ -17,12 +17,14 @@
 #include "avi.h"
 
 #include "riff.h"
+
+#include <windows.h>
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
 #define MAX_VFRAME_NUM              30
 
-#define BUF_VFRAME_MAX              (50 << 10)
+#define BUF_ENC_VFRAME_MAX          (50 << 10)
 
 #define FILENAME_MOVI_PAYLAOD       "movi_payload.tmp"
 //=============================================================================
@@ -41,8 +43,12 @@ typedef struct chunk
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
-static uint8_t      g_bs_buf[BUF_VFRAME_MAX] = {0};
-static uint32_t     g_avi_braking = 1;
+static uint8_t      g_bs_vbuf[BUF_ENC_VFRAME_MAX] = {0};
+static uint8_t      g_bs_abuf[BUF_ENC_VFRAME_MAX] = {0};
+static uint8_t      g_buf[1024] = {0};
+static bool         g_avi_braking = true;
+
+static FILE         *g_fout = 0;
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -117,7 +123,7 @@ _get_video_source(
 {
     *ppBuf = (uint8_t*)0x878787;
     *pBuf_len = 1111;
-    *pFrm_state = AVI_FRAME_END;
+    *pFrm_state = AVI_FRAME_START | AVI_FRAME_END;
     return 0;
 }
 
@@ -164,7 +170,7 @@ _encode_one_vframe(
         jpg_len = ftell(fin);
         fseek(fin, 0, SEEK_SET);
 
-        if( BUF_VFRAME_MAX < jpg_len )
+        if( BUF_ENC_VFRAME_MAX < jpg_len )
         {
             rval = -1;
             break;
@@ -192,54 +198,6 @@ _encode_one_aframe(
 }
 
 static int
-_output_avi_file(
-    char    *pPath)
-{
-    int         rval = 0;
-    FILE        *fout = 0;
-
-    do {
-        int         cnt = 0, out_size = 0;
-        FILE        *fin = 0;
-        uint8_t     buf[512] = {0};
-        uint32_t    length = 512;
-
-        memset(buf, 0xFF, length);
-        avi_mux_gen_header(buf, &length);
-
-        if( !(fout = fopen(pPath, "wb")) )
-        {
-            rval = -1;
-            err("open %s fail\n", pPath);
-            break;
-        }
-
-        fwrite(buf, 1, length, fout);
-
-        if( !(fin = fopen(FILENAME_MOVI_PAYLAOD, "rb")) )
-        {
-            rval = -1;
-            break;
-        }
-
-        while( (length = fread(buf, 1, 512, fin)) )
-        {
-            out_size += length;
-            // printf("%d-th, len= %d, %u\n", cnt, length, out_size);
-            fwrite(buf, 1, length, fout);
-            cnt++;
-        }
-
-        fclose(fin);
-
-    } while(0);
-
-    if( fout )      fclose(fout);
-    fout = 0;
-    return rval;
-}
-
-static int
 _empty_buf(
     avi_mux_ctrl_info_t     *pCtrl_info,
     uint8_t                 *pBS_buf,
@@ -256,7 +214,6 @@ static void
 _test_mux(
     char    *pOut_path)
 {
-    FILE                *fout = 0;
     avi_video_cfg_t     vid_cfg = {0};
 
     vid_cfg.vcodec   = AVI_CODEC_MJPG;
@@ -264,6 +221,20 @@ _test_mux(
     vid_cfg.height   = 600;
     vid_cfg.fps      = 10;
     avi_mux_reset_header(&vid_cfg, 0, 9);
+
+    {
+        uint32_t    length = 512;
+        memset(g_buf, 0x0, length);
+        avi_mux_gen_header(g_buf, &length);
+
+        if( !(g_fout = fopen(pOut_path, "wb")) )
+        {
+            err("open %s fail\n", pOut_path);
+            return;
+        }
+
+        fwrite(g_buf, 1, length, g_fout);
+    }
 
     do {
         uint8_t                 *pFrm_buf = 0;
@@ -273,12 +244,6 @@ _test_mux(
         avi_mux_ctrl_info_t     vctrl_info = {0};
         avi_mux_ctrl_info_t     actrl_info = {0};
 
-        if( !(fout = fopen(FILENAME_MOVI_PAYLAOD, "wb")) )
-        {
-            err("open %s fail \n", FILENAME_MOVI_PAYLAOD);
-            break;
-        }
-
         do {
             avi_frame_state_t       vfrm_state = AVI_FRAME_NONE;
             avi_frame_state_t       afrm_state = AVI_FRAME_NONE;
@@ -287,15 +252,15 @@ _test_mux(
             _get_video_source(&pFrm_buf, &frm_buf_len, &vfrm_state);
             if( frm_buf_len )
             {
-                vctrl_info.pPrivate_data     = &fout;
+                vctrl_info.pPrivate_data     = &g_fout;
                 vctrl_info.frm_type          = AVI_FRM_VIDEO;
                 vctrl_info.cb_enc_one_frame  = _encode_one_vframe;
                 vctrl_info.cb_empty_buf      = _empty_buf;
-                vctrl_info.pBS_buf           = g_bs_buf;
+                vctrl_info.pBS_buf           = g_bs_vbuf;
                 avi_mux_one_frame(&vctrl_info, pFrm_buf, frm_buf_len, vfrm_state);
             }
 
-            if( vfrm_state == AVI_FRAME_END )
+            if( vfrm_state & AVI_FRAME_END )
             {
                 vframe_cnt++;
                 media_total_size += vctrl_info.bs_len;
@@ -304,28 +269,42 @@ _test_mux(
             _get_audio_source(&pFrm_buf, &frm_buf_len, &afrm_state);
             if( frm_buf_len )
             {
-                actrl_info.pPrivate_data     = &fout;
+                actrl_info.pPrivate_data     = &g_fout;
                 actrl_info.frm_type          = AVI_FRM_AUDIO;
                 actrl_info.cb_enc_one_frame  = _encode_one_aframe;
                 actrl_info.cb_empty_buf      = _empty_buf;
-                actrl_info.pBS_buf           = g_bs_buf;
+                actrl_info.pBS_buf           = g_bs_abuf;
                 avi_mux_one_frame(&actrl_info, pFrm_buf, frm_buf_len, AVI_FRAME_END);
             }
 
             if( afrm_state == AVI_FRAME_END )
                 media_total_size += actrl_info.bs_len;
 
-            info.media_data_size = media_total_size;
-            info.total_file_size = media_total_size + avi_mux_get_header_size();
-            info.total_frames    = vframe_cnt;
-            avi_mux_update_info(&info);
-        } while( vframe_cnt < MAX_VFRAME_NUM );
+            if( vfrm_state == AVI_FRAME_END )
+            {
+                uint32_t    cur_pos = 0;
+                uint32_t    length = 512;
 
-        _output_avi_file(pOut_path);
+                info.media_data_size = media_total_size;
+                info.total_file_size = media_total_size + avi_mux_get_header_size();
+                info.total_frames    = vframe_cnt;
+                avi_mux_update_info(&info);
+
+                cur_pos = ftell(g_fout);
+                fseek(g_fout, 0, SEEK_SET);
+
+                memset(g_buf, 0x0, length);
+                avi_mux_gen_header(g_buf, &length);
+
+                fwrite(g_buf, 1, length, g_fout);
+                fseek(g_fout, cur_pos, SEEK_SET);
+            }
+        } while( vframe_cnt < MAX_VFRAME_NUM );
 
     } while(0);
 
-    if( fout )      fclose(fout);
+    if( g_fout )      fclose(g_fout);
+    g_fout = 0;
 
     return;
 }
@@ -351,7 +330,7 @@ _fill_buf(
     rval = fread(pBuf, 1, *pLen, fin);
     *pLen = rval;
 
-    return feof(fin) ? 1 : 0;
+    return (rval) ? 0 : AVI_END_OF_STREAM;
 }
 
 
@@ -363,16 +342,18 @@ _frame_state(
 {
     static int      total_size = 0;
     static FILE     *fdump = 0;
-#if 0
-    static int      i = 0;
 
-    if( !fdump )
+    if( pFrm_info->frm_state & AVI_FRAME_START )
     {
-        char    name[64] = {0};
-        snprintf(name, 64, "%02d.jpg", i++);
-        fdump = fopen(name, "wb");
+        static int      i = 0;
+
+        if( !fdump )
+        {
+            char    name[64] = {0};
+            snprintf(name, 64, "%02d.jpg", i++);
+            fdump = fopen(name, "wb");
+        }
     }
-#endif // 0
 
 #if 0
     if( pFrm_info->frame_len & 0x3 )
@@ -382,7 +363,7 @@ _frame_state(
         printf("addr align: %d\n", (uint32_t)pFrm_info->pFrame_addr & 0x3);
 #endif // 0
 
-    if( pFrm_info->frm_state == AVI_FRAME_PARTIAL )
+    if( pFrm_info->frm_state & AVI_FRAME_PARTIAL )
     {
         if( fdump )
             fwrite(pFrm_info->pFrame_addr, 1, pFrm_info->frame_len, fdump);
@@ -396,7 +377,8 @@ _frame_state(
 
         total_size += pFrm_info->frame_len;
     }
-    else if( pFrm_info->frm_state == AVI_FRAME_END )
+
+    if( pFrm_info->frm_state & AVI_FRAME_END )
     {
         if( fdump )
         {
@@ -407,6 +389,14 @@ _frame_state(
 
         total_size += pFrm_info->frame_len;
 //        printf("end = %d, total = x%x\n", pFrm_info->frame_len, total_size);
+
+        g_avi_braking = false;
+    }
+
+    if( pFrm_info->frm_state & AVI_FRAME_EOS )
+    {
+        g_avi_braking = false;
+        return AVI_FRAME_EOS;
     }
 
 
@@ -421,8 +411,10 @@ _test_demux(
     FILE    *fin = 0;
 
     do {
+        int         cnt = 0;
         uint32_t    section_len = AVI_CACHE_SIZE;
         uint32_t    media_data_offset = 0;
+        bool        is_reset = true;
 
         if( !(fin = fopen(pFile_path, "rb")) )
         {
@@ -430,25 +422,37 @@ _test_demux(
             break;
         }
 
+        #if 1 // for test
         section_len = 10 << 10;
-        fread(g_bs_buf, 1, section_len, fin);
+        #endif // 1
 
-        avi_parse_header((uint32_t*)g_bs_buf, section_len, &media_data_offset);
+        fread(g_bs_vbuf, 1, section_len, fin);
+
+        avi_parse_header((uint32_t*)g_bs_vbuf, section_len, &media_data_offset);
         printf("media offset= x%x\n", media_data_offset);
 
         // fill bs buffer
         fseek(fin, media_data_offset, SEEK_SET);
 
+        while(1)
         {
+            int                       rval = 0;
             avi_demux_ctrl_info_t     ctrl_info = {0};
 
             ctrl_info.pPrivate_data     = &fin;
             ctrl_info.cb_frame_state    = _frame_state;
             ctrl_info.cb_fill_buf       = _fill_buf;
             ctrl_info.cb_misc_proc      = _misc_proc;
-            ctrl_info.pRing_buf         = g_bs_buf;
-            ctrl_info.ring_buf_size     = 1 << 10; //BUF_VFRAME_MAX;
-            avi_demux_media_data(&ctrl_info, &g_avi_braking);
+            ctrl_info.pRing_buf         = g_bs_vbuf;
+            ctrl_info.ring_buf_size     = 1 << 10; //BUF_ENC_VFRAME_MAX;
+            rval = avi_demux_media_data(&ctrl_info, (uint32_t)is_reset, &g_avi_braking);
+            if( rval )      break;
+
+            is_reset = false;
+
+            printf("decode a frame end (%d)\n", cnt++);
+            Sleep(1);
+            g_avi_braking = true;
         }
 
     } while(0);

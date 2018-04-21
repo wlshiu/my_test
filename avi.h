@@ -38,14 +38,15 @@ typedef enum avi_frm_type
 
 } avi_frm_type_t;
 
-typedef enum avi_frame_state
-{
-    AVI_FRAME_NONE       = 0,
-    AVI_FRAME_PARTIAL,
-    AVI_FRAME_END,
 
-} avi_frame_state_t;
+typedef uint32_t    avi_frame_state_t;
+#define AVI_FRAME_NONE          (0)
+#define AVI_FRAME_START         (0x1 << 1)
+#define AVI_FRAME_PARTIAL       (0x1 << 2)
+#define AVI_FRAME_END           (0x1 << 3)
+#define AVI_FRAME_EOS           (0x1 << 4)  // end of stream
 
+#define AVI_END_OF_STREAM       0x00454f53
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -123,6 +124,7 @@ typedef int (*CB_EMPTY_BUF)(struct avi_mux_ctrl_info *pCtrl_info, uint8_t *pBS_b
 typedef struct avi_mux_ctrl_info
 {
     avi_frm_type_t          frm_type;
+    avi_frame_state_t       frm_state;
 
     CB_ENCODE_ONE_FRAME     cb_enc_one_frame;
     CB_EMPTY_BUF            cb_empty_buf;
@@ -298,6 +300,7 @@ avi_parse_header(
  *  \brief  demux media data
  *
  *  \param [in] pCtrl_info      demux control info
+ *  \param [in] is_reset        reset process
  *  \param [in] pIs_braking     braking this function or not
  *  \return                     0: ok, other: fail
  *
@@ -306,6 +309,7 @@ avi_parse_header(
 int
 avi_demux_media_data(
     avi_demux_ctrl_info_t   *pCtrl_info,
+    uint32_t                is_reset,
     uint32_t                *pIs_braking);
 
 

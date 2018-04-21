@@ -6,7 +6,7 @@
  * @author Wei-Lun Hsu
  * @version 0.1
  * @date 2018/03/16
- * @license
+ * @license GNU GENERAL PUBLIC LICENSE Version 3
  * @description
  */
 

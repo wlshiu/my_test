@@ -370,11 +370,12 @@ avi_mux_one_frame(
     do {
         uint32_t    *pCur = (uint32_t*)(((uint32_t)pCtrl_info->pBS_buf + 3) & ~0x3);
 
+        pCtrl_info->frm_state = frm_state;
         rval = cb_enc_frm(pCtrl_info, pFrm_buf, frm_buf_len,
                             (uint8_t*)(pCur + 2), &pCtrl_info->bs_len);
         if( rval )      break;
 
-        if( frm_state != AVI_FRAME_END )
+        if( !(frm_state & AVI_FRAME_END) )
             break;
 
         if( pCtrl_info->frm_type == AVI_FRM_VIDEO )
@@ -739,18 +740,21 @@ avi_parse_header(
 int
 avi_demux_media_data(
     avi_demux_ctrl_info_t   *pCtrl_info,
+    uint32_t                is_reset,
     uint32_t                *pIs_braking)
 {
 #define BUF_RELOAD_THRESHOLD        64
     int                 rval = 0;
-    int                 remain_buf_size = 0;
-    int                 frame_size = 0;
-    float               vid_fps = 0;
     CB_MISC_PROC        cb_misc_proc = 0;
     CB_FRAME_STATE      cb_frame_state = 0;
     CB_FILL_BUF         cb_fill_buf = 0;
     avi_media_info_t    media_info = {0};
-    rb_opt_t            rb_opt = {0};
+
+    static int                 remain_buf_size = 0;
+    static int                 frame_size = 0;
+    static int                 is_eos = false;
+    static float               vid_fps = 0;
+    static rb_opt_t            rb_opt = {0};
 
     _assert(pCtrl_info != 0);
     _assert(pIs_braking != 0);
@@ -766,15 +770,18 @@ avi_demux_media_data(
     cb_frame_state   = pCtrl_info->cb_frame_state;
     cb_fill_buf      = pCtrl_info->cb_fill_buf;
 
-    vid_fps = (float)1000000.0 / g_avi_ctxt.list_hdrl_box.avih.main_hdr.dwMicroSecPerFrame;
-
     _assert(cb_fill_buf != 0);
 
-    remain_buf_size = pCtrl_info->ring_buf_size;
-    if( (rval = cb_fill_buf(pCtrl_info, pCtrl_info->pRing_buf, (uint32_t*)&remain_buf_size)) )
-        return rval;
+    if( is_reset )
+    {
+        vid_fps = (float)1000000.0 / g_avi_ctxt.list_hdrl_box.avih.main_hdr.dwMicroSecPerFrame;
 
-    _rb_opt_init(&rb_opt, (uint32_t)pCtrl_info->pRing_buf, (uint32_t)remain_buf_size);
+        remain_buf_size = pCtrl_info->ring_buf_size;
+        if( (rval = cb_fill_buf(pCtrl_info, pCtrl_info->pRing_buf, (uint32_t*)&remain_buf_size)) )
+            return rval;
+
+        _rb_opt_init(&rb_opt, (uint32_t)pCtrl_info->pRing_buf, (uint32_t)remain_buf_size);
+    }
 
     while( *pIs_braking )
     {
@@ -784,14 +791,16 @@ avi_demux_media_data(
                 break;
         }
 
-        if( remain_buf_size && remain_buf_size <= BUF_RELOAD_THRESHOLD )
+        if( remain_buf_size && remain_buf_size <= BUF_RELOAD_THRESHOLD && is_eos == false )
         {
             uint32_t    offset = remain_buf_size;
             // TODO: start position in ring buffer needs to check alignment
-            memcpy(pCtrl_info->pRing_buf, (void*)rb_opt.pCur, remain_buf_size);
+            memmove(pCtrl_info->pRing_buf, (void*)rb_opt.pCur, remain_buf_size);
             remain_buf_size = pCtrl_info->ring_buf_size - remain_buf_size;
-            if( (rval = cb_fill_buf(pCtrl_info, pCtrl_info->pRing_buf + offset, (uint32_t*)&remain_buf_size)) )
-                break;
+            rval = cb_fill_buf(pCtrl_info, pCtrl_info->pRing_buf + offset, (uint32_t*)&remain_buf_size);
+            if( rval < 0 )      break;
+
+            is_eos = (rval == AVI_END_OF_STREAM) ? true : false;
 
             remain_buf_size += offset;
             // TODO: start position in ring buffer needs to check alignment
@@ -818,6 +827,7 @@ avi_demux_media_data(
                         media_info.codec   = AVI_CODEC_MJPG;
                         media_info.vid.fps = vid_fps;
                         frame_size = GET_4BYTES(pCur[4], pCur[5], pCur[6], pCur[7]);
+                        frame_info.frm_state = AVI_FRAME_START;
                         break;
                     }
                     else if( tag == (uint32_t)AVI_FCC_01WB || tag == (uint32_t)AVI_FCC_00WB )
@@ -825,6 +835,7 @@ avi_demux_media_data(
                         // TODO: assign audio info, e.g. simple rate, ...etc.
                         media_info.codec = AVI_CODEC_PCM;
                         frame_size = GET_4BYTES(pCur[4], pCur[5], pCur[6], pCur[7]);
+                        frame_info.frm_state = AVI_FRAME_START;
                         break;
                     }
                     else if( tag == (uint32_t)AVI_FCC_INDX || tag == (uint32_t)AVI_FCC_IDX1 )
@@ -857,13 +868,19 @@ avi_demux_media_data(
 
             frame_info.pFrame_addr = (uint8_t*)rb_opt.pCur;
             frame_info.frame_len   = (frame_size < (remain_buf_size - BUF_RELOAD_THRESHOLD)) ? frame_size : (remain_buf_size - BUF_RELOAD_THRESHOLD);
+            frame_info.frame_len   = (is_eos) ? frame_size : frame_info.frame_len;
 
             // calculate remain_buf_size and frame_size relation
             remain_buf_size -= frame_info.frame_len;
             frame_size -= frame_info.frame_len;
 
-            frame_info.frm_state = (frame_size) ? AVI_FRAME_PARTIAL : AVI_FRAME_END;
+            frame_info.frm_state = (frame_size)
+                                 ? frame_info.frm_state | AVI_FRAME_PARTIAL
+                                 : frame_info.frm_state | AVI_FRAME_END;
             rb_opt.pCur += frame_info.frame_len;
+
+            if( is_eos && frame_size == 0 )
+                frame_info.frm_state |= AVI_FRAME_EOS;
 
             // TODO: if it should be alignment (2/4/8/16)
             if( (rval = cb_frame_state(pCtrl_info, &media_info, &frame_info)) )
