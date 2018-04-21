@@ -112,6 +112,8 @@ typedef struct avi_frame_info
     uint8_t             *pFrame_addr;
     int                 frame_len;
 
+    uint32_t            frame_offset;
+
 } avi_frame_info_t;
 
 struct avi_mux_ctrl_info;

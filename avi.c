@@ -749,9 +749,11 @@ avi_demux_media_data(
     CB_FRAME_STATE      cb_frame_state = 0;
     CB_FILL_BUF         cb_fill_buf = 0;
     avi_media_info_t    media_info = {0};
+    avi_frame_info_t    frame_info = {.frm_state = AVI_FRAME_NONE,};
 
     static int                 remain_buf_size = 0;
     static int                 frame_size = 0;
+    static int                 frame_offset = 0;
     static int                 is_eos = false;
     static float               vid_fps = 0;
     static rb_opt_t            rb_opt = {0};
@@ -781,6 +783,8 @@ avi_demux_media_data(
             return rval;
 
         _rb_opt_init(&rb_opt, (uint32_t)pCtrl_info->pRing_buf, (uint32_t)remain_buf_size);
+
+        frame_offset = 0;
     }
 
     while( *pIs_braking )
@@ -810,7 +814,6 @@ avi_demux_media_data(
         if( cb_frame_state )
         {
             uint8_t             *pCur = (uint8_t*)rb_opt.pCur;
-            avi_frame_info_t    frame_info = {.frm_state = AVI_FRAME_NONE,};
 
             if( frame_size == 0 )
             {
@@ -853,22 +856,24 @@ avi_demux_media_data(
                     if( is_data_end )   break;
 
                     remain_buf_size = rb_opt.end_ptr - (uint32_t)pCur;
+                    frame_offset += (pCur - rb_opt.pCur);
                     rb_opt.pCur = (uint32_t)pCur;
                     continue;
                 }
 
                 pCur += 8;
                 remain_buf_size = rb_opt.end_ptr - (uint32_t)pCur;
+                frame_offset += (pCur - rb_opt.pCur);
                 rb_opt.pCur = (uint32_t)pCur;
 
                 if( remain_buf_size <= BUF_RELOAD_THRESHOLD )
                     continue;
             }
 
-
-            frame_info.pFrame_addr = (uint8_t*)rb_opt.pCur;
-            frame_info.frame_len   = (frame_size < (remain_buf_size - BUF_RELOAD_THRESHOLD)) ? frame_size : (remain_buf_size - BUF_RELOAD_THRESHOLD);
-            frame_info.frame_len   = (is_eos) ? frame_size : frame_info.frame_len;
+            frame_info.pFrame_addr  = (uint8_t*)rb_opt.pCur;
+            frame_info.frame_len    = (frame_size < (remain_buf_size - BUF_RELOAD_THRESHOLD)) ? frame_size : (remain_buf_size - BUF_RELOAD_THRESHOLD);
+            frame_info.frame_len    = (is_eos) ? frame_size : frame_info.frame_len;
+            frame_info.frame_offset = frame_offset;
 
             // calculate remain_buf_size and frame_size relation
             remain_buf_size -= frame_info.frame_len;
@@ -886,6 +891,8 @@ avi_demux_media_data(
             if( (rval = cb_frame_state(pCtrl_info, &media_info, &frame_info)) )
                 break;
 
+            frame_offset += frame_info.frame_len;
+            frame_info.frm_state = AVI_FRAME_NONE;
         }
     }
 

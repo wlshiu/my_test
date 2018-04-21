@@ -353,6 +353,8 @@ _frame_state(
             snprintf(name, 64, "%02d.jpg", i++);
             fdump = fopen(name, "wb");
         }
+
+        printf("frm offset= x%04x\n", pFrm_info->frame_offset);
     }
 
 #if 0
@@ -445,7 +447,7 @@ _test_demux(
             ctrl_info.cb_misc_proc      = _misc_proc;
             ctrl_info.pRing_buf         = g_bs_vbuf;
             ctrl_info.ring_buf_size     = 1 << 10; //BUF_ENC_VFRAME_MAX;
-            rval = avi_demux_media_data(&ctrl_info, (uint32_t)is_reset, &g_avi_braking);
+            rval = avi_demux_media_data(&ctrl_info, (uint32_t)is_reset, (uint32_t*)&g_avi_braking);
             if( rval )      break;
 
             is_reset = false;
