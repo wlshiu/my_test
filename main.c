@@ -48,6 +48,8 @@ static uint8_t      g_bs_abuf[BUF_ENC_VFRAME_MAX] = {0};
 static uint8_t      g_buf[1024] = {0};
 static bool         g_avi_braking = true;
 
+static uint32_t     g_media_data_offset = 0;
+
 static FILE         *g_fout = 0;
 //=============================================================================
 //                  Private Function Definition
@@ -354,7 +356,7 @@ _frame_state(
             fdump = fopen(name, "wb");
         }
 
-        printf("frm offset= x%04x\n", pFrm_info->frame_offset);
+        printf("real frm offset= x%04x\n", g_media_data_offset + pFrm_info->frame_offset);
     }
 
 #if 0
@@ -415,7 +417,6 @@ _test_demux(
     do {
         int         cnt = 0;
         uint32_t    section_len = AVI_CACHE_SIZE;
-        uint32_t    media_data_offset = 0;
         bool        is_reset = true;
 
         if( !(fin = fopen(pFile_path, "rb")) )
@@ -430,11 +431,11 @@ _test_demux(
 
         fread(g_bs_vbuf, 1, section_len, fin);
 
-        avi_parse_header((uint32_t*)g_bs_vbuf, section_len, &media_data_offset);
-        printf("media offset= x%x\n", media_data_offset);
+        avi_parse_header((uint32_t*)g_bs_vbuf, section_len, &g_media_data_offset);
+        printf("media offset= x%x\n", g_media_data_offset);
 
         // fill bs buffer
-        fseek(fin, media_data_offset, SEEK_SET);
+        fseek(fin, g_media_data_offset, SEEK_SET);
 
         while(1)
         {
