@@ -52,6 +52,8 @@ Mkfile.old
 dkms.conf
 *.depend
 *.layout
+*.jpeg
+*.avi
 obj/*
 bin/*
 
