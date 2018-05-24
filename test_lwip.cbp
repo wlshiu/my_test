@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_lwip" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_lwip" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DMSDOS" />
+					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/include" />
+					<Add directory="../test_lwip" />
+					<Add directory="lwip/include" />
+					<Add directory="lwip/include/ipv4" />
+					<Add directory="pcap/Include" />
+				</Compiler>
+				<Linker>
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libkernel32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libpthread.a" />
+					<Add library="pcap/Lib/wpcap.lib" />
+					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/lib" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_lwip" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="app/http.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="app/http2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/api/api_lib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/api/api_msg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/api/err.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/api/netbuf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/api/netdb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/api/netifapi.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/api/sockets.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/api/tcpip.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/arch/queue.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/arch/sys_arch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/dhcp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/dns.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/init.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/ipv4/autoip.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/ipv4/icmp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/ipv4/igmp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/ipv4/inet.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/ipv4/inet_chksum.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/ipv4/ip.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/ipv4/ip_addr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/ipv4/ip_frag.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/mem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/memp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/netif.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/pbuf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/raw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/snmp/asn1_dec.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/snmp/asn1_enc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/snmp/mib2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/snmp/mib_structs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/snmp/msg_in.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/snmp/msg_out.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/stats.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/sys.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/tcp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/tcp_in.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/tcp_out.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/core/udp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/include/arch/cc.h" />
+		<Unit filename="lwip/include/arch/perf.h" />
+		<Unit filename="lwip/include/arch/queue.h" />
+		<Unit filename="lwip/include/arch/sys_arch.h" />
+		<Unit filename="lwip/include/ipv4/lwip/autoip.h" />
+		<Unit filename="lwip/include/ipv4/lwip/icmp.h" />
+		<Unit filename="lwip/include/ipv4/lwip/igmp.h" />
+		<Unit filename="lwip/include/ipv4/lwip/inet.h" />
+		<Unit filename="lwip/include/ipv4/lwip/inet_chksum.h" />
+		<Unit filename="lwip/include/ipv4/lwip/ip.h" />
+		<Unit filename="lwip/include/ipv4/lwip/ip_addr.h" />
+		<Unit filename="lwip/include/ipv4/lwip/ip_frag.h" />
+		<Unit filename="lwip/include/lwip/api.h" />
+		<Unit filename="lwip/include/lwip/api_msg.h" />
+		<Unit filename="lwip/include/lwip/arch.h" />
+		<Unit filename="lwip/include/lwip/debug.h" />
+		<Unit filename="lwip/include/lwip/def.h" />
+		<Unit filename="lwip/include/lwip/dhcp.h" />
+		<Unit filename="lwip/include/lwip/dns.h" />
+		<Unit filename="lwip/include/lwip/err.h" />
+		<Unit filename="lwip/include/lwip/init.h" />
+		<Unit filename="lwip/include/lwip/mem.h" />
+		<Unit filename="lwip/include/lwip/memp.h" />
+		<Unit filename="lwip/include/lwip/memp_std.h" />
+		<Unit filename="lwip/include/lwip/netbuf.h" />
+		<Unit filename="lwip/include/lwip/netdb.h" />
+		<Unit filename="lwip/include/lwip/netif.h" />
+		<Unit filename="lwip/include/lwip/netifapi.h" />
+		<Unit filename="lwip/include/lwip/opt.h" />
+		<Unit filename="lwip/include/lwip/pbuf.h" />
+		<Unit filename="lwip/include/lwip/raw.h" />
+		<Unit filename="lwip/include/lwip/sio.h" />
+		<Unit filename="lwip/include/lwip/snmp.h" />
+		<Unit filename="lwip/include/lwip/snmp_asn1.h" />
+		<Unit filename="lwip/include/lwip/snmp_msg.h" />
+		<Unit filename="lwip/include/lwip/snmp_structs.h" />
+		<Unit filename="lwip/include/lwip/sockets.h" />
+		<Unit filename="lwip/include/lwip/stats.h" />
+		<Unit filename="lwip/include/lwip/sys.h" />
+		<Unit filename="lwip/include/lwip/tcp.h" />
+		<Unit filename="lwip/include/lwip/tcpip.h" />
+		<Unit filename="lwip/include/lwip/udp.h" />
+		<Unit filename="lwip/include/netif/etharp.h" />
+		<Unit filename="lwip/include/netif/loopif.h" />
+		<Unit filename="lwip/netif/etharp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/netif/ethernetif.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwip/netif/loopif.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pcap/Include/Devioctl.h" />
+		<Unit filename="pcap/Include/Gnuc.h" />
+		<Unit filename="pcap/Include/Ntddndis.h" />
+		<Unit filename="pcap/Include/Ntddpack.h" />
+		<Unit filename="pcap/Include/Packet32.h" />
+		<Unit filename="pcap/Include/Win32-Extensions.h" />
+		<Unit filename="pcap/Include/bittypes.h" />
+		<Unit filename="pcap/Include/bucket_lookup.h" />
+		<Unit filename="pcap/Include/count_packets.h" />
+		<Unit filename="pcap/Include/ip6_misc.h" />
+		<Unit filename="pcap/Include/memory_t.h" />
+		<Unit filename="pcap/Include/net_tap.h" />
+		<Unit filename="pcap/Include/normal_lookup.h" />
+		<Unit filename="pcap/Include/pcap-bpf.h" />
+		<Unit filename="pcap/Include/pcap-int.h" />
+		<Unit filename="pcap/Include/pcap-stdinc.h" />
+		<Unit filename="pcap/Include/pcap.h" />
+		<Unit filename="pcap/Include/remote-ext.h" />
+		<Unit filename="pcap/Include/tcp_session.h" />
+		<Unit filename="pcap/Include/time_calls.h" />
+		<Unit filename="pcap/Include/tme.h" />
+		<Unit filename="pcap/net_tap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
