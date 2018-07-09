@@ -1,380 +1,180 @@
-/*----------------------------------------------------------------------/
-/ Low level disk I/O module function checker                            /
-/-----------------------------------------------------------------------/
-/ WARNING: The data on the target drive will be lost!
-*/
-
+#include <stdint.h>
 #include <stdio.h>
-#include <string.h>
-#include "ff.h"         /* Declarations of sector size */
-#include "diskio.h"     /* Declarations of disk functions */
+#include <stdlib.h>
 
-#define err(str, args...)    do{printf("%s[%u] " str, __func__, __LINE__, ##args); while(1);}while(0)
+#include "ff.h"
+#include "ff_macro.h"
 
+//=============================================================================
+//                  Constant Definition
+//=============================================================================
+#define FS_SD_VOLUME                 "0:"
+//=============================================================================
+//                  Macro Definition
+//=============================================================================
+#define err(str, argv...)       do{ printf("%s[%d] " str, __func__, __LINE__, ##argv); while(1);}while(0)
+//=============================================================================
+//                  Structure Definition
+//=============================================================================
 
-static
-DWORD pn (		/* Pseudo random number generator */
-    DWORD pns	/* 0:Initialize, !0:Read */
-)
+//=============================================================================
+//                  Global Data Definition
+//=============================================================================
+FATFS                   g_sd_fatfs = {0};
+FIL                     g_ff_file = {0};
+
+#include <windows.h>
+//=============================================================================
+//                  Private Function Definition
+//=============================================================================
+static FRESULT
+_fat_simulation_test(
+    char        *pPath,
+    uint8_t     *pBuf,
+    uint32_t    buf_size)
 {
-    static DWORD lfsr;
-    UINT n;
+    FRESULT         rst = FR_OK;
+    UINT            len = 0;
+    uint8_t         *pBuf_cmp = 0;
+    char            full_path[64] = {0};
 
+    snprintf(full_path, 64, "%s%s", FS_SD_VOLUME, pPath);
 
-    if (pns) {
-        lfsr = pns;
-        for (n = 0; n < 32; n++) pn(0);
-    }
-    if (lfsr & 1) {
-        lfsr >>= 1;
-        lfsr ^= 0x80200003;
-    } else {
-        lfsr >>= 1;
-    }
-    return lfsr;
+    FCHK(rst, f_open(&g_ff_file, full_path, FA_CREATE_NEW | FA_WRITE), while(1));
+
+    printf("create '%s'\n", full_path);
+    do{
+        if( !(pBuf_cmp = malloc(buf_size)) )
+        {
+            err("malloc %u fail \n", buf_size);
+            break;
+        }
+
+        FCHK(rst, f_write(&g_ff_file, pBuf, buf_size, &len), while(1));
+        FCHK(rst, f_sync(&g_ff_file), while(1));
+        FCHK(rst, f_close(&g_ff_file), while(1));
+
+        #if 0
+        FCHK(rst, f_open(&g_ff_file, full_path, FA_OPEN_EXISTING | FA_READ), while(1));
+        FCHK(rst, f_read(&g_ff_file, pBuf_cmp, buf_size, &len), while(1));
+        FCHK(rst, f_lseek(&g_ff_file, 0), while(1));
+
+        if( memcmp(pBuf, pBuf_cmp, buf_size) )
+        {
+            err("write data '%s' fail \n", pPath);
+            break;
+        }
+        #endif
+    }while(0);
+
+    if( pBuf_cmp )      free(pBuf_cmp);
+
+#if 0
+    FCHK(rst, f_close(&g_ff_file), while(1));
+#endif // 0
+
+    return rst;
 }
 
-
-int test_diskio (
-    BYTE pdrv,      /* Physical drive number to be checked (all data on the drive will be lost) */
-    UINT ncyc,      /* Number of test cycles */
-    DWORD* buff,    /* Pointer to the working buffer */
-    UINT sz_buff    /* Size of the working buffer in unit of byte */
-)
+static int
+_init_fat(void)
 {
-    UINT n, cc, ns;
-    DWORD sz_drv, lba, lba2, sz_eblk, pns = 1;
-    WORD sz_sect;
-    BYTE *pbuff = (BYTE*)buff;
-    DSTATUS ds;
-    DRESULT dr;
+    static uint8_t      g_wrok_buf[1024] = {0};
+    FRESULT             rst = FR_OK;
 
+    do {
+        rst = f_mount(&g_sd_fatfs, _T(FS_SD_VOLUME), 1);
+        if( rst != FR_OK )
+        {
+            if( rst != FR_NO_FILESYSTEM )
+            {
+                err("%s", "fat mount err !\n");
+                break;
+            }
 
-    printf("test_diskio(%u, %u, 0x%08X, 0x%08X)\n", pdrv, ncyc, (UINT)buff, sz_buff);
+            FCHK(rst, f_mkfs(_T(FS_SD_VOLUME), FM_ANY, 0, g_wrok_buf, sizeof(g_wrok_buf)), while(1));
+            FCHK(rst, f_mount(&g_sd_fatfs, _T(FS_SD_VOLUME), 1), while(1));
+        }
 
-    if (sz_buff < FF_MIN_SS + 4) {
-        printf("Insufficient work area to run program.\n");
+    } while(0);
+
+    return (rst) ? -1 : 0;
+}
+
+//=============================================================================
+//                  Public Function Definition
+//=============================================================================
+int main()
+{
+    if( _init_fat() )
+    {
+        err("%s", "init fat fail !\n");
         return 1;
     }
 
-    for (cc = 1; cc <= ncyc; cc++) {
-        printf("**** Test cycle %u of %u start ****\n", cc, ncyc);
+    {
+        FRESULT     rst = FR_OK;
+        UINT        offset = 0;
+        FATFS       *pFatfs = &g_sd_fatfs;
+        DWORD       free_clust = 0;
 
-        printf(" disk_initalize(%u)", pdrv);
-        ds = disk_initialize(pdrv);
-        if (ds & STA_NOINIT) {
-            printf(" - failed.\n");
-            return 2;
-        } else {
-            printf(" - ok.\n");
-        }
+        FCHK(rst, f_getfree(FS_SD_VOLUME, &free_clust, &pFatfs), while(1));
+        printf("total: %d KBytes, free: %d KBytes\n",
+               ((pFatfs->n_fatent - 2) * pFatfs->csize * FF_MAX_SS) >> 10,
+               (free_clust * pFatfs->csize * FF_MAX_SS) >> 10);
+    }
 
-        printf("**** Get drive size ****\n");
-        printf(" disk_ioctl(%u, GET_SECTOR_COUNT, 0x%08X)", pdrv, (UINT)&sz_drv);
-        sz_drv = 0;
-        dr = disk_ioctl(pdrv, GET_SECTOR_COUNT, &sz_drv);
-        if (dr == RES_OK) {
-            printf(" - ok.\n");
-        } else {
-            printf(" - failed.\n");
-            return 3;
-        }
-        if (sz_drv < 128) {
-            printf("Failed: Insufficient drive size to test.\n");
-            return 4;
-        }
-        printf(" Number of sectors on the drive %u is %lu.\n", pdrv, sz_drv);
+    {
+        FRESULT         rst = FR_OK;
+        uint32_t        pattern_len = 0;
+        uint8_t         pattern[1 << 10] = {0};
+        char            full_path[64] = {0};
+        UINT            len = 0;
+        uint32_t        cur_pos = 0;
+        uint32_t        tmp_value = 0;
 
-#if FF_MAX_SS != FF_MIN_SS
-        printf("**** Get sector size ****\n");
-        printf(" disk_ioctl(%u, GET_SECTOR_SIZE, 0x%X)", pdrv, (UINT)&sz_sect);
-        sz_sect = 0;
-        dr = disk_ioctl(pdrv, GET_SECTOR_SIZE, &sz_sect);
-        if (dr == RES_OK) {
-            printf(" - ok.\n");
-        } else {
-            printf(" - failed.\n");
-            return 5;
-        }
-        printf(" Size of sector is %u bytes.\n", sz_sect);
-#else
-        sz_sect = FF_MAX_SS;
-#endif
+        snprintf(full_path, 64, "%s%s", FS_SD_VOLUME, "test.avi");
 
-        printf("**** Get block size ****\n");
-        printf(" disk_ioctl(%u, GET_BLOCK_SIZE, 0x%X)", pdrv, (UINT)&sz_eblk);
-        sz_eblk = 0;
-        dr = disk_ioctl(pdrv, GET_BLOCK_SIZE, &sz_eblk);
-        if (dr == RES_OK) {
-            printf(" - ok.\n");
-        } else {
-            printf(" - failed.\n");
-        }
-        if (dr == RES_OK || sz_eblk >= 2) {
-            printf(" Size of the erase block is %lu sectors.\n", sz_eblk);
-        } else {
-            printf(" Size of the erase block is unknown.\n");
-        }
+        FCHK(rst, f_open(&g_ff_file, full_path, FA_CREATE_NEW | FA_READ | FA_WRITE), while(1));
 
-        /* Single sector write test */
-        printf("**** Single sector write test 1 ****\n");
-        lba = 0;
-        for (n = 0, pn(pns); n < sz_sect; n++) pbuff[n] = (BYTE)pn(0);
-        printf(" disk_write(%u, 0x%X, %lu, 1)", pdrv, (UINT)pbuff, lba);
-        dr = disk_write(pdrv, pbuff, lba, 1);
-        if (dr == RES_OK) {
-            printf(" - ok.\n");
-        } else {
-            printf(" - failed.\n");
-            return 6;
-        }
-        printf(" disk_ioctl(%u, CTRL_SYNC, NULL)", pdrv);
-        dr = disk_ioctl(pdrv, CTRL_SYNC, 0);
-        if (dr == RES_OK) {
-            printf(" - ok.\n");
-        } else {
-            printf(" - failed.\n");
-            return 7;
-        }
-        memset(pbuff, 0, sz_sect);
-        printf(" disk_read(%u, 0x%X, %lu, 1)", pdrv, (UINT)pbuff, lba);
-        dr = disk_read(pdrv, pbuff, lba, 1);
-        if (dr == RES_OK) {
-            printf(" - ok.\n");
-        } else {
-            printf(" - failed.\n");
-            return 8;
-        }
-        for (n = 0, pn(pns); n < sz_sect && pbuff[n] == (BYTE)pn(0); n++) ;
-        if (n == sz_sect) {
-            printf(" Data matched.\n");
-        } else {
-            printf("Failed: Read data differs from the data written.\n");
-            return 10;
-        }
-        pns++;
+        pattern_len = sizeof(pattern);
+        memset(pattern, 0xAA, pattern_len);
+        FCHK(rst, f_write(&g_ff_file, pattern, pattern_len, &len), while(1));
+        cur_pos = f_tell(&g_ff_file);
 
-        printf("**** Multiple sector write test ****\n");
-        lba = 1; ns = sz_buff / sz_sect;
-        if (ns > 4) ns = 4;
-        for (n = 0, pn(pns); n < (UINT)(sz_sect * ns); n++) pbuff[n] = (BYTE)pn(0);
-        printf(" disk_write(%u, 0x%X, %lu, %u)", pdrv, (UINT)pbuff, lba, ns);
-        dr = disk_write(pdrv, pbuff, lba, ns);
-        if (dr == RES_OK) {
-            printf(" - ok.\n");
-        } else {
-            printf(" - failed.\n");
-            return 11;
-        }
-        printf(" disk_ioctl(%u, CTRL_SYNC, NULL)", pdrv);
-        dr = disk_ioctl(pdrv, CTRL_SYNC, 0);
-        if (dr == RES_OK) {
-            printf(" - ok.\n");
-        } else {
-            printf(" - failed.\n");
-            return 12;
-        }
-        memset(pbuff, 0, sz_sect * ns);
-        printf(" disk_read(%u, 0x%X, %lu, %u)", pdrv, (UINT)pbuff, lba, ns);
-        dr = disk_read(pdrv, pbuff, lba, ns);
-        if (dr == RES_OK) {
-            printf(" - ok.\n");
-        } else {
-            printf(" - failed.\n");
-            return 13;
-        }
-        for (n = 0, pn(pns); n < (UINT)(sz_sect * ns) && pbuff[n] == (BYTE)pn(0); n++) ;
-        if (n == (UINT)(sz_sect * ns)) {
-            printf(" Data matched.\n");
-        } else {
-            printf("Failed: Read data differs from the data written.\n");
-            return 14;
-        }
-        pns++;
+        FCHK(rst, f_lseek(&g_ff_file, 4), while(1));
 
-        printf("**** Single sector write test (misaligned address) ****\n");
-        lba = 5;
-        for (n = 0, pn(pns); n < sz_sect; n++) pbuff[n+3] = (BYTE)pn(0);
-        printf(" disk_write(%u, 0x%X, %lu, 1)", pdrv, (UINT)(pbuff+3), lba);
-        dr = disk_write(pdrv, pbuff+3, lba, 1);
-        if (dr == RES_OK) {
-            printf(" - ok.\n");
-        } else {
-            printf(" - failed.\n");
-            return 15;
-        }
-        printf(" disk_ioctl(%u, CTRL_SYNC, NULL)", pdrv);
-        dr = disk_ioctl(pdrv, CTRL_SYNC, 0);
-        if (dr == RES_OK) {
-            printf(" - ok.\n");
-        } else {
-            printf(" - failed.\n");
-            return 16;
-        }
-        memset(pbuff+5, 0, sz_sect);
-        printf(" disk_read(%u, 0x%X, %lu, 1)", pdrv, (UINT)(pbuff+5), lba);
-        dr = disk_read(pdrv, pbuff+5, lba, 1);
-        if (dr == RES_OK) {
-            printf(" - ok.\n");
-        } else {
-            printf(" - failed.\n");
-            return 17;
-        }
-        for (n = 0, pn(pns); n < sz_sect && pbuff[n+5] == (BYTE)pn(0); n++) ;
-        if (n == sz_sect) {
-            printf(" Data matched.\n");
-        } else {
-            printf("Failed: Read data differs from the data written.\n");
-            return 18;
-        }
-        pns++;
+        FCHK(rst, f_read(&g_ff_file, pattern, 32, &len), while(1));
+        pattern[3] = 0x55;
+        pattern[4] = 0x55;
+        pattern[5] = 0x55;
 
-        printf("**** 4GB barrier test ****\n");
-        if (sz_drv >= 128 + 0x80000000 / (sz_sect / 2)) {
-            lba = 6; lba2 = lba + 0x80000000 / (sz_sect / 2);
-            for (n = 0, pn(pns); n < (UINT)(sz_sect * 2); n++) pbuff[n] = (BYTE)pn(0);
-            printf(" disk_write(%u, 0x%X, %lu, 1)", pdrv, (UINT)pbuff, lba);
-            dr = disk_write(pdrv, pbuff, lba, 1);
-            if (dr == RES_OK) {
-                printf(" - ok.\n");
-            } else {
-                printf(" - failed.\n");
-                return 19;
-            }
-            printf(" disk_write(%u, 0x%X, %lu, 1)", pdrv, (UINT)(pbuff+sz_sect), lba2);
-            dr = disk_write(pdrv, pbuff+sz_sect, lba2, 1);
-            if (dr == RES_OK) {
-                printf(" - ok.\n");
-            } else {
-                printf(" - failed.\n");
-                return 20;
-            }
-            printf(" disk_ioctl(%u, CTRL_SYNC, NULL)", pdrv);
-            dr = disk_ioctl(pdrv, CTRL_SYNC, 0);
-            if (dr == RES_OK) {
-            printf(" - ok.\n");
-            } else {
-                printf(" - failed.\n");
-                return 21;
-            }
-            memset(pbuff, 0, sz_sect * 2);
-            printf(" disk_read(%u, 0x%X, %lu, 1)", pdrv, (UINT)pbuff, lba);
-            dr = disk_read(pdrv, pbuff, lba, 1);
-            if (dr == RES_OK) {
-                printf(" - ok.\n");
-            } else {
-                printf(" - failed.\n");
-                return 22;
-            }
-            printf(" disk_read(%u, 0x%X, %lu, 1)", pdrv, (UINT)(pbuff+sz_sect), lba2);
-            dr = disk_read(pdrv, pbuff+sz_sect, lba2, 1);
-            if (dr == RES_OK) {
-                printf(" - ok.\n");
-            } else {
-                printf(" - failed.\n");
-                return 23;
-            }
-            for (n = 0, pn(pns); pbuff[n] == (BYTE)pn(0) && n < (UINT)(sz_sect * 2); n++) ;
-            if (n == (UINT)(sz_sect * 2)) {
-                printf(" Data matched.\n");
-            } else {
-                printf("Failed: Read data differs from the data written.\n");
-                return 24;
-            }
-        } else {
-            printf(" Test skipped.\n");
-        }
-        pns++;
+        FCHK(rst, f_lseek(&g_ff_file, 4), while(1));
+        FCHK(rst, f_write(&g_ff_file, pattern, 32, &len), while(1));
 
-        printf("**** Test cycle %u of %u completed ****\n\n", cc, ncyc);
+        FCHK(rst, f_lseek(&g_ff_file, cur_pos), while(1));
+        memset(pattern, 0xcc, pattern_len);
+        FCHK(rst, f_write(&g_ff_file, pattern, pattern_len, &len), while(1));
+
+        FCHK(rst, f_close(&g_ff_file), while(1));
+
+        FCHK(rst, f_open(&g_ff_file, full_path, FA_OPEN_EXISTING | FA_READ), while(1));
+        FCHK(rst, f_read(&g_ff_file, pattern, pattern_len, &len), while(1));
+        FCHK(rst, f_read(&g_ff_file, pattern, pattern_len, &len), while(1));
+        FCHK(rst, f_close(&g_ff_file), while(1));
+    }
+
+    {
+        FRESULT     rst = FR_OK;
+        UINT        offset = 0;
+        FATFS       *pFatfs = &g_sd_fatfs;
+        DWORD       free_clust = 0;
+
+        FCHK(rst, f_getfree(FS_SD_VOLUME, &free_clust, &pFatfs), while(1));
+        printf("total: %d KBytes, free: %d KBytes\n",
+               ((pFatfs->n_fatent - 2) * pFatfs->csize * FF_MAX_SS) >> 10,
+               (free_clust * pFatfs->csize * FF_MAX_SS) >> 10);
     }
 
     return 0;
 }
-
-
-
-int main (int argc, char* argv[])
-{
-    int rc = 0;
-
-    #if 1
-    do {
-        FATFS       fatfs_1 = {0};
-        FRESULT     res = 0;
-        FIL         fil;
-        char        *str = "Hello From FATFS";
-        UINT        len = 0;
-        BYTE        test_wrok[1024];
-
-        res = f_mount(&fatfs_1, _T("0:"), 1);
-        if( FR_NO_FILESYSTEM == res )
-        {
-            res = f_mkfs(_T("0:"), FM_ANY, 0, test_wrok, sizeof(test_wrok));
-            if( res != FR_OK )
-            {
-                err("%s", "err !!!!");
-                break;
-            }
-
-            res = f_mount(&fatfs_1, _T("0:"), 1);
-            if( res != FR_OK )
-            {
-                err("%s", "err !!!!");
-                break;
-            }
-        }
-
-        res = f_open(&fil, _T("0:config.h"), FA_CREATE_NEW | FA_WRITE);
-        if( res != FR_OK )
-        {
-            err("%s", "err !!!!");
-            break;
-        }
-        res = f_write(&fil, str, strlen(str), &len);
-        if( res != FR_OK )
-        {
-            err("%s", "err !!!!");
-            break;
-        }
-
-        f_close(&fil);
-
-        {
-            BYTE msg[128] = {0};
-            res = f_open(&fil, _T("0:config.h"), FA_OPEN_ALWAYS | FA_READ);
-            if( res != FR_OK )
-            {
-                err("%s", "err !!!!");
-                break;
-            }
-
-            res = f_read(&fil, msg, 128, &len);
-            if( res != FR_OK )
-            {
-                err("%s", "err !!!!");
-                break;
-            }
-
-            f_close(&fil);
-        }
-
-        res = f_mount(NULL, _T("0:"), 0);
-    } while(0);
-
-    #else
-    DWORD buff[FF_MAX_SS];  /* Working buffer (4 sector in size) */
-
-    /* Check function/compatibility of the physical drive #0 */
-    rc = test_diskio(0, 3, buff, sizeof buff);
-
-    if (rc) {
-        printf("Sorry the function/compatibility test failed. (rc=%d)\nFatFs will not work with this disk driver.\n", rc);
-    } else {
-        printf("Congratulations! The disk driver works well.\n");
-    }
-    #endif // 1
-
-    return rc;
-}
-
