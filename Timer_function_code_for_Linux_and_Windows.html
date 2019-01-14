@@ -1,0 +1,385 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html style=""><script data-savepage-src="moz-extension://e8af3748-cab9-4ad3-8a37-7f418908bdae/js/inject.js" src=""></script><head>
+    <base href="https://teuniz.net/Timer_code/index.html">
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>Timer function code for Linux and Windows</title>
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="-1">
+    <meta name="description" content="Timer function code for Linux and Windows">
+    <style data-savepage-href="../styles.css" type="text/css">
+body { padding-top: 65px; }
+
+h1,h2,h3,h4,h5,h6 {
+
+    margin-left: 25px; font-family: Arial;
+}
+
+h3 {
+    padding-bottom: 0.25em;
+    background-image: /*savepage-url=underline.png*/ url(data:image/png;resource=1;base64,);
+    background-repeat: repeat-x;
+    background-position: bottom;
+}
+
+ul.normal a          { line-height: 1.8em; font-size: 0.9em;}
+
+ul.normal_txt        { line-height: 1.5em; font-size: 0.9em; font-family: Arial;}
+
+pre.code             { margin-left: 25px; line-height: 1.1em; font-size: 1em; background-color: #ECECEC; color: black;}
+
+pre.console          { margin-left: 25px; line-height: 1.1em; font-size: 1em; background-color: black; color: green;}
+
+p                    { margin-left: 25px; line-height: 1.5em; font-size: 0.9em; font-family: Arial;}
+
+p.right, div.right   { text-align: right;  }
+p.center, div.center { text-align: center; }
+
+img.greyborder {
+
+    padding: 2px;
+    border: solid 1px rgb(60%,60%,60%);
+    margin-left: 1.2em;
+    margin-right: 1.2em;
+}
+
+div.cimage {
+
+    margin-top: 1.2em;
+    text-align: center;
+    font-family: Arial;
+}
+
+div.caption {
+
+    text-align: center;
+    font-size: 0.85em;
+    font-family: Arial;
+    color: rgb(20%,20%,20%);
+}
+
+li.normal {
+    font-family: Arial;
+}
+
+ul.navbar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    background-color: #333;
+    overflow: none;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+li.navbar {
+    float: left;
+}
+
+li.navbar a, .dropbtn {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    font-family: Arial;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li.navbar a:hover, .dropdown:hover .dropbtn {
+    background-color: #111;
+}
+
+.dropdown {
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    font-family: Arial;
+    display: block;
+}
+
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+
+th,td {
+   border: 1px solid black;
+   border-collapse: collapse;
+   text-align: center;
+   font-family: Arial;
+   font-size: 0.9em;
+   width: 80px;
+   height: 25px;
+}
+
+
+a.anchor {
+  padding-top: 75px;
+  margin-top: -75px;
+}
+
+</style>
+
+    <link rel="icon" href="">
+    <script id="savepage-pageloader" type="application/javascript">
+      savepage_PageLoader(5);
+      "use strict";function savepage_PageLoader(maxframedepth){var resourceMimeType=new Array();var resourceBase64Data=new Array();var resourceBlobUrl=new Array();window.addEventListener("DOMContentLoaded",function(a){createBlobURLs();replaceReferences(0,document.documentElement)},false);function createBlobURLs(){var i,j,binaryString,blobData;var a=new Array();for(i=0;i<resourceMimeType.length;i++){if(typeof resourceMimeType[i]!="undefined"){binaryString=atob(resourceBase64Data[i]);resourceBase64Data[i]="";a.length=0;for(j=0;j<binaryString.length;j++){a[j]=binaryString.charCodeAt(j)}blobData=new Blob([new Uint8Array(a)],{type:resourceMimeType[i]});resourceMimeType[i]="";resourceBlobUrl[i]=window.URL.createObjectURL(blobData)}}}function replaceReferences(a,b){var i,regex1,regex2,csstext,blobData;regex1=/url\(\s*((?:"[^"]+")|(?:'[^']+')|(?:[^\s)]+))\s*\)/gi;regex2=/data:[^;]*;resource=(\d+);base64,/i;if(b.hasAttribute("style")){csstext=b.style.cssText;b.style.cssText=csstext.replace(regex1,replaceCSSRef)}if(b.localName=="style"){csstext=b.textContent;b.textContent=csstext.replace(regex1,replaceCSSRef)}else if(b.localName=="link"&&(b.rel.toLowerCase()=="icon"||b.rel.toLowerCase()=="shortcut icon")){if(b.href!="")b.href=b.href.replace(regex2,replaceRef)}else if(b.localName=="body"){if(b.background!="")b.background=b.background.replace(regex2,replaceRef)}else if(b.localName=="img"){if(b.src!="")b.src=b.src.replace(regex2,replaceRef)}else if(b.localName=="input"&&b.type.toLowerCase()=="image"){if(b.src!="")b.src=b.src.replace(regex2,replaceRef)}else if(b.localName=="audio"){if(b.src!=""){b.src=b.src.replace(regex2,replaceRef);b.load()}}else if(b.localName=="video"){if(b.src!=""){b.src=b.src.replace(regex2,replaceRef);b.load()}if(b.poster!="")b.poster=b.poster.replace(regex2,replaceRef)}else if(b.localName=="source"){if(b.src!=""){b.src=b.src.replace(regex2,replaceRef);b.parentElement.load()}}else if(b.localName=="track"){if(b.src!="")b.src=b.src.replace(regex2,replaceRef)}else if(b.localName=="object"){if(b.data!="")b.data=b.data.replace(regex2,replaceRef)}else if(b.localName=="embed"){if(b.src!="")b.src=b.src.replace(regex2,replaceRef)}if(b.localName=="iframe"||b.localName=="frame"){if(a<maxframedepth){if(b.hasAttribute("data-savepage-sameorigin")){blobData=new Blob([decodeURIComponent(b.src.substr(29))],{type:"text/html;charset=utf-8"});b.onload=function(){try{if(b.contentDocument.documentElement!=null){replaceReferences(a+1,b.contentDocument.documentElement)}}catch(e){}};b.src=window.URL.createObjectURL(blobData)}}}else{for(i=0;i<b.childNodes.length;i++){if(b.childNodes[i]!=null){if(b.childNodes[i].nodeType==1)replaceReferences(a,b.childNodes[i])}}}}function replaceCSSRef(a,b,c,d){var e=new Array();e=b.match(/data:[^;]*;resource=(\d+);base64,/i);if(e!=null)return"url("+resourceBlobUrl[+e[1]]+")";else return a}function replaceRef(a,b,c,d){return resourceBlobUrl[+b]}
+        resourceMimeType[1] = "image/png"; resourceBase64Data[1] = "iVBORw0KGgoAAAANSUhEUgAAAGQAAAACCAIAAAAhLe5EAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wwHDicUvRqa8AAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAEUlEQVQoFWNgGAWjIUCLEAAAAloAAU94A7IAAAAASUVORK5CYII=";
+        resourceMimeType[2] = "text/html"; resourceBase64Data[2] = "PCFET0NUWVBFIEhUTUwgUFVCTElDICItLy9XM0MvL0RURCBIVE1MIDQuMDEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvVFIvaHRtbDQvc3RyaWN0LmR0ZCI+CjxodG1sPjxoZWFkPgogICAgPG1ldGEgaHR0cC1lcXVpdj0iQ29udGVudC1UeXBlIiBjb250ZW50PSJ0ZXh0L2h0bWw7IGNoYXJzZXQ9SVNPLTg4NTktMSI+CiAgICA8dGl0bGU+VGltZXIgZnVuY3Rpb24gY29kZSBmb3IgTGludXggYW5kIFdpbmRvd3M8L3RpdGxlPgogICAgPG1ldGEgaHR0cC1lcXVpdj0iUHJhZ21hIiBjb250ZW50PSJuby1jYWNoZSI+CiAgICA8bWV0YSBodHRwLWVxdWl2PSJFeHBpcmVzIiBjb250ZW50PSItMSI+CiAgICA8bWV0YSBuYW1lPSJkZXNjcmlwdGlvbiIgY29udGVudD0iVGltZXIgZnVuY3Rpb24gY29kZSBmb3IgTGludXggYW5kIFdpbmRvd3MiPgogICAgPGxpbmsgcmVsPSJzdHlsZXNoZWV0IiB0eXBlPSJ0ZXh0L2NzcyIgaHJlZj0iLi4vc3R5bGVzLmNzcyI+CjwvaGVhZD48Ym9keT4KCjx1bCBjbGFzcz0ibmF2YmFyIj4KICA8bGkgY2xhc3M9Im5hdmJhciI+PGEgaHJlZj0iLi4vaW5kZXguaHRtbCI+SG9tZTwvYT48L2xpPgogIDxsaT4KICAgIDxkaXYgY2xhc3M9ImRyb3Bkb3duIj4KICAgICAgPGEgY2xhc3M9ImRyb3BidG4iPlByb2plY3RzPC9hPgogICAgICA8ZGl2IGNsYXNzPSJkcm9wZG93bi1jb250ZW50Ij4KICAgICAgICA8YSBocmVmPSIuLi9lZGZicm93c2VyL2luZGV4Lmh0bWwiPkVERmJyb3dzZXI8L2E+CiAgICAgICAgPGEgaHJlZj0iLi4vZWRmbGliL2luZGV4Lmh0bWwiPkVERmxpYjwvYT4KICAgICAgICA8YSBocmVmPSIuLi9lZGZfbGFidmlldy9pbmRleC5odG1sIj5FREYgZm9yIExhYnZpZXc8L2E+CiAgICAgICAgPGEgaHJlZj0iLi4vUlMtMjMyL2luZGV4Lmh0bWwiPlJTLTIzMjwvYT4KICAgICAgICA8YSBocmVmPSIuLi9EU1JlbW90ZS9pbmRleC5odG1sIj5EU1JlbW90ZTwvYT4KICAgICAgICA8YSBocmVmPSIuLi9zZXJpYWwtY29tLXRlc3Rlci9pbmRleC5odG1sIj5TZXJpYWwgQ29tIFRlc3RlcjwvYT4KICAgICAgICA8YSBocmVmPSIjIj5UaW1lciBsaWJyYXJ5PC9hPgo8IS0tICAgICAgICA8YSBocmVmPSIuLi9lYWdsZS9lYWdsZWxpYmNoZWNrL2luZGV4Lmh0bWwiPkVhZ2xlIGxpYnJhcnkgY2hlY2tlcjwvYT4gICAtLT4KICAgICAgPC9kaXY+CiAgICA8L2Rpdj4KICA8L2xpPgo8L3VsPgoKPGgxPlRpbWVyIGZ1bmN0aW9uIGNvZGUgZm9yIExpbnV4IGFuZCBXaW5kb3dzPC9oMT4KCjxwPgogICAgSGVyZSB5b3UgY2FuIGZpbmQgYSBtdWx0aXBsYXRmb3JtIHRpbWVyIGxpYnJhcnkuPGJyPgogICAgSXQgaGFzIGJlZW4gdGVzdGVkIHdpdGggR0NDIG9uIExpbnV4IGFuZCBNaW5HVyBvbiBXaW5kb3dzLjxicj4KCiAgICBJdCBpcyBsaWNlbnNlZCB1bmRlciB0aGUgPGEgaHJlZj0iaHR0cDovL3d3dy5nbnUub3JnL2xpY2Vuc2VzL29sZC1saWNlbnNlcy9ncGwtMi4wLnR4dCI+R1BMIHZlcnNpb24gMjwvYT4uPGJyPjxicj4KPC9wPgoKPHA+PGJyPjwvcD4KCjxoMz5Eb3dubG9hZDwvaDM+Cgo8cD4KICAgIFRoaXMgaXMgZnJlZSBzb2Z0d2FyZSwgaXQgaXMgZXhwZXJpbWVudGFsIGFuZCBhdmFpbGFibGUgdW5kZXIgdGhlIEdQTCBMaWNlbnNlIHZlcnNpb24gMi48YnI+CiAgICBEZXNwaXRlIHRoaXMgc29mdHdhcmUgaXMgaW50ZW5kIHRvIGJlIHVzZWZ1bGwsIHRoZXJlIGlzIG5vIHdhcnJhbnR5LCB1c2UgdGhpcyBzb2Z0d2FyZSBhdCB5b3VyIG93biByaXNrLgo8L3A+Cgo8aDI+VGhlIHNvdXJjZWNvZGU8L2gyPgo8dWw+CiAgICA8bGkgY2xhc3M9Im5vcm1hbCI+PGEgaHJlZj0idGltZXIudGFyLmd6Ij50aW1lci50YXIuZ3o8L2E+PC9saT4KPC91bD4KCjxwPjxicj48L3A+Cgo8aDM+RnVuY3Rpb25zPC9oMz4KCjxwPgogICAgPHZhcj48YSBzdHlsZT0iY29sb3I6IG1hcm9vbiI+aW50PC9hPjwvdmFyPiBzdGFydF90aW1lcig8dmFyPjxhIHN0eWxlPSJjb2xvcjogbWFyb29uIj5pbnQ8L2E+IG1pbGxpU2Vjb25kcywgPGEgc3R5bGU9ImNvbG9yOiBtYXJvb24iPnZvaWQ8L2E+ICgqKSg8YSBzdHlsZT0iY29sb3I6IG1hcm9vbiI+dm9pZDwvYT4pPC92YXI+KTxicj48YnI+CiAgICAgICAgJm5ic3A7Jm5ic3A7U3RhcnRzIHRoZSB0aW1lci4gU2Vjb25kIGFyZ3VtZW50IGlzIGEgcG9pbnRlciB0byB5b3VyIGZ1bmN0aW9uIHRoYXQgd2lsbCBiZSBjYWxsZWQuPGJyPgogICAgICAgICZuYnNwOyZuYnNwO1JldHVybnMgMSBpbiBjYXNlIG9mIGFuIGVycm9yLjxicj48YnI+CgogICAgPHZhcj48YSBzdHlsZT0iY29sb3I6IG1hcm9vbiI+dm9pZDwvYT48L3Zhcj4gc3RvcF90aW1lcig8dmFyPjxhIHN0eWxlPSJjb2xvcjogbWFyb29uIj52b2lkPC9hPik8L3Zhcj48YnI+PGJyPgogICAgICAgICZuYnNwOyZuYnNwO1N0b3BzIHRoZSB0aW1lcjxicj4KPC9wPgoKPHA+PGJyPjwvcD4KCjxoMz5Ob3Rlczo8L2gzPgoKPHA+CiAgICBFeGFtcGxlIGNvZGUgdGhhdCBkZW1vbnN0cmF0ZXMgaG93IHRvIHVzZSB0aGUgdGltZXI6PGJyPgogICAgKGNvbXBpbGUgd2l0aCB0aGUgY29tbWFuZDogZ2NjIG1haW4uYyB0aW1lci5jIC1XYWxsIC1XZXh0cmEgLXMgLW8yIC1vIHRlc3RfdGltZXIpCjwvcD4KCjxwcmUgY2xhc3M9ImNvZGUiPgoKLyoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCgpmaWxlOiBtYWluLmMKcHVycG9zZTogc2ltcGxlIGRlbW8gdGhhdCBkZW1vbnN0cmF0ZXMgdGhlIHRpbWVyLWZ1bmN0aW9uCgoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKi8KCgoKI2luY2x1ZGUgJmx0O3N0ZGlvLmgmZ3Q7CiNpbmNsdWRlICZsdDtzdGRsaWIuaCZndDsKCiNpbmNsdWRlICZxdW90O3RpbWVyLmgmcXVvdDsKCgoKdm9pZCB0aW1lcl9oYW5kbGVyKHZvaWQpOwoKaW50IHZhcj0wOwoKCmludCBtYWluKHZvaWQpCnsKICBpZihzdGFydF90aW1lcigxMDAwLCAmYW1wO3RpbWVyX2hhbmRsZXIpKQogIHsKICAgIHByaW50ZigmcXVvdDtcbiB0aW1lciBlcnJvclxuJnF1b3Q7KTsKICAgIHJldHVybigxKTsKICB9CgogIHByaW50ZigmcXVvdDtcbnByZXNzIGN0bC1jIHRvIHF1aXQuXG4mcXVvdDspOwoKICB3aGlsZSgxKQogIHsKICAgIGlmKHZhciAmZ3Q7IDUpCiAgICB7CiAgICAgIGJyZWFrOwogICAgfQogIH0KCiAgc3RvcF90aW1lcigpOwoKICByZXR1cm4oMCk7Cn0KCgp2b2lkIHRpbWVyX2hhbmRsZXIodm9pZCkKewogIHByaW50ZigmcXVvdDt0aW1lcjogdmFyIGlzICVpXG4mcXVvdDssIHZhcisrKTsKfQoKPC9wcmU+Cgo8cD48YnI+PC9wPgoKPGgzPkFjY3VyYWN5IGFuZCBUaW1lciBSZXNvbHV0aW9uPC9oMz4KCjxwPgogICAgVGhlIHRpbWVyIHdpbGwgbmV2ZXIgdGltZSBvdXQgZWFybGllciB0aGFuIHRoZSBzcGVjaWZpZWQgdGltZW91dCB2YWx1ZSBhbmQgaXQgaXMgbm90IGd1YXJhbnRlZWQgdG8gdGltZSBvdXQgYXQgdGhlIGV4YWN0IHZhbHVlIHNwZWNpZmllZC48YnI+CiAgICBJbiBtYW55IHNpdHVhdGlvbnMsIHRoZXkgbWF5IHRpbWUgb3V0IGxhdGUgYnkgYSBwZXJpb2Qgb2YgdGltZSB0aGF0IGRlcGVuZHMgb24gdGhlIGFjY3VyYWN5IG9mIHRoZSBzeXN0ZW0gdGltZXJzLjxicj4KPGJyPgogICAgVGhlIGFjY3VyYWN5IG9mIGEgdGltZXIgZGVwZW5kcyBvbiB0aGUgdW5kZXJseWluZyBvcGVyYXRpbmcgc3lzdGVtIGFuZCBoYXJkd2FyZS4gTW9zdCBwbGF0Zm9ybXMgc3VwcG9ydCBhIHJlc29sdXRpb24gb2YgMSBtaWxsaXNlY29uZCw8YnI+CiAgICB0aG91Z2ggdGhlIGFjY3VyYWN5IG9mIHRoZSB0aW1lciB3aWxsIG5vdCBlcXVhbCB0aGlzIHJlc29sdXRpb24gaW4gbWFueSByZWFsLXdvcmxkIHNpdHVhdGlvbnMuCjwvcD4KCjxwPjxicj48YnI+PGJyPjxicj48L3A+Cgo8L2JvZHk+PC9odG1sPgo=";
+      }
+    </script>
+    <meta name="savepage-url" content="https://teuniz.net/Timer_code/index.html">
+    <meta name="savepage-title" content="Timer function code for Linux and Windows">
+    <meta name="savepage-date" content="Mon Jan 14 2019 20:29:30 GMT+0800">
+    <meta name="savepage-state" content="Standard Items; Used page loader; Retained cross-origin frames; Removed unsaved URLs; Max frame depth = 5; Max resource size = 50MB; Max resource time = 10s;">
+    <meta name="savepage-version" content="12.7">
+    <meta name="savepage-comments" content=""></head><body style="margin-bottom: 36px !important;">
+
+<ul class="navbar">
+  <li class="navbar"><a href="../index.html">Home</a></li>
+  <li>
+    <div class="dropdown">
+      <a class="dropbtn">Projects</a>
+      <div class="dropdown-content">
+        <a href="../edfbrowser/index.html">EDFbrowser</a>
+        <a href="../edflib/index.html">EDFlib</a>
+        <a href="../edf_labview/index.html">EDF for Labview</a>
+        <a href="../RS-232/index.html">RS-232</a>
+        <a href="../DSRemote/index.html">DSRemote</a>
+        <a href="../serial-com-tester/index.html">Serial Com Tester</a>
+        <a href="#">Timer library</a>
+<!--        <a href="../eagle/eaglelibcheck/index.html">Eagle library checker</a>   -->
+      </div>
+    </div>
+  </li>
+</ul>
+
+<h1>Timer function code for Linux and Windows</h1>
+
+<p>
+    Here you can find a multiplatform timer library.<br>
+    It has been tested with GCC on Linux and MinGW on Windows.<br>
+
+    It is licensed under the <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL version 2</a>.<br><br>
+</p>
+
+<p><br></p>
+
+<h3>Download</h3>
+
+<p>
+    This is free software, it is experimental and available under the GPL License version 2.<br>
+    Despite this software is intend to be usefull, there is no warranty, use this software at your own risk.
+</p>
+
+<h2>The sourcecode</h2>
+<ul>
+    <li class="normal"><a href="timer.tar.gz">timer.tar.gz</a></li>
+</ul>
+
+<p><br></p>
+
+<h3>Functions</h3>
+
+<p>
+    <var><a style="color: maroon">int</a></var> start_timer(<var><a style="color: maroon">int</a> milliSeconds, <a style="color: maroon">void</a> (*)(<a style="color: maroon">void</a>)</var>)<br><br>
+          Starts the timer. Second argument is a pointer to your function that will be called.<br>
+          Returns 1 in case of an error.<br><br>
+
+    <var><a style="color: maroon">void</a></var> stop_timer(<var><a style="color: maroon">void</a>)</var><br><br>
+          Stops the timer<br>
+</p>
+
+<p><br></p>
+
+<h3>Notes:</h3>
+
+<p>
+    Example code that demonstrates how to use the timer:<br>
+    (compile with the command: gcc main.c timer.c -Wall -Wextra -s -o2 -o test_timer)
+</p>
+
+<pre class="code">
+/**************************************************
+
+file: main.c
+purpose: simple demo that demonstrates the timer-function
+
+**************************************************/
+
+
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+#include "timer.h"
+
+
+
+void timer_handler(void);
+
+int var=0;
+
+
+int main(void)
+{
+  if(start_timer(1000, &amp;timer_handler))
+  {
+    printf("\n timer error\n");
+    return(1);
+  }
+
+  printf("\npress ctl-c to quit.\n");
+
+  while(1)
+  {
+    if(var &gt; 5)
+    {
+      break;
+    }
+  }
+
+  stop_timer();
+
+  return(0);
+}
+
+
+void timer_handler(void)
+{
+  printf("timer: var is %i\n", var++);
+}
+
+</pre>
+
+<p><br></p>
+
+<h3>Accuracy and Timer Resolution</h3>
+
+<p>
+    The timer will never time out earlier than the specified timeout value and it is not guaranteed to time out at the exact value specified.<br>
+    In many situations, they may time out late by a period of time that depends on the accuracy of the system timers.<br>
+<br>
+    The accuracy of a timer depends on the underlying operating system and hardware. Most platforms support a resolution of 1 millisecond,<br>
+    though the accuracy of the timer will not equal this resolution in many real-world situations.
+</p>
+
+<p><br><br><br><br></p>
+
+
+<link rel="stylesheet" type="text/css" href="moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/s3downbar.css?googleapis"><link rel="stylesheet" type="text/css" href="moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/contextmenu.css?googleapis"><link rel="stylesheet" type="text/css" href="moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/tooltip.css?googleapis"><div id="s3downbar-ibmbeeacmbeeaebmfjpmnlgkhoejinha" style="box-sizing: initial !important; position: fixed; white-space: nowrap; width: 100% !important; left: 0px; bottom: 0px; border-top: 1px solid rgb(153, 153, 153); transform-origin: left bottom 0px; z-index: 2147483647; margin: 0px; padding: 2px 0px; background-color: rgb(238, 238, 238); color: rgb(34, 34, 34); display: flex !important; transform: scale(1) !important;"><style type="text/css" media="print">#s3downbar-ibmbeeacmbeeaebmfjpmnlgkhoejinha { display: none !important; }</style><div style="box-sizing: initial !important; position: absolute !important;" id="s3downbar_resize_pane" is_top="false"><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important; color: rgb(34, 34, 34) !important; position: relative !important; order: 4 !important;" class="s3dmBox" id="s3downbar_hide_button" is_hidden="false"><div id="s3downbar_hide_button_img" style="box-sizing: initial !important; background-image: url(&quot;moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/s3dm_icons.png&quot;) !important; display: inline-block !important;"></div><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div style="box-sizing: initial !important;" class="tooltipText">Hide Download Bar</div><div style="box-sizing: initial !important;" class="tooltipText">Ctrl + Shift + Z = Show/Hide Download Bar</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important; color: rgb(34, 34, 34) !important; position: relative !important;" class="s3dmBox" id="s3downbar_main_menu_button" is_hidden="false"><img style="box-sizing: initial !important;" src="moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/logo16.png"><span style="box-sizing: initial !important;">下載</span><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div style="box-sizing: initial !important;" class="tooltipText">Download Manager (S3)</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important; color: rgb(34, 34, 34) !important; position: relative !important; order: 2 !important;" class="s3dmBox" id="s3downbar_clear_button" is_hidden="false">清除<div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div style="box-sizing: initial !important;" class="tooltipText">按左鍵: 移除全部已完成檔案</div><div style="box-sizing: initial !important;" class="tooltipText">按右鍵: 復原上次清除項目</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important; color: rgb(34, 34, 34) !important; position: relative !important; order: 1 !important;" class="s3dmBox" id="s3downbar_holder_summary_progress" is_hidden="false"><div style="box-sizing: initial !important;">100%</div><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div style="box-sizing: initial !important;" class="tooltipText">下載歷史記錄</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div><div style="box-sizing: initial !important;" id="s3downbar_download_data_listbox"><div style="box-sizing: initial !important; max-height: 60px !important;" id="s3downbar_download_data_listbox_scroll" list_count="2"><div style="box-sizing: initial !important;" id="s3downbar_download_data_list_empty">Download list is empty</div><div id="s3db_C81E728D9D4C2F636F067F89CC14862C" class="download_data_box db_finishedHbox" style="background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)) !important;" click_handle="finished_click_handle">
+		<div class="download_data_box_iframe_box"><div id="s3downbar_download_box_iframe" class="download_data_box_iframe" is_hidden="true"></div></div>
+		<div id="s3downbar_download_box_progressremainder" class="download_data_box_progressremainder" is_hidden="true"></div>
+		<div id="s3downbar_download_box_progress" class="download_data_box_progress" style="background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)) !important; width: 100% !important; background-color: rgb(112, 143, 181) !important; border-right: 1px solid rgb(255, 0, 0) !important;" is_hidden="true"></div>
+		<div id="s3downbar_download_box_data" class="download_data_box_data">
+			<img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" id="s3downbar_download_box_img" class="download_data_box_img" style="background: rgba(0, 0, 0, 0) url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABaElEQVQ4jZXRMW6DMBQGYB/NV8gaVercNVszeWLmAtwABoQsWRYRLFlyiXRJ5wSwAWPzd0hC44Yk6pN+eXn+LL9HyKXKssSr5HluV6vVJ5mrsixhhwHWDnDOwjmLcXQYRwdrB4yjw263gxDCLd+WH3dAURQYBvMQGUeH7XYLrTU45/1isXj3gM1mA2P6p4iUEkIICCEgpYQH5HkO03dnxBjYwcwi34cDvvb7e0BKib5rQSkFY2w2lNIJEkL4gBACXaunxtuL12KMPQY452j1GSCEgFKKoigmhBACxtj0Hc65D2RZBq3U1AxgunQbd5lLlmU+kKYpdNN4r/09GWOw9ryhNE19IEkSqLp+OcTrmpMk8YE4jtFUFVRdQzUNtGrQaoVOa3Rti77rftc8GMRx7ANRFKGuqntEKbQzSBRFPhCGIerTCXV1ukHqGaSF6TuEYegDQRCgOh49pHmCBEHgA+v1Gv8NIYT8AFzulm08p3zfAAAAAElFTkSuQmCC&quot;) no-repeat scroll 50% 50% / contain !important;" no_image="false" is_hidden="false">
+			<img data-savepage-src="" src="data:text/html;resource=2;base64," id="s3downbar_download_box_img_queue" class="download_data_box_img" is_hidden="true">
+			<img data-savepage-src="" src="data:text/html;resource=2;base64," id="s3downbar_download_box_picToShrink" pictoshrink="true" is_hidden="true" class="download_data_box_img">
+			<div id="s3downbar_download_box_filename" class="download_data_box_filename">timer.tar.gz</div>
+			<div id="s3downbar_download_box_progress_data" class="download_data_box_progress_data" is_hidden="true">
+				<div id="s3downbar_download_box_progress_percent" class="download_data_box_progress_percent" is_hidden="true">100%</div>
+				<div id="s3downbar_download_box_progress_remaintime" class="download_data_box_progress_remaintime" is_hidden="false">--:--</div>
+				<div id="s3downbar_download_box_progress_bytesReceived" class="download_data_box_progress_bytesReceived" is_hidden="true">2 KB</div>
+				<div id="s3downbar_download_box_progress_speed" class="download_data_box_progress_speed" is_hidden="false">-.--</div>
+			</div>
+		</div>
+	<div style="box-sizing: initial !important; position: fixed !important; z-index: 50 !important;"><div style="box-sizing: initial !important; display: none !important; opacity: 0 !important;" class="tooltip_box" is_top="false"><div id="download_data_tooltip" class="download_data_tooltip">
+		<div class="download_data_tooltip_head">
+			<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACTElEQVRYhe3WvWsacRwG8KfQqUvpWGgLNYQMaen/0Kkt3fxHLBSX3N1f0zh10MG9Q7jNhAQ8QcRm0aRWzZDk3n4vTwc1Jqd3ei/d8oUHD055Pt/fiQg8zuNEpt1u8+LigqPRiJeXl1tm9v7BYEDbtlkqlSqZAY7jUGvNLCOEoOM4tG2bOzs73zMDgiAgSWqtqbWiUnGRlHIZkuz1eux2uzw7O1OlUukbgCc5APHF0fIF4Pz8N4fDIaWUPD095d7eXgXA00yAbbZeRpAku90u+/0+SfLq6opHR0fc3d2tbo1wHIe+78cC4soXgE6nw1rtB2u1Gg8PD9loNNhsNgngLYBnqQEAcqXVarFer2sAHwG8zATIOovPOo6jAHwB8DozIGnLZIDm9fW1AvAZwKuUAPkAkLRlEmA6naYFeNRaU0oZewJRwLr7AKi15nQ6SQfwvGTA/fLoCawCVLGAaFESqACAKAQwmaQGuNRaUYjtAXGPQynFyWScHqDUesC6JH0JlZLpAa67CsgyBQDC3D/FOQCSQoQMw/sJGIYBg+B+/Lv4/iLeXZSSHI8zAKSUK8XLcn9jse979DyPUgqOx3/zALYpXy2exc0DSD7yuK1nAPcuGQG3lFJEyjcf+XL7ggB5yzMB2u02b25uGIbhvNyLANyVuK5L171dmzAUHI3+KACftgb8j8HsH9FmQLlc/lmpVH5ZlnVimuaxaZrHhjF7NU3jQQzDODaMg7U5OJjFsqyTarXaAvAVwJuNgPk8B/AewH4BeQfgw/z6RbToH+g5dv8ovZECAAAAAElFTkSuQmCC" id="s3downbar_download_tooltip_img" class="download_data_tooltip_img" no_image="false">
+			<div id="s3downbar_download_tooltip_filename" class="download_data_tooltip_filename">timer.tar.gz </div>
+		</div>
+		<div class="download_data_tooltip_data_box" id="s3downbar_download_tooltip_data_box" is_hidden_progress="true" is_hidden_finish="false">
+			<table class="download_data_tooltip_data">
+				<tbody><tr id="s3downbar_download_tooltip_source_box"><td><div>Source:</div></td><td><input value="https://teuniz.net/Timer_code/index.html" id="s3downbar_download_tooltip_source" class="download_data_tooltip_url" readonly="true" title="https://teuniz.net/Timer_code/index.html" type="text"></td></tr>
+				<tr><td><div>從:</div></td><td><input value="https://teuniz.net/Timer_code/timer.tar.gz" id="s3downbar_download_tooltip_from" class="download_data_tooltip_url" readonly="true" title="https://teuniz.net/Timer_code/timer.tar.gz" type="text"></td></tr>
+				<tr><td><div>儲存至:</div></td><td><div id="s3downbar_download_tooltip_to">D:\_portable\msys64\home\redegg\timer.tar.gz</div></td></tr>
+				<tr class="download_progress"><td><div>狀態:</div></td><td><div id="s3downbar_download_tooltip_status">2 KB / 2 KB ( -.-- )</div></td></tr>
+				<tr class="download_finish"><td><div>檔案大小:</div></td><td><div id="s3downbar_download_tooltip_size" filenotfound="false">2 KB</div></td></tr>
+				<tr class="download_finish" id="s3downbar_download_virus_scan_box" is_hidden="true"><td><div id="s3downbar_download_virus_scan_label">Virus scan:</div></td><td><a id="s3downbar_download_virus_scan" target="_blank"></a></td></tr>
+				<tr><td><div>開始時間:</div></td><td><div id="s3downbar_download_tooltip_timeStart">2019.01.14 - 20:03:41</div></td></tr>
+				<tr class="download_finish"><td><div>完成時間:</div></td><td><div id="s3downbar_download_tooltip_timeEnd">00:01</div></td></tr>
+				<tr class="download_progress"><td><div>剩餘時間:</div></td><td><div id="s3downbar_download_tooltip_timeLeft">--:--</div></td></tr>
+				<tr class="download_progress"><td><div>完成百分比:</div></td><td><div id="s3downbar_download_tooltip_percent">100%</div></td></tr>
+				<tr class="download_finish"><td><div>平均速度:</div></td><td><div id="s3downbar_download_tooltip_speed">1 KB/秒</div></td></tr>
+			</tbody></table>
+			<div class="download_data_tooltip_img_preview_box download_finish"><div class="download_data_tooltip_img_box">
+				<img data-savepage-src="" src="data:text/html;resource=2;base64," id="s3downbar_download_tooltip_img_preview" is_hidden="true" class="download_data_tooltip_img_preview download_finish" width="120" height="120">
+				<div id="s3downbar_download_tooltip_img_size" class="download_data_tooltip_img_size"></div>
+			</div></div>
+		</div>
+		<div class="download_data_tooltip_hint" id="s3downbar_download_tooltip_hint_progress" is_hidden="true">
+			<div>mouse double click: download pause/resume</div>
+			<div>mouse middle click: download cancel</div>
+		</div>
+		<div class="download_data_tooltip_hint" id="s3downbar_download_tooltip_hint_finish" is_hidden="false">
+			<div>mouse double click: open file</div>
+			<div>mouse double click + Ctrl: open dir</div>
+			<div style="padding-top: 4px !important;">mouse middle click: delete from list</div>
+			<div>mouse middle click + Ctrl: delete from system</div>
+			<div style="padding-top: 4px !important;">press mouse button + Ctrl: drag &amp; drop</div>
+		</div>
+	</div></div><div style="box-sizing: initial !important; display: none !important; opacity: 0 !important;" class="tooltip_arrow" is_top="false"></div></div></div><div id="s3db_ECCBC87E4B5CE2FE28308FD9F2A7BAF3" class="download_data_box db_finishedHbox" style="background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)) !important;" click_handle="finished_click_handle">
+		<div class="download_data_box_iframe_box"><div id="s3downbar_download_box_iframe" is_hidden="true" class="download_data_box_iframe"></div></div>
+		<div id="s3downbar_download_box_progressremainder" class="download_data_box_progressremainder" is_hidden="true"></div>
+		<div id="s3downbar_download_box_progress" class="download_data_box_progress" style="background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)) !important; width: 100% !important;" is_hidden="true"></div>
+		<div id="s3downbar_download_box_data" class="download_data_box_data">
+			<img src="moz-extension://64b58237-9a08-4b20-84b9-ff7892f0d1ff/skin/delete2.png" id="s3downbar_download_box_img" class="download_data_box_img" style="background: rgba(0, 0, 0, 0) url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABxElEQVQ4jZ3Sy24SYQDFccKj2EcwuGCrG9zaBzDBpe7rhsSFqdoFMYQ0JjaBEVNrjRqaiLReWtomSKpVxAqlNDrcSjt1WmCYG/P93RiSBgaNJznL81sdj+dPkpkio/r8XYGF9DaJpQ/Ek9kZj1uSmSJuEcDDxVV8gSBT9+JPRgIv3n8bPRZg9wXRRJrlzQK+QJCbd2MLQ8DiypeR435fYFoOESnFhcvXBh0C5l9tnRmv5CrckdaZjmdoKhpq1yYipQbQEJBYyg7GU9FlJibDTEsZLt2Icf7qLIeqTUMxiUgpfIHgMBB7uYEQAuVUw+sPkdupYVqC+pHGrbk1ytU28uEYYO7ZKn1HkM7u4fWHsGyBpjuonT7KiUX9yKBS092BB/NvMGxBtlDD6w9xcKzR1R2UU5tduc2PA4Pvcs8diD56jWY4aLrDxGSY27EMmuFw/2kOrz/E57JKfr/rDkSkFGrHRm3brG1XuXg9htcf4tyVMDOPs5Rkna3SX4DWL5OGYtJQLBrHFk3FRG6Z7FZ7fCp32fzaHg/ILZP9pkG5ZlCSe+z87JGvaOSKHdbzbd5+PBkP7NX1wVnG1RXwBYL/3CHgf/Mb+oUs6jhtMfoAAAAASUVORK5CYII=&quot;) no-repeat scroll 50% 50% / contain !important;" no_image="false" is_hidden="false">
+			<img data-savepage-src="" src="data:text/html;resource=2;base64," id="s3downbar_download_box_img_queue" class="download_data_box_img" is_hidden="true">
+			<img data-savepage-src="" src="data:text/html;resource=2;base64," id="s3downbar_download_box_picToShrink" pictoshrink="true" is_hidden="true" class="download_data_box_img">
+			<div id="s3downbar_download_box_filename" class="download_data_box_filename">RTInterrupt.c</div>
+			<div id="s3downbar_download_box_progress_data" class="download_data_box_progress_data" is_hidden="true">
+				<div id="s3downbar_download_box_progress_percent" class="download_data_box_progress_percent" is_hidden="true">100%</div>
+				<div id="s3downbar_download_box_progress_remaintime" class="download_data_box_progress_remaintime" is_hidden="false">--:--</div>
+				<div id="s3downbar_download_box_progress_bytesReceived" class="download_data_box_progress_bytesReceived" is_hidden="true">25 KB</div>
+				<div id="s3downbar_download_box_progress_speed" class="download_data_box_progress_speed" is_hidden="false">-.--</div>
+			</div>
+		</div>
+	<div style="box-sizing: initial !important; position: fixed !important; z-index: 50 !important;"><div style="box-sizing: initial !important;" class="tooltip_box" is_top="false"><div id="download_data_tooltip" class="download_data_tooltip">
+		<div class="download_data_tooltip_head">
+			<img src="data:image/png;base64,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" id="s3downbar_download_tooltip_img" class="download_data_tooltip_img" no_image="false">
+			<div id="s3downbar_download_tooltip_filename" class="download_data_tooltip_filename">RTInterrupt.c </div>
+		</div>
+		<div class="download_data_tooltip_data_box" id="s3downbar_download_tooltip_data_box" is_hidden_progress="true" is_hidden_finish="false">
+			<table class="download_data_tooltip_data">
+				<tbody><tr id="s3downbar_download_tooltip_source_box"><td><div>Source:</div></td><td><input value="https://www.google.com/" id="s3downbar_download_tooltip_source" class="download_data_tooltip_url" readonly="true" title="https://www.google.com/" type="text"></td></tr>
+				<tr><td><div>從:</div></td><td><input value="http://www.vcl.salk.edu/~micah/RTInterrupt/RTInterrupt.c" id="s3downbar_download_tooltip_from" class="download_data_tooltip_url" readonly="true" title="http://www.vcl.salk.edu/~micah/RTInterrupt/RTInterrupt.c" type="text"></td></tr>
+				<tr><td><div>儲存至:</div></td><td><div id="s3downbar_download_tooltip_to">C:\Users\redegg\Desktop\RTInterrupt.c</div></td></tr>
+				<tr class="download_progress"><td><div>狀態:</div></td><td><div id="s3downbar_download_tooltip_status">25 KB / 25 KB ( -.-- )</div></td></tr>
+				<tr class="download_finish"><td><div>檔案大小:</div></td><td><div id="s3downbar_download_tooltip_size" filenotfound="true">找不到檔案</div></td></tr>
+				<tr class="download_finish" id="s3downbar_download_virus_scan_box" is_hidden="true"><td><div id="s3downbar_download_virus_scan_label">Virus scan:</div></td><td><a id="s3downbar_download_virus_scan" target="_blank"></a></td></tr>
+				<tr><td><div>開始時間:</div></td><td><div id="s3downbar_download_tooltip_timeStart">2019.01.14 - 20:19:17</div></td></tr>
+				<tr class="download_finish"><td><div>完成時間:</div></td><td><div id="s3downbar_download_tooltip_timeEnd">&lt;00:01</div></td></tr>
+				<tr class="download_progress"><td><div>剩餘時間:</div></td><td><div id="s3downbar_download_tooltip_timeLeft">--:--</div></td></tr>
+				<tr class="download_progress"><td><div>完成百分比:</div></td><td><div id="s3downbar_download_tooltip_percent">100%</div></td></tr>
+				<tr class="download_finish"><td><div>平均速度:</div></td><td><div id="s3downbar_download_tooltip_speed">未知</div></td></tr>
+			</tbody></table>
+			<div class="download_data_tooltip_img_preview_box download_finish"><div class="download_data_tooltip_img_box">
+				<img data-savepage-src="" src="data:text/html;resource=2;base64," id="s3downbar_download_tooltip_img_preview" is_hidden="true" class="download_data_tooltip_img_preview download_finish" width="120" height="120">
+				<div id="s3downbar_download_tooltip_img_size" class="download_data_tooltip_img_size"></div>
+			</div></div>
+		</div>
+		<div class="download_data_tooltip_hint" id="s3downbar_download_tooltip_hint_progress" is_hidden="true">
+			<div>mouse double click: download pause/resume</div>
+			<div>mouse middle click: download cancel</div>
+		</div>
+		<div class="download_data_tooltip_hint" id="s3downbar_download_tooltip_hint_finish" is_hidden="false">
+			<div>mouse double click: open file</div>
+			<div>mouse double click + Ctrl: open dir</div>
+			<div style="padding-top: 4px !important;">mouse middle click: delete from list</div>
+			<div>mouse middle click + Ctrl: delete from system</div>
+			<div style="padding-top: 4px !important;">press mouse button + Ctrl: drag &amp; drop</div>
+		</div>
+	</div></div><div style="box-sizing: initial !important;" class="tooltip_arrow" is_top="false"></div></div></div></div></div></div></body></html>
