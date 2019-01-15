@@ -34,20 +34,33 @@
 #include "timer.h"
 
 
-
 void (*timer_func_handler_pntr)(void);
 
-
 #ifdef __linux__
+
+
+/**
+ *  FIXME: Not sure it works or not
+ */
+#define CFG_ENABLE_SIGINFO      1
 
 struct itimerval    timervalue;
 struct sigaction    new_handler, old_handler;
 
+#if defined(CFG_ENABLE_SIGINFO) && (CFG_ENABLE_SIGINFO)
+static void
+timer_sig_handler(int sig, siginfo_t *si, void *uc)
+{
+    // ucontext_t      *context = (ucontext_t*)uc;
+
+    timer_func_handler_pntr();
+}
+#else
 static void timer_sig_handler(int arg)
 {
     timer_func_handler_pntr();
 }
-
+#endif
 
 void*
 timer_get_time(void)
@@ -76,6 +89,29 @@ int start_timer(int mSec, void (*timer_func_handler)(void))
 {
     timer_func_handler_pntr = timer_func_handler;
 
+#if defined(CFG_ENABLE_SIGINFO) && (CFG_ENABLE_SIGINFO)
+
+    printf("Establishing handler for signal %d\n", SIGALRM);
+    memset(&new_handler, 0x0, sizeof(new_handler));
+    new_handler.sa_flags     = SA_SIGINFO;
+    new_handler.sa_sigaction = timer_sig_handler;
+    sigemptyset(&new_handler.sa_mask);
+    if (sigaction(SIGALRM, &new_handler, NULL) == -1)
+    {
+        printf("\nsigaction() error\n");
+        return(1);
+    }
+#else
+
+    new_handler.sa_handler = &timer_sig_handler;
+    new_handler.sa_flags   = SA_NOMASK;
+    if(sigaction(SIGALRM, &new_handler, &old_handler))
+    {
+        printf("\nsigaction() error\n");
+        return(1);
+    }
+#endif
+
     timervalue.it_interval.tv_sec = mSec / 1000;
     timervalue.it_interval.tv_usec = (mSec % 1000) * 1000;
     timervalue.it_value.tv_sec = mSec / 1000;
@@ -86,19 +122,8 @@ int start_timer(int mSec, void (*timer_func_handler)(void))
         return(1);
     }
 
-    new_handler.sa_handler = &timer_sig_handler;
-    new_handler.sa_flags   = SA_NOMASK;
-    if(sigaction(SIGALRM, &new_handler, &old_handler))
-    {
-        printf("\nsigaction() error\n");
-        return(1);
-    }
-
     return(0);
 }
-
-
-
 
 void stop_timer(void)
 {
@@ -111,7 +136,7 @@ void stop_timer(void)
     sigaction(SIGALRM, &old_handler, NULL);
 }
 
-#else
+#else  /* #ifdef __linux__ */
 
 HANDLE  win_timer;
 
@@ -149,6 +174,18 @@ int timer_start(int mSec, void (*timer_func_handler)(void))
 {
     timer_func_handler_pntr = timer_func_handler;
 
+/**
+ *  BOOL WINAPI CreateTimerQueueTimer(
+ *          _Out_    PHANDLE             phNewTimer,
+ *          _In_opt_ HANDLE              TimerQueue,
+ *          _In_     WAITORTIMERCALLBACK Callback,
+ *          _In_opt_ PVOID               Parameter,
+ *          _In_     DWORD               DueTime,
+ *          _In_     DWORD               Period,
+ *          _In_     ULONG               Flags
+ *          );
+ */
+
     if(CreateTimerQueueTimer(&win_timer, NULL, (WAITORTIMERCALLBACK)timer_sig_handler, NULL, mSec, mSec, WT_EXECUTEINTIMERTHREAD) == 0)
     {
         printf("\nCreateTimerQueueTimer() error\n");
@@ -161,21 +198,11 @@ int timer_start(int mSec, void (*timer_func_handler)(void))
 
 void timer_stop(void)
 {
+    // CloseHandle(win_timer);
     DeleteTimerQueueTimer(NULL, win_timer, NULL);
-//    CloseHandle(win_timer);
 }
 
 #endif
-
-
-
-
-
-
-
-
-
-
 
 
 
