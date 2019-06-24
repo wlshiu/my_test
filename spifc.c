@@ -56,7 +56,11 @@ _spi_program_page(uint8_t *pData, uintptr_t flash_addr, uint32_t bytes)
 
     for(int i = 0; i < cnt; i++)
     {
-        g_spifc_mem_sim[flash_addr + (i << 2)] &= *pCur++;
+        uint32_t    *pDest = (uint32_t*)g_spifc_mem_sim;
+
+        pDest = (uint32_t*)((uintptr_t)pDest + (flash_addr + (i << 2)));
+
+        *pDest &= *pCur++;
     }
     return;
 }
