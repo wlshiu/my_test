@@ -19,4 +19,6 @@
 + test_tftp_client
 + test_timer
 + test_trace_malloc
++ test_wsdiscovery
 + test_xml
+
