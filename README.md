@@ -6,6 +6,8 @@
 + test_c_wrap_py
 + test_combination
 + test_crc32
++ test_elf
+    - [reference](https://github.com/TheCodeArtist/elf-parser)
 + test_fatfs
 + test_frame_buf
 + test_libevent
