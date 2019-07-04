@@ -470,7 +470,6 @@ read_elf_header(
     file_handle_t   *pHFile,
     Elf32_Ehdr      *pElf_header)
 {
-    int     rval = 0;
     do {
         long    len = 0;
 
@@ -481,7 +480,7 @@ read_elf_header(
         if( len != sizeof(Elf32_Ehdr) )
             err("read fail %ld/%ld\n", len, sizeof(Elf32_Ehdr));
     } while(0);
-    return rval;
+    return;
 }
 
 

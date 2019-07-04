@@ -50,7 +50,43 @@ int main(int argc, char *argv[])
              */
 //            print_symbols(&hFile, &eh, pSh_tbl);
 
-            save_text_section(&hFile, &eh, pSh_tbl);
+//            save_text_section(&hFile, &eh, pSh_tbl);
+
+            {   // output bin file
+                FILE        *fout = 0;
+                char        bin_name[64] = {0};
+                uint8_t     *pSh_str = 0;
+
+                pSh_str = read_section(&hFile, &pSh_tbl[eh.e_shstrndx]);
+                if( !pSh_str )      break;
+
+                snprintf(bin_name, 64, "%s.bin", argv[1]);
+                if( !(fout = fopen(bin_name, "wb")) )
+                {
+                    err("open %s fail \n", bin_name);
+                    break;
+                }
+
+                for(int i = 0; i < eh.e_phnum; i++)
+                {
+                    uint8_t     *pBuf = 0;
+
+                    if( !(pBuf = malloc(pSh_tbl[i + 1].sh_size)) )
+                    {
+                        continue;
+                    }
+
+                    fseek(hFile.fp, pSh_tbl[i + 1].sh_offset, SEEK_SET);
+                    fread(pBuf, 1, pSh_tbl[i + 1].sh_size, hFile.fp);
+
+                    fwrite(pBuf, 1, pSh_tbl[i + 1].sh_size, fout);
+                    free(pBuf);
+                }
+
+                if( pSh_str )   free(pSh_str);
+
+                fclose(fout);
+            }
 
             if( pSh_tbl )   free(pSh_tbl);
 
