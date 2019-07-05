@@ -763,6 +763,74 @@ print_symbols(
 }
 
 void
+save_section(
+    file_handle_t   *pHFile,
+    Elf32_Ehdr      *pEh,
+    Elf32_Shdr      *pSh_table,
+    char            *pName)
+{
+    uint8_t     *pSh_str = 0;   /* section-header string-table is also a section. */
+    uint8_t     *pBuf_txt = 0;
+    do {
+        int     i = 0;
+        long    len = 0;
+
+        pSh_str = read_section(pHFile, &pSh_table[pEh->e_shstrndx]);
+        if( !pSh_str )
+        {
+            err("no data \n");
+            break;
+        }
+
+        for(i = 0; i < pEh->e_shnum; i++)
+        {
+            printf("%s\n", pSh_str + pSh_table[i].sh_name);
+            if( !strcmp(pName, (pSh_str + pSh_table[i].sh_name)) )
+            {
+                msg("Found section\t\".text\"\n");
+                msg("at offset\t0x%08x\n", pSh_table[i].sh_offset);
+                msg("of size\t\t0x%08x\n", pSh_table[i].sh_size);
+                break;
+            }
+        }
+
+        if( i == pEh->e_shnum )
+        {
+            err("Can't find %s section \n", pName);
+            break;
+        }
+
+        fseek(pHFile->fp, pSh_table[i].sh_offset, SEEK_SET);
+
+        if( !(pBuf_txt = malloc(pSh_table[i].sh_size)) )
+        {
+            err("malloc %d fail \n", pSh_table[i].sh_size);
+            break;
+        }
+
+        len = fread(pBuf_txt, 1, pSh_table[i].sh_size, pHFile->fp);
+        if( len != pSh_table[i].sh_size )
+            err("read fail %ld/%ld\n", len, pSh_table[i].sh_size);
+
+        {
+            FILE    *fout = 0;
+            char    out_name[64] = {0};
+
+            snprintf(out_name, 64, "%s.bin", pName);
+            if( !(fout = fopen(out_name, "wb")) )
+            {
+                err("open %s fail \n", out_name);
+                break;
+            }
+
+            fwrite(pBuf_txt, 1, pSh_table[i].sh_size, fout);
+            fclose(fout);
+        }
+    } while(0);
+    return;
+}
+
+void
 save_text_section(
     file_handle_t   *pHFile,
     Elf32_Ehdr      *pEh,

@@ -52,6 +52,9 @@ int main(int argc, char *argv[])
 
 //            save_text_section(&hFile, &eh, pSh_tbl);
 
+            save_section(&hFile, &eh, pSh_tbl, ".img_m0");
+            save_section(&hFile, &eh, pSh_tbl, ".img_dsp");
+
             {   // output bin file
                 FILE        *fout = 0;
                 char        bin_name[64] = {0};
