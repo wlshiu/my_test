@@ -16,9 +16,11 @@
 + test_ring_log
 + test_sim_spifc
 + test_string_reverse
-+ test_tftp_client
 + test_timer
 + test_trace_malloc
 + test_wsdiscovery
 + test_xml
++ test_tftp
+    - [reference](https://github.com/wlshiu/tftpx)
++ test_uip
 
