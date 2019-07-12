@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_uip_win" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_uip_win" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c99" />
+					<Add option="-g" />
+					<Add option="-DWIN32" />
+					<Add directory="uip" />
+					<Add directory="x86-gcc" />
+					<Add directory="npcap-1.03/Include" />
+					<Add directory="../my_test" />
+				</Compiler>
+				<Linker>
+					<Add library="npcap-1.03/Lib/Packet.lib" />
+					<Add library="npcap-1.03/Lib/wpcap.lib" />
+					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/lib" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_uip_win" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="net.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="net.h" />
+		<Unit filename="net_app.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="net_app.h" />
+		<Unit filename="tftp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tftp.h" />
+		<Unit filename="uip/clock.h" />
+		<Unit filename="uip/lc-addrlabels.h" />
+		<Unit filename="uip/lc-switch.h" />
+		<Unit filename="uip/lc.h" />
+		<Unit filename="uip/pt.h" />
+		<Unit filename="uip/uip.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="uip/uip.h" />
+		<Unit filename="uip/uip_arch.h" />
+		<Unit filename="uip/uip_arp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="uip/uip_arp.h" />
+		<Unit filename="uip/uip_timer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="uip/uip_timer.h" />
+		<Unit filename="uip/uipopt.h" />
+		<Unit filename="x86-gcc/clock-arch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="x86-gcc/clock-arch.h" />
+		<Unit filename="x86-gcc/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="x86-gcc/pcapdev.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="x86-gcc/pcapdev.h" />
+		<Unit filename="x86-gcc/uip-conf.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
