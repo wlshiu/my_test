@@ -3,9 +3,14 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <windowsx.h>
+#include <winsock2.h>
 #include <ws2tcpip.h>
-extern int tftp_client(int argc, char **argv);
+#include <IPHlpApi.h>
 
+
+extern int tftp_client(int argc, char **argv);
+extern int tftp_server(int argc, char **argv);
 
 int main(int argc, char **argv)
 {
@@ -15,7 +20,8 @@ int main(int argc, char **argv)
     WSAStartup(MAKEWORD(2, 2), &wsadata);
 #endif
 
-    tftp_client(argc, argv);
+    tftp_server(argc, argv);
+//    tftp_client(argc, argv);
 
     WSACleanup();
 

@@ -77,6 +77,8 @@ void *work_thread(void *arg)
     struct sockaddr_in server;
     static socklen_t addr_len = sizeof(struct sockaddr_in);
 
+    pthread_detach(pthread_self());
+
     if(request->size <= 0)
     {
         printf("Bad request.\n");
@@ -110,21 +112,21 @@ void *work_thread(void *arg)
     // Choose handler
     switch(request->packet.cmd)
     {
-    case CMD_RRQ:
-        printf("handle_rrq called.\n");
-        handle_rrq(sock, request);
-        break;
-    case CMD_WRQ:
-        printf("handle_wrq called.\n");
-        handle_wrq(sock, request);
-        break;
-    case CMD_LIST:
-        printf("handle_list called.\n");
-        handle_list(sock, request);
-        break;
-    default:
-        printf("Illegal TFTP operation.\n");
-        break;
+        case CMD_RRQ:
+            printf("handle_rrq called.\n");
+            handle_rrq(sock, request);
+            break;
+        case CMD_WRQ:
+            printf("handle_wrq called.\n");
+            handle_wrq(sock, request);
+            break;
+        case CMD_LIST:
+            printf("handle_list called.\n");
+            handle_list(sock, request);
+            break;
+        default:
+            printf("Illegal TFTP operation.\n");
+            break;
     }
 
     // test{
@@ -284,8 +286,7 @@ void handle_rrq(int sock, struct tftpx_request *request)
     int s_size = 0;
     uint16_t block = 1;
     snd_packet.cmd = htons(CMD_DATA);
-    do
-    {
+    do {
         memset(snd_packet.data, 0, sizeof(snd_packet.data));
         snd_packet.block = htons(block);
         s_size = fread(snd_packet.data, 1, blocksize, fp);
@@ -295,8 +296,7 @@ void handle_rrq(int sock, struct tftpx_request *request)
             goto rrq_error;
         }
         block ++;
-    }
-    while(s_size == blocksize);
+    } while(s_size == blocksize);
 
     printf("\nSend file end.\n");
 
@@ -372,8 +372,7 @@ void handle_wrq(int sock, struct tftpx_request *request)
     int r_size = 0;
     uint16_t block = 1;
     int time_wait_data;
-    do
-    {
+    do {
         for(time_wait_data = 0; time_wait_data < PKT_RCV_TIMEOUT * PKT_MAX_RXMT; time_wait_data += 20000)
         {
             // Try receive(Nonblock receive).
@@ -406,8 +405,7 @@ void handle_wrq(int sock, struct tftpx_request *request)
         }
         printf("Send ACK=%d\n", block);
         block ++;
-    }
-    while(r_size == blocksize + 4);
+    } while(r_size == blocksize + 4);
 
     printf("Receive file end.\n");
 

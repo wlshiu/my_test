@@ -17,12 +17,15 @@
 
 // defined(__MINGW32__)
 #if defined(WIN32)
-//    #ifndef WIN32_LEAN_AND_MEAN
-//    #define WIN32_LEAN_AND_MEAN
-//    #endif
+    #ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
+    #endif
+
     #include <windows.h>
-//    #include <winsock2.h>
+    #include <windowsx.h>
+    #include <winsock2.h>
     #include <ws2tcpip.h>
+    #include <IPHlpApi.h>
     #include <ctype.h>
 
     #define MSG_DONTWAIT    0x40            /* Nonblocking io        */
@@ -49,7 +52,7 @@
 char *conf_document_root;
 
 
-#define SERVER_PORT         10220
+#define SERVER_PORT         69 //10220
 
 // Max request datagram size
 #define MAX_REQUEST_SIZE    1024
@@ -90,6 +93,8 @@ struct tftpx_request
     int size;
     struct sockaddr_in client;
     struct tftpx_packet packet;
+
+    struct sockaddr_in server;
 };
 
 #endif
