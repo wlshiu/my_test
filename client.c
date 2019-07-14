@@ -25,17 +25,7 @@ void help()
            "    blocksize   [size]\n"
            "    quit    \n");
 
-//    printf("Usage: cmd  arg0[,arg1,arg2...]\n");
-//    printf("  -Directory listing:\n");
-//    printf("    list path\n");
-//    printf("  -Download a file from the server:\n");
-//    printf("    get remote_file[ local_file]\n");
-//    printf("  -Upload a file to the server:\n");
-//    printf("    put filename\n");
-//    printf("  -Set blocksize:\n");
-//    printf("    blocksize size\n");
-//    printf("  -Quit this programm:\n");
-//    printf("    quit\n");
+    return;
 }
 
 int tftp_client(int argc, char **argv)
@@ -54,8 +44,8 @@ int tftp_client(int argc, char **argv)
 
     if(argc < 2)
     {
-        printf("Usage: %s server_ip [server_port]\n", argv[0]);
-        printf("    server_port - default 10220\n");
+        printf("Usage: %s [server_ip] [server_port]\n", argv[0]);
+        printf("    server_port - default %d\n", SERVER_PORT);
         return 0;
     }
     help();
@@ -67,19 +57,11 @@ int tftp_client(int argc, char **argv)
     }
     printf("Connect to server at %s:%d", server_ip, port);
 
-#if 1
     if((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
         printf("Server socket could not be created.\n");
         return 0;
     }
-#else
-    if((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
-    {
-        printf("Server socket could not be created.\n");
-        return 0;
-    }
-#endif
 
     // Initialize server address
     server.sin_family = AF_INET;
@@ -288,8 +270,7 @@ void do_put(char *filename)
     uint16_t block = 1;
     snd_packet.cmd = htons(CMD_DATA);
     // Send data.
-    do
-    {
+    do {
         memset(snd_packet.data, 0, sizeof(snd_packet.data));
         snd_packet.block = htons(block);
         s_size = fread(snd_packet.data, 1, blocksize, fp);
@@ -333,8 +314,7 @@ void do_put(char *filename)
         }
 
         block ++;
-    }
-    while(s_size == blocksize);
+    } while(s_size == blocksize);
 
     printf("\nSend file end.\n");
 
@@ -369,8 +349,7 @@ void do_list(int sock, char *dir)
     printf("-------------------------------------------------\n");
 
     // Receive data.
-    do
-    {
+    do {
         for(time_wait_data = 0; time_wait_data < PKT_RCV_TIMEOUT * PKT_MAX_RXMT; time_wait_data += 20000)
         {
             // Try receive(Nonblock receive).
@@ -396,6 +375,5 @@ void do_list(int sock, char *dir)
             printf("Wait for DATA #%d timeout.\n", block);
             return;
         }
-    }
-    while(r_size == blocksize + 4);
+    } while(r_size == blocksize + 4);
 }
