@@ -17,10 +17,17 @@
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-#define TFTP_IP1        127
-#define TFTP_IP2        0
-#define TFTP_IP3        0
-#define TFTP_IP4        1
+#if 1
+    #define TFTP_IP1        127
+    #define TFTP_IP2        0
+    #define TFTP_IP3        0
+    #define TFTP_IP4        1
+#else
+    #define TFTP_IP1        192
+    #define TFTP_IP2        168
+    #define TFTP_IP3        0
+    #define TFTP_IP4        11
+#endif
 
 #define STATE_CLOSED        0
 #define STATE_CONNECTING    1

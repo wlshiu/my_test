@@ -1,6 +1,6 @@
 
 #if 1
-    #define DEBUG_PRINTF(str, ...)   printf("[%s:%u] " str, __func__, __LINE__, __VA_ARGS__)
+    #define DEBUG_PRINTF(str, ...)   printf("[%s:%u] " str, __func__, __LINE__, ##__VA_ARGS__)
 #else
     #define DEBUG_PRINTF(...)
 #endif
@@ -208,6 +208,10 @@ uint8_t uip_acc32[4];
 static uint8_t c, opt;
 static uint16_t tmp16;
 
+#if UIP_UDP_CHECKSUMS
+static uint8_t g_do_udp_chksum = 0;
+#endif
+
 /* Structures and definitions. */
 #define TCP_FIN 0x01
 #define TCP_SYN 0x02
@@ -343,10 +347,31 @@ uip_chksum(uint16_t *data, uint16_t len)
 uint16_t
 uip_ipchksum(void)
 {
-    uint16_t sum;
+    uint16_t sum = 0;
 
-    sum = chksum(0, &uip_buf[UIP_LLH_LEN], UIP_IPH_LEN);
-//    DEBUG_PRINTF("uip_ipchksum: sum 0x%04x\n", sum);
+    if( uip_buf[UIP_LLH_LEN + 10] == 0 && uip_buf[UIP_LLH_LEN + 11] == 0 )
+    {
+        DEBUG_PRINTF("no ip chksum -> ip header chksum bypass\n");
+    }
+    else
+    {
+        sum = chksum(0, &uip_buf[UIP_LLH_LEN], UIP_IPH_LEN);
+        DEBUG_PRINTF("uip_ipchksum: sum 0x%04x\n", sum);
+    #if 0
+        if( sum == 0 || sum == 0xFFFF )
+        {
+            DEBUG_PRINTF("\n\n========== @@@\n");
+            for(int i = 0; i < UIP_IPH_LEN; i++)
+            {
+                if( i && !(i & 0xF) )
+                    DEBUG_PRINTF("\n");
+                DEBUG_PRINTF("%02X ", uip_buf[UIP_LLH_LEN + i]);
+            }
+            DEBUG_PRINTF("\n\n");
+        }
+    #endif
+    }
+
     return (sum == 0) ? 0xffff : uip_htons(sum);
 }
 #endif
@@ -355,24 +380,32 @@ static uint16_t
 upper_layer_chksum(uint8_t proto)
 {
     uint16_t upper_layer_len;
-    uint16_t sum;
+    uint16_t sum = 0;
 
-    #if UIP_CONF_IPV6
-    upper_layer_len = (((uint16_t)(BUF->len[0]) << 8) + BUF->len[1]);
-    #else /* UIP_CONF_IPV6 */
-    upper_layer_len = (((uint16_t)(BUF->len[0]) << 8) + BUF->len[1]) - UIP_IPH_LEN;
-    #endif /* UIP_CONF_IPV6 */
+    if( g_do_udp_chksum == 0 &&
+       uip_buf[UIP_LLH_LEN + 10] == 0 && uip_buf[UIP_LLH_LEN + 11] == 0 )
+    {
+        DEBUG_PRINTF("no ip chksum -> udp chksum bypass\n");
+    }
+    else
+    {
+        #if UIP_CONF_IPV6
+        upper_layer_len = (((uint16_t)(BUF->len[0]) << 8) + BUF->len[1]);
+        #else /* UIP_CONF_IPV6 */
+        upper_layer_len = (((uint16_t)(BUF->len[0]) << 8) + BUF->len[1]) - UIP_IPH_LEN;
+        #endif /* UIP_CONF_IPV6 */
 
-    /* First sum pseudoheader. */
+        /* First sum pseudoheader. */
 
-    /* IP protocol and length fields. This addition cannot carry. */
-    sum = upper_layer_len + proto;
-    /* Sum IP source and destination addresses. */
-    sum = chksum(sum, (uint8_t *)&BUF->srcipaddr[0], 2 * sizeof(uip_ipaddr_t));
+        /* IP protocol and length fields. This addition cannot carry. */
+        sum = upper_layer_len + proto;
+        /* Sum IP source and destination addresses. */
+        sum = chksum(sum, (uint8_t *)&BUF->srcipaddr[0], 2 * sizeof(uip_ipaddr_t));
 
-    /* Sum TCP header and data. */
-    sum = chksum(sum, &uip_buf[UIP_IPH_LEN + UIP_LLH_LEN],
-                 upper_layer_len);
+        /* Sum TCP header and data. */
+        sum = chksum(sum, &uip_buf[UIP_IPH_LEN + UIP_LLH_LEN],
+                     upper_layer_len);
+    }
 
     return (sum == 0) ? 0xffff : uip_htons(sum);
 }
@@ -382,7 +415,6 @@ uint16_t
 uip_icmp6chksum(void)
 {
     return upper_layer_chksum(UIP_PROTO_ICMP6);
-
 }
 #endif /* UIP_CONF_IPV6 */
 /*---------------------------------------------------------------------------*/
@@ -976,12 +1008,11 @@ uip_process(uint8_t flag)
 
     #if !UIP_CONF_IPV6
     if(uip_ipchksum() != 0xffff) {
-        /* Compute and check the IP header
-        			    checksum. */
+        /* Compute and check the IP header checksum. */
         UIP_STAT(++uip_stat.ip.drop);
         UIP_STAT(++uip_stat.ip.chkerr);
-//        UIP_LOG("ip: bad checksum.");
-//        goto drop;
+        UIP_LOG("ip: bad checksum.");
+        goto drop;
     }
     else
     {
@@ -1227,10 +1258,12 @@ udp_send:
 
     #if UIP_UDP_CHECKSUMS
     /* Calculate UDP checksum. */
+    g_do_udp_chksum = 1;
     UDPBUF->udpchksum = ~(uip_udpchksum());
     if(UDPBUF->udpchksum == 0) {
         UDPBUF->udpchksum = 0xffff;
     }
+    g_do_udp_chksum = 0;
     #endif /* UIP_UDP_CHECKSUMS */
     UIP_STAT(++uip_stat.udp.sent);
     goto ip_send_nolen;

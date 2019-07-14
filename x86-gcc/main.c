@@ -12,7 +12,17 @@
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-
+#if 1
+    #define MY_IP1        127
+    #define MY_IP2        0
+    #define MY_IP3        0
+    #define MY_IP4        2
+#else
+    #define MY_IP1        192
+    #define MY_IP2        168
+    #define MY_IP3        0
+    #define MY_IP4        12
+#endif
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -67,7 +77,7 @@ int main(void)
     uip_init();
     uip_ipaddr_t    ip;
 
-    uip_ipaddr(&ip, 127, 0, 0, 2);
+    uip_ipaddr(&ip, MY_IP1, MY_IP2, MY_IP3, MY_IP4);
     uip_sethostaddr(&ip);
 
     uip_ipaddr(&ip, 255, 255, 255, 0);

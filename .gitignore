@@ -41,10 +41,28 @@
 *.su
 *.idb
 *.pdb
+*/.gdb*
+
+# trace files
+tags
+TAGS
+ID
+cscope*
+GTAGS
+GPATH
+GRTAGS
+GSYMS
+
+# backup files
+*.orig
+*.bak
+*.swp
+*.un~
 
 # Kernel Module Compile Results
 *.mod*
 *.cmd
+*.bin
 .tmp_versions/
 modules.order
 Module.symvers
@@ -52,10 +70,31 @@ Mkfile.old
 dkms.conf
 *.depend
 *.layout
+*.emDepend
+*.emLayout
 obj/*
 bin/*
+*/build/*
+*.bak
+*.pyc
+*/.waf-*/*
+*/.lock-waf*
+*.xml
+*/build/*
+*/netanim-*/*
+*.pcap
+*/scratch/*
+*.log
+*.toolchain
 *.7z
 *.gz
+**/out/*
+**/Listings/*
+**/Objects/*
+*.uvguix.*
+*.uvgui.*
+**/JLinkLog.txt
+**/toolchain.env
 **/doc/*
 **/docs/*
 *.html

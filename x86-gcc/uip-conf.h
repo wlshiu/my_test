@@ -59,24 +59,6 @@
 
 
 /**
- * 8 bit datatype
- *
- * This typedef defines the 8-bit type used throughout uIP.
- *
- * \hideinitializer
- */
-typedef uint8_t uint8_t;
-
-/**
- * 16 bit datatype
- *
- * This typedef defines the 16-bit type used throughout uIP.
- *
- * \hideinitializer
- */
-typedef uint16_t uint16_t;
-
-/**
  * Statistics datatype
  *
  * This typedef defines the dataype used for keeping statistics in
@@ -165,7 +147,7 @@ typedef unsigned short uip_stats_t;
 #define log_ip(prefix, pIp4addr, str, ...)                    \
     do{ ip_convert_t    ip_cnv_ipaddr = {0};                  \
         memcpy(&ip_cnv_ipaddr, pIp4addr, 4);                  \
-        printf("%s %d:%d:%d:%d " str, prefix,                    \
+        printf("%s %d:%d:%d:%d " str, prefix,                 \
                ip_cnv_ipaddr.ip[0], ip_cnv_ipaddr.ip[1],      \
                ip_cnv_ipaddr.ip[2], ip_cnv_ipaddr.ip[3],      \
                ## __VA_ARGS__);                               \
