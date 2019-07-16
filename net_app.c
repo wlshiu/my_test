@@ -58,8 +58,13 @@ net_app__get_callback(void)
 }
 
 
+#if defined(CONFIG_CALLBACK_TRACE)
+void
+net_app__call_callback(const char* caller, int line)
+#else
 void
 net_app__call_callback(void)
+#endif // 1
 {
     do {
         if( !g_net_callback_func )
@@ -68,6 +73,9 @@ net_app__call_callback(void)
             break;
         }
 
+        #if defined(CONFIG_CALLBACK_TRACE)
+        printf("[%s] caller= %s, %u\n", __func__, caller, line);
+        #endif // defined
         g_net_callback_func();
     } while(0);
 

@@ -230,7 +230,7 @@ uip_arp_update(uint16_t *ipaddr, struct uip_eth_addr *ethaddr)
  * variable uip_len.
  */
 /*-----------------------------------------------------------------------------------*/
-#if 1
+#if 0
 void
 uip_arp_ipin(void)
 {

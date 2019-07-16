@@ -73,14 +73,14 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_CONF_MAX_CONNECTIONS 10
+#define UIP_CONF_MAX_CONNECTIONS    3
 
 /**
  * Maximum number of listening TCP ports.
  *
  * \hideinitializer
  */
-#define UIP_CONF_MAX_LISTENPORTS 5
+#define UIP_CONF_MAX_LISTENPORTS    5
 
 /**
  * uIP buffer size.
@@ -129,9 +129,13 @@ typedef unsigned short uip_stats_t;
 /* Here we include the header file for the application(s) we use in
    our project. */
 #include "net_app.h"
+#if defined(CONFIG_CALLBACK_TRACE)
+#define UIP_APPCALL()     	    net_app__call_callback(__func__, __LINE__)
+#define UIP_UDP_APPCALL()       net_app__call_callback(__func__, __LINE__)
+#else
 #define UIP_APPCALL     	net_app__call_callback
 #define UIP_UDP_APPCALL     net_app__call_callback
-
+#endif
 
 //#define UIP_CONF_EXTERNAL_BUFFER
 

@@ -83,13 +83,15 @@ _ifprint(pcap_if_t *d)
 }
 
 static int
-_get_packet(unsigned int* pLen, char** pkt_data)
+_get_packet(unsigned int* pLen, uint8_t** pkt_data)
 {
     int     rval = 0;
 
     do {
         int                 res;
         struct pcap_pkthdr  *header;
+
+//        int tm_start = clock_time();
 
         *pLen = 0;
         res = pcap_next_ex(g_pAd_handle, &header, (const u_char**)pkt_data);
@@ -99,6 +101,7 @@ _get_packet(unsigned int* pLen, char** pkt_data)
             rval = -12;
             break;
         }
+//        printf("[%s] rx pkg (use %d ms)\n", __func__, clock_time() - tm_start);
 
         *pLen = (res) ? header->len : 0;
     } while(0);
@@ -182,7 +185,7 @@ pcapdev_read(void)
 {
     uint32_t    len = 0;
     do {
-        char        *pData = 0;
+        uint8_t        *pData = 0;
 
         _get_packet(&len, &pData);
         if( len == 0 )  break;
@@ -230,6 +233,7 @@ pcapdev_send(void)
         tmpbuf[i] = ((uint8_t*)uip_appdata)[i - 40 - UIP_LLH_LEN];
     }
 
+#if 0
     printf("\n\n============== tx %d bytes\n", uip_len);
     for(i = 0; i < uip_len; i++)
     {
@@ -238,6 +242,7 @@ pcapdev_send(void)
         printf("%02X ", tmpbuf[i]);
     }
     printf("\n\n");
+#endif // 0
 
     if( pcap_sendpacket(g_pAd_handle, tmpbuf, uip_len) != 0 )
     {

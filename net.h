@@ -24,7 +24,8 @@ extern "C" {
 //=============================================================================
 typedef enum net_action
 {
-    NET_ACT_DHCP      = 0,
+    NET_ACT_UPGRADE_EVENT  = 0,
+    NET_ACT_DHCP,
     NET_ACT_TFTPC,
 
     NET_ACT_ALL,

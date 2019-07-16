@@ -22,6 +22,8 @@ extern "C" {
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
+//#define CONFIG_CALLBACK_TRACE
+
 typedef void (*cb_net_app)(void);
 //=============================================================================
 //                  Macro Definition
@@ -58,10 +60,13 @@ net_app__set_callback(
 cb_net_app
 net_app__get_callback(void);
 
-
+#if defined(CONFIG_CALLBACK_TRACE)
+void
+net_app__call_callback(const char* caller, int line);
+#else
 void
 net_app__call_callback(void);
-
+#endif
 
 #ifdef __cplusplus
 }

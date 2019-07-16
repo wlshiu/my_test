@@ -20,7 +20,19 @@
 //=============================================================================
 #define CONFIG_TIMEOUT_SEC          (CLOCK_CONF_SECOND * 500)
 
-#define CONFIG_FW_FILE_NAME         "tftp_patt.bin"
+#define CONFIG_FW_FILE_NAME         "ggg.jpg"
+
+#if 0
+    #define TFTP_IP1        127
+    #define TFTP_IP2        0
+    #define TFTP_IP3        0
+    #define TFTP_IP4        1
+#else
+    #define TFTP_IP1        192
+    #define TFTP_IP2        168
+    #define TFTP_IP3        56
+    #define TFTP_IP4        3
+#endif
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -45,7 +57,16 @@ static lc_t             g_net_act[NET_ACT_ALL] = {0};
 //=============================================================================
 PT_THREAD(_net_handler(void))
 {
+    uip_ipaddr_t    svr_addr;
+
     PT_BEGIN(&g_net_mgr.pt);
+
+    g_net_act[NET_ACT_UPGRADE_EVENT] = g_net_mgr.pt.lc;
+    // receive broadcast packet for upgrading
+
+    #if 0
+    PT_WAIT_UNTIL(&g_net_mgr.pt, dhcp_done());
+    #endif // 0
 
     g_net_act[NET_ACT_DHCP] = g_net_mgr.pt.lc;
 
@@ -60,9 +81,11 @@ PT_THREAD(_net_handler(void))
     // TFTP handle
     net_app__set_callback(tftpc_appcall);
     tftpc_init();
-    tftpc_get(CONFIG_FW_FILE_NAME);
 
-    PT_WAIT_UNTIL(&g_net_mgr.pt, !tftpc_busy());
+    uip_ipaddr(&svr_addr, TFTP_IP1, TFTP_IP2, TFTP_IP3, TFTP_IP4);
+    tftpc_get(&svr_addr, CONFIG_FW_FILE_NAME);
+
+    PT_WAIT_UNTIL(&g_net_mgr.pt, !tftpc_is_busy());
 
     #if 0
     timer_set(&g_net_mgr.timer, CONFIG_TIMEOUT_SEC);

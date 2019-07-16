@@ -1,5 +1,5 @@
 
-#if 1
+#if 0
     #define DEBUG_PRINTF(str, ...)   printf("[%s:%u] " str, __func__, __LINE__, ##__VA_ARGS__)
 #else
     #define DEBUG_PRINTF(...)
@@ -208,9 +208,8 @@ uint8_t uip_acc32[4];
 static uint8_t c, opt;
 static uint16_t tmp16;
 
-#if UIP_UDP_CHECKSUMS
-static uint8_t g_do_udp_chksum = 0;
-#endif
+static volatile uint32_t g_is_rx_chksum = 0;
+
 
 /* Structures and definitions. */
 #define TCP_FIN 0x01
@@ -349,7 +348,8 @@ uip_ipchksum(void)
 {
     uint16_t sum = 0;
 
-    if( uip_buf[UIP_LLH_LEN + 10] == 0 && uip_buf[UIP_LLH_LEN + 11] == 0 )
+    if( g_is_rx_chksum &&
+        uip_buf[UIP_LLH_LEN + 10] == 0 && uip_buf[UIP_LLH_LEN + 11] == 0 )
     {
         DEBUG_PRINTF("no ip chksum -> ip header chksum bypass\n");
     }
@@ -371,7 +371,7 @@ uip_ipchksum(void)
         }
     #endif
     }
-
+    g_is_rx_chksum = 0;
     return (sum == 0) ? 0xffff : uip_htons(sum);
 }
 #endif
@@ -382,7 +382,7 @@ upper_layer_chksum(uint8_t proto)
     uint16_t upper_layer_len;
     uint16_t sum = 0;
 
-    if( g_do_udp_chksum == 0 &&
+    if( g_is_rx_chksum &&
        uip_buf[UIP_LLH_LEN + 10] == 0 && uip_buf[UIP_LLH_LEN + 11] == 0 )
     {
         DEBUG_PRINTF("no ip chksum -> udp chksum bypass\n");
@@ -407,6 +407,7 @@ upper_layer_chksum(uint8_t proto)
                      upper_layer_len);
     }
 
+    g_is_rx_chksum = 0;
     return (sum == 0) ? 0xffff : uip_htons(sum);
 }
 /*---------------------------------------------------------------------------*/
@@ -979,9 +980,8 @@ uip_process(uint8_t flag)
 //        DEBUG_PRINTF("UDP IP checksum 0x%04x\n", uip_ipchksum());
 //        log_ip("### ", &BUF->destipaddr, "(ln. %d)\n", __LINE__);
         if(BUF->proto == UIP_PROTO_UDP &&
-                uip_ipaddr_cmp(BUF->destipaddr, all_ones_addr)
-                /*&&
-                uip_ipchksum() == 0xffff*/) {
+           uip_ipaddr_cmp(BUF->destipaddr, all_ones_addr)
+                /*&& uip_ipchksum() == 0xffff*/) {
             goto udp_input;
         }
         #endif /* UIP_BROADCAST */
@@ -1007,6 +1007,7 @@ uip_process(uint8_t flag)
     }
 
     #if !UIP_CONF_IPV6
+    g_is_rx_chksum = 1;
     if(uip_ipchksum() != 0xffff) {
         /* Compute and check the IP header checksum. */
         UIP_STAT(++uip_stat.ip.drop);
@@ -1014,16 +1015,11 @@ uip_process(uint8_t flag)
         UIP_LOG("ip: bad checksum.");
         goto drop;
     }
-    else
-    {
-        __asm("nop");
-    }
     #endif /* UIP_CONF_IPV6 */
 
     if(BUF->proto == UIP_PROTO_TCP) {
-        /* Check for TCP packet. If so,
-        			       proceed with TCP input
-        			       processing. */
+        /* Check for TCP packet.
+            If so, proceed with TCP input processing. */
         goto tcp_input;
     }
 
@@ -1091,8 +1087,7 @@ icmp_input:
     DEBUG_PRINTF("icmp6_input: length %d\n", uip_len);
 
     if(BUF->proto != UIP_PROTO_ICMP6) {
-        /* We only allow ICMPv6 packets from
-        				 here. */
+        /* We only allow ICMPv6 packets from here. */
         UIP_STAT(++uip_stat.ip.drop);
         UIP_STAT(++uip_stat.ip.protoerr);
         UIP_LOG("ip: neither tcp nor icmp6.");
@@ -1165,6 +1160,7 @@ udp_input:
     #if UIP_UDP_CHECKSUMS
     uip_len = uip_len - UIP_IPUDPH_LEN;
     uip_appdata = &uip_buf[UIP_LLH_LEN + UIP_IPUDPH_LEN];
+    g_is_rx_chksum = 1;
     if(UDPBUF->udpchksum != 0 && uip_udpchksum() != 0xffff) {
         UIP_STAT(++uip_stat.udp.drop);
         UIP_STAT(++uip_stat.udp.chkerr);
@@ -1177,8 +1173,9 @@ udp_input:
 
     /* Demultiplex this UDP packet between the UDP "connections". */
     for(uip_udp_conn = &uip_udp_conns[0];
-            uip_udp_conn < &uip_udp_conns[UIP_UDP_CONNS];
-            ++uip_udp_conn) {
+        uip_udp_conn < &uip_udp_conns[UIP_UDP_CONNS];
+        ++uip_udp_conn)
+    {
         /* If the local UDP port is non-zero, the connection is considered
            to be used. If so, the local port number is checked against the
            destination port number in the received packet. If the two port
@@ -1187,20 +1184,28 @@ udp_input:
            connection is bound to a remote IP address, the source IP
            address of the packet is checked. */
 
-        #if 1
-        printf("\n\n    lport=%d, destport=%d, rport=%d, srcport=%d\n",
-               uip_udp_conn->lport, UDPBUF->destport, uip_udp_conn->rport, UDPBUF->srcport);
+        #if 0
+        #warning "TODO: log disable"
+        printf("\n\n    lport=x%04x, destport=x%04x, rport=x%04x, srcport=x%02x\n",
+               uip_htons(uip_udp_conn->lport), uip_htons(UDPBUF->destport),
+               uip_htons(uip_udp_conn->rport), uip_htons(UDPBUF->srcport));
         log_ip("    ripaddr= ", &uip_udp_conn->ripaddr, "\n");
         log_ip("    srcipaddr= ", &BUF->srcipaddr, "\n");
         #endif
 
-        if(uip_udp_conn->lport != 0 &&
-                UDPBUF->destport == uip_udp_conn->lport &&
-                /*(uip_udp_conn->rport == 0 ||
-                 UDPBUF->srcport == uip_udp_conn->rport) && */
-                (uip_ipaddr_cmp(uip_udp_conn->ripaddr, all_zeroes_addr) ||
-                 uip_ipaddr_cmp(uip_udp_conn->ripaddr, all_ones_addr) ||
-                 uip_ipaddr_cmp(BUF->srcipaddr, uip_udp_conn->ripaddr))) {
+        if( uip_udp_conn->lport != 0 &&
+            UDPBUF->destport == uip_udp_conn->lport &&
+            (uip_udp_conn->rport == 0 ||
+             UDPBUF->srcport == uip_udp_conn->rport) &&
+            (uip_ipaddr_cmp(uip_udp_conn->ripaddr, all_zeroes_addr) ||
+             uip_ipaddr_cmp(uip_udp_conn->ripaddr, all_ones_addr) ||
+             uip_ipaddr_cmp(BUF->srcipaddr, uip_udp_conn->ripaddr)) )
+        {
+            #if 1
+            if(uip_udp_conn->rport == 0) {
+                uip_udp_conn->rport = UDPBUF->srcport;
+            }
+            #endif
             goto udp_found;
         }
     }
@@ -1258,12 +1263,10 @@ udp_send:
 
     #if UIP_UDP_CHECKSUMS
     /* Calculate UDP checksum. */
-    g_do_udp_chksum = 1;
     UDPBUF->udpchksum = ~(uip_udpchksum());
     if(UDPBUF->udpchksum == 0) {
         UDPBUF->udpchksum = 0xffff;
     }
-    g_do_udp_chksum = 0;
     #endif /* UIP_UDP_CHECKSUMS */
     UIP_STAT(++uip_stat.udp.sent);
     goto ip_send_nolen;
@@ -1283,7 +1286,6 @@ tcp_input:
         UIP_LOG("tcp: bad checksum.");
         goto drop;
     }
-
 
     /* Demultiplex this segment. */
     /* First check any active connections. */

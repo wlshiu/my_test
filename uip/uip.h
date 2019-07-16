@@ -1097,9 +1097,8 @@ struct uip_udp_conn *uip_udp_new(uip_ipaddr_t *ripaddr, uint16_t rport);
 uint16_t uip_htons(uint16_t val);
 #endif /* uip_htons */
 
-#ifndef ntohs
-//#define ntohs htons
-#define ntohs uip_htons
+#ifndef uip_ntohs
+#define uip_ntohs   uip_htons
 #endif
 /** @} */
 
@@ -1532,14 +1531,10 @@ struct uip_udpip_hdr {
 #define UIP_IPH_LEN    20    /* Size of IP header */
 #endif /* UIP_CONF_IPV6 */
 #define UIP_UDPH_LEN    8    /* Size of UDP header */
-#define UIP_TCPH_LEN   20    /* Size of TCP header */
-#define UIP_IPUDPH_LEN (UIP_UDPH_LEN + UIP_IPH_LEN)    /* Size of IP +
-							  UDP
-							  header */
-#define UIP_IPTCPH_LEN (UIP_TCPH_LEN + UIP_IPH_LEN)    /* Size of IP +
-							  TCP
-							  header */
-#define UIP_TCPIP_HLEN UIP_IPTCPH_LEN
+#define UIP_TCPH_LEN    20    /* Size of TCP header */
+#define UIP_IPUDPH_LEN  (UIP_UDPH_LEN + UIP_IPH_LEN)    /* Size of IP + UDP header */
+#define UIP_IPTCPH_LEN  (UIP_TCPH_LEN + UIP_IPH_LEN)    /* Size of IP + TCP  header */
+#define UIP_TCPIP_HLEN  UIP_IPTCPH_LEN
 
 
 #if UIP_FIXEDADDR
