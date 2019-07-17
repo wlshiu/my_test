@@ -27,6 +27,95 @@
     - [offical](https://github.com/adamdunkels/uip)
 
 
+# DHCP
+
++ install
+
+    ```
+    $ sudo apt install isc-dhcp-server
+    ```
+
++ configure setting
+
+    - set interface
+
+        ```
+        $ sudo vi /etc/default/isc-dhcp-server
+        ...
+        INTERFACES=""  => INTERFACES="eth0" or "enp0s8"
+        ```
+
+    - set dhcp config
+        ```
+        $ sudo vim /etc/dhcp/dhcpd.conf
+        ...
+        # add to tail
+        subnet 192.168.56.0 netmask 255.255.255.0 {
+            range 192.168.56.5 192.168.56.10;
+            option domain-name-servers 8.8.8.8;
+            option domain-name "my-cloud.orz";
+            option subnet-mask 255.255.255.0;
+            option routers 196.168.56.3;  # dhcp server ip address
+            option broadcast-address 192.168.56.254;
+            default-lease-time 600;
+            max-lease-time 7200;
+            filename "test.elf";
+        }
+        ```
+
++ run dhcp server
+
+    ```
+    $ sudo systemctl enable isc-dhcp-server
+    $ sudo systemctl restart isc-dhcp-server
+    ```
+
++ check dhcp server status
+
+    ```
+    $ sudo systemctl status isc-dhcp-server
+    ```
+
++ list assigned addresses
+
+    ```
+    $ dhcp-lease-list
+    ```
+
++ misc
+
+    - error msg `Can't open /var/lib/dhcp/dhcpd.leases for append.`
+        > change permission
+
+    ```
+    $ sudo chmod -R 777 /var/lib/dhcp/dhcpd.leases
+    ```
+
+    - [dhcptest](https://github.com/CyberShadow/dhcptest)
+
+    ```
+    # windows console
+    $ dhcptest-0.7-win64.exe --quiet --query --wait --tries 5 --timeout 10
+    op=BOOTREPLY chaddr=E4:97:67:C9:E3:E0 hops=0 xid=45B7FC3D secs=0 flags=0000
+    ciaddr=0.0.0.0 yiaddr=192.168.56.104 siaddr=0.0.0.0 giaddr=0.0.0.0 sname= file=
+    4 options:
+     54 (Server Identifier): 192.168.56.100
+     53 (DHCP Message Type): offer
+      1 (Subnet Mask): 255.255.255.0
+     51 (IP Address Lease Time): 1200 (20 minutes)
+    op=BOOTREPLY chaddr=E4:97:67:C9:E3:E0 hops=0 xid=45B7FC3D secs=0 flags=8000
+    ciaddr=0.0.0.0 yiaddr=192.168.56.7 siaddr=192.168.56.3 giaddr=0.0.0.0 sname= file=
+    8 options:
+     53 (DHCP Message Type): offer
+     54 (Server Identifier): 192.168.56.3
+     51 (IP Address Lease Time): 600 (10 minutes)
+      1 (Subnet Mask): 255.255.255.0
+      3 (Router Option): 196.168.56.2
+      6 (Domain Name Server Option): 8.8.8.8
+     28 (Broadcast Address Option): 192.168.56.254
+     15 (Domain Name): my-cloud.orz
+    ```
+
 # MS Visual Studio
 
 + include libs

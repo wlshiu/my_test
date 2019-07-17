@@ -84,16 +84,16 @@ int main(void)
     /* Initialize the uIP TCP/IP stack. */
     uip_init();
 
-    uip_ipaddr(&ip, MY_IP1, MY_IP2, MY_IP3, MY_IP4);
-    uip_sethostaddr(&ip);
-
-    uip_ipaddr(&ip, 255, 255, 255, 0);
-    uip_setnetmask(&ip);
+//    uip_ipaddr(&ip, MY_IP1, MY_IP2, MY_IP3, MY_IP4);
+//    uip_sethostaddr(&ip);
+//
+//    uip_ipaddr(&ip, 255, 255, 255, 0);
+//    uip_setnetmask(&ip);
 
 //    uip_ipaddr(&ip, 192, 168, 99, 1);
 //    uip_setdraddr(&ip);
 
-#if 1
+#if 0
     const uint8_t           mac[] = {MY_MAC1, MY_MAC2, MY_MAC3, MY_MAC4, MY_MAC5, MY_MAC6};
     struct uip_eth_addr     xAddr;
     xAddr.addr[0] = mac[0];

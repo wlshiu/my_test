@@ -13,7 +13,9 @@
 
 #include "pt.h"
 #include "uip_timer.h"
+#include "uip_arp.h"
 #include "net.h"
+#include "dhcpc.h"
 #include "tftp.h"
 //=============================================================================
 //                  Constant Definition
@@ -33,6 +35,24 @@
     #define TFTP_IP3        56
     #define TFTP_IP4        3
 #endif
+
+
+#if 1
+
+    #define MY_MAC1        0xaa
+    #define MY_MAC2        0xbb
+    #define MY_MAC3        0xcc
+    #define MY_MAC4        0xdd
+    #define MY_MAC5        0x11
+    #define MY_MAC6        0x22
+#else
+    #define MY_MAC1        0x0a
+    #define MY_MAC2        0x00
+    #define MY_MAC3        0x27
+    #define MY_MAC4        0x00
+    #define MY_MAC5        0x00
+    #define MY_MAC6        0x0e
+#endif
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -50,14 +70,15 @@ typedef struct net_mgr
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
-static net_mgr_t        g_net_mgr = {0};
-static lc_t             g_net_act[NET_ACT_ALL] = {0};
+static net_mgr_t                g_net_mgr = {0};
+static lc_t                     g_net_act[NET_ACT_ALL] = {0};
+static struct uip_eth_addr      g_mac_addr = {0};
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
 PT_THREAD(_net_handler(void))
 {
-    uip_ipaddr_t    svr_addr;
+//    uint16_t        retries = 0;
 
     PT_BEGIN(&g_net_mgr.pt);
 
@@ -65,27 +86,34 @@ PT_THREAD(_net_handler(void))
     // receive broadcast packet for upgrading
 
     #if 0
-    PT_WAIT_UNTIL(&g_net_mgr.pt, dhcp_done());
+    PT_WAIT_UNTIL(&g_net_mgr.pt, is_upgrade_event());
     #endif // 0
 
     g_net_act[NET_ACT_DHCP] = g_net_mgr.pt.lc;
 
-    // DHCP handle
+    {   // DHCP handle
+        net_app__set_callback(dhcpc_appcall);
 
-    #if 0
-    PT_WAIT_UNTIL(&g_net_mgr.pt, dhcp_done());
-    #endif // 0
+        PT_WAIT_UNTIL(&g_net_mgr.pt, (dhcpc_init(&g_mac_addr) == DHCPC_ERR_OK));
+
+        PT_WAIT_UNTIL(&g_net_mgr.pt, !dhcpc_is_busy());
+    }
 
     g_net_act[NET_ACT_TFTPC] = g_net_mgr.pt.lc;
 
-    // TFTP handle
-    net_app__set_callback(tftpc_appcall);
-    tftpc_init();
+#if 0
+    {   // TFTP handle
+        uip_ipaddr_t    svr_addr;
 
-    uip_ipaddr(&svr_addr, TFTP_IP1, TFTP_IP2, TFTP_IP3, TFTP_IP4);
-    tftpc_get(&svr_addr, CONFIG_FW_FILE_NAME);
+        net_app__set_callback(tftpc_appcall);
+        tftpc_init();
 
-    PT_WAIT_UNTIL(&g_net_mgr.pt, !tftpc_is_busy());
+        uip_ipaddr(&svr_addr, TFTP_IP1, TFTP_IP2, TFTP_IP3, TFTP_IP4);
+        tftpc_get(&svr_addr, CONFIG_FW_FILE_NAME);
+
+        PT_WAIT_UNTIL(&g_net_mgr.pt, !tftpc_is_busy());
+    }
+#endif // 0
 
     #if 0
     timer_set(&g_net_mgr.timer, CONFIG_TIMEOUT_SEC);
@@ -104,6 +132,15 @@ PT_THREAD(_net_handler(void))
 //=============================================================================
 void net_init(void)
 {
+    g_mac_addr.addr[0] = MY_MAC1;
+    g_mac_addr.addr[1] = MY_MAC2;
+    g_mac_addr.addr[2] = MY_MAC3;
+    g_mac_addr.addr[3] = MY_MAC4;
+    g_mac_addr.addr[4] = MY_MAC5;
+    g_mac_addr.addr[5] = MY_MAC6;
+
+    uip_setethaddr(g_mac_addr);
+
     PT_INIT(&g_net_mgr.pt);
     return;
 }
