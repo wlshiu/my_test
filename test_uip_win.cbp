@@ -46,6 +46,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="dhcpc.h" />
+		<Unit filename="ev_prober.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ev_prober.h" />
 		<Unit filename="net.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -464,7 +464,7 @@ tftpc_get(
         g_tftpc.conn[1] = uip_udp_new(pSvr_ipaddr, UIP_HTONS(0));
         if( !g_tftpc.conn[0] || !g_tftpc.conn[1] )
         {
-            log("No available connections");
+            log("No available udp connections\n");
             rval = TFTPC_ERR_CONNECTION_FULL;  // no available connections
             break;
         }

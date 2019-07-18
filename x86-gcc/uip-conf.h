@@ -111,29 +111,29 @@ typedef unsigned short uip_stats_t;
  */
 #define UIP_CONF_BROADCAST          1
 #define UIP_CONF_UDP                1
-#define UIP_CONF_UDP_CONNS		    3
+#define UIP_CONF_UDP_CONNS          6
 /**
  * UDP checksums on or off
  *
  * \hideinitializer
  */
-#define UIP_CONF_UDP_CHECKSUMS   1
+#define UIP_CONF_UDP_CHECKSUMS      1
 
 /**
  * uIP statistics on or off
  *
  * \hideinitializer
  */
-#define UIP_CONF_STATISTICS      0
+#define UIP_CONF_STATISTICS         0
 
 /* Here we include the header file for the application(s) we use in
    our project. */
 #include "net_app.h"
 #if defined(CONFIG_CALLBACK_TRACE)
-#define UIP_APPCALL()     	    net_app__call_callback(__func__, __LINE__)
+#define UIP_APPCALL()           net_app__call_callback(__func__, __LINE__)
 #define UIP_UDP_APPCALL()       net_app__call_callback(__func__, __LINE__)
 #else
-#define UIP_APPCALL     	net_app__call_callback
+#define UIP_APPCALL         net_app__call_callback
 #define UIP_UDP_APPCALL     net_app__call_callback
 #endif
 

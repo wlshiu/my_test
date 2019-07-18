@@ -44,6 +44,8 @@
 #define CONFIG_MEASURE_TIME
 
 
+#define DHCP_MSG_FILENAME_SIZE  128
+
 #define STATE_INITIAL           0
 #define STATE_SENDING           1
 #define STATE_OFFER_RECEIVED    2
@@ -76,11 +78,21 @@
 #define DHCP_OPTION_MSG_TYPE        53
 #define DHCP_OPTION_SERVER_ID       54
 #define DHCP_OPTION_REQ_LIST        55
-#define DHCP_OPTION_TFTP_SERVER     66
+#define DHCP_OPTION_TFTPD_NAME      66
+#define DHCP_OPTION_TFTPD_IP        150
 #define DHCP_OPTION_END             255
 
 
 #define DHCP_MAGIC_COOKIE           0x63538263u
+
+typedef enum dhcpc_phase
+{
+    DHCPC_PHASE_IP_ALLOC,
+    DHCPC_PHASE_IP_FREE,
+    DHCPC_PHASE_REQ,
+
+
+} dhcpc_phase_t;
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -113,10 +125,14 @@ typedef struct dhcpc
 
     uint16_t                lease_time[2];
     uip_ipaddr_t            ipaddr;
+    uip_ipaddr_t            next_ipaddr;
     uip_ipaddr_t            tftp_ipaddr;
     uip_ipaddr_t            netmask;
     uip_ipaddr_t            dnsaddr;
     uip_ipaddr_t            default_router;
+
+    char                    tftpd_name[64];
+    char                    boot_filename[DHCP_MSG_FILENAME_SIZE];
 } dhcpc_t;
 
 #pragma pack(1)
@@ -136,7 +152,7 @@ typedef struct dhcp_msg
     uint8_t     chaddr[16];     /* client's hardware address */
 
     uint8_t     sname[64];      /* server host name */
-    uint8_t     file[128];      /* boot file name */
+    uint8_t     filename[DHCP_MSG_FILENAME_SIZE];  /* boot file name */
 
     uint32_t    cookie;
     uint8_t     options[308];   /* message options - cookie */
@@ -150,6 +166,7 @@ static const uint8_t    magic_cookie[4] = {99, 130, 83, 99};
 
 static dhcpc_t          g_dhcpc;
 static uint32_t         g_dhcpc_is_busy = 0;
+static dhcpc_phase_t    g_dhcpc_phase = DHCPC_PHASE_IP_ALLOC;
 
 #if defined(CONFIG_MEASURE_TIME)
 static clock_time_t     g_tm_start = 0;
@@ -314,10 +331,12 @@ _dhcpc_parse_options(uint8_t *optptr, int len)
             case DHCP_OPTION_END:
                 return type;
 
-            case DHCP_OPTION_TFTP_SERVER:
+            case DHCP_OPTION_TFTPD_NAME:
+                vt_memcpy(g_dhcpc.tftpd_name, optptr + 2, *(optptr + 1));
+                break;
+            case DHCP_OPTION_TFTPD_IP:
                 vt_memcpy(g_dhcpc.tftp_ipaddr, optptr + 2, 4);
                 break;
-
             default:    break;
         }
 
@@ -346,7 +365,9 @@ _dhcpc_parse_msg(void)
              m->chaddr[4] == g_dhcpc.mac_addr.addr[4] &&
              m->chaddr[5] == g_dhcpc.mac_addr.addr[5]) )
         {
-            *((uint32_t*)&g_dhcpc.ipaddr) = m->yiaddr;
+            *((uint32_t*)&g_dhcpc.ipaddr)      = m->yiaddr;
+            *((uint32_t*)&g_dhcpc.next_ipaddr) = m->siaddr;
+            vt_memcpy(g_dhcpc.boot_filename, m->filename, DHCP_MSG_FILENAME_SIZE - 1);
             return _dhcpc_parse_options(m->options, uip_datalen());
         }
     } while(0);
@@ -363,64 +384,97 @@ PT_THREAD(handle_dhcp(void))
     g_dhcpc.state = STATE_SENDING;
     g_dhcpc.ticks = CLOCK_SECOND;
 
-#if defined(CONFIG_MEASURE_TIME)
-g_tm_start = clock_time();
-#endif // defined
+    if( g_dhcpc_phase == DHCPC_PHASE_IP_ALLOC )
+    {
+        #if defined(CONFIG_MEASURE_TIME)
+        g_tm_start = clock_time();
+        #endif // defined
 
-    do {
-        _dhcpc_send_discover();
+        do {
+            _dhcpc_send_discover();
 
-        timer_set(&g_dhcpc.timer, g_dhcpc.ticks);
-        PT_WAIT_UNTIL(&g_dhcpc.pt, uip_newdata() || timer_expired(&g_dhcpc.timer));
+            timer_set(&g_dhcpc.timer, g_dhcpc.ticks);
+            PT_WAIT_UNTIL(&g_dhcpc.pt, uip_newdata() || timer_expired(&g_dhcpc.timer));
 
-        if( _dhcpc_parse_msg() == DHCP_MSG_OFFER ) {
-            g_dhcpc.state = STATE_OFFER_RECEIVED;
-            break;
-        }
+            if( _dhcpc_parse_msg() == DHCP_MSG_OFFER ) {
+                g_dhcpc.state = STATE_OFFER_RECEIVED;
+                break;
+            }
 
-        if( g_dhcpc.ticks < CLOCK_SECOND * 60 ) {
-            g_dhcpc.ticks *= 2;
-        }
-    } while(g_dhcpc.state != STATE_OFFER_RECEIVED);
+            if( g_dhcpc.ticks < CLOCK_SECOND * 60 ) {
+                g_dhcpc.ticks *= 2;
+            }
+        } while(g_dhcpc.state != STATE_OFFER_RECEIVED);
 
-    g_dhcpc.ticks = CLOCK_SECOND;
+        #if defined(CONFIG_MEASURE_TIME)
+        log("time: %d ms\n", clock_time() - g_tm_start);
+        #endif // defined
 
-#if defined(CONFIG_MEASURE_TIME)
-log("time: %d ms\n", clock_time() - g_tm_start);
-g_tm_start = clock_time();
-#endif // defined
+        #if 1
+        log_ip("\n\nGot IP address : ", g_dhcpc.ipaddr, "(ln. %d)\n", __LINE__);
+        log_ip("Got netmask    : ", g_dhcpc.netmask, "(ln. %d)\n", __LINE__);
+        log_ip("Got DNS        : ", g_dhcpc.dnsaddr, "(ln. %d)\n", __LINE__);
+        log_ip("Got def-router : ", g_dhcpc.default_router, "(ln. %d)\n", __LINE__);
+        log_ip("Got tftp-svr   : ", g_dhcpc.tftp_ipaddr, "(name= '%s')\n", g_dhcpc.tftpd_name);
+        log("Got boot file: %s\n", g_dhcpc.boot_filename);
+        log("Lease expires in %ld seconds\n\n",
+            uip_ntohs(g_dhcpc.lease_time[0]) * 65536ul + uip_ntohs(g_dhcpc.lease_time[1]));
+        #endif
 
-    do {
-        _dhcpc_send_request();
+        #if defined(CONFIG_MEASURE_TIME)
+        g_tm_start = clock_time();
+        #endif // defined
+
+        g_dhcpc.ticks = CLOCK_SECOND;
+
+        do {
+            _dhcpc_send_request();
+            timer_set(&g_dhcpc.timer, g_dhcpc.ticks);
+            PT_YIELD_UNTIL(&g_dhcpc.pt, uip_newdata() || timer_expired(&g_dhcpc.timer));
+
+            if( _dhcpc_parse_msg() == DHCP_MSG_ACK ) {
+                g_dhcpc.state = STATE_CONFIG_RECEIVED;
+                break;
+            }
+
+            if( g_dhcpc.ticks <= CLOCK_SECOND * 10 )
+                g_dhcpc.ticks += CLOCK_SECOND;
+            else
+            {
+                PT_RESTART(&g_dhcpc.pt);
+            }
+        } while( g_dhcpc.state != STATE_CONFIG_RECEIVED );
+
+        #if defined(CONFIG_MEASURE_TIME)
+        log("time: %d ms\n", clock_time() - g_tm_start);
+        #endif // defined
+    }
+    else if( g_dhcpc_phase == DHCPC_PHASE_IP_FREE )
+    {
+        #if defined(CONFIG_MEASURE_TIME)
+        g_tm_start = clock_time();
+        #endif // defined
+
+        g_dhcpc.ticks = CLOCK_SECOND;
+
+        _dhcpc_send_release();
 
         timer_set(&g_dhcpc.timer, g_dhcpc.ticks);
         PT_YIELD_UNTIL(&g_dhcpc.pt, uip_newdata() || timer_expired(&g_dhcpc.timer));
-
-        if( _dhcpc_parse_msg() == DHCP_MSG_ACK ) {
+        if( _dhcpc_parse_msg() == DHCP_MSG_ACK )
+        {
+            log("@@@ dhcp release GOT ACK\n");
             g_dhcpc.state = STATE_CONFIG_RECEIVED;
-            break;
         }
-
-        if( g_dhcpc.ticks <= CLOCK_SECOND * 10 )
-            g_dhcpc.ticks += CLOCK_SECOND;
         else
         {
-            PT_RESTART(&g_dhcpc.pt);
+            log("@@@ dhcp release NOT response !!!!!!!!!!!\n");
         }
-    } while( g_dhcpc.state != STATE_CONFIG_RECEIVED );
 
-#if defined(CONFIG_MEASURE_TIME)
-    log("time: %d ms\n", clock_time() - g_tm_start);
-#endif // defined
-
-    #if 1
-    log_ip("Got IP address: ", g_dhcpc.ipaddr, "(ln. %d)\n", __LINE__);
-    log_ip("Got netmask   : ", g_dhcpc.netmask, "(ln. %d)\n", __LINE__);
-    log_ip("Got DNS       : ", g_dhcpc.dnsaddr, "(ln. %d)\n", __LINE__);
-    log_ip("Got drouter   : ", g_dhcpc.default_router, "(ln. %d)\n", __LINE__);
-    log("Lease expires in %ld seconds\n",
-        uip_ntohs(g_dhcpc.lease_time[0]) * 65536ul + uip_ntohs(g_dhcpc.lease_time[1]));
-    #endif
+        #if defined(CONFIG_MEASURE_TIME)
+        log("time: %d ms\n", clock_time() - g_tm_start);
+        #endif // defined
+    }
 
     /**
      *  Configure net setting
@@ -470,6 +524,7 @@ dhcpc_init(struct uip_eth_addr  *pMac_addr)
 
         uip_udp_bind(g_dhcpc.conn, UIP_HTONS(DHCPC_CLIENT_PORT));
 
+        g_dhcpc_phase   = DHCPC_PHASE_IP_ALLOC;
         g_dhcpc_is_busy = 1;
 
     } while(0);
@@ -494,7 +549,7 @@ dhcpc_get_tftp_server(uip_ipaddr_t *pAddr)
     dhcpc_err_t     rval = DHCPC_ERR_OK;
     do {
         uip_ipaddr_t    mask;
-        uip_ipaddr(&mask, 255, 255, 255, 0);
+        uip_ipaddr(&mask, 255, 255, 0, 0);
 
         // tftp server and received IP MUST be in the same LAN
         if( !uip_ipaddr_maskcmp(g_dhcpc.tftp_ipaddr, g_dhcpc.ipaddr, mask) )
@@ -508,9 +563,21 @@ dhcpc_get_tftp_server(uip_ipaddr_t *pAddr)
     return rval;
 }
 
+char*
+dhcpc_get_boot_filename(void)
+{
+    return g_dhcpc.boot_filename;
+}
+
 void
 dhcpc_release_ip(void)
 {
-    _dhcpc_send_release();
+    PT_INIT(&g_dhcpc.pt);
+    vt_memset(g_dhcpc.ipaddr, 0x0, sizeof(g_dhcpc.ipaddr));
+    vt_memset(g_dhcpc.netmask, 0x0, sizeof(g_dhcpc.netmask));
+    vt_memset(g_dhcpc.default_router, 0x0, sizeof(g_dhcpc.default_router));
+
+    g_dhcpc_phase   = DHCPC_PHASE_IP_FREE;
+    g_dhcpc_is_busy = 1;
     return;
 }

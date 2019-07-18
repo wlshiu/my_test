@@ -97,7 +97,7 @@ struct pt {
  *
  * \hideinitializer
  */
-#define PT_THREAD(name_args) char name_args
+#define PT_THREAD(name_args) int name_args
 
 /**
  * Declare the start of a protothread inside the C function
@@ -112,7 +112,7 @@ struct pt {
  *
  * \hideinitializer
  */
-#define PT_BEGIN(pt) { char __attribute__((unused)) PT_YIELD_FLAG = 1; LC_RESUME((pt)->lc)
+#define PT_BEGIN(pt) { int __attribute__((unused)) PT_YIELD_FLAG = 1; LC_RESUME((pt)->lc)
 
 /**
  * Declare the end of a protothread.
@@ -145,12 +145,12 @@ struct pt {
  *
  * \hideinitializer
  */
-#define PT_WAIT_UNTIL(pt, condition)	        \
-  do {						\
-    LC_SET((pt)->lc);				\
-    if(!(condition)) {				\
-      return PT_WAITING;			\
-    }						\
+#define PT_WAIT_UNTIL(pt, condition)    \
+  do {                              \
+    LC_SET((pt)->lc);               \
+    if(!(condition)) {              \
+      return PT_WAITING;            \
+    }                               \
   } while(0)
 
 /**
@@ -203,10 +203,10 @@ struct pt {
  *
  * \hideinitializer
  */
-#define PT_SPAWN(pt, child, thread)		\
-  do {						\
-    PT_INIT((child));				\
-    PT_WAIT_THREAD((pt), (thread));		\
+#define PT_SPAWN(pt, child, thread) \
+  do {                              \
+    PT_INIT((child));               \
+    PT_WAIT_THREAD((pt), (thread)); \
   } while(0)
 
 /** @} */
@@ -226,10 +226,10 @@ struct pt {
  *
  * \hideinitializer
  */
-#define PT_RESTART(pt)				\
-  do {						\
-    PT_INIT(pt);				\
-    return PT_WAITING;			\
+#define PT_RESTART(pt)      \
+  do {                      \
+    PT_INIT(pt);            \
+    return PT_WAITING;      \
   } while(0)
 
 /**
@@ -243,10 +243,10 @@ struct pt {
  *
  * \hideinitializer
  */
-#define PT_EXIT(pt)				\
-  do {						\
-    PT_INIT(pt);				\
-    return PT_EXITED;			\
+#define PT_EXIT(pt)         \
+  do {                      \
+    PT_INIT(pt);            \
+    return PT_EXITED;       \
   } while(0)
 
 /** @} */
@@ -287,13 +287,13 @@ struct pt {
  *
  * \hideinitializer
  */
-#define PT_YIELD(pt)				\
-  do {						\
-    PT_YIELD_FLAG = 0;				\
-    LC_SET((pt)->lc);				\
-    if(PT_YIELD_FLAG == 0) {			\
-      return PT_YIELDED;			\
-    }						\
+#define PT_YIELD(pt)            \
+  do {                          \
+    PT_YIELD_FLAG = 0;          \
+    LC_SET((pt)->lc);           \
+    if(PT_YIELD_FLAG == 0) {    \
+      return PT_YIELDED;        \
+    }                           \
   } while(0)
 
 /**
@@ -307,13 +307,13 @@ struct pt {
  *
  * \hideinitializer
  */
-#define PT_YIELD_UNTIL(pt, cond)		\
-  do {						\
-    PT_YIELD_FLAG = 0;				\
-    LC_SET((pt)->lc);				\
-    if((PT_YIELD_FLAG == 0) || !(cond)) {	\
-      return PT_YIELDED;			\
-    }						\
+#define PT_YIELD_UNTIL(pt, cond)    \
+  do {                              \
+    PT_YIELD_FLAG = 0;              \
+    LC_SET((pt)->lc);               \
+    if((PT_YIELD_FLAG == 0) || !(cond)) {   \
+      return PT_YIELDED;            \
+    }                               \
   } while(0)
 
 /** @} */

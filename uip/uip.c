@@ -978,7 +978,7 @@ uip_process(uint8_t flag)
            UDP packet, which may be destined to us. */
         #if UIP_BROADCAST
 //        DEBUG_PRINTF("UDP IP checksum 0x%04x\n", uip_ipchksum());
-//        log_ip("### ", &BUF->destipaddr, "(ln. %d)\n", __LINE__);
+        log_ip("### ", &BUF->destipaddr, "(ln. %d)\n", __LINE__);
         if(BUF->proto == UIP_PROTO_UDP &&
            uip_ipaddr_cmp(BUF->destipaddr, all_ones_addr)
                 /*&& uip_ipchksum() == 0xffff*/) {
@@ -1244,20 +1244,8 @@ udp_send:
     BUF->srcport  = uip_udp_conn->lport;
     BUF->destport = uip_udp_conn->rport;
 
-#if 1
     uip_ipaddr_copy(BUF->srcipaddr, uip_hostaddr);
     uip_ipaddr_copy(BUF->destipaddr, uip_udp_conn->ripaddr);
-#else
-    extern int g_udp_spoof;
-    extern uip_ipaddr_t g_udp_spoof_ip;
-    if(!g_udp_spoof) {
-        uip_ipaddr_copy(BUF->srcipaddr, uip_hostaddr);
-    } else {
-        g_udp_spoof = 0;
-        uip_ipaddr_copy(BUF->srcipaddr, g_udp_spoof_ip);
-    }
-    uip_ipaddr_copy(BUF->destipaddr, uip_udp_conn->ripaddr);
-#endif // 1
 
     uip_appdata = &uip_buf[UIP_LLH_LEN + UIP_IPTCPH_LEN];
 

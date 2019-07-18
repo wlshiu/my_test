@@ -57,6 +57,9 @@ dhcpc_is_busy(void);
 dhcpc_err_t
 dhcpc_get_tftp_server(uip_ipaddr_t *pAddr);
 
+char*
+dhcpc_get_boot_filename(void);
+
 void
 dhcpc_release_ip(void);
 
