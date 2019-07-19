@@ -42,6 +42,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="crc32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="crc32.h" />
 		<Unit filename="dhcpc.c">
 			<Option compilerVar="CC" />
 		</Unit>
