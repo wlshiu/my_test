@@ -14,10 +14,13 @@
 #include "uip.h"
 #include "tftp.h"
 #include "net.h"
+#include "util.h"
+#include "spifc.h"
+#include "crc32.h"
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-#define CONFIG_ENABLE_TFTP_RX_DUMP
+//#define CONFIG_ENABLE_TFTP_RX_DUMP
 
 
 #define TFTP_RETRY_CNT      5
@@ -51,12 +54,16 @@
 
 #define TFTP_SEGSIZE        512     /* data segment size */
 
+
+typedef enum wctrl_state
+{
+    WCTRL_STATE_IDLE        = 0,
+    WCTRL_STATE_WAIT_HEADER,
+    WCTRL_STATE_PP,
+} wctrl_state_t;
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
-#define stringize(s)        #s
-#define _toStr(a)           stringize(a)
-
 /**
  *  @brief get_srcport_from_pkg
  *      get source port number of received package
@@ -64,18 +71,30 @@
  */
 #define get_srcport_from_pkg()      ((struct uip_udpip_hdr*)&uip_buf[UIP_LLH_LEN])->srcport
 
-#define log(str, ...)               printf("[%s:%d] " str, __func__, __LINE__, ##__VA_ARGS__)
-
-
-#ifndef vt_memcpy
-#warning "TODO: include util.h for vt_memcpy !!!!"
-#define vt_memcpy   memcpy
-#define vt_strlen   strlen
-#define vt_strncmp  strncmp
-#endif // vt_memcpy
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
+typedef struct net_part_hdr
+{
+#define NET_PARTITION_HEADER_SIZE           256
+
+    uint32_t        partition_uid;
+    uintptr_t       partition_start;
+    uint32_t        payload_length;
+    uint32_t        crc32[];
+
+} net_part_hdr_t;
+
+typedef struct wr_ctrl
+{
+    wctrl_state_t   state;
+    uint32_t        partition_uid;
+    uintptr_t       partition_start;
+    uint32_t        payload_length;
+    uint32_t        program_offset;
+    uint32_t        received_data_len;
+} wr_ctrl_t;
+
 typedef struct tftpc
 {
     struct uip_udp_conn *conn[2];
@@ -91,6 +110,7 @@ typedef struct tftpc
     uint8_t         duplicate;
     uint8_t         state;
     char            fname[TFTP_MAX_FNAME_LEN];
+    wr_ctrl_t       wr_ctrl;
 } tftpc_t;
 
 #pragma pack(1)
@@ -156,17 +176,84 @@ static FILE     *fout = 0;
 //                  Private Function Definition
 //=============================================================================
 static void
-_tftp_write_data_block(void)
+_tftp_write_data_block(tftp_msg_t *msg, int data_len)
 {
-    uint8_t     *pData = 0;
-    tftp_msg_t  *msg = (tftp_msg_t*)uip_appdata;
+    do {
+        spifc_err_t     rval = SPIFC_ERR_OK;
+        wr_ctrl_t       *pWCtrl = &g_tftpc.wr_ctrl;
+        uint8_t         *pData = msg->packet.data.data;
 
-    pData = msg->packet.data.data;
+        if( data_len != 516 )   break;
+        if( !pData )            break;
 
+        for(int i = 0; i < 2; i++)
+        {
+            pWCtrl->received_data_len += SPIFC_PAGE_SIZE;
 
-#if defined(CONFIG_ENABLE_TFTP_RX_DUMP)
-    if( fout )  fwrite(pData, 1, g_tftpc.datalen - 4, fout);
-#endif
+            if( pWCtrl->payload_length &&
+                pWCtrl->received_data_len > pWCtrl->payload_length )
+            {
+                memset((void*)pWCtrl, 0x0, sizeof(wr_ctrl_t));
+                pWCtrl->state = WCTRL_STATE_WAIT_HEADER;
+            }
+
+            if( pWCtrl->state == WCTRL_STATE_PP )
+            {
+                if( !pWCtrl->program_offset )
+                {
+                    uint32_t    *pUid = (uint32_t*)pData;
+
+                    // simply verify partition uid
+                    if( *pUid != pWCtrl->partition_uid )
+                    {
+                        pData += NET_PARTITION_HEADER_SIZE;
+                        continue;
+                    }
+                }
+
+                printf("    pp: 0x%08x\n", pWCtrl->partition_start + pWCtrl->program_offset);
+                rval = spifc_program(pData, pWCtrl->partition_start + pWCtrl->program_offset, SPIFC_PAGE_SIZE);
+                if( rval )    break;
+
+                pWCtrl->program_offset += SPIFC_PAGE_SIZE;
+
+                pData += NET_PARTITION_HEADER_SIZE;
+
+                if( pWCtrl->program_offset == pWCtrl->payload_length )
+                {
+                    memset((void*)pWCtrl, 0x0, sizeof(wr_ctrl_t));
+                    pWCtrl->state = WCTRL_STATE_WAIT_HEADER;
+                    continue;
+                }
+            }
+            else if( pWCtrl->state == WCTRL_STATE_WAIT_HEADER )
+            {
+                net_part_hdr_t      *pNPart_hdr = (net_part_hdr_t*)pData;
+
+                // check CRC32
+                if( pNPart_hdr->crc32[0] != calc_crc32((uint8_t*)pData, sizeof(net_part_hdr_t)));
+                {
+                    pData += NET_PARTITION_HEADER_SIZE;
+                    continue;
+                }
+
+                pWCtrl->state               = WCTRL_STATE_PP;
+                pWCtrl->partition_uid       = pNPart_hdr->partition_uid;
+                pWCtrl->partition_start     = pNPart_hdr->partition_start;
+                pWCtrl->payload_length      = pNPart_hdr->payload_length;
+
+                pData += NET_PARTITION_HEADER_SIZE;
+
+                // erase  blocks
+                pWCtrl->partition_start = (pWCtrl->partition_start + SPIFC_1_SECTOR_SIZE - 1) & ~(SPIFC_1_SECTOR_SIZE - 1);
+                printf("erase: 0x%08x, len= %d, cnt= %d\n", pWCtrl->partition_start, pWCtrl->payload_length, (pWCtrl->payload_length / SPIFC_1_SECTOR_SIZE));
+                rval = spifc_erase(SPIFC_ERASE_SECTOR, pWCtrl->partition_start, (pWCtrl->payload_length / SPIFC_1_SECTOR_SIZE));
+                if( rval )    break;
+            }
+        }
+
+    } while(0);
+
     return;
 }
 
@@ -200,14 +287,14 @@ _tftp_send_rrq(void)
     datalen = 2;
 
     // filename
-    len = vt_strlen(g_tftpc.fname) + 1;
-    vt_memcpy(pData, g_tftpc.fname, len);
+    len = strlen(g_tftpc.fname) + 1;
+    memcpy(pData, g_tftpc.fname, len);
     pData   += len;
     datalen += len;
 
     // mode
-    len = vt_strlen(mode) + 1;
-    vt_memcpy(pData, mode, len);
+    len = strlen(mode) + 1;
+    memcpy(pData, mode, len);
     pData   += len;
     datalen += len;
 
@@ -317,7 +404,7 @@ PT_THREAD(handle_tftp(void))
 
     if( g_tftpc.state == STATE_DATA )
     {
-        _tftp_write_data_block();
+        _tftp_write_data_block((tftp_msg_t*)uip_appdata, uip_datalen());
 
         while( g_tftpc.datalen == 516 )
         {
@@ -338,7 +425,7 @@ PT_THREAD(handle_tftp(void))
             {
                 if( !g_tftpc.duplicate )
                 {
-                    _tftp_write_data_block();
+                    _tftp_write_data_block((tftp_msg_t*)uip_appdata, uip_datalen());
                 }
             }
             else
@@ -393,7 +480,7 @@ PT_THREAD(handle_tftp(void))
         uip_udp_remove(g_tftpc.conn[1]);
         g_tftpc.state = STATE_CLOSED;
 
-        #if 1
+        #if 0
         switch( g_tftpc.tftp_error )
         {
             case TFTP_ERRCODE_FILE_NOT_FOUND:    printf("error! %s\n", _toStr(TFTP_ERRCODE_FILE_NOT_FOUND));    break;
@@ -432,7 +519,8 @@ tftpc_get_result(void)
 void tftpc_init(void)
 {
     memset(&g_tftpc, 0x0, sizeof(g_tftpc));
-    g_tftpc.state = STATE_CLOSED;
+    g_tftpc.state         = STATE_CLOSED;
+    g_tftpc.wr_ctrl.state = WCTRL_STATE_WAIT_HEADER;
 
     PT_INIT(&g_tftpc.pt);
 
@@ -458,7 +546,7 @@ tftpc_get(
 
         log("request '%s'\n", fname);
 
-        strncpy(g_tftpc.fname, fname, vt_strlen(fname));
+        strncpy(g_tftpc.fname, fname, strlen(fname));
 
         g_tftpc.conn[0] = uip_udp_new(pSvr_ipaddr, UIP_HTONS(TFTP_PORT));
         g_tftpc.conn[1] = uip_udp_new(pSvr_ipaddr, UIP_HTONS(0));

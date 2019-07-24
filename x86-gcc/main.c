@@ -62,7 +62,6 @@
 //=============================================================================
 extern uint8_t  uip_buf[UIP_BUFSIZE + 2] __attribute__ ((aligned(4)));
 
-//static struct timer    g_periodic_timer;
 static struct timer    g_arp_timer;
 //=============================================================================
 //                  Private Function Definition
@@ -73,9 +72,6 @@ static struct timer    g_arp_timer;
 //=============================================================================
 int main(void)
 {
-    uip_ipaddr_t    ip;
-
-//    timer_set(&g_periodic_timer, CLOCK_SECOND / 2);   /* 0.5s */
     timer_set(&g_arp_timer, CLOCK_SECOND * 10);	    /* 10s */
 
     /* Initialize the device driver. */

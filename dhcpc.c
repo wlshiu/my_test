@@ -96,16 +96,7 @@ typedef enum dhcpc_phase
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
-#define log(str, ...)               printf("[%s:%d] " str, __func__, __LINE__, ##__VA_ARGS__)
 
-
-#ifndef vt_memcpy
-#warning "TODO: include util.h for vt_memcpy !!!!"
-#define vt_memcpy   memcpy
-#define vt_memset   memset
-#define vt_strlen   strlen
-#define vt_strncmp  strncmp
-#endif // vt_memcpy
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
@@ -201,7 +192,7 @@ _dhcpc_add_server_id(uint8_t *optptr)
 {
     *optptr++ = DHCP_OPTION_SERVER_ID;
     *optptr++ = 4;
-    vt_memcpy(optptr, g_dhcpc.serverid, 4);
+    memcpy(optptr, g_dhcpc.serverid, 4);
     return optptr + 4;
 }
 
@@ -211,11 +202,11 @@ _dhcpc_add_req_ipaddr(uint8_t *optptr)
 {
     *optptr++ = DHCP_OPTION_REQ_IPADDR;
     *optptr++ = 4;
-    vt_memcpy(optptr, g_dhcpc.ipaddr, sizeof(g_dhcpc.ipaddr));
+    memcpy(optptr, g_dhcpc.ipaddr, sizeof(g_dhcpc.ipaddr));
     return optptr + 4;
 }
 
-
+#if 0
 static uint8_t*
 _dhcpc_add_req_options(uint8_t *optptr)
 {
@@ -226,7 +217,7 @@ _dhcpc_add_req_options(uint8_t *optptr)
     *optptr++ = DHCP_OPTION_DNS_SERVER;
     return optptr;
 }
-
+#endif
 
 static uint8_t*
 _dhcpc_add_end_tag(uint8_t *optptr)
@@ -239,7 +230,7 @@ _dhcpc_add_end_tag(uint8_t *optptr)
 static void
 _dhcpc_create_msg(dhcp_msg_t *m)
 {
-    vt_memset(m, 0x0, sizeof(dhcp_msg_t));
+    memset(m, 0x0, sizeof(dhcp_msg_t));
 
     m->op     = DHCP_OP_REQUEST;
     m->htype  = DHCP_HTYPE_ETHERNET;
@@ -248,7 +239,7 @@ _dhcpc_create_msg(dhcp_msg_t *m)
     m->flags  = UIP_HTONS(BOOTP_BROADCAST); /*  Broadcast bit. */
     m->cookie = DHCP_MAGIC_COOKIE;
 
-    vt_memcpy(m->chaddr, &g_dhcpc.mac_addr, sizeof(g_dhcpc.mac_addr));
+    memcpy(m->chaddr, &g_dhcpc.mac_addr, sizeof(g_dhcpc.mac_addr));
     return;
 }
 
@@ -311,31 +302,31 @@ _dhcpc_parse_options(uint8_t *optptr, int len)
         switch( *optptr )
         {
             case DHCP_OPTION_SUBNET_MASK:
-                vt_memcpy(g_dhcpc.netmask, optptr + 2, 4);
+                memcpy(g_dhcpc.netmask, optptr + 2, 4);
                 break;
             case DHCP_OPTION_ROUTER:
-                vt_memcpy(g_dhcpc.default_router, optptr + 2, 4);
+                memcpy(g_dhcpc.default_router, optptr + 2, 4);
                 break;
             case DHCP_OPTION_DNS_SERVER:
-                vt_memcpy(g_dhcpc.dnsaddr, optptr + 2, 4);
+                memcpy(g_dhcpc.dnsaddr, optptr + 2, 4);
                 break;
             case DHCP_OPTION_MSG_TYPE:
                 type = *(optptr + 2);
                 break;
             case DHCP_OPTION_SERVER_ID:
-                vt_memcpy(g_dhcpc.serverid, optptr + 2, 4);
+                memcpy(g_dhcpc.serverid, optptr + 2, 4);
                 break;
             case DHCP_OPTION_LEASE_TIME:
-                vt_memcpy(g_dhcpc.lease_time, optptr + 2, 4);
+                memcpy(g_dhcpc.lease_time, optptr + 2, 4);
                 break;
             case DHCP_OPTION_END:
                 return type;
 
             case DHCP_OPTION_TFTPD_NAME:
-                vt_memcpy(g_dhcpc.tftpd_name, optptr + 2, *(optptr + 1));
+                memcpy(g_dhcpc.tftpd_name, optptr + 2, *(optptr + 1));
                 break;
             case DHCP_OPTION_TFTPD_IP:
-                vt_memcpy(g_dhcpc.tftp_ipaddr, optptr + 2, 4);
+                memcpy(g_dhcpc.tftp_ipaddr, optptr + 2, 4);
                 break;
             default:    break;
         }
@@ -349,7 +340,6 @@ _dhcpc_parse_options(uint8_t *optptr, int len)
 static int
 _dhcpc_parse_msg(void)
 {
-    int         rval = 0;
     do {
         dhcp_msg_t  *m = (struct dhcp_msg *)uip_appdata;
 
@@ -367,7 +357,7 @@ _dhcpc_parse_msg(void)
         {
             *((uint32_t*)&g_dhcpc.ipaddr)      = m->yiaddr;
             *((uint32_t*)&g_dhcpc.next_ipaddr) = m->siaddr;
-            vt_memcpy(g_dhcpc.boot_filename, m->filename, DHCP_MSG_FILENAME_SIZE - 1);
+            memcpy(g_dhcpc.boot_filename, m->filename, DHCP_MSG_FILENAME_SIZE - 1);
             return _dhcpc_parse_options(m->options, uip_datalen());
         }
     } while(0);
@@ -410,7 +400,7 @@ PT_THREAD(handle_dhcp(void))
         log("time: %d ms\n", clock_time() - g_tm_start);
         #endif // defined
 
-        #if 1
+        #if 0
         log_ip("\n\nGot IP address : ", g_dhcpc.ipaddr, "(ln. %d)\n", __LINE__);
         log_ip("Got netmask    : ", g_dhcpc.netmask, "(ln. %d)\n", __LINE__);
         log_ip("Got DNS        : ", g_dhcpc.dnsaddr, "(ln. %d)\n", __LINE__);
@@ -505,14 +495,14 @@ dhcpc_init(struct uip_eth_addr  *pMac_addr)
     do {
         uip_ipaddr_t    broadcast_ipaddr;
 
-        vt_memset(&g_dhcpc, 0x0, sizeof(g_dhcpc));
+        memset(&g_dhcpc, 0x0, sizeof(g_dhcpc));
 
         g_dhcpc.xid   = _dhcpc_gen_xid();
         g_dhcpc.state = STATE_INITIAL;
 
         PT_INIT(&g_dhcpc.pt);
 
-        vt_memcpy(&g_dhcpc.mac_addr, pMac_addr, sizeof(struct uip_eth_addr));
+        memcpy(&g_dhcpc.mac_addr, pMac_addr, sizeof(struct uip_eth_addr));
 
         uip_ipaddr(broadcast_ipaddr, 255, 255, 255, 255);
         g_dhcpc.conn = uip_udp_new(&broadcast_ipaddr, UIP_HTONS(DHCPC_SERVER_PORT));
@@ -558,7 +548,7 @@ dhcpc_get_tftp_server(uip_ipaddr_t *pAddr)
             break;
         }
 
-        vt_memcpy(pAddr, g_dhcpc.tftp_ipaddr, sizeof(uip_ipaddr_t));
+        memcpy(pAddr, g_dhcpc.tftp_ipaddr, sizeof(uip_ipaddr_t));
     } while(0);
     return rval;
 }
@@ -573,9 +563,9 @@ void
 dhcpc_release_ip(void)
 {
     PT_INIT(&g_dhcpc.pt);
-    vt_memset(g_dhcpc.ipaddr, 0x0, sizeof(g_dhcpc.ipaddr));
-    vt_memset(g_dhcpc.netmask, 0x0, sizeof(g_dhcpc.netmask));
-    vt_memset(g_dhcpc.default_router, 0x0, sizeof(g_dhcpc.default_router));
+    memset(g_dhcpc.ipaddr, 0x0, sizeof(g_dhcpc.ipaddr));
+    memset(g_dhcpc.netmask, 0x0, sizeof(g_dhcpc.netmask));
+    memset(g_dhcpc.default_router, 0x0, sizeof(g_dhcpc.default_router));
 
     g_dhcpc_phase   = DHCPC_PHASE_IP_FREE;
     g_dhcpc_is_busy = 1;

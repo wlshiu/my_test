@@ -8,8 +8,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define err(str, ...)       printf("[%s:%u] " str, __func__, __LINE__, ##__VA_ARGS__)
-
 
 #ifndef UIP_CONF_EXTERNAL_BUFFER
 	extern uint8_t uip_buf[UIP_BUFSIZE+2];

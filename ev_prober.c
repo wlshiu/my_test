@@ -11,6 +11,7 @@
  */
 
 
+#include <string.h>
 #include "pt.h"
 #include "uip_timer.h"
 #include "uip_arp.h"
@@ -30,19 +31,7 @@ typedef enum ev_prober_state
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
-#define FOUR_CC(a, b, c, d)         (((d) << 24) | ((c) << 16) | ((b) << 8) | (a))
 
-
-#define log(str, ...)               printf("[%s:%d] " str, __func__, __LINE__, ##__VA_ARGS__)
-
-
-#ifndef vt_memcpy
-#warning "TODO: include util.h for vt_memcpy !!!!"
-#define vt_memcpy   memcpy
-#define vt_memset   memset
-#define vt_strlen   strlen
-#define vt_strncmp  strncmp
-#endif // vt_memcpy
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
@@ -96,8 +85,6 @@ _ev_prober_parse_msg(void)
 {
     int     rval = EV_PROBER_STATE_NONE;
     do {
-        //
-        int         data_len = uip_datalen();
         ev_msg_t    *pMsg = (ev_msg_t*)uip_appdata;
 
         if( !uip_newdata() )    break;
@@ -106,6 +93,7 @@ _ev_prober_parse_msg(void)
 
     #if 0
         {
+            int         data_len = uip_datalen();
             char        *pData = (char*)uip_appdata;
             printf("\n\n==========\n");
             for(int i = 0; i < data_len; i++)
@@ -121,7 +109,7 @@ _ev_prober_parse_msg(void)
             break;
         }
 
-        #if 1
+        #if 0
         {
             char    *pTag = (char*)&pMsg->uid;
             log("uid        = '%c%c%c%c'\n", pTag[0], pTag[1], pTag[2], pTag[3]);
@@ -174,7 +162,7 @@ ev_prober_init(void)
     do {
         uip_ipaddr_t    broadcast_ipaddr;
 
-        vt_memset(&g_ev_prober, 0x0, sizeof(g_ev_prober));
+        memset(&g_ev_prober, 0x0, sizeof(g_ev_prober));
         PT_INIT(&g_ev_prober.pt);
 
         uip_ipaddr(broadcast_ipaddr, 255, 255, 255, 255);

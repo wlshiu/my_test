@@ -126,8 +126,8 @@ typedef unsigned short uip_stats_t;
  */
 #define UIP_CONF_STATISTICS         0
 
-/* Here we include the header file for the application(s) we use in
-   our project. */
+/* Here we include the header file for the application(s) we use in our project. */
+#include "util.h"
 #include "net_app.h"
 #if defined(CONFIG_CALLBACK_TRACE)
 #define UIP_APPCALL()           net_app__call_callback(__func__, __LINE__)
@@ -139,15 +139,7 @@ typedef unsigned short uip_stats_t;
 
 //#define UIP_CONF_EXTERNAL_BUFFER
 
-
-#ifndef __align
-#define __align(num)        __attribute__ ((aligned(num)))
-#endif
-
-#ifndef __unused
-#define __unused            __attribute__ ((unused))
-#endif
-
+#if 1
 #define log_ip(prefix, pIp4addr, str, ...)                    \
     do{ ip_convert_t    ip_cnv_ipaddr = {0};                  \
         memcpy(&ip_cnv_ipaddr, pIp4addr, 4);                  \
@@ -156,6 +148,10 @@ typedef unsigned short uip_stats_t;
                ip_cnv_ipaddr.ip[2], ip_cnv_ipaddr.ip[3],      \
                ## __VA_ARGS__);                               \
     }while(0)
+
+#else
+    #define log_ip(prefix, pIp4addr, str, ...)
+#endif
 
 
 #endif /* __UIP_CONF_H__ */

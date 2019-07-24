@@ -59,7 +59,6 @@
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
-#define log(str, ...)               printf("[%s:%d] " str, __func__, __LINE__, ##__VA_ARGS__)
 
 //=============================================================================
 //                  Structure Definition
@@ -121,7 +120,7 @@ PT_THREAD(_net_handler(void))
             return PT_YIELDED;
         }
 
-    #if 1
+    #if 0
         {
             uip_ipaddr_t    ipaddr;
             uip_gethostaddr(&ipaddr);

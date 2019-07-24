@@ -58,10 +58,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="net.h" />
-		<Unit filename="net_app.c">
+		<Unit filename="spifc.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="net_app.h" />
+		<Unit filename="spifc.h" />
 		<Unit filename="tftp.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -85,6 +85,7 @@
 		</Unit>
 		<Unit filename="uip/uip_timer.h" />
 		<Unit filename="uip/uipopt.h" />
+		<Unit filename="util.h" />
 		<Unit filename="x86-gcc/clock-arch.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -92,6 +93,10 @@
 		<Unit filename="x86-gcc/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="x86-gcc/net_app.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="x86-gcc/net_app.h" />
 		<Unit filename="x86-gcc/pcapdev.c">
 			<Option compilerVar="CC" />
 		</Unit>
