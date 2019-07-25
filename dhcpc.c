@@ -160,6 +160,7 @@ static uint32_t         g_dhcpc_is_busy = 0;
 static dhcpc_phase_t    g_dhcpc_phase = DHCPC_PHASE_IP_ALLOC;
 
 #if defined(CONFIG_MEASURE_TIME)
+#include <stdio.h>
 static clock_time_t     g_tm_start = 0;
 #endif // defined
 //=============================================================================

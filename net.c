@@ -108,12 +108,16 @@ PT_THREAD(_net_handler(void))
     g_net_act[NET_ACT_TFTPC] = g_net_mgr.pt.lc;
 
     {   // TFTP handle
-        dhcpc_err_t     rval = DHCPC_ERR_OK;
+        int             rval = 0;
         uip_ipaddr_t    tftp_svr_ipaddr;
         char            *pFw_name = 0;
 
-        rval     = dhcpc_get_tftp_server(&tftp_svr_ipaddr);
-        pFw_name = dhcpc_get_boot_filename();
+        if( (rval = ev_prober_get_tftp_svr_ip(&tftp_svr_ipaddr)) )
+            rval = dhcpc_get_tftp_server(&tftp_svr_ipaddr);
+
+        if( !(pFw_name = ev_prober_get_pkg_name()) )
+            pFw_name = dhcpc_get_boot_filename();
+
         if( rval != DHCPC_ERR_OK || !pFw_name )
         {
             g_net_mgr.pt.lc = g_net_act[NET_ACT_DHCP];

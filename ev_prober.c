@@ -43,6 +43,8 @@ typedef struct ev_prober
 
     uint16_t            ticks;
     bool                has_burn_fw;
+    char                pkg_name[128];
+    uip_ipaddr_t        tftp_ipaddr;
 
 } ev_prober_t;
 
@@ -69,7 +71,8 @@ typedef struct ev_msg
     /**
      *  F/W image file name (if no data, system will take from DHCP)
      */
-    uint8_t     fw_name[128];
+    char        pkg_name[128];
+    uint32_t    tftp_server_ip;
     uint32_t    crc32;
 } ev_msg_t;
 #pragma pack()
@@ -115,7 +118,8 @@ _ev_prober_parse_msg(void)
             log("uid        = '%c%c%c%c'\n", pTag[0], pTag[1], pTag[2], pTag[3]);
             log("msg_len    = %d\n", pMsg->msg_len);
             log("reboot_sec = %d\n", pMsg->reboot_sec);
-            log("fw_name    = '%s'\n", strlen(pMsg->fw_name) ? pMsg->fw_name : "");
+            log("pkg_name   = '%s'\n", strlen(pMsg->pkg_name) ? pMsg->pkg_name : "");
+            log_ip("tftp ip    = ", &pMsg->tftp_server_ip, "%d\n", __LINE__);
             log("crc32      = 0x%x\n", pMsg->crc32);
         }
         #endif
@@ -125,6 +129,12 @@ _ev_prober_parse_msg(void)
 
         rval = EV_PROBER_STATE_START_BURN_FW;
         g_ev_prober.has_burn_fw = true;
+
+        if( strlen(pMsg->pkg_name) )
+            strcpy(g_ev_prober.pkg_name, pMsg->pkg_name);
+
+        if( pMsg->tftp_server_ip )
+            memcpy(&g_ev_prober.tftp_ipaddr, &pMsg->tftp_server_ip, sizeof(g_ev_prober.tftp_ipaddr));
 
     } while(0);
     return rval;
@@ -191,4 +201,27 @@ ev_prober_is_burn_img(void)
     return g_ev_prober.has_burn_fw;
 }
 
+char*
+ev_prober_get_pkg_name(void)
+{
+    return (strlen(g_ev_prober.pkg_name)) ? g_ev_prober.pkg_name : 0;
+}
 
+int
+ev_prober_get_tftp_svr_ip(uip_ipaddr_t *pIpaddr)
+{
+    int             rval = 0;
+    uip_ipaddr_t    zero_ipaddr;
+    uip_ipaddr(zero_ipaddr, 0, 0, 0, 0);
+
+    do {
+        if( uip_ipaddr_cmp(&g_ev_prober.tftp_ipaddr, &zero_ipaddr) )
+        {
+            rval = -1;
+            break;
+        }
+
+        uip_ipaddr_copy(pIpaddr, &g_ev_prober.tftp_ipaddr);
+    } while(0);
+    return rval;
+}

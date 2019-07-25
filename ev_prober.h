@@ -51,6 +51,11 @@ ev_prober_appcall(void);
 bool
 ev_prober_is_burn_img(void);
 
+char*
+ev_prober_get_pkg_name(void);
+
+int
+ev_prober_get_tftp_svr_ip(uip_ipaddr_t *pIpaddr);
 
 #ifdef __cplusplus
 }

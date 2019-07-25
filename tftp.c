@@ -144,11 +144,6 @@ typedef struct _tftp_msg
 } tftp_msg_t;
 #pragma pack()
 
-//typedef struct oack_opt
-//{
-//    char    *pOpt;
-//    int     opt_strlen;
-//} oack_opt_t;
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
@@ -191,7 +186,7 @@ _tftp_write_data_block(tftp_msg_t *msg, int data_len)
             pWCtrl->received_data_len += SPIFC_PAGE_SIZE;
 
             if( pWCtrl->payload_length &&
-                pWCtrl->received_data_len > pWCtrl->payload_length )
+                (pWCtrl->received_data_len - SPIFC_PAGE_SIZE) >= pWCtrl->payload_length )
             {
                 memset((void*)pWCtrl, 0x0, sizeof(wr_ctrl_t));
                 pWCtrl->state = WCTRL_STATE_WAIT_HEADER;
@@ -231,7 +226,7 @@ _tftp_write_data_block(tftp_msg_t *msg, int data_len)
                 net_part_hdr_t      *pNPart_hdr = (net_part_hdr_t*)pData;
 
                 // check CRC32
-                if( pNPart_hdr->crc32[0] != calc_crc32((uint8_t*)pData, sizeof(net_part_hdr_t)));
+                if( pNPart_hdr->crc32[0] != calc_crc32((uint8_t*)pData, sizeof(net_part_hdr_t)) )
                 {
                     pData += NET_PARTITION_HEADER_SIZE;
                     continue;
@@ -241,6 +236,7 @@ _tftp_write_data_block(tftp_msg_t *msg, int data_len)
                 pWCtrl->partition_uid       = pNPart_hdr->partition_uid;
                 pWCtrl->partition_start     = pNPart_hdr->partition_start;
                 pWCtrl->payload_length      = pNPart_hdr->payload_length;
+                pWCtrl->received_data_len   = 0;
 
                 pData += NET_PARTITION_HEADER_SIZE;
 
@@ -251,7 +247,6 @@ _tftp_write_data_block(tftp_msg_t *msg, int data_len)
                 if( rval )    break;
             }
         }
-
     } while(0);
 
     return;
@@ -373,7 +368,7 @@ PT_THREAD(handle_tftp(void))
 
     PT_BEGIN(&g_tftpc.pt);
     g_tftpc.state   = STATE_SENDING;
-    g_tftpc.ticks   = CLOCK_SECOND >> 8;// CLOCK_SECOND * 3;
+    g_tftpc.ticks   = CLOCK_SECOND * 3;
     g_tftpc.retries = TFTP_RETRY_CNT;
 
     do {

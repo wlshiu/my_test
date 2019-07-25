@@ -13,11 +13,11 @@ set -e
 
 help()
 {
-    echo -e "${YELLOW}usage: $0 [fw-img-name] ${NC}"
+    echo -e "${YELLOW}usage: $0 [fw-img-name] [tftp server IP] ${NC}"
     exit 1;
 }
 
-if [ $# != 1 ]; then
+if [ $# != 2 ]; then
     help
 fi
 
@@ -27,6 +27,7 @@ cat > t.py << EOF
 #!/usr/bin/env python
 import sys
 import struct
+import socket
 from array import *
 Crc32_table = [0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
                0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988, 0x09B64C2B, 0x7EB17CBD, 0xE7B82D07, 0x90BF1D91,
@@ -65,7 +66,8 @@ uid = 'nbrn'
 msg_len = 4 + 2 + 2 + 128
 reboot_sec = 10
 fw_name = '$1'
-a = struct.pack("4sHH128s", uid, msg_len, reboot_sec, fw_name)
+tftp_svr_ip = '$2'
+a = struct.pack("4sHH128sI", uid, msg_len, reboot_sec, fw_name, socket.htonl(int(socket.inet_aton(tftp_svr_ip).encode('hex'), 16)))
 out_file.write(a)
 out_file.close()
 crc32 = 0xFFFFFFFF

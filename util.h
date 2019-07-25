@@ -52,12 +52,18 @@ extern "C" {
 
 #define FOUR_CC(a, b, c, d)         (((d) << 24) | ((c) << 16) | ((b) << 8) | (a))
 
+#define align_4(x)                  (((uintptr_t)(x) + 0x3) & ~0x3)
+
 #ifndef __unused
 #define __unused            __attribute__ ((unused))
 #endif
 
 #ifndef __align
 #define __align(num)        __attribute__ ((aligned(num)))
+#endif
+
+#ifndef __section
+#define __section(x)        __attribute__((section(x)))
 #endif
 
 /**
