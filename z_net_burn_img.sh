@@ -13,15 +13,31 @@ set -e
 
 help()
 {
-    echo -e "${YELLOW}usage: $0 [fw-img-name] [tftp server IP] ${NC}"
+    echo -e "${YELLOW}usage: $0 [elf-img-name] [tftp file root] [tftp server IP] ${NC}"
+    echo -e "    e.g. $0 upgrade.elf $HOME/tftpboot/ 192.168.56.3"
     exit 1;
 }
 
-if [ $# != 2 ]; then
+if [ $# != 3 ]; then
     help
 fi
 
+elf_file=$1
+pkg_file=${elf_file}.pkg
+tftp_root_dir=$2
+tftp_ip=$3
 packet_bin='__nbrn.pkt'
+
+speed_opt="--speed 115200"
+
+input_argv="${input_argv} --log 0"
+input_argv="${input_argv} --timeout 4"
+input_argv="${input_argv} ${speed_opt}"
+
+./out/bin/MemProber ${input_argv} burn -n ./$elf_file ./$pkg_file
+
+echo -e "${GREEN}mv $pkg_file to $tftp_root_dir ${NC}"
+mv -f ./$pkg_file $tftp_root_dir
 
 cat > t.py << EOF
 #!/usr/bin/env python
@@ -65,8 +81,8 @@ out_file = open('${packet_bin}', 'w+b')
 uid = 'nbrn'
 msg_len = 4 + 2 + 2 + 128
 reboot_sec = 10
-fw_name = '$1'
-tftp_svr_ip = '$2'
+fw_name = '$pkg_file'
+tftp_svr_ip = '$tftp_ip'
 a = struct.pack("4sHH128sI", uid, msg_len, reboot_sec, fw_name, socket.htonl(int(socket.inet_aton(tftp_svr_ip).encode('hex'), 16)))
 out_file.write(a)
 out_file.close()

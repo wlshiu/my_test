@@ -91,7 +91,6 @@ typedef enum dhcpc_phase
     DHCPC_PHASE_IP_FREE,
     DHCPC_PHASE_REQ,
 
-
 } dhcpc_phase_t;
 //=============================================================================
 //                  Macro Definition
@@ -169,13 +168,8 @@ static clock_time_t     g_tm_start = 0;
 static uint32_t
 _dhcpc_gen_xid(void)
 {
-#if 1
-    const uint8_t    xid[4] = {0xad, 0xde, 0x12, 0x23};
-    return *((uint32_t*)&xid);
-#else
     srand(time(0));
     return rand() & 0xFFFFFFFF;
-#endif
 }
 
 static uint8_t*

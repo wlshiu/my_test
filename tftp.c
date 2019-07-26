@@ -166,6 +166,9 @@ static tftpc_err_t      g_result_code = TFTPC_ERR_OK;
 
 #if defined(CONFIG_ENABLE_TFTP_RX_DUMP)
 static FILE     *fout = 0;
+
+#define CONFIG_SPIFC_SIM_SIZE               (2 << 20)
+extern uint8_t      g_spifc_mem_sim[CONFIG_SPIFC_SIM_SIZE];
 #endif
 //=============================================================================
 //                  Private Function Definition
@@ -451,8 +454,11 @@ PT_THREAD(handle_tftp(void))
         g_tftpc.state = STATE_CLOSED;
 
         #if defined(CONFIG_ENABLE_TFTP_RX_DUMP)
-        if( fout )
         {
+            printf("dump %d bytes \n", sizeof(g_spifc_mem_sim));
+            fout = fopen("dump.bin", "wb");
+
+            fwrite(g_spifc_mem_sim, 1, sizeof(g_spifc_mem_sim), fout);
             fclose(fout);
             fout = 0;
         }
@@ -513,15 +519,15 @@ tftpc_get_result(void)
 
 void tftpc_init(void)
 {
+    #if defined(CONFIG_ENABLE_TFTP_RX_DUMP)
+    memset(g_spifc_mem_sim, 0xFF, sizeof(g_spifc_mem_sim));
+    #endif
+
     memset(&g_tftpc, 0x0, sizeof(g_tftpc));
     g_tftpc.state         = STATE_CLOSED;
     g_tftpc.wr_ctrl.state = WCTRL_STATE_WAIT_HEADER;
 
     PT_INIT(&g_tftpc.pt);
-
-    #if defined(CONFIG_ENABLE_TFTP_RX_DUMP)
-    if( !fout )     fout = fopen("dump.bin", "wb");
-    #endif
     return;
 }
 
