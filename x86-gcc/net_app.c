@@ -63,7 +63,7 @@ net_app__call_callback(void)
     do {
         if( !g_net_callback_func )
         {
-//            err("NO app callback...\n");
+            // err("NO app callback...\n");
             break;
         }
 

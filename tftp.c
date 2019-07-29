@@ -74,22 +74,11 @@ typedef enum wctrl_state
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
-typedef struct net_part_hdr
-{
-#define NET_PARTITION_HEADER_SIZE           256
-
-    uint32_t        partition_uid;
-    uintptr_t       partition_start;
-    uint32_t        payload_length;
-    uint32_t        crc32[];
-
-} net_part_hdr_t;
-
 typedef struct wr_ctrl
 {
     wctrl_state_t   state;
     uint32_t        partition_uid;
-    uintptr_t       partition_start;
+    cross_addr_t    partition_start;
     uint32_t        payload_length;
     uint32_t        program_offset;
     uint32_t        received_data_len;
@@ -114,6 +103,17 @@ typedef struct tftpc
 } tftpc_t;
 
 #pragma pack(1)
+typedef struct net_part_hdr
+{
+#define NET_PARTITION_HEADER_SIZE           256
+
+    uint32_t        partition_uid;
+    cross_addr_t    partition_start;
+    uint32_t        payload_length;
+    uint32_t        crc32[];
+
+} net_part_hdr_t;
+
 typedef struct _tftp_msg
 {
     uint16_t   opcode;
@@ -209,8 +209,8 @@ _tftp_write_data_block(tftp_msg_t *msg, int data_len)
                     }
                 }
 
-                printf("    pp: 0x%08x\n", pWCtrl->partition_start + pWCtrl->program_offset);
-                rval = spifc_program(pData, pWCtrl->partition_start + pWCtrl->program_offset, SPIFC_PAGE_SIZE);
+                printf("    pp: 0x%08x\n", pWCtrl->partition_start.addr_value + pWCtrl->program_offset);
+                rval = spifc_program(pData, pWCtrl->partition_start.addr_value + pWCtrl->program_offset, SPIFC_PAGE_SIZE);
                 if( rval )    break;
 
                 pWCtrl->program_offset += SPIFC_PAGE_SIZE;
@@ -235,18 +235,19 @@ _tftp_write_data_block(tftp_msg_t *msg, int data_len)
                     continue;
                 }
 
-                pWCtrl->state               = WCTRL_STATE_PP;
-                pWCtrl->partition_uid       = pNPart_hdr->partition_uid;
-                pWCtrl->partition_start     = pNPart_hdr->partition_start;
-                pWCtrl->payload_length      = pNPart_hdr->payload_length;
-                pWCtrl->received_data_len   = 0;
+                pWCtrl->state                       = WCTRL_STATE_PP;
+                pWCtrl->partition_uid               = pNPart_hdr->partition_uid;
+                pWCtrl->partition_start.addr_value  = pNPart_hdr->partition_start.addr_value;
+                pWCtrl->payload_length              = pNPart_hdr->payload_length;
+                pWCtrl->received_data_len           = 0;
 
                 pData += NET_PARTITION_HEADER_SIZE;
 
                 // erase  blocks
-                pWCtrl->partition_start = (pWCtrl->partition_start + SPIFC_1_SECTOR_SIZE - 1) & ~(SPIFC_1_SECTOR_SIZE - 1);
+                pWCtrl->partition_start.addr_value = (pWCtrl->partition_start.addr_value + SPIFC_1_SECTOR_SIZE - 1) & ~(SPIFC_1_SECTOR_SIZE - 1);
+
                 printf("erase: 0x%08x, len= %d, cnt= %d\n", pWCtrl->partition_start, pWCtrl->payload_length, (pWCtrl->payload_length / SPIFC_1_SECTOR_SIZE));
-                rval = spifc_erase(SPIFC_ERASE_SECTOR, pWCtrl->partition_start, (pWCtrl->payload_length / SPIFC_1_SECTOR_SIZE));
+                rval = spifc_erase(SPIFC_ERASE_SECTOR, pWCtrl->partition_start.addr_value, (pWCtrl->payload_length / SPIFC_1_SECTOR_SIZE));
                 if( rval )    break;
             }
         }
