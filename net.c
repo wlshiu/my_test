@@ -11,6 +11,7 @@
  */
 
 
+#include <string.h>
 #include "pt.h"
 #include "uip_timer.h"
 #include "uip_arp.h"
@@ -55,6 +56,8 @@
     #define MY_MAC6        0x0e
 #endif
 
+#define NET_BURNING_RST_OK          0
+#define NET_BURNING_RST_FAIL        -1
 
 //=============================================================================
 //                  Macro Definition
@@ -65,12 +68,27 @@
 //=============================================================================
 typedef struct net_mgr
 {
+    struct uip_udp_conn     *conn;
     struct pt           pt;
     struct timer        timer;
 
-    uint32_t            is_finish;
+    uint16_t            retries;
+    uint16_t            is_finish;
+    int                 rval;
+
 } net_mgr_t;
 
+#define NET_BURN_TAG_RETURN        FOUR_CC('r', 't', 'r', 'n')
+
+#pragma pack(1)
+typedef struct net_repot_msg
+{
+    uint32_t    tag;
+    uint32_t    local_id;
+    int         result;
+
+} net_repot_msg_t;
+#pragma pack()
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
@@ -80,9 +98,37 @@ static struct uip_eth_addr      g_mac_addr = {0};
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
+static void
+_net_send_finish_ack(int rval)
+{
+    net_repot_msg_t  *msg = (net_repot_msg_t*)uip_appdata;
+
+    msg->tag      = NET_BURN_TAG_RETURN;
+    msg->local_id = 0x1234;
+    msg->result   = rval;
+
+    uip_udp_send(sizeof(net_repot_msg_t));
+    return;
+}
+
+static void
+_net_report_appcall(void)
+{
+    do {
+        if( g_net_mgr.is_finish )
+            break;
+
+        _net_send_finish_ack(g_net_mgr.rval);
+        g_net_mgr.is_finish = true;
+    } while(0);
+    return;
+}
+
 PT_THREAD(_net_handler(void))
 {
     PT_BEGIN(&g_net_mgr.pt);
+
+    g_net_mgr.is_finish = false;
 
     g_net_act[NET_ACT_UPGRADE_EVENT] = g_net_mgr.pt.lc;
 
@@ -106,8 +152,10 @@ PT_THREAD(_net_handler(void))
 
     PT_WAIT_UNTIL(&g_net_mgr.pt, 1);
     g_net_act[NET_ACT_TFTPC] = g_net_mgr.pt.lc;
+    g_net_mgr.retries = 3;
+    g_net_mgr.rval    = NET_BURNING_RST_FAIL;
 
-    {   // TFTP handle
+    do {   // TFTP handle
         int             rval = 0;
         uip_ipaddr_t    tftp_svr_ipaddr;
         char            *pFw_name = 0;
@@ -139,7 +187,13 @@ PT_THREAD(_net_handler(void))
         tftpc_get(&tftp_svr_ipaddr, pFw_name);
 
         PT_WAIT_UNTIL(&g_net_mgr.pt, !tftpc_is_busy());
-    }
+
+        if( tftpc_get_result() == TFTPC_ERR_OK )
+        {
+            g_net_mgr.rval = NET_BURNING_RST_OK;
+            break;
+        }
+    } while( --g_net_mgr.retries );
 
     {   // release IP for others
         net_app__set_callback(dhcpc_appcall);
@@ -147,10 +201,21 @@ PT_THREAD(_net_handler(void))
         PT_WAIT_UNTIL(&g_net_mgr.pt, !dhcpc_is_busy());
     }
 
+    net_app__set_callback(_net_report_appcall);
+
+    {   // report to host
+        uip_ipaddr_t    broadcast_ipaddr;
+        uip_ipaddr(broadcast_ipaddr, 255, 255, 255, 255);
+        g_net_mgr.conn = uip_udp_new(&broadcast_ipaddr, UIP_HTONS(ev_prober_get_return_port()));
+
+        PT_WAIT_UNTIL(&g_net_mgr.pt, g_net_mgr.is_finish);
+    }
+
     net_app__set_callback(0);
 
-    while(1)
-    {
+    PT_RESTART(&g_net_mgr.pt);
+
+    while(1) {
         PT_YIELD(&g_net_mgr.pt);
     }
 
@@ -169,6 +234,8 @@ void net_init(void)
         g_mac_addr.addr[4] = MY_MAC5;
         g_mac_addr.addr[5] = MY_MAC6;
         uip_setethaddr(g_mac_addr);
+
+        memset(&g_net_mgr, 0x0, sizeof(g_net_mgr));
 
         PT_INIT(&g_net_mgr.pt);
     } while(0);

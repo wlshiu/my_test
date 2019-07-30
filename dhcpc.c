@@ -388,10 +388,10 @@ PT_THREAD(handle_dhcp(void))
                 break;
             }
 
-            if( g_dhcpc.ticks < CLOCK_SECOND * 60 ) {
+            if( g_dhcpc.ticks < CLOCK_SECOND * 30 ) {
                 g_dhcpc.ticks *= 2;
             }
-        } while(g_dhcpc.state != STATE_OFFER_RECEIVED);
+        } while( g_dhcpc.state != STATE_OFFER_RECEIVED );
 
         #if defined(CONFIG_MEASURE_TIME)
         log("time: %d ms\n", clock_time() - g_tm_start);
@@ -448,15 +448,10 @@ PT_THREAD(handle_dhcp(void))
 
         timer_set(&g_dhcpc.timer, g_dhcpc.ticks);
         PT_YIELD_UNTIL(&g_dhcpc.pt, uip_newdata() || timer_expired(&g_dhcpc.timer));
-        if( _dhcpc_parse_msg() == DHCP_MSG_ACK )
-        {
-            log("@@@ dhcp release GOT ACK\n");
-            g_dhcpc.state = STATE_CONFIG_RECEIVED;
-        }
-        else
-        {
-            log("@@@ dhcp release NOT response !!!!!!!!!!!\n");
-        }
+
+        log("@@@ sent DHCPRelease message\n");
+
+        uip_udp_remove(g_dhcpc.conn);
 
         #if defined(CONFIG_MEASURE_TIME)
         log("time: %d ms\n", clock_time() - g_tm_start);

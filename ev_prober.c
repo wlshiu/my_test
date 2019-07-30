@@ -43,12 +43,13 @@ typedef struct ev_prober
 
     uint16_t            ticks;
     bool                has_burn_fw;
+    uint32_t            return_port;
     char                pkg_name[128];
     uip_ipaddr_t        tftp_ipaddr;
 
 } ev_prober_t;
 
-#define EV_PROBER_UID_BURN_FW       FOUR_CC('n', 'b', 'r', 'n')
+#define EV_PROBER_TAG_BURN_FW       FOUR_CC('n', 'b', 'r', 'n')
 
 #pragma pack(1)
 typedef struct ev_msg
@@ -56,7 +57,7 @@ typedef struct ev_msg
     /**
      *  uid: 'nbrn'
      */
-    uint32_t    uid;
+    uint32_t    tag;
 
     /**
      *  msg_len = sizeof(struct ev_msg) - 4
@@ -73,6 +74,18 @@ typedef struct ev_msg
      */
     char        pkg_name[128];
     uint32_t    tftp_server_ip;
+
+    /**
+     *  the target node (the unique id in every device)
+     *  if target_dest == 0xFFFFFFFF, it means all nodes.
+     */
+    uint32_t    target_uid;
+
+    /**
+     *  the port number to report to host after net burning
+     */
+    uint32_t    return_port;
+
     uint32_t    crc32;
 } ev_msg_t;
 #pragma pack()
@@ -114,21 +127,24 @@ _ev_prober_parse_msg(void)
 
         #if 0
         {
-            char    *pTag = (char*)&pMsg->uid;
-            log("uid        = '%c%c%c%c'\n", pTag[0], pTag[1], pTag[2], pTag[3]);
-            log("msg_len    = %d\n", pMsg->msg_len);
-            log("reboot_sec = %d\n", pMsg->reboot_sec);
-            log("pkg_name   = '%s'\n", strlen(pMsg->pkg_name) ? pMsg->pkg_name : "");
+            char    *pTag = (char*)&pMsg->tag;
+            log("tag         = '%c%c%c%c'\n", pTag[0], pTag[1], pTag[2], pTag[3]);
+            log("msg_len     = %d\n", pMsg->msg_len);
+            log("reboot_sec  = %d\n", pMsg->reboot_sec);
+            log("pkg_name    = '%s'\n", strlen(pMsg->pkg_name) ? pMsg->pkg_name : "");
             log_ip("tftp ip    = ", &pMsg->tftp_server_ip, "%d\n", __LINE__);
-            log("crc32      = 0x%x\n", pMsg->crc32);
+            log("target_uid  = x%08x\n", pMsg->target_uid);
+            log("return_port = %d\n", pMsg->return_port);
+            log("crc32       = 0x%x\n", pMsg->crc32);
         }
         #endif
 
-        if( pMsg->uid != EV_PROBER_UID_BURN_FW )
+        if( pMsg->tag != EV_PROBER_TAG_BURN_FW )
             break;
 
         rval = EV_PROBER_STATE_START_BURN_FW;
         g_ev_prober.has_burn_fw = true;
+        g_ev_prober.return_port = pMsg->return_port;
 
         if( strlen(pMsg->pkg_name) )
             strcpy(g_ev_prober.pkg_name, pMsg->pkg_name);
@@ -224,4 +240,10 @@ ev_prober_get_tftp_svr_ip(uip_ipaddr_t *pIpaddr)
         uip_ipaddr_copy(pIpaddr, &g_ev_prober.tftp_ipaddr);
     } while(0);
     return rval;
+}
+
+uint32_t
+ev_prober_get_return_port(void)
+{
+    return g_ev_prober.return_port;
 }

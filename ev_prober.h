@@ -57,6 +57,9 @@ ev_prober_get_pkg_name(void);
 int
 ev_prober_get_tftp_svr_ip(uip_ipaddr_t *pIpaddr);
 
+uint32_t
+ev_prober_get_return_port(void);
+
 #ifdef __cplusplus
 }
 #endif

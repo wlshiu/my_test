@@ -111,7 +111,7 @@ typedef unsigned short uip_stats_t;
  */
 #define UIP_CONF_BROADCAST          1
 #define UIP_CONF_UDP                1
-#define UIP_CONF_UDP_CONNS          6
+#define UIP_CONF_UDP_CONNS          10
 /**
  * UDP checksums on or off
  *
