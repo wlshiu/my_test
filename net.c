@@ -176,6 +176,7 @@ PT_THREAD(_net_handler(void))
         {
             uip_ipaddr_t    ipaddr;
             uip_gethostaddr(&ipaddr);
+            log("\n\n====================\n");
             log_ip("local ip: ", ipaddr, " ln.%d\n", __LINE__);
             log_ip("tftp-svr: ", tftp_svr_ipaddr, "=> GET %s\n", pFw_name);
         }

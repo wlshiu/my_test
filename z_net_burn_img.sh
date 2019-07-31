@@ -13,12 +13,12 @@ set -e
 
 help()
 {
-    echo -e "${YELLOW}usage: $0 [elf-img-name] [tftp file root] [tftp server IP] ${NC}"
+    echo -e "${YELLOW}usage: $0 [elf-img-name] [tftp file root] [tftp server IP] [waiting seconds]NC}"
     echo -e "    e.g. $0 upgrade.elf $HOME/tftpboot/ 192.168.56.3"
     exit 1;
 }
 
-if [ $# != 3 ]; then
+if [ $# != 4 ]; then
     help
 fi
 
@@ -26,7 +26,10 @@ elf_file=$1
 pkg_file=${elf_file}.pkg
 tftp_root_dir=$2
 tftp_ip=$3
+monitor_sec=$4
 packet_bin='__nbrn.pkt'
+return_port=8888
+
 
 speed_opt="--speed 115200"
 
@@ -39,12 +42,16 @@ input_argv="${input_argv} ${speed_opt}"
 echo -e "${GREEN}mv $pkg_file to $tftp_root_dir ${NC}"
 mv -f ./$pkg_file $tftp_root_dir
 
+pack_fmt_discovery="4sHH128s"
+pack_fmt_burn_fw="4sHHI128sII"
+
 cat > t.py << EOF
 #!/usr/bin/env python
 import sys
 import struct
 import socket
 from array import *
+import argparse
 Crc32_table = [0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
                0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988, 0x09B64C2B, 0x7EB17CBD, 0xE7B82D07, 0x90BF1D91,
                0x1DB71064, 0x6AB020F2, 0xF3B97148, 0x84BE41DE, 0x1ADAD47D, 0x6DDDE4EB, 0xF4D4B551, 0x83D385C7,
@@ -77,13 +84,25 @@ Crc32_table = [0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706
                0xAED16A4A, 0xD9D65ADC, 0x40DF0B66, 0x37D83BF0, 0xA9BCAE53, 0xDEBB9EC5, 0x47B2CF7F, 0x30B5FFE9,
                0xBDBDF21C, 0xCABAC28A, 0x53B39330, 0x24B4A3A6, 0xBAD03605, 0xCDD70693, 0x54DE5729, 0x23D967BF,
                0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D]
+arg_parser = argparse.ArgumentParser()
+arg_parser.add_argument("packet_type", help="packet type: discovery, burn", type = str)
+args = arg_parser.parse_args()
 out_file = open('${packet_bin}', 'w+b')
-uid = 'nbrn'
-msg_len = 4 + 2 + 2 + 128
-reboot_sec = 10
-fw_name = '$pkg_file'
-tftp_svr_ip = '$tftp_ip'
-a = struct.pack("4sHH128sI", uid, msg_len, reboot_sec, fw_name, socket.htonl(int(socket.inet_aton(tftp_svr_ip).encode('hex'), 16)))
+if args.packet_type == 'discovery':
+    uid = 'dvry'
+    msg_len = struct.calcsize("${pack_fmt_discovery}")
+    port = ${return_port}
+    meta='HeyMan'
+    a = struct.pack("${pack_fmt_discovery}", uid, msg_len, port, meta)
+elif args.packet_type == 'burn':
+    uid = 'nbrn'
+    msg_len = struct.calcsize("${pack_fmt_burn_fw}")
+    reboot_sec = 1
+    fw_name = '$pkg_file'
+    tftp_svr_ip = '$tftp_ip'
+    port = ${return_port}
+    tartget_dest = 0xFFFFFFFF
+    a = struct.pack("${pack_fmt_burn_fw}", uid, msg_len, port, reboot_sec, fw_name, socket.htonl(int(socket.inet_aton(tftp_svr_ip).encode('hex'), 16)), tartget_dest)
 out_file.write(a)
 out_file.close()
 crc32 = 0xFFFFFFFF
@@ -92,18 +111,108 @@ buf = f.read()
 f.close()
 for c in buf:
     crc32 = ((crc32 >> 8) & 0x00FFFFFF) ^ Crc32_table[(crc32 ^ ord(c)) & 0xFF]
-crc32 = hex(crc32 ^ 0xffffffff)
-print 'crc32= 0x%x' % int(crc32, 16)
-a = struct.pack("I", int(crc32, 16))
+# crc32 = hex(crc32 ^ 0xffffffff)
+crc32 = crc32 ^ 0xffffffff
+print 'crc32= 0x%x' % int(crc32)
+a = struct.pack("I", int(crc32))
 out_file = open('${packet_bin}', 'ab')
 out_file.write(a)
 out_file.close()
 EOF
 
 chmod +x t.py
-./t.py
+
+./t.py discovery
+sudo socat -u open:${packet_bin} udp4-datagram:255.255.255.255:9999,broadcast
+
+./t.py burn
+
+sudo socat -u open:${packet_bin} udp4-datagram:255.255.255.255:9999,broadcast
+
 rm -f t.py
-
-socat -u open:${packet_bin} udp4-datagram:255.255.255.255:9999,broadcast
-
 rm -f ${packet_bin}
+
+echo -e "\n${GREEN}wait remotes response ${NC}"
+###################################
+resp_packet=rx.bin
+
+cat > resp_daemon.sh << EOF
+#!/bin/bash
+#PIDFILE=/var/run/socat-${return_port}.pid
+PIDFILE=./socat-${return_port}.pid
+if [ "\$1" = "start" -o -z "\$1" ]; then
+    socat -u udp4-listen:${return_port} open:rx.bin,create,append </dev/null &
+    echo \$! >\$PIDFILE
+
+elif [ "\$1" = "stop" ]; then
+    kill \$(/bin/cat \$PIDFILE)
+    # ps all | grep 'socat -u udp4-listen' | awk '{print $3}' | xargs kill
+fi
+EOF
+
+cat > resp_parse.py << EOF
+#!/usr/bin/env python
+import sys
+import struct
+import socket
+from array import *
+class colors: # You may need to change color settings in iPython
+    RED = '\033[31m'
+    ENDC = '\033[m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+
+f = open('${resp_packet}', 'rb')
+print colors.YELLOW + '\n@@@ remote report state' + colors.ENDC
+print 'tag  |     id     | state'
+print '-----+------------+--------------'
+
+while True:
+    pkt = f.read(12)
+    if not pkt:
+        break
+
+    tag, id, result = struct.unpack("4sII", pkt)
+
+    if tag != 'rtrn':
+        break
+
+    print '%s | %10s | %s' % (tag, hex(id), hex(result))
+
+f.close()
+EOF
+
+chmod +x resp_daemon.sh
+chmod +x resp_parse.py
+
+if [ -f ${resp_packet} ]; then
+    rm -f ${resp_packet}
+fi
+
+resp_daemon.sh start
+prev_income=
+
+cnt=1
+while [ $cnt != ${monitor_sec} ]
+do
+    if [ -f ${resp_packet} ]; then
+        if [ -z "${prev_income}" ]; then
+            prev_income=$(ls -l "${resp_packet}")
+        fi
+
+        cur_income=$(ls -l "${resp_packet}")
+        if [ "${cur_income}" !=  "${prev_income}" ] || [ ${cnt} == 1 ]; then
+            prev_income="${cur_income}"
+            resp_parse.py
+            # xxd -g 4 -e -c 12 ${resp_packet} | awk
+        fi
+
+        cnt=$(($cnt+1))
+    fi
+
+    sleep 1
+done
+
+resp_daemon.sh stop
+rm -f resp_daemon.sh
+rm -f resp_parse.py

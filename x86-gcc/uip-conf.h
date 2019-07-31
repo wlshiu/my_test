@@ -140,6 +140,7 @@ typedef unsigned short uip_stats_t;
 //#define UIP_CONF_EXTERNAL_BUFFER
 
 #if 1
+#include <stdio.h>
 #define log_ip(prefix, pIp4addr, str, ...)                    \
     do{ ip_convert_t    ip_cnv_ipaddr = {0};                  \
         memcpy(&ip_cnv_ipaddr, pIp4addr, 4);                  \
