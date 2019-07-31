@@ -42,6 +42,8 @@ input_argv="${input_argv} ${speed_opt}"
 echo -e "${GREEN}mv $pkg_file to $tftp_root_dir ${NC}"
 mv -f ./$pkg_file $tftp_root_dir
 
+resp_packet=rx.bin
+
 pack_fmt_discovery="4sHH128s"
 pack_fmt_burn_fw="4sHHI128sII"
 
@@ -120,28 +122,12 @@ out_file.write(a)
 out_file.close()
 EOF
 
-chmod +x t.py
-
-./t.py discovery
-sudo socat -u open:${packet_bin} udp4-datagram:255.255.255.255:9999,broadcast
-
-./t.py burn
-
-sudo socat -u open:${packet_bin} udp4-datagram:255.255.255.255:9999,broadcast
-
-rm -f t.py
-rm -f ${packet_bin}
-
-echo -e "\n${GREEN}wait remotes response ${NC}"
-###################################
-resp_packet=rx.bin
-
 cat > resp_daemon.sh << EOF
 #!/bin/bash
 #PIDFILE=/var/run/socat-${return_port}.pid
 PIDFILE=./socat-${return_port}.pid
 if [ "\$1" = "start" -o -z "\$1" ]; then
-    socat -u udp4-listen:${return_port} open:rx.bin,create,append </dev/null &
+    socat -u udp4-listen:${return_port} open:${resp_packet},create,append </dev/null &
     echo \$! >\$PIDFILE
 
 elif [ "\$1" = "stop" ]; then
@@ -155,18 +141,28 @@ cat > resp_parse.py << EOF
 import sys
 import struct
 import socket
-from array import *
+# from array import *
+import argparse
 class colors: # You may need to change color settings in iPython
     RED = '\033[31m'
     ENDC = '\033[m'
     GREEN = '\033[32m'
     YELLOW = '\033[33m'
 
+arg_parser = argparse.ArgumentParser()
+arg_parser.add_argument("packet_type", help="packet type: discovery, burn", type = str)
+args = arg_parser.parse_args()
 f = open('${resp_packet}', 'rb')
-print colors.YELLOW + '\n@@@ remote report state' + colors.ENDC
-print 'tag  |     id     | state'
-print '-----+------------+--------------'
 
+if args.packet_type == 'discovery':
+    print colors.YELLOW + '\n### discovery list' + colors.ENDC
+elif args.packet_type == 'burn':
+    print colors.YELLOW + '\n@@@ remote report state' + colors.ENDC
+
+print 'No. | tag  |     id     | state'
+print '----+------+------------+--------------'
+
+idx=1
 while True:
     pkt = f.read(12)
     if not pkt:
@@ -177,23 +173,38 @@ while True:
     if tag != 'rtrn':
         break
 
-    print '%s | %10s | %s' % (tag, hex(id), hex(result))
+    print '%03d | %s | %10s | %s' % (idx, tag, hex(id), hex(result))
+
+    idx = idx + 1
 
 f.close()
 EOF
 
 chmod +x resp_daemon.sh
 chmod +x resp_parse.py
+chmod +x t.py
 
 if [ -f ${resp_packet} ]; then
     rm -f ${resp_packet}
 fi
 
 resp_daemon.sh start
-prev_income=
 
+#######################
+## send discovery request
+./t.py discovery
+sudo socat -u open:${packet_bin} udp4-datagram:255.255.255.255:9999,broadcast
+
+sleep 0.5
+
+rm -f ${packet_bin}
+
+## waiting to receive response of discovery
+echo -e "${GREEN}wait discovery response ${NC}"
+prev_income=
 cnt=1
-while [ $cnt != ${monitor_sec} ]
+sec=1
+while [ $sec != ${monitor_sec} ]
 do
     if [ -f ${resp_packet} ]; then
         if [ -z "${prev_income}" ]; then
@@ -201,18 +212,81 @@ do
         fi
 
         cur_income=$(ls -l "${resp_packet}")
-        if [ "${cur_income}" !=  "${prev_income}" ] || [ ${cnt} == 1 ]; then
+        if [ "${cur_income}" !=  "${prev_income}" ] || [ ${sec} == 1 ]; then
             prev_income="${cur_income}"
             resp_parse.py
-            # xxd -g 4 -e -c 12 ${resp_packet} | awk
         fi
 
-        cnt=$(($cnt+1))
+        sec=$(($sec+1))
+    else
+        _mos=$(($cnt % 4))
+
+        if [ $_mos == 0 ]; then
+            printf "\r/"
+        elif [ $_mos == 1 ]; then
+            printf "\r-"
+        elif [ $_mos == 2 ]; then
+            printf '\r\\'
+        elif [ $_mos == 3 ]; then
+            printf '\r|'
+        fi
     fi
 
+    cnt=$(($cnt+1))
+    sleep 1
+done
+
+#######################
+## send burning request
+./t.py burn
+sudo socat -u open:${packet_bin} udp4-datagram:255.255.255.255:9999,broadcast
+
+rm -f t.py
+rm -f ${packet_bin}
+
+echo -e "\n${GREEN}wait remotes response ${NC}"
+
+## waiting to receive response of burning
+if [ -f ${resp_packet} ]; then
+    rm -f ${resp_packet}
+fi
+
+prev_income=
+cnt=1
+sec=1
+while [ $sec != ${monitor_sec} ]
+do
+    if [ -f ${resp_packet} ]; then
+        if [ -z "${prev_income}" ]; then
+            prev_income=$(ls -l "${resp_packet}")
+        fi
+
+        cur_income=$(ls -l "${resp_packet}")
+        if [ "${cur_income}" !=  "${prev_income}" ] || [ ${sec} == 1 ]; then
+            prev_income="${cur_income}"
+            resp_parse.py
+        fi
+
+        sec=$(($sec+1))
+    else
+        _mos=$(($cnt % 4))
+
+        if [ $_mos == 0 ]; then
+            printf "\r/"
+        elif [ $_mos == 1 ]; then
+            printf "\r-"
+        elif [ $_mos == 2 ]; then
+            printf '\r\\'
+        elif [ $_mos == 3 ]; then
+            printf '\r|'
+        fi
+    fi
+
+    cnt=$(($cnt+1))
     sleep 1
 done
 
 resp_daemon.sh stop
 rm -f resp_daemon.sh
 rm -f resp_parse.py
+rm -f ${resp_packet}
