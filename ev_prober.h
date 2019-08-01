@@ -48,8 +48,25 @@ ev_prober_init(void);
 void
 ev_prober_appcall(void);
 
+/**
+ *  @brief  ev_prober_is_burn_img()
+ *              start burning image or net
+ *
+ *  @return     true/false
+ *
+ */
 bool
 ev_prober_is_burn_img(void);
+
+/**
+ *  @brief  ev_prober_has_resp_discovery()
+ *              has respond an ack for discovery event
+ *
+ *  @return     true/false
+ *
+ */
+bool
+ev_prober_has_resp_discovery();
 
 char*
 ev_prober_get_pkg_name(void);
@@ -61,7 +78,13 @@ uint32_t
 ev_prober_get_return_port(void);
 
 uint32_t
-ev_prober_is_busy(void);
+ev_prober_is_sent(void);
+
+void
+ev_prober_send_discovery_ack(int rval);
+
+void
+ev_prober_send_finish_ack(int rval);
 
 
 #ifdef __cplusplus

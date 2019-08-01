@@ -77,18 +77,6 @@ typedef struct net_mgr
     int                 rval;
 
 } net_mgr_t;
-
-#define NET_BURN_TAG_RETURN        FOUR_CC('r', 't', 'r', 'n')
-
-#pragma pack(1)
-typedef struct net_repot_msg
-{
-    uint32_t    tag;
-    uint32_t    local_id;
-    int         result;
-
-} net_repot_msg_t;
-#pragma pack()
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
@@ -98,32 +86,6 @@ static struct uip_eth_addr      g_mac_addr = {0};
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
-static void
-_net_send_finish_ack(int rval)
-{
-    net_repot_msg_t  *msg = (net_repot_msg_t*)uip_appdata;
-
-    msg->tag      = NET_BURN_TAG_RETURN;
-    msg->local_id = 0x1234;
-    msg->result   = rval;
-
-    uip_udp_send(sizeof(net_repot_msg_t));
-    return;
-}
-
-static void
-_net_report_appcall(void)
-{
-    do {
-        if( g_net_mgr.is_finish )
-            break;
-
-        _net_send_finish_ack(g_net_mgr.rval);
-        g_net_mgr.is_finish = true;
-    } while(0);
-    return;
-}
-
 PT_THREAD(_net_handler(void))
 {
     PT_BEGIN(&g_net_mgr.pt);
@@ -136,7 +98,17 @@ PT_THREAD(_net_handler(void))
         net_app__set_callback(ev_prober_appcall);
 
         ev_prober_init();
-        PT_WAIT_UNTIL(&g_net_mgr.pt, ev_prober_is_burn_img());
+
+        do {
+            timer_set(&g_net_mgr.timer, CLOCK_SECOND / 100);
+            PT_WAIT_UNTIL(&g_net_mgr.pt, timer_expired(&g_net_mgr.timer));
+            if( ev_prober_has_resp_discovery() )
+            {
+                // send ack of discovery if necessary
+                ev_prober_send_discovery_ack(0);
+                PT_WAIT_UNTIL(&g_net_mgr.pt, ev_prober_is_sent());
+            }
+        } while( !ev_prober_is_burn_img() );
     }
 
     PT_WAIT_UNTIL(&g_net_mgr.pt, 1);
@@ -202,17 +174,11 @@ PT_THREAD(_net_handler(void))
         PT_WAIT_UNTIL(&g_net_mgr.pt, !dhcpc_is_busy());
     }
 
-    net_app__set_callback(_net_report_appcall);
-
     {   // report to host
-        uip_ipaddr_t    broadcast_ipaddr;
-        uip_ipaddr(broadcast_ipaddr, 255, 255, 255, 255);
-        g_net_mgr.conn = uip_udp_new(&broadcast_ipaddr, UIP_HTONS(ev_prober_get_return_port()));
-
-        PT_WAIT_UNTIL(&g_net_mgr.pt, g_net_mgr.is_finish);
+        net_app__set_callback(ev_prober_appcall);
+        ev_prober_send_finish_ack(g_net_mgr.rval);
+        PT_WAIT_UNTIL(&g_net_mgr.pt, ev_prober_is_sent());
     }
-
-    net_app__set_callback(0);
 
     PT_RESTART(&g_net_mgr.pt);
 

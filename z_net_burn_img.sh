@@ -11,6 +11,12 @@ NC='\e[0m' # No Color
 
 set -e
 
+if ps | grep -q 'socat'; then
+    ps | grep 'socat' | awk -F' ' '{ print $1; }' | xargs kill
+    # ps aux | grep 'socat' | grep -v 'grep' | awk '{print $2}' | xargs kill -9
+fi
+
+
 help()
 {
     echo -e "${YELLOW}usage: $0 [elf-img-name] [tftp file root] [tftp server IP] [waiting seconds]NC}"
@@ -47,7 +53,7 @@ resp_packet=rx.bin
 pack_fmt_discovery="4sHH128s"
 pack_fmt_burn_fw="4sHHI128sII"
 
-cat > t.py << EOF
+cat > packet_generator.py << EOF
 #!/usr/bin/env python
 import sys
 import struct
@@ -115,7 +121,7 @@ for c in buf:
     crc32 = ((crc32 >> 8) & 0x00FFFFFF) ^ Crc32_table[(crc32 ^ ord(c)) & 0xFF]
 # crc32 = hex(crc32 ^ 0xffffffff)
 crc32 = crc32 ^ 0xffffffff
-print 'crc32= 0x%x' % int(crc32)
+print '\ncrc32= 0x%x' % int(crc32)
 a = struct.pack("I", int(crc32))
 out_file = open('${packet_bin}', 'ab')
 out_file.write(a)
@@ -170,19 +176,20 @@ while True:
 
     tag, id, result = struct.unpack("4sII", pkt)
 
-    if tag != 'rtrn':
+    if (tag != 'fnsh') and (tag != 'dvry'):
         break
 
     print '%03d | %s | %10s | %s' % (idx, tag, hex(id), hex(result))
 
     idx = idx + 1
 
+print '\n\n'
 f.close()
 EOF
 
+chmod +x packet_generator.py
 chmod +x resp_daemon.sh
 chmod +x resp_parse.py
-chmod +x t.py
 
 if [ -f ${resp_packet} ]; then
     rm -f ${resp_packet}
@@ -190,9 +197,9 @@ fi
 
 resp_daemon.sh start
 
-#######################
 ## send discovery request
-./t.py discovery
+echo -e "${GREEN}send discovery request ${NC}"
+./packet_generator.py discovery
 sudo socat -u open:${packet_bin} udp4-datagram:255.255.255.255:9999,broadcast
 
 sleep 0.5
@@ -214,10 +221,16 @@ do
         cur_income=$(ls -l "${resp_packet}")
         if [ "${cur_income}" !=  "${prev_income}" ] || [ ${sec} == 1 ]; then
             prev_income="${cur_income}"
-            resp_parse.py
+            printf "\n"
+            resp_parse.py discovery
         fi
 
         sec=$(($sec+1))
+
+        remain_sec=$(($monitor_sec - $sec))
+        printf '\r wait %d sec...' ${remain_sec}
+
+        sleep 1
     else
         _mos=$(($cnt % 4))
 
@@ -230,30 +243,36 @@ do
         elif [ $_mos == 3 ]; then
             printf '\r|'
         fi
+
+        sleep 0.1
     fi
 
     cnt=$(($cnt+1))
-    sleep 1
 done
 
-#######################
+if [ -f ${resp_packet} ]; then
+    rm -f ${resp_packet}
+fi
+
+resp_daemon.sh stop
+resp_daemon.sh start
+
 ## send burning request
-./t.py burn
+echo -e "${GREEN}send burning F/w request ${NC}"
+./packet_generator.py burn
 sudo socat -u open:${packet_bin} udp4-datagram:255.255.255.255:9999,broadcast
 
-rm -f t.py
+rm -f packet_generator.py
 rm -f ${packet_bin}
 
 echo -e "\n${GREEN}wait remotes response ${NC}"
 
 ## waiting to receive response of burning
-if [ -f ${resp_packet} ]; then
-    rm -f ${resp_packet}
-fi
-
 prev_income=
+
 cnt=1
 sec=1
+monitor_sec=$(($monitor_sec * 4))
 while [ $sec != ${monitor_sec} ]
 do
     if [ -f ${resp_packet} ]; then
@@ -264,10 +283,15 @@ do
         cur_income=$(ls -l "${resp_packet}")
         if [ "${cur_income}" !=  "${prev_income}" ] || [ ${sec} == 1 ]; then
             prev_income="${cur_income}"
-            resp_parse.py
+            printf "\n"
+            resp_parse.py burn
         fi
 
         sec=$(($sec+1))
+
+        remain_sec=$(($monitor_sec - $sec))
+        printf '\r wait %d sec...' ${remain_sec}
+        sleep 1
     else
         _mos=$(($cnt % 4))
 
@@ -280,10 +304,11 @@ do
         elif [ $_mos == 3 ]; then
             printf '\r|'
         fi
+
+        sleep 0.1
     fi
 
     cnt=$(($cnt+1))
-    sleep 1
 done
 
 resp_daemon.sh stop

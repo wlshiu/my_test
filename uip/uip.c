@@ -176,11 +176,9 @@ struct uip_conn *uip_conn;   /* uip_conn always points to the current
 				connection. */
 
 struct uip_conn uip_conns[UIP_CONNS];
-/* The uip_conns array holds all TCP
-connections. */
+/* The uip_conns array holds all TCP connections. */
 uint16_t uip_listenports[UIP_LISTENPORTS];
-/* The uip_listenports list all currently
-listning ports. */
+/* The uip_listenports list all currently listening ports. */
 #if UIP_UDP
     struct uip_udp_conn *uip_udp_conn;
     struct uip_udp_conn uip_udp_conns[UIP_UDP_CONNS];
