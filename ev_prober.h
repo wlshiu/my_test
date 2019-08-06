@@ -43,7 +43,7 @@ extern "C" {
 //                  Public Function Definition
 //=============================================================================
 int
-ev_prober_init(void);
+ev_prober_init(uint32_t local_uid);
 
 void
 ev_prober_appcall(void);

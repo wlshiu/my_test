@@ -19,6 +19,7 @@
 #include "ev_prober.h"
 #include "dhcpc.h"
 #include "tftp.h"
+#include "crc32.h"
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -76,6 +77,7 @@ typedef struct net_mgr
     uint16_t            is_finish;
     int                 rval;
 
+    uint32_t            uid[3];
 } net_mgr_t;
 //=============================================================================
 //                  Global Data Definition
@@ -97,7 +99,7 @@ PT_THREAD(_net_handler(void))
     {   // receive broadcast packet for upgrading
         net_app__set_callback(ev_prober_appcall);
 
-        ev_prober_init();
+        ev_prober_init(g_net_mgr.uid[2]);
 
         do {
             timer_set(&g_net_mgr.timer, CLOCK_SECOND / 100);
@@ -117,7 +119,7 @@ PT_THREAD(_net_handler(void))
     {   // DHCP handle
         net_app__set_callback(dhcpc_appcall);
 
-        PT_WAIT_UNTIL(&g_net_mgr.pt, (dhcpc_init(&g_mac_addr) == DHCPC_ERR_OK));
+        PT_WAIT_UNTIL(&g_net_mgr.pt, (dhcpc_init(&g_mac_addr, g_net_mgr.uid[2]) == DHCPC_ERR_OK));
 
         PT_WAIT_UNTIL(&g_net_mgr.pt, !dhcpc_is_busy());
     }
@@ -200,6 +202,8 @@ void net_init(void)
         g_mac_addr.addr[3] = MY_MAC4;
         g_mac_addr.addr[4] = MY_MAC5;
         g_mac_addr.addr[5] = MY_MAC6;
+
+        g_net_mgr.uid[2] = calc_crc32((uint8_t*)&g_mac_addr, sizeof(g_mac_addr));
         uip_setethaddr(g_mac_addr);
 
         memset(&g_net_mgr, 0x0, sizeof(g_net_mgr));

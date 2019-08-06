@@ -15,6 +15,8 @@
 					<Add option="-std=c99" />
 					<Add option="-g" />
 					<Add option="-DWIN32" />
+					<Add option="-DCONFIG_USE_STD_LIBC=1" />
+					<Add option="-DCONFIG_SW_CRC32_ENABLE=1" />
 					<Add directory="uip" />
 					<Add directory="x86-gcc" />
 					<Add directory="npcap-1.03/Include" />

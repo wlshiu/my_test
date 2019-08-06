@@ -32,11 +32,13 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 #include <string.h>
 
+#include <stdlib.h>
+#include <time.h>
+
 #include "uip.h"
+#include "uip_arp.h"
 #include "dhcpc.h"
 #include "uip_timer.h"
 #include "pt.h"
@@ -167,12 +169,14 @@ static clock_time_t     g_tm_start = 0;
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
+#if 0
 static uint32_t
 _dhcpc_gen_xid(void)
 {
     srand(time(0));
     return rand() & 0xFFFFFFFF;
 }
+#endif
 
 static uint8_t*
 _dhcpc_add_msg_type(uint8_t *optptr, uint8_t type)
@@ -481,7 +485,7 @@ PT_THREAD(handle_dhcp(void))
 //                  Public Function Definition
 //=============================================================================
 dhcpc_err_t
-dhcpc_init(struct uip_eth_addr  *pMac_addr)
+dhcpc_init(struct uip_eth_addr  *pMac_addr, uint32_t local_uid)
 {
     dhcpc_err_t     rval = DHCPC_ERR_OK;
     do {
@@ -489,7 +493,7 @@ dhcpc_init(struct uip_eth_addr  *pMac_addr)
 
         memset(&g_dhcpc, 0x0, sizeof(g_dhcpc));
 
-        g_dhcpc.xid   = _dhcpc_gen_xid();
+        g_dhcpc.xid   = local_uid; // _dhcpc_gen_xid();
         g_dhcpc.state = STATE_INITIAL;
 
         PT_INIT(&g_dhcpc.pt);

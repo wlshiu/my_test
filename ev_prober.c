@@ -113,7 +113,7 @@ typedef struct ev_msg_ack
     uint32_t    tag;
     uint32_t    local_id;
     int         result;
-
+    uint8_t     mac_addr[6];
 } ev_msg_ack_t;
 #pragma pack()
 
@@ -160,6 +160,10 @@ _ev_prober_parse_msg(void)
         if( pMsg->tag == EV_PROBER_TAG_BURN_FW )
         {
             ev_msg_burn_t   *pMsg_burn = (ev_msg_burn_t*)pMsg;
+
+            if( pMsg_burn->target_uid != 0xFFFFFFFF &&
+                pMsg_burn->target_uid != g_ev_ack.msg_ack.local_id )
+                break;
 
             #if 1
             {
@@ -271,7 +275,7 @@ PT_THREAD(_ev_prober_ack(void))
 //                  Public Function Definition
 //=============================================================================
 int
-ev_prober_init(void)
+ev_prober_init(uint32_t local_uid)
 {
     int     rval = 0;
     do {
@@ -291,7 +295,7 @@ ev_prober_init(void)
 
         uip_udp_bind(g_ev_prober.conn, UIP_HTONS(CONFIG_EV_PROBER_PORT));
 
-        g_ev_ack.msg_ack.local_id = 0x1234;
+        g_ev_ack.msg_ack.local_id = local_uid;
 
         if(  !g_ev_ack.conn )
         {

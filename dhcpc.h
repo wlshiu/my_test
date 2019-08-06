@@ -49,7 +49,7 @@ typedef enum dhcpc_err
 
 
 dhcpc_err_t
-dhcpc_init(struct uip_eth_addr *pMac_addr);
+dhcpc_init(struct uip_eth_addr *pMac_addr, uint32_t local_uid);
 
 uint32_t
 dhcpc_is_busy(void);
