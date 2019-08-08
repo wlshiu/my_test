@@ -72,6 +72,7 @@ static struct timer    g_arp_timer;
 //=============================================================================
 int main(void)
 {
+    srand(time(0));
     timer_set(&g_arp_timer, CLOCK_SECOND * 10);	    /* 10s */
 
     /* Initialize the device driver. */

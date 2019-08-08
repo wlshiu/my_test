@@ -51,7 +51,7 @@
 
 #include <windows.h>
 
-
+#if 0
 static int              g_is_initialized = 0;
 static clock_time_t     g_time_cnt = 0;
 /*---------------------------------------------------------------------------*/
@@ -64,6 +64,7 @@ timer_sig_handler(PVOID lpParameter, BOOLEAN TimerOrWaitFired)
 clock_time_t
 clock_time(void)
 {
+
     if( g_is_initialized == 0 )
     {
         HANDLE      win_timer;
@@ -77,7 +78,13 @@ clock_time(void)
         }
         g_is_initialized = 1;
     }
-
     return (clock_time_t)g_time_cnt;
 }
+#else
+clock_time_t
+clock_time(void)
+{
+    return (clock_time_t)GetTickCount();
+}
+#endif
 /*---------------------------------------------------------------------------*/

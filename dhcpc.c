@@ -173,7 +173,7 @@ static clock_time_t     g_tm_start = 0;
 static uint32_t
 _dhcpc_gen_xid(void)
 {
-    srand(time(0));
+
     return rand() & 0xFFFFFFFF;
 }
 #endif
@@ -365,8 +365,6 @@ _dhcpc_parse_msg(void)
     return 0;
 }
 
-
-
 static
 PT_THREAD(handle_dhcp(void))
 {
@@ -392,7 +390,7 @@ PT_THREAD(handle_dhcp(void))
                 break;
             }
 
-            if( g_dhcpc.ticks < CLOCK_SECOND * 30 ) {
+            if( g_dhcpc.ticks < CLOCK_SECOND * 60 ) {
                 g_dhcpc.ticks *= 2;
             }
         } while( g_dhcpc.state != STATE_OFFER_RECEIVED );

@@ -1188,6 +1188,7 @@ udp_input:
                uip_htons(uip_udp_conn->rport), uip_htons(UDPBUF->srcport));
         log_ip("    ripaddr= ", &uip_udp_conn->ripaddr, "\n");
         log_ip("    srcipaddr= ", &BUF->srcipaddr, "\n");
+        log_ip("    destipaddr= ", &BUF->destipaddr, "\n");
         #endif
 
         if( uip_udp_conn->lport != 0 &&
