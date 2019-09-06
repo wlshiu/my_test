@@ -24,7 +24,7 @@
 //__BEGIN_DECLS
 
 /* Standard ELF types.  */
-
+#include <stdbool.h>
 #include <stdint.h>
 
 /* Type for a 16-bit quantity.  */

@@ -32,6 +32,10 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="elf.h" />
+		<Unit filename="elf32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="elf32.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
