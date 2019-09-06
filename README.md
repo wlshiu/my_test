@@ -23,6 +23,7 @@
 + test_tftp
     - [reference](https://github.com/wlshiu/tftpx)
 + test_uip
++ test_elf2
 
 # MS Visual Studio
 
