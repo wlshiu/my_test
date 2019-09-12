@@ -24,6 +24,7 @@
     - [reference](https://github.com/wlshiu/tftpx)
 + test_uip
 + test_elf2
++ test_shell
 
 # MS Visual Studio
 
