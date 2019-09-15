@@ -41,6 +41,9 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="sh_user_io.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="shell.c">
 			<Option compilerVar="CC" />
 		</Unit>

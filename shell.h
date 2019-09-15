@@ -23,7 +23,52 @@ extern "C" {
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
+/*! \name VT100 Common Commands (VT100 escape codes)
+ */
 
+/**
+ *  VT100 color of text
+ */
+#define VT100_COLOR_BLACK             "\033[30m"
+#define VT100_COLOR_RED               "\033[31m"
+#define VT100_COLOR_GREEN             "\033[32m"
+#define VT100_COLOR_YELLOW            "\033[33m"
+#define VT100_COLOR_BLUE              "\033[34m"
+#define VT100_COLOR_MAGENTA           "\033[35m"
+#define VT100_COLOR_CYAN              "\033[36m"
+#define VT100_COLOR_WHITE             "\033[37m"
+#define VT100_COLOR_DEFAULT           "\033[39m"
+#define VT100_COLOR_RESET             "\033[m"
+
+/**
+ *  VT100 background color
+ */
+#define VT100_BG_BLACK                "\033[40m"
+#define VT100_BG_RED                  "\033[41m"
+#define VT100_BG_GREEN                "\033[42m"
+#define VT100_BG_YELLOW               "\033[43m"
+#define VT100_BG_BLUE                 "\033[44m"
+#define VT100_BG_MAGENTA              "\033[45m"
+#define VT100_BG_CYAN                 "\033[46m"
+#define VT100_BG_WHITE                "\033[47m"
+#define VT100_BG_DEFAULT              "\033[49m"
+
+/**
+ *  VT100 control
+ */
+#define VT100_CURSOR_BACKSPACE        ""
+#define VT100_CURSOR_HOME             ""
+#define VT100_CURSOR_END              ""
+#define VT100_CURSOR_INSERT           ""
+#define VT100_CURSOR_DELET            ""
+#define VT100_CURSOR_UP               ""
+#define VT100_CURSOR_DOWN             ""
+#define VT100_CURSOR_LEFT             ""
+#define VT100_CURSOR_RIGHT            ""
+
+#define VT100_CTRL_C                  ""
+
+typedef int (*cb_shell_out_t)(const char *str, ...);
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -31,13 +76,21 @@ extern "C" {
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
+
+typedef struct sh_set
+{
+    uint8_t     *pLing_buf;
+    uint32_t    ling_buf_length;
+
+} sh_set_t;
+
 /**
  *  the I/O description of shell module
  */
 typedef struct sh_io_desc
 {
-    int     (*cb_init)(void *pInfo);
-    int     (*cb_deint)(void *pInfo);
+    int     (*cb_init)(sh_set_t *pSet_info);
+    int     (*cb_deinit)(void *pInfo);
 
     int     (*cb_read)(uint8_t *pBuf, uint32_t length, void *pExtra);
     int     (*cb_write)(uint8_t *pBuf, uint32_t length, void *pExtra);
@@ -51,9 +104,20 @@ typedef struct sh_cmd
     struct sh_cmd   *next;
 
     char    *pCmd_name;
-    int     (*cmd_exec)(int argc, char **argv);
+    int     (*cmd_exec)(int argc, char **argv, cb_shell_out_t out_func);
+    char    *pDescription;
 
 } sh_cmd_t;
+
+typedef struct sh_args
+{
+    uint32_t    is_blocking;
+
+    int     (*cb_regular_alarm)(struct sh_args *pArg);
+
+    void    *pTunnel_info;
+
+} sh_args_t;
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
@@ -66,11 +130,13 @@ typedef struct sh_cmd
 //                  Public Function Definition
 //=============================================================================
 int
-shell_init(sh_io_desc_t *pDesc);
+shell_init(
+    sh_io_desc_t *pDesc,
+    void         *pInfo);
 
 
 int
-shell_deinit(void);
+shell_deinit(void *pInfo);
 
 
 int
@@ -78,7 +144,7 @@ shell_register_cmd(sh_cmd_t *pCmd);
 
 
 void*
-shell_routine(void *pArg);
+shell_proc(sh_args_t *pArg);
 
 
 #ifdef __cplusplus
