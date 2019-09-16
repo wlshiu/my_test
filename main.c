@@ -38,9 +38,16 @@ static sh_cmd_t     g_sh_cmd_help =
 //=============================================================================
 int main(void)
 {
+    char        line_buf[256] = {0};
+    char        io_cache[32] = {0};
+    sh_set_t    sh_set = {0};
     sh_args_t   sh_args = {0};
 
-    shell_init(&g_sh_io_win, 0);
+    sh_set.pLine_buf    = line_buf;
+    sh_set.line_buf_len = sizeof(line_buf);
+    sh_set.pIO_cache    = io_cache;
+    sh_set.io_cache_len = sizeof(io_cache);
+    shell_init(&g_sh_io_win, &sh_set);
 
     shell_register_cmd(&g_sh_cmd_help);
 

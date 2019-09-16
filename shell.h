@@ -53,20 +53,9 @@ extern "C" {
 #define VT100_BG_WHITE                "\033[47m"
 #define VT100_BG_DEFAULT              "\033[49m"
 
-/**
- *  VT100 control
- */
-#define VT100_CURSOR_BACKSPACE        ""
-#define VT100_CURSOR_HOME             ""
-#define VT100_CURSOR_END              ""
-#define VT100_CURSOR_INSERT           ""
-#define VT100_CURSOR_DELET            ""
-#define VT100_CURSOR_UP               ""
-#define VT100_CURSOR_DOWN             ""
-#define VT100_CURSOR_LEFT             ""
-#define VT100_CURSOR_RIGHT            ""
 
-#define VT100_CTRL_C                  ""
+
+#define SHELL_PROMPT                  "~# "
 
 typedef int (*cb_shell_out_t)(const char *str, ...);
 //=============================================================================
@@ -79,8 +68,13 @@ typedef int (*cb_shell_out_t)(const char *str, ...);
 
 typedef struct sh_set
 {
-    uint8_t     *pLing_buf;
-    uint32_t    ling_buf_length;
+    char        *pLine_buf;
+    uint32_t    line_buf_len;
+
+    char        *pIO_cache;
+    uint32_t    io_cache_len;
+
+    void        *pUser_data;
 
 } sh_set_t;
 
@@ -103,9 +97,10 @@ typedef struct sh_cmd
 {
     struct sh_cmd   *next;
 
-    char    *pCmd_name;
-    int     (*cmd_exec)(int argc, char **argv, cb_shell_out_t out_func);
-    char    *pDescription;
+    char        *pCmd_name;
+    uint32_t    cmd_name_len;
+    int         (*cmd_exec)(int argc, char **argv, cb_shell_out_t out_func);
+    char        *pDescription;
 
 } sh_cmd_t;
 
@@ -132,7 +127,7 @@ typedef struct sh_args
 int
 shell_init(
     sh_io_desc_t *pDesc,
-    void         *pInfo);
+    sh_set_t     *pSet_info);
 
 
 int
