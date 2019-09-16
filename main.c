@@ -18,6 +18,9 @@
 //                  Global Data Definition
 //=============================================================================
 extern sh_io_desc_t    g_sh_io_win;
+
+extern void setupConsole(void);
+extern void restoreConsole(void);
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -53,7 +56,9 @@ int main(void)
 
     sh_args.is_blocking = 1;
 
+    setupConsole();
     shell_proc(&sh_args);
 
+    restoreConsole();
     return 0;
 }

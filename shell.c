@@ -236,37 +236,6 @@ _shell_esc_code_proc(
 
                 *pWr_pos = *pWr_pos - 1;
             }
-
-#if 0
-        if ((*pNumPrint >= 0) && (*pCursorPos > 0)) {
-            Shell_ConsoleWrite("\x1b[D\x1b[P", 6);
-            Shell_RemoveChar(pCursorPos);
-            (*pNumPrint)--;
-        }
-
-        {Shell_RemoveChar
-            int i;
-            char *pString = &_AmbaShellKeyBuf[0];
-            int Len = strlen(pString);
-            int Loc = *pLocate;
-
-            if (Loc == Len) {
-                pString[Len - 1] = '\0';
-                *pLocate -= 1;
-                return OK;
-            }
-
-            for (i = (Loc - 1); i <= Len; i++) {
-                pString[i] = pString[i + 1];
-            }
-
-            *pLocate -= 1;
-
-            return OK;
-        }
-
-#endif
-
             break;
         case SH_ESC_CODE_LEFT:
             if( *pCursor_pos > 0 )

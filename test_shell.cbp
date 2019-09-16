@@ -48,6 +48,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="shell.h" />
+		<Unit filename="win_platform.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />
