@@ -99,8 +99,22 @@ typedef struct sh_cmd
 
     char        *pCmd_name;
     uint32_t    cmd_name_len;
-    int         (*cmd_exec)(int argc, char **argv, cb_shell_out_t out_func);
     char        *pDescription;
+
+    void        *pExtra;
+
+    /**
+     *  @brief  cmd_exec
+     *              executable program of shell command 
+     *  
+     *  @param [in] argc        count of arguments
+     *  @param [in] argv        values of arguments
+     *  @param [in] out_func    function of shell log output 
+     *  @param [in] pExtra      extra data from (struct sh_cmd)->pExtra
+     *  @return 
+     *      0: ok, other fail
+     */
+    int         (*cmd_exec)(int argc, char **argv, cb_shell_out_t out_func, void *pExtra);
 
 } sh_cmd_t;
 

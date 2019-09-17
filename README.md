@@ -25,6 +25,8 @@
 + test_uip
 + test_elf2
 + test_shell
+    - It MUST be on Windows 10 platform
+        > support `ENABLE_VIRTUAL_TERMINAL_PROCESSING`
 
 # MS Visual Studio
 

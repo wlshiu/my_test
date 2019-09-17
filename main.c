@@ -25,8 +25,12 @@ extern void restoreConsole(void);
 //                  Private Function Definition
 //=============================================================================
 static int
-_sh_cmd_help(int argc, char **argv, cb_shell_out_t out_func)
+_sh_cmd_help(int argc, char **argv, cb_shell_out_t log, void *pExtra)
 {
+    log("[%s:%d] help cmd\n", __func__, __LINE__);
+    for(int i = 0; i < argc; i++)
+        log("argv[%d]:%s\n", i, argv[i]);
+
     return 0;
 }
 
@@ -59,6 +63,6 @@ int main(void)
     setupConsole();
     shell_proc(&sh_args);
 
-    restoreConsole();
+//    restoreConsole();
     return 0;
 }

@@ -1,4 +1,5 @@
 
+#define DEFINE_CONSOLEV2_PROPERTIES
 #define  _CRT_SECURE_NO_WARNINGS 1
 #include <windows.h>
 
@@ -35,7 +36,7 @@ void setupConsole(void)
     inModeInit = inMode;
 
     // Enable ANSI escape codes
-    outMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    outMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING; // win 10
 
     // Set stdin as no echo and unbuffered
     inMode &= ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);

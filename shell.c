@@ -12,11 +12,14 @@
 
 
 #include <string.h>
+#include <stdarg.h>
 #include "shell.h"
 
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
+#define CONFIG_SH_CMD_ARG_MAX_NUM       16
+
 #define SH_LF       '\n'
 #define SH_CR       '\r'
 
@@ -26,7 +29,7 @@
 #define ESC_START_CODE              0x1b
 #define ESC_CODE_HOME               "\x1b[1~"
 #define ESC_CODE_INSERT             "\x1b[2~"
-#define ESC_CODE_DELET              "\x1b[3~"
+#define ESC_CODE_DEL                "\x1b[3~"
 #define ESC_CODE_END                "\x1b[4~"
 #define ESC_CODE_PAGE_UP            "\x1b[5~"
 #define ESC_CODE_PAGE_DOWN          "\x1b[6~"
@@ -36,11 +39,24 @@
 #define ESC_CODE_RIGHT              "\x1b[C"
 #define ESC_CODE_LEFT               "\x1b[D"
 
-#define ESC_CODE_DELETE             "\x1b[P"
+#define ESC_CODE_VT100_DELETE       "\x1b[P"
+#define ESC_CODE_VT100_INSTER       "\x1b[4h"
 
 #define ESC_CODE_BACKSPACE          "\x08"
 #define ESC_CODE_TAB                "\x09"
 #define ESC_CODE_CTRL_C             "\x03"
+
+#if defined(WIN32)
+    #define ESC_WIN_START_CODE          0xe0
+    #define ESC_CODE_WIN_HOME           "\xe0\x47"
+    #define ESC_CODE_WIN_END            "\xe0\x4F"
+    #define ESC_CODE_WIN_UP             "\xe0\x48"
+    #define ESC_CODE_WIN_DOWN           "\xe0\x50"
+    #define ESC_CODE_WIN_RIGHT          "\xe0\x4D"
+    #define ESC_CODE_WIN_LEFT           "\xe0\x4B"
+    #define ESC_CODE_WIN_DEL            "\xe0\x53"
+    #define ESC_CODE_WIN_INSERT         "\xe0\x52"
+#endif
 
 typedef enum sh_state
 {
@@ -51,9 +67,10 @@ typedef enum sh_state
 
 typedef enum sh_esc_code
 {
-    SH_ESC_CODE_HOME    = 0,
+    SH_ESC_CODE_UNKNOWN    = 0,
+    SH_ESC_CODE_HOME,
     SH_ESC_CODE_INSERT,
-    SH_ESC_CODE_DELET,
+    SH_ESC_CODE_DELETE,
     SH_ESC_CODE_END,
     SH_ESC_CODE_PAGE_UP,
     SH_ESC_CODE_PAGE_DOWN,
@@ -64,6 +81,17 @@ typedef enum sh_esc_code
     SH_ESC_CODE_BACKSPACE,
     SH_ESC_CODE_TAB,
     SH_ESC_CODE_CTRL_C,
+
+#if defined(WIN32)
+    SH_ESC_CODE_WIN_HOME,
+    SH_ESC_CODE_WIN_END,
+    SH_ESC_CODE_WIN_UP,
+    SH_ESC_CODE_WIN_DOWN,
+    SH_ESC_CODE_WIN_LEFT,
+    SH_ESC_CODE_WIN_RIGHT,
+    SH_ESC_CODE_WIN_DEL,
+    SH_ESC_CODE_WIN_INSERT,
+#endif // WIN32
 
     SH_ESC_CODE_TOTAL
 
@@ -122,7 +150,8 @@ static sh_esc_item_t    g_esc_code_table[] =
 {
     { .esc_code = SH_ESC_CODE_HOME,      .pEsc_ascii = ESC_CODE_HOME,      .esc_code_len = 4 },
     { .esc_code = SH_ESC_CODE_INSERT,    .pEsc_ascii = ESC_CODE_INSERT,    .esc_code_len = 4 },
-    { .esc_code = SH_ESC_CODE_DELET,     .pEsc_ascii = ESC_CODE_DELET,     .esc_code_len = 4 },
+    { .esc_code = SH_ESC_CODE_DELETE,    .pEsc_ascii = ESC_CODE_DEL,       .esc_code_len = 4 },
+    { .esc_code = SH_ESC_CODE_DELETE,    .pEsc_ascii = ESC_CODE_VT100_DELETE, .esc_code_len = 3 },
     { .esc_code = SH_ESC_CODE_END,       .pEsc_ascii = ESC_CODE_END,       .esc_code_len = 4 },
     { .esc_code = SH_ESC_CODE_PAGE_UP,   .pEsc_ascii = ESC_CODE_PAGE_UP,   .esc_code_len = 4 },
     { .esc_code = SH_ESC_CODE_PAGE_DOWN, .pEsc_ascii = ESC_CODE_PAGE_DOWN, .esc_code_len = 4 },
@@ -133,11 +162,40 @@ static sh_esc_item_t    g_esc_code_table[] =
     { .esc_code = SH_ESC_CODE_BACKSPACE, .pEsc_ascii = ESC_CODE_BACKSPACE, .esc_code_len = 1 },
     { .esc_code = SH_ESC_CODE_TAB,       .pEsc_ascii = ESC_CODE_TAB,       .esc_code_len = 1 },
     { .esc_code = SH_ESC_CODE_CTRL_C,    .pEsc_ascii = ESC_CODE_CTRL_C,    .esc_code_len = 1 },
+
+#if defined(WIN32)
+    { .esc_code = SH_ESC_CODE_HOME,     .pEsc_ascii = ESC_CODE_WIN_HOME,  .esc_code_len = 2 },
+    { .esc_code = SH_ESC_CODE_END,      .pEsc_ascii = ESC_CODE_WIN_END,   .esc_code_len = 2 },
+    { .esc_code = SH_ESC_CODE_UP,       .pEsc_ascii = ESC_CODE_WIN_UP,    .esc_code_len = 2 },
+    { .esc_code = SH_ESC_CODE_DOWN,     .pEsc_ascii = ESC_CODE_WIN_DOWN,  .esc_code_len = 2 },
+    { .esc_code = SH_ESC_CODE_LEFT,     .pEsc_ascii = ESC_CODE_WIN_LEFT,  .esc_code_len = 2 },
+    { .esc_code = SH_ESC_CODE_RIGHT,    .pEsc_ascii = ESC_CODE_WIN_RIGHT, .esc_code_len = 2 },
+    { .esc_code = SH_ESC_CODE_DELETE,   .pEsc_ascii = ESC_CODE_WIN_DEL,   .esc_code_len = 2 },
+    { .esc_code = SH_ESC_CODE_INSERT,   .pEsc_ascii = ESC_CODE_WIN_INSERT, .esc_code_len = 2 },
+#endif
     { .esc_code = SH_ESC_CODE_TOTAL, }
 };
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
+static int
+_shell_log(const char *fmt, ...)
+{
+    static char     log_buf[256] = {0};
+    int             rval = 0;
+    sh_io_desc_t    *pIO = g_sh_dev.pIO;
+    va_list         args;
+
+    va_start(args, fmt);
+    rval = vsprintf(log_buf, fmt, args);
+    va_end(args);
+
+    if(pIO && pIO->cb_write )
+        rval = pIO->cb_write((uint8_t*)log_buf, strlen(log_buf), g_sh_dev.pUser_data);
+
+    return rval;
+}
+
 static int
 _shell_get_esc_code(
     char            character,
@@ -147,13 +205,22 @@ _shell_get_esc_code(
     do {
         sh_esc_item_t   *pEsc_item_cur = g_esc_code_table;
 
-        if( character == ESC_START_CODE ||
+        if( (uint8_t)character == ESC_START_CODE ||
             g_sh_dev.esc_input_cumulation >= sizeof(g_sh_dev.esc_op_buf) )
         {
             g_sh_dev.esc_input_cumulation = 0;
             g_sh_dev.esc_u32_buf[0]       = 0;
             g_sh_dev.esc_u32_buf[1]       = 0;
         }
+
+    #if defined(WIN32)
+        if( (uint8_t)character == ESC_WIN_START_CODE )
+        {
+            g_sh_dev.esc_input_cumulation = 0;
+            g_sh_dev.esc_u32_buf[0]       = 0;
+            g_sh_dev.esc_u32_buf[1]       = 0;
+        }
+    #endif
 
         g_sh_dev.esc_op_buf[g_sh_dev.esc_input_cumulation++] = character;
 
@@ -181,7 +248,11 @@ _shell_get_esc_code(
         }
 
         if( g_sh_dev.esc_input_cumulation == 1 &&
-            character != ESC_START_CODE )
+            (uint8_t)character != ESC_START_CODE
+            #if defined(WIN32)
+            && (uint8_t)character != ESC_WIN_START_CODE
+            #endif
+            )
         {
             *pEsc_code = SH_ESC_CODE_TOTAL;
             g_sh_dev.esc_input_cumulation = 0;
@@ -211,10 +282,7 @@ _shell_esc_code_proc(
                 uint32_t    len = 0;
                 uint32_t    cursor_pos = *pCursor_pos;
 
-//                uint8_t left_seq[] = { 0x1b, 0x5b, 0x44, 0x00 };
-
-                cb_write((uint8_t*)ESC_CODE_LEFT "\x1b[P", 6, g_sh_dev.pUser_data);
-//                cb_write((uint8_t*)left_seq, sizeof(left_seq), g_sh_dev.pUser_data);
+                cb_write((uint8_t*)ESC_CODE_LEFT ESC_CODE_VT100_DELETE, 6, g_sh_dev.pUser_data);
 
                 len = strlen(pLine_buf);
                 if( cursor_pos == len )
@@ -230,12 +298,31 @@ _shell_esc_code_proc(
                         pLine_buf[i] = pLine_buf[i + 1];
 
                     *pCursor_pos = cursor_pos;
-
-                    cb_write((uint8_t*)&pLine_buf[cursor_pos], len - cursor_pos, g_sh_dev.pUser_data);
                 }
 
                 *pWr_pos = *pWr_pos - 1;
             }
+            break;
+        case SH_ESC_CODE_HOME:
+            if( *pCursor_pos > 0 )
+            {
+                char    str_buf[12] = {0};
+                snprintf(str_buf, 12, "\x1b[%dD", *pCursor_pos);
+                cb_write((uint8_t*)str_buf, strlen(str_buf), g_sh_dev.pUser_data);
+                *pCursor_pos = 0;
+            }
+            break;
+        case SH_ESC_CODE_END:
+            if( *pCursor_pos < *pWr_pos )
+            {
+                char    str_buf[12] = {0};
+                snprintf(str_buf, 12, "\x1b[%dC", (*pWr_pos) - (*pCursor_pos));
+                cb_write((uint8_t*)str_buf, strlen(str_buf), g_sh_dev.pUser_data);
+                *pCursor_pos = *pWr_pos;
+            }
+            break;
+        case SH_ESC_CODE_UP:
+        case SH_ESC_CODE_DOWN:
             break;
         case SH_ESC_CODE_LEFT:
             if( *pCursor_pos > 0 )
@@ -251,15 +338,32 @@ _shell_esc_code_proc(
                 (*pCursor_pos)++;
             }
             break;
-        case SH_ESC_CODE_HOME:
         case SH_ESC_CODE_INSERT:
-        case SH_ESC_CODE_DELET:
-        case SH_ESC_CODE_END:
+            #if 0
+            cb_write((uint8_t*)ESC_CODE_VT100_INSTER, 3, g_sh_dev.pUser_data);
+            #endif
+            break;
+        case SH_ESC_CODE_DELETE:
+            if( *pCursor_pos < *pWr_pos )
+            {
+                char        *pLine_buf = g_sh_dev.pLine_buf;
+                uint32_t    len = 0;
+                uint32_t    cursor_pos = *pCursor_pos;
+
+                cb_write((uint8_t*)ESC_CODE_VT100_DELETE, 3, g_sh_dev.pUser_data);
+
+                len = strlen(pLine_buf);
+                for(int i = cursor_pos; i < len; i++)
+                    pLine_buf[i] = pLine_buf[i + 1];
+
+                *pCursor_pos = cursor_pos;
+
+                *pWr_pos = *pWr_pos - 1;
+            }
+            break;
+
         case SH_ESC_CODE_PAGE_UP:
         case SH_ESC_CODE_PAGE_DOWN:
-        case SH_ESC_CODE_UP:
-        case SH_ESC_CODE_DOWN:
-
         case SH_ESC_CODE_TAB:
         case SH_ESC_CODE_CTRL_C:
         default:    break;
@@ -291,8 +395,7 @@ _shell_read_line(
             uint32_t        pos = 0;
             uint32_t        wr_pos = g_sh_dev.wr_pos;
             uint32_t        rd_pos = g_sh_dev.rd_pos;
-//            uint32_t        cursor_pos = g_sh_dev.cursor_pos;
-            sh_esc_code_t   esc_code;
+            sh_esc_code_t   esc_code = SH_ESC_CODE_UNKNOWN;
 
             pos = (wr_pos + 1) % g_sh_dev.line_buf_len;
             if( pos == rd_pos )     break;
@@ -308,13 +411,40 @@ _shell_read_line(
             _shell_get_esc_code(c, &esc_code);
 
             if( esc_code == SH_ESC_CODE_TOTAL )
-            {
-                // non-escape text
-                g_sh_dev.pLine_buf[wr_pos] = c;
-                g_sh_dev.wr_pos            = pos;
-                g_sh_dev.cursor_pos        = pos;
+            {   // non-escape text
+                char        *pLine_buf = g_sh_dev.pLine_buf;
+                uint32_t    len = 0;
 
-                cb_write((uint8_t*)&c, 1, g_sh_dev.pUser_data);
+                if( g_sh_dev.cursor_pos > wr_pos )
+                {
+                    rval = -1;
+                    break;
+                }
+
+                len = strlen(pLine_buf);
+                pLine_buf[len + 1] = '\0';
+
+                for(int i = len; i > g_sh_dev.cursor_pos; i--)
+                {
+                    pLine_buf[i] = pLine_buf[i - 1];
+                }
+
+                g_sh_dev.wr_pos = pos;
+
+                pLine_buf[g_sh_dev.cursor_pos] = c;
+
+                cb_write((uint8_t*)&pLine_buf[g_sh_dev.cursor_pos],
+                         g_sh_dev.wr_pos - g_sh_dev.cursor_pos,
+                         g_sh_dev.pUser_data);
+
+                if( g_sh_dev.cursor_pos < wr_pos )
+                {
+                    char        str_buf[12] = {0};
+                    snprintf(str_buf, 12, "\x1b[%dD", g_sh_dev.wr_pos - g_sh_dev.cursor_pos - 1);
+                    cb_write((uint8_t*)str_buf, strlen(str_buf), g_sh_dev.pUser_data);
+                }
+
+                g_sh_dev.cursor_pos += 1;
             }
             else
             {
@@ -325,19 +455,6 @@ _shell_read_line(
 
     } while(0);
 
-    return rval;
-}
-
-static int
-_shell_output(
-    sh_io_desc_t    *pIO,
-    char            *pBuf,
-    uint32_t        len)
-{
-    int     rval = 0;
-
-    if( pIO->cb_write )
-        rval = pIO->cb_write((uint8_t*)pBuf, len, 0);
     return rval;
 }
 //=============================================================================
@@ -433,13 +550,63 @@ shell_proc(sh_args_t *pArg)
             rval = _shell_read_line(pIO);
             if( rval == SH_STATE_GET_LINE )
             {
-                // TODO: execute command
+                int         arg_cnt = 0;
+                char        *pCmd_args[CONFIG_SH_CMD_ARG_MAX_NUM] = {0};
+                char        *pCur = g_sh_dev.pLine_buf;
+                char        *pEnd = g_sh_dev.pLine_buf + g_sh_dev.line_buf_len;
+                uint32_t    is_arg_head = 0;
 
+                // -------------------------------
+                // parse arguments from line buffer
+                is_arg_head = 1;
+                while( pCur < pEnd )
+                {
+                    char    c = *pCur;
+
+                    if( c == ' ' || c == '\t' )
+                    {
+                        *pCur++ = '\0';
+                        is_arg_head = 1;
+                        continue;
+                    }
+
+                    if( is_arg_head && (arg_cnt < CONFIG_SH_CMD_ARG_MAX_NUM) &&
+                        ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') ||
+                         (c >= 'A' && c <= 'Z') || c == '_' || c == '?') )
+                    {
+                        pCmd_args[arg_cnt++] = pCur;
+                        is_arg_head = 0;
+                    }
+
+                    pCur++;
+                }
+
+                //-----------------------
+                {   // execute command
+                    sh_cmd_t    *pCmd_cur = g_sh_dev.pCmd_head;
+
+                    while( pCmd_cur )
+                    {
+                        if( !strncmp(pCmd_cur->pCmd_name, pCmd_args[0],
+                                     strlen(pCmd_cur->pCmd_name)) )
+                        {
+                            break;
+                        }
+                        pCmd_cur = pCmd_cur->next;
+                    }
+
+                    if( pCmd_cur )
+                        pCmd_cur->cmd_exec(arg_cnt, pCmd_args, _shell_log, pCmd_cur->pExtra);
+                }
+
+                //-----------------------
+                // reset parameters
                 is_line_head = 1;
+
+                g_sh_dev.wr_pos     = 0;
+                g_sh_dev.cursor_pos = 0;
                 memset(g_sh_dev.pLine_buf, 0x0, g_sh_dev.line_buf_len);
             }
-
-//            _shell_output(pIO, );
         }
 
         if( pArg->cb_regular_alarm )
