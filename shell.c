@@ -18,7 +18,10 @@
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-#define CONFIG_SH_CMD_ARG_MAX_NUM       16
+#define CONFIG_ENABLE_SH_CMD_HISTORY
+
+#define CONFIG_SH_CMD_ARG_MAX_NUM           16
+
 
 #define SH_LF       '\n'
 #define SH_CR       '\r'
@@ -140,6 +143,14 @@ typedef struct sh_dev
 
     void            *pUser_data;
 
+#if defined(CONFIG_ENABLE_SH_CMD_HISTORY)
+    char            *pHistory_buf;
+    uint16_t        line_size;
+    uint16_t        cmd_deep;
+    char            **ppLine_list;
+#endif // defined
+
+    int             row_index;
 } sh_dev_t;
 //=============================================================================
 //                  Global Data Definition
@@ -193,6 +204,83 @@ _shell_log(const char *fmt, ...)
     if(pIO && pIO->cb_write )
         rval = pIO->cb_write((uint8_t*)log_buf, strlen(log_buf), g_sh_dev.pUser_data);
 
+    return rval;
+}
+
+#if defined(CONFIG_ENABLE_SH_CMD_HISTORY)
+static int
+_shell_push_to_history(char *pLine)
+{
+    int     rval = 0;
+    do {
+        char    *pAct_line = g_sh_dev.ppLine_list[g_sh_dev.cmd_deep - 1];
+
+        for(int i = g_sh_dev.cmd_deep - 1; i > 0; i--)
+        {
+            g_sh_dev.ppLine_list[i] = g_sh_dev.ppLine_list[i - 1];
+        }
+
+        g_sh_dev.ppLine_list[0] = pAct_line;
+
+        snprintf(pAct_line, g_sh_dev.line_size, "%s", pLine);
+
+    } while(0);
+
+    g_sh_dev.row_index = 0;
+
+    return rval;
+}
+
+static char*
+_shell_pop_history(int *pRow_index)
+{
+    char    *pLine = 0;
+    do {
+        int     row_index = *pRow_index;
+        if( row_index < 0 )
+            row_index += g_sh_dev.cmd_deep;
+        else if( row_index >= g_sh_dev.cmd_deep )
+            row_index -= g_sh_dev.cmd_deep;
+
+        *pRow_index = row_index;
+
+        pLine = g_sh_dev.ppLine_list[row_index];
+    } while(0);
+    return pLine;
+}
+#else
+    #define _shell_push_to_history(pLine)
+    #define _shell_pop_history(pRow_index)       0
+#endif
+
+static int
+_shell_erase_line(
+    uint32_t        *pWr_pos,
+    uint32_t        *pCursor_pos,
+    int (*cb_write)(uint8_t*, uint32_t, void*))
+{
+    int     rval = 0;
+    do {
+        // move to end of line
+        char        *pLine_buf = g_sh_dev.pLine_buf;
+        uint32_t    wr_pos = *pWr_pos;
+        uint32_t    cursor_pos = *pCursor_pos;
+
+        if( cursor_pos < wr_pos )
+        {
+            char    str_buf[12] = {0};
+            snprintf(str_buf, 12, "\x1b[%dC", wr_pos - cursor_pos);
+            cb_write((uint8_t*)str_buf, strlen(str_buf), g_sh_dev.pUser_data);
+        }
+
+        // delete characters
+        while( wr_pos-- )
+            cb_write((uint8_t*)ESC_CODE_LEFT ESC_CODE_VT100_DELETE, 6, g_sh_dev.pUser_data);
+
+        // reset parameters
+        *pCursor_pos = *pWr_pos = 0;
+        pLine_buf[0] = '\0';
+    } while(0);
     return rval;
 }
 
@@ -323,6 +411,25 @@ _shell_esc_code_proc(
             break;
         case SH_ESC_CODE_UP:
         case SH_ESC_CODE_DOWN:
+            {
+                char        *pLine = 0;
+                uint32_t    line_len = 0;
+
+                _shell_erase_line(pWr_pos, pCursor_pos, cb_write);
+
+                pLine    = _shell_pop_history(&g_sh_dev.row_index);
+                line_len = (pLine) ? strlen(pLine) : 0;
+
+                if( pLine && line_len )
+                {
+                    strncpy(g_sh_dev.pLine_buf, pLine, line_len);
+                    cb_write((uint8_t*)pLine, line_len, g_sh_dev.pUser_data);
+                    *pCursor_pos = *pWr_pos = line_len;
+                }
+
+                if( esc_code == SH_ESC_CODE_UP )    g_sh_dev.row_index++;
+                else                                g_sh_dev.row_index--;
+            }
             break;
         case SH_ESC_CODE_LEFT:
             if( *pCursor_pos > 0 )
@@ -402,9 +509,18 @@ _shell_read_line(
 
             if( c == '\n' || c == '\r' )
             {
-                rval = SH_STATE_GET_LINE;
+//                if( (wr_pos + 1) < g_sh_dev.line_buf_len )
+//                {
+//                    g_sh_dev.pLine_buf[wr_pos++] = '\n';
+//                    pos = (wr_pos + 1) % g_sh_dev.line_buf_len;
+//                }
+
                 g_sh_dev.pLine_buf[wr_pos] = '\0';
                 g_sh_dev.wr_pos            = pos;
+
+                _shell_push_to_history(g_sh_dev.pLine_buf);
+
+                rval = SH_STATE_GET_LINE;
                 break;
             }
 
@@ -457,6 +573,27 @@ _shell_read_line(
 
     return rval;
 }
+
+static int
+_sh_cmd_help(int argc, char **argv, cb_shell_out_t log, void *pExtra)
+{
+    sh_cmd_t    *pCur = g_sh_dev.pCmd_head;
+
+    while( pCur )
+    {
+        log("command: '%s'\n    %s\n", pCur->pCmd_name, pCur->pDescription);
+        pCur = pCur->next;
+    }
+
+    return 0;
+}
+
+static sh_cmd_t     g_sh_cmd_help =
+{
+    .pCmd_name      = "help",
+    .cmd_exec       = _sh_cmd_help,
+    .pDescription   = "list commands",
+};
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
@@ -481,6 +618,29 @@ shell_init(
         g_sh_dev.pLine_buf    = pSet_info->pLine_buf;
         g_sh_dev.line_buf_len = pSet_info->line_buf_len;
         g_sh_dev.pUser_data   = pSet_info->pUser_data;
+        g_sh_dev.pCmd_head    = &g_sh_cmd_help;
+
+#if defined(CONFIG_ENABLE_SH_CMD_HISTORY)
+        if( pSet_info->history_buf_size <
+                SHELL_CALC_HISTORY_BUFFER(pSet_info->line_size, pSet_info->cmd_deep) )
+        {
+            err("Wrong cmd history buffer size !\n");
+            break;
+        }
+
+        g_sh_dev.pHistory_buf = pSet_info->pHistory_buf;
+        g_sh_dev.line_size    = pSet_info->line_size;
+        g_sh_dev.cmd_deep     = pSet_info->cmd_deep;
+        g_sh_dev.ppLine_list  = (char**)pSet_info->pHistory_buf;
+        memset(g_sh_dev.pHistory_buf, 0x0, pSet_info->history_buf_size);
+
+        for(int i = 0; i < g_sh_dev.cmd_deep; i++)
+        {
+            g_sh_dev.ppLine_list[i] = (char*)((uintptr_t)pSet_info->pHistory_buf
+                                        + sizeof(uintptr_t) * g_sh_dev.cmd_deep
+                                        + i * g_sh_dev.line_size);
+        }
+#endif // defined
 
         if( g_sh_dev.pLine_buf )
             memset(g_sh_dev.pLine_buf, 0x0, g_sh_dev.line_buf_len);
@@ -553,7 +713,8 @@ shell_proc(sh_args_t *pArg)
                 int         arg_cnt = 0;
                 char        *pCmd_args[CONFIG_SH_CMD_ARG_MAX_NUM] = {0};
                 char        *pCur = g_sh_dev.pLine_buf;
-                char        *pEnd = g_sh_dev.pLine_buf + g_sh_dev.line_buf_len;
+//                char        *pEnd = g_sh_dev.pLine_buf + g_sh_dev.line_buf_len;
+                char        *pEnd = g_sh_dev.pLine_buf + strlen(g_sh_dev.pLine_buf);
                 uint32_t    is_arg_head = 0;
 
                 // -------------------------------
@@ -563,7 +724,7 @@ shell_proc(sh_args_t *pArg)
                 {
                     char    c = *pCur;
 
-                    if( c == ' ' || c == '\t' )
+                    if( c == ' ' || c == '\t' || c == '\n' )
                     {
                         *pCur++ = '\0';
                         is_arg_head = 1;
@@ -581,8 +742,13 @@ shell_proc(sh_args_t *pArg)
                     pCur++;
                 }
 
+                if( pIO->cb_write )
+                    pIO->cb_write((uint8_t*)"\n", 1, g_sh_dev.pUser_data);
+
                 //-----------------------
-                {   // execute command
+                // execute command
+                if( arg_cnt )
+                {
                     sh_cmd_t    *pCmd_cur = g_sh_dev.pCmd_head;
 
                     while( pCmd_cur )
@@ -597,6 +763,7 @@ shell_proc(sh_args_t *pArg)
 
                     if( pCmd_cur )
                         pCmd_cur->cmd_exec(arg_cnt, pCmd_args, _shell_log, pCmd_cur->pExtra);
+
                 }
 
                 //-----------------------

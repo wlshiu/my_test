@@ -17,10 +17,14 @@
 					<Add directory="../my_test" />
 				</Compiler>
 				<Linker>
+					<Add option="-Wl,-Map=out.map" />
 					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libkernel32.a" />
 					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libpthread.a" />
 					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/lib" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="size bin\Debug\test_shell.exe" />
+				</ExtraCommands>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/test_shell" prefix_auto="1" extension_auto="1" />

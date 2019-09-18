@@ -62,6 +62,20 @@ typedef int (*cb_shell_out_t)(const char *str, ...);
 //                  Macro Definition
 //=============================================================================
 
+/**
+ *  command history buffer usage
+ *
+ *      +-------------+   ^
+ *      | line_size   |   |
+ *      +-------------+   |
+ *      |             |   | cmd_deep
+ *      |  ...        |   |
+ *      +-------------+   |
+ *      | line_size   |   |
+ *      +-------------+   v
+ *
+ */
+#define SHELL_CALC_HISTORY_BUFFER(line_size, cmd_deep)        (((line_size) + 4) * (cmd_deep))
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
@@ -73,6 +87,14 @@ typedef struct sh_set
 
     char        *pIO_cache;
     uint32_t    io_cache_len;
+
+    /**
+     *  pHistory_buf MUST be 4-bytes alignment
+     */
+    char        *pHistory_buf;
+    uint16_t    line_size;
+    uint16_t    cmd_deep;
+    uint32_t    history_buf_size;  // assign with SHELL_CALC_HISTORY_BUFFER()
 
     void        *pUser_data;
 
@@ -105,13 +127,13 @@ typedef struct sh_cmd
 
     /**
      *  @brief  cmd_exec
-     *              executable program of shell command 
-     *  
+     *              executable program of shell command
+     *
      *  @param [in] argc        count of arguments
      *  @param [in] argv        values of arguments
-     *  @param [in] out_func    function of shell log output 
+     *  @param [in] out_func    function of shell log output
      *  @param [in] pExtra      extra data from (struct sh_cmd)->pExtra
-     *  @return 
+     *  @return
      *      0: ok, other fail
      */
     int         (*cmd_exec)(int argc, char **argv, cb_shell_out_t out_func, void *pExtra);
