@@ -25,6 +25,11 @@
 + test_uip
 + test_elf2
 + test_shell
+    - It MUST be on Windows 10 platform
+        > support `ENABLE_VIRTUAL_TERMINAL_PROCESSING`
++ test_rbuf
+    - ring buffer template
+        > if end_idx catches start_idx, replace the data and force start_idx forward
 
 # MS Visual Studio
 
