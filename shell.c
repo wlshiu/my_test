@@ -697,6 +697,8 @@ shell_proc(sh_args_t *pArg)
     {
         sh_state_t  rval = SH_STATE_OK;
 
+        pArg->exec_result = SH_EXEC_RVAL_UNKNOWN;
+
         if( pIO )
         {
             if( is_line_head )
@@ -762,8 +764,9 @@ shell_proc(sh_args_t *pArg)
                     }
 
                     if( pCmd_cur )
-                        pCmd_cur->cmd_exec(arg_cnt, pCmd_args, _shell_log, pCmd_cur->pExtra);
-
+                    {
+                        pArg->exec_result = pCmd_cur->cmd_exec(arg_cnt, pCmd_args, _shell_log, pCmd_cur->pExtra);
+                    }
                 }
 
                 //-----------------------

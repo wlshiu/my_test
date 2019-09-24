@@ -140,13 +140,23 @@ typedef struct sh_cmd
 
 } sh_cmd_t;
 
+/**
+ *  shell arguments, it MUST has a static instance for shell_proc()
+ */
 typedef struct sh_args
 {
     uint32_t    is_blocking;
 
-    int     (*cb_regular_alarm)(struct sh_args *pArg);
+    /**
+     *  exec_result is used to report the result of shell commands.
+     *  The shell command is not handled if exec_result is SH_EXEC_RVAL_UNKNOWN
+     */
+#define SH_EXEC_RVAL_UNKNOWN    0xdeadbeef
+    uint32_t    exec_result;
 
-    void    *pTunnel_info;
+    int         (*cb_regular_alarm)(struct sh_args *pArg);
+
+    void        *pTunnel_info;
 
 } sh_args_t;
 //=============================================================================
