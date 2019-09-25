@@ -125,7 +125,6 @@ typedef struct sh_esc_item
 
 typedef struct sh_dev
 {
-    sh_cmd_t        *pCmd_head;
     sh_io_desc_t    *pIO;
 
     char            *pLine_buf;
@@ -156,6 +155,7 @@ typedef struct sh_dev
 //                  Global Data Definition
 //=============================================================================
 static sh_dev_t         g_sh_dev = {0};
+static sh_cmd_t         *g_pCmd_head = 0;
 
 static sh_esc_item_t    g_esc_code_table[] =
 {
@@ -577,7 +577,7 @@ _shell_read_line(
 static int
 _sh_cmd_help(int argc, char **argv, cb_shell_out_t log, void *pExtra)
 {
-    sh_cmd_t    *pCur = g_sh_dev.pCmd_head;
+    sh_cmd_t    *pCur = g_pCmd_head;
 
     while( pCur )
     {
@@ -588,12 +588,7 @@ _sh_cmd_help(int argc, char **argv, cb_shell_out_t log, void *pExtra)
     return 0;
 }
 
-static sh_cmd_t     g_sh_cmd_help =
-{
-    .pCmd_name      = "help",
-    .cmd_exec       = _sh_cmd_help,
-    .pDescription   = "list commands",
-};
+sh_cmd_add("help", "list commands", _sh_cmd_help, 1);
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
@@ -618,7 +613,6 @@ shell_init(
         g_sh_dev.pLine_buf    = pSet_info->pLine_buf;
         g_sh_dev.line_buf_len = pSet_info->line_buf_len;
         g_sh_dev.pUser_data   = pSet_info->pUser_data;
-        g_sh_dev.pCmd_head    = &g_sh_cmd_help;
 
 #if defined(CONFIG_ENABLE_SH_CMD_HISTORY)
         if( pSet_info->history_buf_size <
@@ -671,18 +665,18 @@ shell_register_cmd(sh_cmd_t *pCmd)
 {
     int     rval = 0;
 
-    if( g_sh_dev.pCmd_head )
+    if( g_pCmd_head )
     {
-        sh_cmd_t    *pCur = g_sh_dev.pCmd_head;
+        sh_cmd_t    *pCur = g_pCmd_head;
 
         while( pCur->next )
-            pCur = pCmd->next;
+            pCur = pCur->next;
 
         pCur->next = pCmd;
     }
     else
     {
-        g_sh_dev.pCmd_head = pCmd;
+        g_pCmd_head = pCmd;
     }
     return rval;
 }
@@ -695,7 +689,7 @@ shell_proc(sh_args_t *pArg)
 
     while( pArg->is_blocking )
     {
-        sh_state_t  rval = SH_STATE_OK;
+        sh_state_t      rval = SH_STATE_OK;
 
         pArg->exec_result = SH_EXEC_RVAL_UNKNOWN;
 
@@ -715,7 +709,6 @@ shell_proc(sh_args_t *pArg)
                 int         arg_cnt = 0;
                 char        *pCmd_args[CONFIG_SH_CMD_ARG_MAX_NUM] = {0};
                 char        *pCur = g_sh_dev.pLine_buf;
-//                char        *pEnd = g_sh_dev.pLine_buf + g_sh_dev.line_buf_len;
                 char        *pEnd = g_sh_dev.pLine_buf + strlen(g_sh_dev.pLine_buf);
                 uint32_t    is_arg_head = 0;
 
@@ -751,7 +744,7 @@ shell_proc(sh_args_t *pArg)
                 // execute command
                 if( arg_cnt )
                 {
-                    sh_cmd_t    *pCmd_cur = g_sh_dev.pCmd_head;
+                    sh_cmd_t    *pCmd_cur = g_pCmd_head;
 
                     while( pCmd_cur )
                     {

@@ -40,6 +40,18 @@ static sh_cmd_t     g_sh_cmd_test =
     .cmd_exec       = _sh_cmd_test,
     .pDescription   = "this is 'test' command",
 };
+
+static int
+_sh_cmd_test2(int argc, char **argv, cb_shell_out_t log, void *pExtra)
+{
+    log("[%s:%d] help cmd\n", __func__, __LINE__);
+    for(int i = 0; i < argc; i++)
+        log("argv[%d]:%s\n", i, argv[i]);
+
+    return 0;
+}
+
+sh_cmd_add("test2", "this is 'test2' cmd", _sh_cmd_test2, SH_CMD_REGISTER_PRIORITY_NORMAL);
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================

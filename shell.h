@@ -53,14 +53,28 @@ extern "C" {
 #define VT100_BG_WHITE                "\033[47m"
 #define VT100_BG_DEFAULT              "\033[49m"
 
-
-
 #define SHELL_PROMPT                  "~# "
+
+#define SH_CMD_REGISTER_PRIORITY_NORMAL     150
 
 typedef int (*cb_shell_out_t)(const char *str, ...);
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
+#define SHELL_EXPAND2(a, b)     a ## b
+#define SHELL_EXPAND(a, b)      SHELL_EXPAND2(a, b)
+#define SHELL_CMD_UID(what)     SHELL_EXPAND(what, __LINE__)
+
+#define sh_cmd_add(cmd_name, desc_, cmd_func, priority)                                     \
+    static void __attribute__((constructor(priority))) SHELL_CMD_UID(cmd_reg_helper_)() {   \
+		static sh_cmd_t SHELL_CMD_UID(cmd_desc_) = {                                        \
+			.pCmd_name    = cmd_name,                                                       \
+			.pDescription = desc_,                                                          \
+			.cmd_exec     = &cmd_func,                                                      \
+		};                                                                                  \
+		shell_register_cmd(&SHELL_CMD_UID(cmd_desc_));                                      \
+    }
+
 
 /**
  *  command history buffer usage
