@@ -27,6 +27,10 @@
 + test_shell
     - It MUST be on Windows 10 platform
         > support `ENABLE_VIRTUAL_TERMINAL_PROCESSING`
++ test_backtrace
+    > backtrace for MCU system
+
+    - [reference](https://github.com/armink/CmBacktrace)
 + test_rbuf
     - ring buffer template
         > if end_idx catches start_idx, replace the data and force start_idx forward
