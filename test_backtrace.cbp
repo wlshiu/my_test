@@ -15,6 +15,7 @@
 					<Add option="-g" />
 					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/include" />
 					<Add directory="../my_test" />
+					<Add directory="cm_backtrace" />
 				</Compiler>
 				<Linker>
 					<Add option="-Wl,-Map=out.map" />
@@ -42,10 +43,12 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="backtrace.c">
+		<Unit filename="cm_backtrace/cm_backtrace.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="backtrace.h" />
+		<Unit filename="cm_backtrace/cm_backtrace.h" />
+		<Unit filename="cm_backtrace/cmb_cfg.h" />
+		<Unit filename="cm_backtrace/cmb_def.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
