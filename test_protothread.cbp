@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_protothread" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_protothread" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="pt-1.4" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_protothread" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pt-1.4/example-buffer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pt-1.4/example-codelock.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pt-1.4/example-small.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pt-1.4/lc-addrlabels.h" />
+		<Unit filename="pt-1.4/lc-switch.h" />
+		<Unit filename="pt-1.4/lc.h" />
+		<Unit filename="pt-1.4/pt-sem.h" />
+		<Unit filename="pt-1.4/pt.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
