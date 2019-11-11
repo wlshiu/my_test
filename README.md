@@ -36,6 +36,8 @@
         > if end_idx catches start_idx, replace the data and force start_idx forward
 + test_protothreads
     > Protothreads function as stackless, lightweight threads, or coroutines, providing a blocking context cheaply using minimal memory per protothread (on the order of single bytes).
++ test_uart_term
+    > base on raspberry pi
 
 # MS Visual Studio
 
