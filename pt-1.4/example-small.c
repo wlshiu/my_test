@@ -96,4 +96,5 @@ int ex_small(void)
         protothread1(&pt1);
         protothread2(&pt2);
     }
+    return 0;
 }
