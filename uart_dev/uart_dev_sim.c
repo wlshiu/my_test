@@ -89,7 +89,10 @@ _sim_uart_send_bytes(
 {
     int     rval = 0;
     do {
-//        sim_dev_t     *pHDev = (sim_dev_t*)pHandle;
+        sim_dev_t   *pHDev = (sim_dev_t*)pHandle;
+        int         count = 0;
+
+        if( !pHDev )   break;
     } while(0);
     return rval;
 }
@@ -108,7 +111,7 @@ _sim_uart_recv_bytes(
         if( !pHDev || !pHDev->fd_uart )
             break;
 
-        *pData_len = fread(pData, 1, buf_len, pHDev->fd_uart);
+        *pData_len = fread(pData, 1, 1, pHDev->fd_uart);
 
         rval = 0;
     } while(0);

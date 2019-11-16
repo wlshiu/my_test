@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include "uart_dev.h"
 #include "log.h"
+
+#include "pthread.h"
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -56,6 +58,7 @@ typedef struct reader_cfg
 //=============================================================================
 unsigned long       gLog_flags = 0x1;
 
+pthread_mutex_t     g_log_mtx;
 //static uint32_t     g_in_buf[(CONFIG_IN_BUF_LEN + 20) >> 2] = {0};
 //=============================================================================
 //                  Private Function Definition
@@ -81,7 +84,8 @@ _reader_create(reader_cfg_t *pCfg)
         if( !pCfg )  break;
 
         uart_cfg.pDev_name       = pCfg->pName;
-        uart_cfg.act_dev_type    = UART_DEV_TYPE_SIM;//UART_DEV_TYPE_RASP_PI;
+        /* uart_cfg.act_dev_type    = UART_DEV_TYPE_SIM; */
+        uart_cfg.act_dev_type    = UART_DEV_TYPE_RASP_PI;
         uart_cfg.uart.baud_rate  = pCfg->uart.baudrate;
         uart_cfg.uart.port       = pCfg->uart.port;
         hUart = uart_dev_init(&uart_cfg, 0);
@@ -153,23 +157,33 @@ _reader_full_buf(
         }
 
         remain_data = pReader->pEnd - pReader->pCur;
-        if( remain_data >= 0 && remain_data < (pReader->buf_size >> 2) )
+        remain_data = (remain_data < 0) ? 0 : remain_data;
+        if( remain_data < (pReader->buf_size >> 2) )
         {
             int     nbytes = 0;
 
-            if( remain_data && pReader->pBuf != pReader->pCur )
+            if( remain_data > 0 && pReader->pBuf != pReader->pCur )
                 memmove(pReader->pBuf, pReader->pCur, remain_data);
 
-            nbytes = pReader->buf_size - remain_data - 1;
+            #if 0
+            nbytes = pReader->buf_size - remain_data;
+            #else
+            nbytes = pReader->buf_size - remain_data - 2;
+            #endif
             uart_dev_recv_bytes(pReader->hUart, pReader->pBuf + remain_data, &nbytes);
 
             pReader->pCur = pReader->pBuf;
             pReader->pEnd = pReader->pBuf + remain_data + nbytes;
-            *pReader->pEnd = '\0';
 
-            if( cb_post_read &&
-                (rval = cb_post_read(pReader->pBuf + remain_data, nbytes)) )
-                break;
+            if( nbytes )
+            {
+                *pReader->pEnd       = '\\';
+                *(pReader->pEnd + 1) = '\0';
+
+                if( cb_post_read &&
+                    (rval = cb_post_read(pReader->pBuf + remain_data, nbytes)) )
+                    break;
+            }
         }
 
         pReader->buf_remain_data = pReader->pEnd - pReader->pCur;
@@ -187,7 +201,7 @@ _post_read(unsigned char *pBuf, int buf_size)
 
         for(int i = 0; i < buf_size; ++i)
         {
-            putchar(pBuf[i]);
+            putchar((char)pBuf[i]);
             pBuf[i] = (pBuf[i] == '\n' || pBuf[i] == '\r')
                     ? '\0' : pBuf[i];
         }
@@ -205,6 +219,7 @@ int main(int argc, char **argv)
     do {
         reader_cfg_t    cfg = {0};
         int             item_num = -1;
+        int             is_sent = 0;
 
         if( argc < 2 )
         {
@@ -217,15 +232,19 @@ int main(int argc, char **argv)
         pReader = _reader_create(&cfg);
         if( !pReader )      break;
 
+        pthread_mutex_init(&g_log_mtx, 0);
+
         while(1)
         {
             int     rval = 0;
 
+        #if 0
             if( item_num == -1 )
             {
                 char    ch = 'l';
                 uart_dev_send_bytes(pReader->hUart, (uint8_t*)&ch, 1);
             }
+        #endif
 
             _reader_full_buf(pReader, _post_read);
             while( pReader->pCur < pReader->pEnd )
@@ -233,20 +252,34 @@ int main(int argc, char **argv)
                 if( _reader_full_buf(pReader, _post_read) )
                     break;
 
-                // start parsing a line
-                {
+                {   // start parsing a line
                     char    *pAct_str = 0;
+                    size_t  offset = 0;
 
                     pAct_str = (char*)pReader->pCur;
-                    pReader->pCur += (strlen(pAct_str) + 1);
-                    rval = sscanf(pAct_str, "---total %d items", &item_num);
-                    if( rval != 1 )
+                    offset  = (strlen(pAct_str) + 1);
+                    if( pAct_str[offset - 2] != '\\' )
                     {
-                        continue;
+                        pReader->pCur += offset;
+                        rval = sscanf(pAct_str, "--- total %d items", &item_num);
                     }
-                    printf("\n==== %d\n", item_num);
-                }
+                    else        rval = 0;
 
+                    if( rval != 1 )
+                        continue;
+
+                    printf("\n==== %d\n", item_num);
+
+                    if( is_sent == 0 )
+                    {
+                        char    ch = '2';
+                        rval = uart_dev_send_bytes(pReader->hUart, (uint8_t*)&ch, 1);
+                        if( rval == 0 )
+                            is_sent = 1;
+                        else
+                            fprintf(stdout, "send fail %d\n", rval);
+                    }
+                }
             }
         }
 

@@ -41,10 +41,28 @@
 *.su
 *.idb
 *.pdb
+*/.gdb*
+
+# trace files
+tags
+TAGS
+ID
+cscope*
+GTAGS
+GPATH
+GRTAGS
+GSYMS
+
+# backup files
+*.orig
+*.bak
+*.swp
+*.un~
 
 # Kernel Module Compile Results
 *.mod*
 *.cmd
+*.bin
 .tmp_versions/
 modules.order
 Module.symvers
@@ -52,10 +70,35 @@ Mkfile.old
 dkms.conf
 *.depend
 *.layout
+*.emDepend
+*.emLayout
 obj/*
 bin/*
+*/build/*
+*.bak
+*.pyc
+*.xml
+*.pcap
+*/scratch/*
+*.log
+*.toolchain
 *.7z
 *.gz
+*.tar
+**/out/*
+**/Listings/*
+**/Objects/*
+*.uvguix.*
+*.uvgui.*
+**/toolchain.env
+**/autom4te.cache/*
 **/.deps/*
 **/.libs/*
-**/autom4te.cache/*
+libtool
+stamp-h1
+**/.dirstamp
+config.h
+config.status
+Makefile
+*.in~
+

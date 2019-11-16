@@ -18,6 +18,7 @@
 #include "pthread.h"
 #include "log.h"
 
+
 #if defined(__linux__)
 
 #include <unistd.h>         //Used for UART
@@ -55,6 +56,8 @@ typedef struct pi_uart_dev
 static uint8_t      g_rx_buf[CONFIG_UART_RX_BUF_SIZE] = {0};
 
 static pi_uart_dev_t   g_rasp_pi_uart_dev = {.fd_uart = -1, };
+
+extern pthread_mutex_t     g_log_mtx;
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -139,7 +142,7 @@ _rasp_pi_uart_init(uart_cfg_t *pCfg)
         options.c_oflag = 0;
         // options.c_lflag = 0;
 
-        msg("baud rate: %d\n", pCfg->uart.baud_rate);
+        msg(LOG_LEVEL_INFO, "baud rate: %d\n", pCfg->uart.baud_rate);
 
         cfsetispeed(&options, baudrate);
         cfsetospeed(&options, baudrate);
@@ -180,12 +183,18 @@ _rasp_pi_uart_send_bytes(
 {
     int     rval = 0;
     do {
-        pi_uart_dev_t     *pHDev = (pi_uart_dev_t*)pHandle;
-        int             count = 0;
+        pi_uart_dev_t       *pHDev = (pi_uart_dev_t*)pHandle;
+        int                 retry = 2;
+        int                 count = 0;
 
         if( !pHDev )   break;
 
-        count = write(pHDev->fd_uart, pData, data_len);
+        do {
+            count = write(pHDev->fd_uart, pData, data_len);
+        } while( count < 0 && --retry );
+
+        fprintf(stderr, "[%s:%d] %c, cnt= %d, %d\n", __func__, __LINE__, *((char*)pData), count, data_len);
+
         if( count < 0 || (count != data_len) )
             rval = -1;
     } while(0);
