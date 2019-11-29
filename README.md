@@ -38,8 +38,9 @@
     > Protothreads function as stackless, lightweight threads, or coroutines, providing a blocking context cheaply using minimal memory per protothread (on the order of single bytes).
 + test_uart_term
     > base on raspberry pi
-+ test_test_nodeq
++ test_nodeq
     > node queue base on share memory pool between 2 tasks
+    >> No promise it is thread-self
 
 
 # MS Visual Studio

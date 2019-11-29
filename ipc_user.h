@@ -48,7 +48,7 @@ extern "C" {
     do {((nodeq_header_t*)GET_NODEQ_HDR(pBase, nodeq_id))->rw_type##_index++;                       \
         ((nodeq_header_t*)GET_NODEQ_HDR(pBase, nodeq_id))->rw_type##_index &= (NODEQ_DEPTH - 1);    \
         ((nodeq_header_t*)GET_NODEQ_HDR(pBase, nodeq_id))->rw_type##_cnt++;                         \
-        ((nodeq_header_t*)GET_NODEQ_HDR(pBase, nodeq_id))->rw_type##_cnt &= 0xFFFF;                 \
+        ((nodeq_header_t*)GET_NODEQ_HDR(pBase, nodeq_id))->rw_type##_cnt &= 0xFFFFFFFF;             \
     } while(0)
 
 //=============================================================================
@@ -56,10 +56,10 @@ extern "C" {
 //=============================================================================
 typedef struct nodeq_header
 {
-    uint16_t    rd_index;
-    uint16_t    rd_cnt;
-    uint16_t    wr_index;
-    uint16_t    wr_cnt;
+    volatile uint32_t    rd_index;
+    volatile uint32_t    rd_cnt;
+    volatile uint32_t    wr_index;
+    volatile uint32_t    wr_cnt;
 } nodeq_header_t;
 
 
