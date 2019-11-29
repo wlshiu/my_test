@@ -22,16 +22,15 @@ _task_a(void *argv)
         node_t  *pNode_cur = 0;
 
         // push to queue
-        pNode_cur = GET_NEXT_WR_NODE(&g_buf, 0);
+        GET_NEXT_WR_NODE(&g_buf, 0, &pNode_cur);
         if( pNode_cur )
         {
             pNode_cur->is_used = true;
             snprintf(pNode_cur->data, sizeof(pNode_cur->data), "a -> b (%02d)\n", cnt++);
-            UPDATE_NODE_INDEX(&g_buf, 0, wr);
         }
 
         // pop from queue
-        pNode_cur = GET_NEXT_RD_NODE(&g_buf, 1);
+        GET_NEXT_RD_NODE(&g_buf, 1, &pNode_cur);
         if( pNode_cur  )
         {
             if( pNode_cur->is_used )
@@ -39,8 +38,6 @@ _task_a(void *argv)
                 printf("%s\n", pNode_cur->data);
                 pNode_cur->is_used = false;
             }
-
-            UPDATE_NODE_INDEX(&g_buf, 1, rd);
         }
 
         Sleep(1);
@@ -61,16 +58,15 @@ _task_b(void *argv)
         node_t  *pNode_cur = 0;
 
         // push to queue
-        pNode_cur = GET_NEXT_WR_NODE(&g_buf, 1);
+        GET_NEXT_WR_NODE(&g_buf, 1, &pNode_cur);
         if( pNode_cur )
         {
             pNode_cur->is_used = true;
             snprintf(pNode_cur->data, sizeof(pNode_cur->data), "b -> a (%02d)\n", cnt++);
-            UPDATE_NODE_INDEX(&g_buf, 1, wr);
         }
 
         // pop from queue
-        pNode_cur = GET_NEXT_RD_NODE(&g_buf, 0);
+        GET_NEXT_RD_NODE(&g_buf, 0, &pNode_cur);
         if( pNode_cur )
         {
             if( pNode_cur->is_used )
@@ -78,8 +74,6 @@ _task_b(void *argv)
                 printf("%s\n", pNode_cur->data);
                 pNode_cur->is_used = false;
             }
-
-            UPDATE_NODE_INDEX(&g_buf, 0, rd);
         }
 
         Sleep(1);
