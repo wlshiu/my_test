@@ -42,6 +42,9 @@
     > node queue base on share memory pool between 2 tasks
 + test_rsa
     > Asymmetric Encryption: use Public and Private Key-pair
++ test_version_info
+    > import key-pair for authentication
+
 
 # MS Visual Studio
 
