@@ -82,8 +82,6 @@ uint64_t prime_num_generator(uint64_t start_num)
 {
     uint64_t  prime_num = 0;
     do {
-        srand((uint64_t)time(NULL));
-
         if( start_num >= N )
             break;
 
@@ -92,7 +90,7 @@ uint64_t prime_num_generator(uint64_t start_num)
         {
             int     is_prime = MillerTest(prime_num, TEST_TIMES);
 
-            if( is_prime )  break;;
+            if( is_prime )  break;
         }
     } while(0);
 

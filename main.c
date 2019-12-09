@@ -3,10 +3,27 @@
 #include <string.h>
 #include <assert.h>
 #include <inttypes.h>
+#include <time.h>
 #include <windows.h>
 #include "stdint.h"
 
 #define uintx_t     uint64_t
+
+#define TWOCC(a, b)     ((((a) & 0xFF) << 8) | ((b) & 0xFF))
+
+typedef struct key
+{
+    uintx_t         N;
+    uintx_t         public_key;
+    uintx_t         private_key;
+
+} key_t;
+
+typedef struct cypher
+{
+    uint32_t    data[10];
+
+} cypher_t;
 
 extern uint64_t prime_num_generator(uint64_t start_num);
 
@@ -43,33 +60,20 @@ _mod(uintx_t a, uintx_t n)
 
 uintx_t inv(uintx_t e, uintx_t r)
 {
-    uintx_t d;
-    for (d = 2; d < r; d++)
+    uintx_t     d;
+    for(d = 2; d < r; d++)
     {
         uintx_t     ed = _mul(e, d); // re = (e*d) % r;
         uintx_t     re = _mod(ed, r);
         if (re == 1)
         {
-            printf("e=%" PRIu64 ", d=%" PRIu64 ", r=%" PRIu64 ", (e*d) _mod r=%" PRIu64 "\n", e, d, r, re);
-            return d;
+            // printf("e=%" PRIu64 ", d=%" PRIu64 ", r=%" PRIu64 ", (e*d) _mod r=%" PRIu64 "\n", e, d, r, re);
+            break;
         }
     }
-    assert(0);
+    return d;
 }
 
-/*
-uintx_t power(uintx_t a, uintx_t k, uintx_t N)
-{
-  uintx_t p=1, i;
-  for (i=1; i<=k; i++) {
-    p = _mul(p, a); // p = (p * a) % N;
-    p = _mod(p, N);
-  }
-  return p;
-}
-*/
-
-#if 1
 uintx_t power(uintx_t a, uintx_t k, uintx_t N)
 {
     uintx_t     l_out = 1;
@@ -89,76 +93,141 @@ uintx_t power(uintx_t a, uintx_t k, uintx_t N)
     return l_out;
 }
 
-#else
-uintx_t power(uintx_t a, uintx_t k, uintx_t N)
+int key_generator(key_t *pKey)
 {
-    if (k < 0)          assert(0);
-    if (k == 0)         return 1;
-    else if (k == 1)    return a;
+    int         rval = 0;
+    uintx_t     r;
 
-    // k >=2
-    uintx_t k2 = k >> 1;           // k2 = k / 2;
-    uintx_t re = k & 0x1;           // re = k % 2;
-    uintx_t ak2 = power(a, k2, N); // ak2 = a^(k/2);
-    uintx_t ak = ak2 * ak2;       // ak  = ak2*ak2 = a^((k/2)*2)
-    uintx_t akN = ak % N;         // akN = ak % N
-    if (re == 1)                 // if k is odd
-    {
-        akN = akN * a;             //   ak = ak*a;
-        return akN % N;            //   return ak * k;
-    }
-    else                         // else
-        return akN;
+    memset(pKey, 0x0, sizeof(key_t));
+
+    do {
+        do {
+            uintx_t     p = prime_num_generator(2500);
+            uintx_t     q = prime_num_generator(5000);
+
+            r = _mul(p - 1, q - 1);
+            pKey->N = _mul(p, q);
+
+        } while( !pKey->N );
+
+        pKey->public_key = 0;
+
+        while( pKey->public_key == 0 )
+            pKey->public_key = rand() & 0xFFF;
+
+        pKey->private_key = inv(pKey->public_key, r);
+
+    } while( pKey->private_key == r );
+
+    return rval;
 }
-#endif
 
+int encrypt(char *pMsg, key_t *pKey, cypher_t *pCiphertext)
+{
+    int     rval = 0;
+    char    *pBuf = 0;
+    do {
+        int     len = 0;
+        if( !pMsg || ((strlen(pMsg) + 1 ) >> 1) > (sizeof(cypher_t) >> 2) )
+        {
+            rval = -1;
+            break;
+        }
+
+        len = (sizeof(cypher_t) >> 1);
+
+        if( !(pBuf = malloc(len)) )
+        {
+            rval = -1;
+            break;
+        }
+
+        memset(pBuf, 0x0, len);
+
+        len = (strlen(pMsg) + 1) & ~0x1;
+
+        for(int i = 0; i < len; i += 2)
+        {
+            uintx_t     plaintext = (*(pMsg + i) << 8) | (*(pMsg + i + 1));
+            pCiphertext->data[i >> 1] = power(plaintext, pKey->public_key, pKey->N);
+        }
+
+    } while(0);
+
+    if( pBuf )  free(pBuf);
+    return rval;
+}
+
+int
+decrypt(key_t *pKey, cypher_t *pCiphertext, char *pMsg_buf, int msg_len)
+{
+    int     rval = 0;
+    do {
+        int     pos = 0;
+        memset(pMsg_buf, 0x0, msg_len);
+
+        for(int i = 0; i < sizeof(cypher_t) >> 2; i++)
+        {
+            uintx_t     plaintext = 0;
+
+            if( !pCiphertext->data[i] )
+                continue;
+
+            plaintext = power(pCiphertext->data[i], pKey->private_key, pKey->N);
+
+            pMsg_buf[pos]     = (plaintext >> 8) & 0xFF;
+            pMsg_buf[pos + 1] = plaintext & 0xFF;
+            pos += 2;
+        }
+
+    } while(0);
+    return rval;
+}
 
 int main(void)
 {
-    uintx_t     public_key = 0;
-    uintx_t     private_key = 0;
-    uintx_t     N = 0;
+    int     cnt = 0;
 
-    {   // generate key-pair
-        #if 0
-        uintx_t p = newBigInt("2213"), q = newBigInt("2663");
-        #else
-        uintx_t     p = prime_num_generator(2500);
-        uintx_t     q = prime_num_generator(5000);
-        #endif
-        uintx_t     r = _mul(p - 1, q - 1);
-
-        printf("p= %" PRIu64 ", q= %" PRIu64 "\n", p, q);
-
-        N = _mul(p, q);
-        printf("N= %s, r= %s\n", big2str(N), big2str(r));
-
-        public_key = newBigInt("4723");
-        private_key = inv(public_key, r);
-
-        printf("\n\n");
-        printf("Public key  = %" PRIu64 "\n", public_key);
-        printf("Private key = %" PRIu64 "\n\n", private_key);
-    }
+    srand((unsigned int)time(NULL));
 
     do {
-        uintx_t     plaintext_msg = 0;
-        uintx_t     ciphertext = 0;
-        uintx_t     plaintext_msg2 = 0;
+        int         rval = 0;
+        key_t       key = {.N = 0,};
+        cypher_t    cypher = {0};
+        char        *pMsg = "test1234";
+        char        msg_buf[128] = {0};
 
-        // generate data
-//        plaintext_msg = newBigInt("3320");
-        plaintext_msg = newBigInt("9999999"); // support max: 9999999
-        printf("plaintext_msg= '%s'\n", big2str(plaintext_msg));
+        // generate key-pair
+        rval = key_generator(&key);
+        if( rval )
+        {
+            printf("key generate fail \n");
+            break;
+        }
+
+        printf("\n\n");
+        printf("Public key  = %" PRIu64 "\n", key.public_key);
+        printf("Private key = %" PRIu64 "\n\n", key.private_key);
 
         // encrypt
-        ciphertext = power(plaintext_msg, public_key, N);
-        printf("ciphertext= '%s'\n", big2str(ciphertext));
+        memset(&cypher, 0x0, sizeof(cypher));
+        rval = encrypt(pMsg, &key, &cypher);
+        if( rval )
+        {
+            printf("encrypt fail \n");
+            break;
+        }
 
         // decrypt
-        plaintext_msg2 = power(ciphertext, private_key, N);
-        printf("plaintext_msg2= '%s'\n", big2str(plaintext_msg2));
-    } while(0);
+        rval = decrypt(&key, &cypher, msg_buf, sizeof(msg_buf));
+        if( rval )
+        {
+            printf("decrypt fail \n");
+            break;
+        }
+
+        printf("%02d-th: plaintext_msg: %s\n", cnt, msg_buf);
+    } while( cnt++ < 10 );
 
 
     while(1)
