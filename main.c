@@ -45,6 +45,7 @@ typedef struct ver_mgt
 {
     char        tag[8];  // start code
     uint32_t    lenght;
+    uint32_t    type;  // info type
 
     struct {
         union {
@@ -174,10 +175,12 @@ int main(int argc, char **argv)
     dictionary  *pIni = 0;
     FILE        *fraw = 0;
     FILE        *fini = 0;
+    uint8_t     *pRaw = 0;
 
     do {
         char        *pIni_filename = 0;
         char        *pRaw_filename = 0;
+        ver_mgt_t   *pVer_mgr = 0;
 
         if( argc != 4 )
         {
@@ -185,40 +188,61 @@ int main(int argc, char **argv)
             break;
         }
 
-        memset(&g_ver_mgr, 0x0, sizeof(g_ver_mgr));
+        pIni_filename = argv[2];
+        pRaw_filename = argv[3];
 
         if( !strncmp(argv[1], "-g", strlen("-g")) )
         {
             size_t      len = 0;
-            time_t      t = time(NULL);
-            struct tm   tm = *localtime(&t);
 
-            pIni_filename = argv[2];
-            pRaw_filename = argv[3];
-            pIni          = iniparser_load(pIni_filename);
+            pIni = iniparser_load(pIni_filename);
 
-            printf("now: %d-%d-%d %d:%d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-            g_ver_mgr.ver_info.build_date.year  = tm.tm_year;
-            g_ver_mgr.ver_info.build_date.month = tm.tm_mon;
-            g_ver_mgr.ver_info.build_date.day   = tm.tm_mday;
-            g_ver_mgr.ver_info.build_date.hour  = tm.tm_hour;
-            g_ver_mgr.ver_info.build_date.min   = tm.tm_min;
-            g_ver_mgr.ver_info.build_date.sec   = (tm.tm_sec >> 1);
+            {
+                char    *pDesc = iniparser_getstring(pIni, "APP:app_description", NULL);
+
+                len = sizeof(ver_mgt_t) + sizeof(uint32_t);
+                if( pDesc )
+                    len += (strlen(pDesc) + 1);
+
+                len = (len + 0x3) & ~0x3;
+                if( !(pVer_mgr = malloc(len)) )
+                {
+                    _err("malloc %d fail !\n", len);
+                    break;
+                }
+                memset(pVer_mgr, 0x0, len);
+                memcpy(pVer_mgr->ver_info.description, pDesc, strlen(pDesc));
+            }
+
+            {
+                time_t      t = time(NULL);
+                struct tm   tm = *localtime(&t);
+
+                printf("now: %d-%d-%d %d:%d:%d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+                pVer_mgr->ver_info.build_date.year  = tm.tm_year;
+                pVer_mgr->ver_info.build_date.month = tm.tm_mon;
+                pVer_mgr->ver_info.build_date.day   = tm.tm_mday;
+                pVer_mgr->ver_info.build_date.hour  = tm.tm_hour;
+                pVer_mgr->ver_info.build_date.min   = tm.tm_min;
+                pVer_mgr->ver_info.build_date.sec   = (tm.tm_sec >> 1);
+            }
 
             // length involve all struct ver_mgt_t but no CRC32 member
-            g_ver_mgr.lenght = sizeof(g_ver_mgr) - sizeof(uint32_t);
+            pVer_mgr->lenght = len - sizeof(uint32_t);
 
-            snprintf(g_ver_mgr.tag, sizeof(g_ver_mgr.tag), "%s", iniparser_getstring(pIni, "APP:start_code", NULL));
-            snprintf(g_ver_mgr.ver_info.chip_id.uid_tag, sizeof(g_ver_mgr.ver_info.chip_id.uid_tag), "%s", iniparser_getstring(pIni, "APP:chip_device_tag", NULL));
-            snprintf(g_ver_mgr.ver_info.project_name, sizeof(g_ver_mgr.ver_info.project_name), "%s", iniparser_getstring(pIni, "APP:project_name", NULL));
-//            snprintf(g_ver_mgr.ver_info.description, sizeof(g_ver_mgr.data) - sizeof(g_ver_mgr.ver_info), "%s", iniparser_getstring(pIni, "APP:app_description", NULL));
+            snprintf(pVer_mgr->tag, sizeof(pVer_mgr->tag), "%s", iniparser_getstring(pIni, "APP:start_code", NULL));
+            snprintf(pVer_mgr->ver_info.chip_id.uid_tag, sizeof(pVer_mgr->ver_info.chip_id.uid_tag), "%s", iniparser_getstring(pIni, "APP:chip_device_tag", NULL));
+            snprintf(pVer_mgr->ver_info.project_name, sizeof(pVer_mgr->ver_info.project_name), "%s", iniparser_getstring(pIni, "APP:project_name", NULL));
 
-            g_ver_mgr.ver_info.sdk_ver_major     = iniparser_getint(pIni, "APP:sdk_ver_major", 0);
-            g_ver_mgr.ver_info.sdk_ver_minor     = iniparser_getint(pIni, "APP:sdk_ver_minor", 0);
-            g_ver_mgr.ver_info.project_ver_major = iniparser_getint(pIni, "APP:project_ver_major", 0);
-            g_ver_mgr.ver_info.project_ver_minor = iniparser_getint(pIni, "APP:project_ver_minor", 0);
+            pVer_mgr->ver_info.sdk_ver_major     = iniparser_getint(pIni, "APP:sdk_ver_major", 0);
+            pVer_mgr->ver_info.sdk_ver_minor     = iniparser_getint(pIni, "APP:sdk_ver_minor", 0);
+            pVer_mgr->ver_info.project_ver_major = iniparser_getint(pIni, "APP:project_ver_major", 0);
+            pVer_mgr->ver_info.project_ver_minor = iniparser_getint(pIni, "APP:project_ver_minor", 0);
 
-            g_ver_mgr.crc32 = _crc32((const unsigned char*)&g_ver_mgr, sizeof(g_ver_mgr) - sizeof(uint32_t), g_crc_value);
+            {
+                uint32_t    *pCrc32 = (uint32_t*)((uintptr_t)pVer_mgr + pVer_mgr->lenght);
+                *pCrc32 = _crc32((const unsigned char*)pVer_mgr, pVer_mgr->lenght, g_crc_value);
+            }
 
             if( !(fraw = fopen(pRaw_filename, "wb")) )
             {
@@ -226,8 +250,8 @@ int main(int argc, char **argv)
                 break;
             }
 
-            len = fwrite((void*)&g_ver_mgr, 1, sizeof(g_ver_mgr), fraw);
-            if( len != sizeof(g_ver_mgr) )
+            len = fwrite((void*)pVer_mgr, 1, pVer_mgr->lenght + sizeof(uint32_t), fraw);
+            if( len != pVer_mgr->lenght + sizeof(uint32_t) )
             {
                 _err("output file fail !\n");
                 break;
@@ -235,8 +259,94 @@ int main(int argc, char **argv)
         }
         else if( !strncmp(argv[1], "-p", strlen("-p")) )
         {
-            pIni_filename = argv[2];
-            pRaw_filename = argv[3];
+            uint32_t    file_size = 0;
+            uint32_t    *pCrc32 = 0;
+
+            if( !(fraw = fopen(pRaw_filename, "rb")) )
+            {
+                _err("open %s fail \n", pRaw_filename);
+                break;
+            }
+
+            fseek(fraw, 0l, SEEK_END);
+            file_size = ftell(fraw);
+            fseek(fraw, 0l, SEEK_SET);
+
+            if( !(pRaw = malloc(file_size)) )
+            {
+                _err("malloc %d fail \n", file_size);
+                break;
+            }
+
+            fread(pRaw, 1, file_size, fraw);
+            fclose(fraw);
+            fraw = 0;
+
+            pVer_mgr = (ver_mgt_t*)pRaw;
+            pCrc32 = (uint32_t*)(pRaw + pVer_mgr->lenght);
+
+            if( *pCrc32 != _crc32(pRaw, pVer_mgr->lenght, g_crc_value) )
+            {
+                _err("CRC not match !\n");
+                break;
+            }
+
+            {   // output ini file
+                char    buf[512] = {0};
+
+                if( !(fini = fopen(pIni_filename, "w")) )
+                {
+                    _err("open %s fail \n", pIni_filename);
+                    break;
+                }
+                fprintf(fini, "#\n# Automatically generated file;\n#\n\n");
+                fclose(fini);
+                fini = 0;
+
+                pIni = iniparser_load(pIni_filename);
+
+                iniparser_set(pIni, "APP", 0);
+
+                snprintf(buf, sizeof(buf), "%d-%02d-%02d %02d:%02d:%02d",
+                         pVer_mgr->ver_info.build_date.year + 1900,
+                         pVer_mgr->ver_info.build_date.month + 1,
+                         pVer_mgr->ver_info.build_date.day,
+                         pVer_mgr->ver_info.build_date.hour,
+                         pVer_mgr->ver_info.build_date.min,
+                         pVer_mgr->ver_info.build_date.sec << 1);
+                iniparser_set(pIni, "APP:build_date", buf);
+
+                strncpy(buf, pVer_mgr->tag, sizeof(pVer_mgr->tag));
+                iniparser_set(pIni, "APP:start_code", buf);
+
+                strncpy(buf, pVer_mgr->ver_info.chip_id.uid_tag, sizeof(pVer_mgr->ver_info.chip_id.uid_tag));
+                iniparser_set(pIni, "APP:chip_device_tag", buf);
+
+                strncpy(buf, pVer_mgr->ver_info.project_name, sizeof(pVer_mgr->ver_info.project_name));
+                iniparser_set(pIni, "APP:project_name", buf);
+
+                snprintf(buf, sizeof(buf), "%d", pVer_mgr->ver_info.sdk_ver_major);
+                iniparser_set(pIni, "APP:sdk_ver_major", buf);
+
+                snprintf(buf, sizeof(buf), "%d", pVer_mgr->ver_info.sdk_ver_minor);
+                iniparser_set(pIni, "APP:sdk_ver_minor", buf);
+
+                snprintf(buf, sizeof(buf), "%d", pVer_mgr->ver_info.project_ver_major);
+                iniparser_set(pIni, "APP:project_ver_major", buf);
+
+                snprintf(buf, sizeof(buf), "%d", pVer_mgr->ver_info.project_ver_minor);
+                iniparser_set(pIni, "APP:project_ver_minor", buf);
+
+                iniparser_set(pIni, "APP:app_description", pVer_mgr->ver_info.description);
+
+                if( !(fini = fopen(pIni_filename, "a+w")) )
+                {
+                    _err("open %s fail \n", pIni_filename);
+                    break;
+                }
+
+                iniparser_dump_ini(pIni, fini);
+            }
         }
         else
         {
@@ -244,10 +354,12 @@ int main(int argc, char **argv)
         }
     } while(0);
 
+    if( pRaw )   free(pRaw);
     if( fraw )   fclose(fraw);
     if( fini )   fclose(fini);
-    if( pIni )  iniparser_freedict(pIni);
+    if( pIni )   iniparser_freedict(pIni);
 
+    printf("------- done\n");
     while(1)
         __asm("nop");
 
