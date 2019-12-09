@@ -7,10 +7,21 @@
 #include <windows.h>
 #include "stdint.h"
 
-#define uintx_t     uint64_t
+//=============================================================================
+//                  Constant Definition
+//=============================================================================
+//#define CONFIG_KEY_SWITCH
 
+#define uintx_t         uint64_t
+
+//=============================================================================
+//                  Macro Definition
+//=============================================================================
 #define TWOCC(a, b)     ((((a) & 0xFF) << 8) | ((b) & 0xFF))
 
+//=============================================================================
+//                  Structure Definition
+//=============================================================================
 typedef struct key
 {
     uintx_t         N;
@@ -25,16 +36,22 @@ typedef struct cypher
 
 } cypher_t;
 
+//=============================================================================
+//                  Global Data Definition
+//=============================================================================
 extern uint64_t prime_num_generator(uint64_t start_num);
 
-uintx_t newBigInt(char *str)
+static char     tempStr[1025];
+//=============================================================================
+//                  Private Function Definition
+//=============================================================================
+static uintx_t newBigInt(char *str)
 {
     return atoi(str);
 }
 
-char tempStr[1025];
 
-char *big2str(uintx_t a)
+static char *big2str(uintx_t a)
 {
     sprintf(tempStr, "%" PRIu64, a);
     return tempStr;
@@ -58,7 +75,8 @@ _mod(uintx_t a, uintx_t n)
     return a % n;
 }
 
-uintx_t inv(uintx_t e, uintx_t r)
+static uintx_t
+_inv(uintx_t e, uintx_t r)
 {
     uintx_t     d;
     for(d = 2; d < r; d++)
@@ -74,7 +92,8 @@ uintx_t inv(uintx_t e, uintx_t r)
     return d;
 }
 
-uintx_t power(uintx_t a, uintx_t k, uintx_t N)
+static uintx_t
+_power(uintx_t a, uintx_t k, uintx_t N)
 {
     uintx_t     l_out = 1;
 
@@ -93,6 +112,10 @@ uintx_t power(uintx_t a, uintx_t k, uintx_t N)
     return l_out;
 }
 
+
+//=============================================================================
+//                  Public Function Definition
+//=============================================================================
 int key_generator(key_t *pKey)
 {
     int         rval = 0;
@@ -115,7 +138,7 @@ int key_generator(key_t *pKey)
         while( pKey->public_key == 0 )
             pKey->public_key = rand() & 0xFFF;
 
-        pKey->private_key = inv(pKey->public_key, r);
+        pKey->private_key = _inv(pKey->public_key, r);
 
     } while( pKey->private_key == r );
 
@@ -149,7 +172,12 @@ int encrypt(char *pMsg, key_t *pKey, cypher_t *pCiphertext)
         for(int i = 0; i < len; i += 2)
         {
             uintx_t     plaintext = (*(pMsg + i) << 8) | (*(pMsg + i + 1));
-            pCiphertext->data[i >> 1] = power(plaintext, pKey->public_key, pKey->N);
+
+        #if defined(CONFIG_KEY_SWITCH)
+            pCiphertext->data[i >> 1] = _power(plaintext, pKey->private_key, pKey->N);
+        #else
+            pCiphertext->data[i >> 1] = _power(plaintext, pKey->public_key, pKey->N);
+        #endif // defined
         }
 
     } while(0);
@@ -173,7 +201,11 @@ decrypt(key_t *pKey, cypher_t *pCiphertext, char *pMsg_buf, int msg_len)
             if( !pCiphertext->data[i] )
                 continue;
 
-            plaintext = power(pCiphertext->data[i], pKey->private_key, pKey->N);
+        #if defined(CONFIG_KEY_SWITCH)
+            plaintext = _power(pCiphertext->data[i], pKey->public_key, pKey->N);
+        #else
+            plaintext = _power(pCiphertext->data[i], pKey->private_key, pKey->N);
+        #endif // defined
 
             pMsg_buf[pos]     = (plaintext >> 8) & 0xFF;
             pMsg_buf[pos + 1] = plaintext & 0xFF;
@@ -206,8 +238,13 @@ int main(void)
         }
 
         printf("\n\n");
+    #if defined(CONFIG_KEY_SWITCH)
+        printf("Public key  = %" PRIu64 "\n", key.private_key);
+        printf("Private key = %" PRIu64 "\n\n", key.public_key);
+    #else
         printf("Public key  = %" PRIu64 "\n", key.public_key);
         printf("Private key = %" PRIu64 "\n\n", key.private_key);
+    #endif // defined
 
         // encrypt
         memset(&cypher, 0x0, sizeof(cypher));
