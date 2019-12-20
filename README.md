@@ -44,6 +44,8 @@
     > Asymmetric Encryption: use Public and Private Key-pair
 + test_version_info
     > import key-pair for authentication
++ test_auto_script
+    > configure regiter of H/w module with script
 
 
 # MS Visual Studio
