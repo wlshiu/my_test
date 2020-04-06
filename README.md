@@ -46,7 +46,8 @@
     > import key-pair for authentication
 + test_auto_script
     > configure regiter of H/w module with script
-
++ test_sw_time_event
+    > software time event trigger
 
 # MS Visual Studio
 
