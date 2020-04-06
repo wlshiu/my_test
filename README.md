@@ -48,6 +48,8 @@
     > configure regiter of H/w module with script
 + test_sw_time_event
     > software time event trigger
++ test_lwmesh
+    > mesh route [Atmel Lightweight Mesh](https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/Atmel%20Lightweight%20Mesh)
 
 # MS Visual Studio
 
