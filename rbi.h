@@ -1,31 +1,28 @@
 /**
  * Copyright (c) 2020 Wei-Lun Hsu. All Rights Reserved.
  */
-/** @file virtual_phy.h
+/** @file rbi.h
  *
  * @author Wei-Lun Hsu
  * @version 0.1
- * @date 2020/04/06
+ * @date 2020/04/07
  * @license
  * @description
  */
 
-#ifndef __virtual_phy_H_wqu4VmmZ_l7FO_Hqdj_s7BG_uV5srYGjmxuA__
-#define __virtual_phy_H_wqu4VmmZ_l7FO_Hqdj_s7BG_uV5srYGjmxuA__
+#ifndef __rbi_H_wacjyBe6_lUs2_Hcqo_sz5Q_u1uqyxh5Uhqw__
+#define __rbi_H_wacjyBe6_lUs2_Hcqo_sz5Q_u1uqyxh5Uhqw__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 #include <stdint.h>
-#include <pthread.h>
-//#include "mqueue.h"
-#include "rbi.h"
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-#define CONFIG_VPHY_NODE_MAX            10
-#define CONFIG_VPHY_MSG_SIZE            256
+
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -33,32 +30,7 @@ extern "C" {
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
-struct vphy_dataq;
-
-typedef void (*cb_vphy_isr_t)(struct vphy_dataq *pDataq);
-
-typedef struct vphy_package
-{
-    pthread_t   src_tid;
-    uint32_t    data_len;
-    uint8_t     data[];
-} vphy_package_t;
-
-typedef struct vphy_dataq
-{
-    pthread_t       tid;
-#if 0
-    char            dataq_name[16];
-    mqd_t           dataq;
-#else
-    rbi_t           dataq;
-#endif
-    cb_vphy_isr_t   cb_isr;
-    void            *pUser_data;
-
-} vphy_dataq_t;
-
-
+typedef uintptr_t rbi_t;
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
@@ -70,24 +42,29 @@ typedef struct vphy_dataq
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
-int
-vphy_init(void);
+rbi_t
+rbi_init(
+    uint32_t    slot_size,
+    uint32_t    item_size);
 
 
 int
-vphy_deinit(void);
+rbi_deinit(
+    rbi_t       hRbi);
 
 
 int
-vphy_register_event_callback(
-    cb_vphy_isr_t   cb_isr,
-    void            *pUser_data);
-
-
-int
-vphy_send(
+rbi_pop(
+    rbi_t       hRbi,
     uint8_t     *pData,
-    uint32_t    length);
+    int         len);
+
+
+int
+rbi_push(
+    rbi_t       hRbi,
+    uint8_t     *pData,
+    int         len);
 
 
 #ifdef __cplusplus
