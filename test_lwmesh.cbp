@@ -15,6 +15,7 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/include" />
+					<Add directory="../my_test" />
 				</Compiler>
 				<Linker>
 					<Add library="D:/_portable/codeblocks-17.12mingw/MinGW/lib/libkernel32.a" />
@@ -42,13 +43,22 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="log.h" />
-		<Unit filename="main.c">
-			<Option compilerVar="CC" />
-		</Unit>
+		<Unit filename="msg_box.h" />
 		<Unit filename="rbi.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="rbi.h" />
+		<Unit filename="scheduler.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="scheduler.h" />
+		<Unit filename="sys_time.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sys_time.h" />
+		<Unit filename="test/test_scheduler.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="virtual_phy.c">
 			<Option compilerVar="CC" />
 		</Unit>

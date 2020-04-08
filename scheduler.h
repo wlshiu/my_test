@@ -1,0 +1,146 @@
+/**
+ * Copyright (c) 2020 Wei-Lun Hsu. All Rights Reserved.
+ */
+/** @file scheduler.h
+ *
+ * @author Wei-Lun Hsu
+ * @version 0.1
+ * @date 2020/04/08
+ * @license
+ * @description
+ */
+
+#ifndef __scheduler_H_woP5WlUm_ljsb_HvVu_sBda_ujX9QbJ5hXGQ__
+#define __scheduler_H_woP5WlUm_ljsb_HvVu_sBda_ujX9QbJ5hXGQ__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <stdint.h>
+#include "rbi.h"
+//=============================================================================
+//                  Constant Definition
+//=============================================================================
+typedef enum scheduler_ev
+{
+    SCHEDULER_EV_MODE_INTERVAL   = 0x12, // once
+    SCHEDULER_EV_MODE_PERIODIC,
+} scheduler_ev_t;
+//=============================================================================
+//                  Macro Definition
+//=============================================================================
+
+//=============================================================================
+//                  Structure Definition
+//=============================================================================
+
+typedef struct scheduler_job
+{
+    scheduler_ev_t      ev_type;
+    uint32_t            wait_time;  // waiting time (depend on time_quantum) to execute a job
+
+    /**
+     *  @brief  cb_create_job_ctxt
+     *              create the context of this job to send to watchers
+     *
+     *  @param [in] pJob            job info
+     *  @param [in] pCtxt           the buffer of the context of a job
+     *  @param [in] pCtxt_len       the buffer length of the context of a job
+     *  @return
+     *      0: ok, others: fail
+     */
+    int (*cb_create_job_ctxt)(struct scheduler_job *pJob, uint8_t *pCtxt, int *pCtxt_len);
+
+    /**
+     *  @brief  cb_destroy_job_ctxt
+     *              destroy the context of this job
+     *
+     *  @param [in] pJob            job info
+     *  @param [in] pCtxt           the buffer of the context of a job
+     *  @param [in] pCtxt_len       the buffer length of the context of a job
+     *  @return
+     *      0: ok, others: fail
+     */
+    int (*cb_destroy_job_ctxt)(struct scheduler_job *pJob, uint8_t *pCtxt, int *pCtxt_len);
+
+    void                *pExtra_data;
+
+    uint32_t            src_uid;
+    uint32_t            destination_cnt;
+    uint32_t            pDest_uid[];
+} scheduler_job_t;
+
+typedef struct scheduler_watcher
+{
+    uint32_t    watcher_uid;
+
+    rbi_t       msgq; // It MUST be initialized before register to the scheduler
+
+} scheduler_watcher_t;
+//=============================================================================
+//                  Global Data Definition
+//=============================================================================
+
+//=============================================================================
+//                  Private Function Definition
+//=============================================================================
+
+//=============================================================================
+//                  Public Function Definition
+//=============================================================================
+/**
+ *  @brief  scheduler_init
+ *  
+ *  @param [in] time_quantum        time quantum for time scaling (unit: ms)
+ *  @return 
+ *      0: ok, others: fail
+ */
+int
+scheduler_init(
+    uint32_t    time_quantum);
+
+
+void
+scheduler_deinit(void);
+
+
+/**
+ *  @brief  scheduler_add_job
+ *              this job will be executed after (now + pJob->wait_time)
+ *
+ *  @param [in] pJob        target job info
+ *  @param [in] pJob_uid    return the uid of a job in this scheduler
+ *  @return
+ *      0: ok, others: fail
+ */
+int
+scheduler_add_job(
+    scheduler_job_t     *pJob,
+    uint32_t            *pJob_uid);
+
+
+int
+scheduler_del_job(
+    uint32_t    job_uid);
+
+
+int
+scheduler_register_watcher(
+    scheduler_watcher_t     *pWatcher);
+
+
+int
+scheduler_unregister_watcher(
+    uint32_t    watcher_uid);
+
+
+int
+scheduler_proc(void);
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

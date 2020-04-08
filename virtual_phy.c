@@ -10,10 +10,8 @@
  * @description
  */
 
+#include <stdio.h>
 #include <windows.h>
-//#include <stdlib.h>
-//#include <stdio.h>
-//#include <string.h>
 #include <fcntl.h>
 #include <time.h>
 #include "virtual_phy.h"
@@ -84,9 +82,7 @@ _task_vphy_routine(void *argv)
 
         pPackage = (vphy_package_t*)&g_vphy_buf;
 
-        log_out("%s\n", (char*)pPackage->data);
-
-    #if 0
+    #if 1
         pthread_mutex_lock(&g_vphy_mtx);
 
         for(int i = 0; i < CONFIG_VPHY_NODE_MAX; i++)
