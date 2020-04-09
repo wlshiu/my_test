@@ -19,7 +19,7 @@
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-
+#define CONFIG_SCHEDULER_JOB_MAX_NUM        10
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -50,7 +50,7 @@ typedef struct scheduler_job_list
 {
     struct scheduler_job_list   *next;
     uint32_t            uid;
-    uint32_t            timeout;
+    uint64_t            timeout;
     scheduler_job_t     pJob[];
 } scheduler_job_list_t;
 
@@ -64,6 +64,8 @@ typedef struct scheduler_watcher_list
 //=============================================================================
 static scheduler_job_list_t         *g_pScheduler_jobs_head = 0;
 static scheduler_watcher_list_t     *g_pScheduler_watchers_head = 0;
+
+static uint32_t                     g_job_cnt = 0;
 
 static uint64_t                     g_schedualer_tick = 0;
 static pthread_mutex_t              g_schedualer_job_mtx;
@@ -88,6 +90,9 @@ scheduler_init(
     int     rval = 0;
 
     do {
+        g_pScheduler_jobs_head     = 0;
+        g_pScheduler_watchers_head = 0;
+
         // scaling system time
         g_schedualer_tick = 0ull;
         sys_tmr_start(time_quantum, _time_observer, 0);
@@ -125,7 +130,7 @@ scheduler_add_job(
         scheduler_job_list_t    *pNew = 0;
         uint32_t                len = 0;
 
-        if( !pJob )
+        if( !pJob || g_job_cnt == CONFIG_SCHEDULER_JOB_MAX_NUM )
         {
             rval = -1;
             break;
@@ -140,7 +145,7 @@ scheduler_add_job(
 
         memset(pNew, 0x0, len);
 
-        *pNew->pJob = *pJob;
+        memcpy(pNew->pJob, pJob, sizeof(scheduler_job_t) + sizeof(uint32_t) * pJob->destination_cnt);
 
         pNew->timeout = g_schedualer_tick + pJob->wait_time;
         pNew->uid     = job_uid;
@@ -157,8 +162,18 @@ scheduler_add_job(
                 // sort by timeout
                 if( pTail->timeout > pNew->timeout )
                 {
-                    pPrev->next = pNew;
-                    pNew->next = pTail->next;
+                    g_job_cnt++;
+
+                    if( pPrev )
+                    {
+                        pPrev->next = pNew;
+                        pNew->next  = pTail;
+                    }
+                    else
+                    {
+                        pNew->next = pTail;
+                        g_pScheduler_jobs_head = pNew;
+                    }
                     break;
                 }
 
@@ -167,10 +182,15 @@ scheduler_add_job(
             }
 
             if( !pTail )
+            {
+                g_job_cnt++;
                 pPrev->next = pNew;
+            }
+
         }
         else
         {
+            g_job_cnt++;
             g_pScheduler_jobs_head = pNew;
         }
 
@@ -306,13 +326,19 @@ scheduler_proc(void)
     do {
         scheduler_job_list_t    *pJob_list_act = 0;
         scheduler_job_list_t    *pJob_list_act_head = 0;
-        scheduler_job_list_t    *pJob_list_cur = g_pScheduler_jobs_head;
-
-        if( !g_pScheduler_jobs_head )
-            break;
+        scheduler_job_list_t    *pJob_list_cur = 0;
 
         // get active jobs
         pthread_mutex_lock(&g_schedualer_job_mtx);
+
+        if( !g_pScheduler_jobs_head )
+        {
+            pthread_mutex_unlock(&g_schedualer_job_mtx);
+            break;
+        }
+
+        pJob_list_cur = g_pScheduler_jobs_head;
+
         while( pJob_list_cur )
         {
             if( pJob_list_cur->timeout > g_schedualer_tick )
@@ -343,7 +369,7 @@ scheduler_proc(void)
             scheduler_watcher_list_t    *pWatcher_cur = 0;
             scheduler_job_t             *pJob = 0;
             uint8_t                     *pJob_ctxt = 0;
-            int                         job_ctxt_len = 256;
+            int                         job_ctxt_len = 0;
 
             pJob_list_cur = pJob_list_act;
             pJob_list_act = pJob_list_act->next;
@@ -365,14 +391,9 @@ scheduler_proc(void)
 
                     if( !pJob_ctxt )
                     {
-                        if( !(pJob_ctxt = malloc(job_ctxt_len)) )
-                            break;
-
-                        memset(pJob_ctxt, 0x0, job_ctxt_len);
-
                         if( pJob->cb_create_job_ctxt )
                         {
-                            rval = pJob->cb_create_job_ctxt(pJob, pJob_ctxt, &job_ctxt_len);
+                            rval = pJob->cb_create_job_ctxt(pJob, &pJob_ctxt, &job_ctxt_len);
                             if( rval < 0 ) break;
                         }
                     }
@@ -394,10 +415,8 @@ scheduler_proc(void)
             {
                 if( pJob->cb_destroy_job_ctxt )
                 {
-                    pJob->cb_destroy_job_ctxt(pJob, pJob_ctxt, &job_ctxt_len);
+                    pJob->cb_destroy_job_ctxt(pJob, &pJob_ctxt, &job_ctxt_len);
                 }
-
-                free(pJob_ctxt);
             }
 
             free(pJob_list_cur);

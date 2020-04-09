@@ -45,24 +45,24 @@ typedef struct scheduler_job
      *              create the context of this job to send to watchers
      *
      *  @param [in] pJob            job info
-     *  @param [in] pCtxt           the buffer of the context of a job
+     *  @param [in] ppCtxt          the buffer of the context of a job
      *  @param [in] pCtxt_len       the buffer length of the context of a job
      *  @return
      *      0: ok, others: fail
      */
-    int (*cb_create_job_ctxt)(struct scheduler_job *pJob, uint8_t *pCtxt, int *pCtxt_len);
+    int (*cb_create_job_ctxt)(struct scheduler_job *pJob, uint8_t **ppCtxt, int *pCtxt_len);
 
     /**
      *  @brief  cb_destroy_job_ctxt
      *              destroy the context of this job
      *
      *  @param [in] pJob            job info
-     *  @param [in] pCtxt           the buffer of the context of a job
+     *  @param [in] ppCtxt          the buffer of the context of a job
      *  @param [in] pCtxt_len       the buffer length of the context of a job
      *  @return
      *      0: ok, others: fail
      */
-    int (*cb_destroy_job_ctxt)(struct scheduler_job *pJob, uint8_t *pCtxt, int *pCtxt_len);
+    int (*cb_destroy_job_ctxt)(struct scheduler_job *pJob, uint8_t **ppCtxt, int *pCtxt_len);
 
     void                *pExtra_data;
 
@@ -91,9 +91,9 @@ typedef struct scheduler_watcher
 //=============================================================================
 /**
  *  @brief  scheduler_init
- *  
+ *
  *  @param [in] time_quantum        time quantum for time scaling (unit: ms)
- *  @return 
+ *  @return
  *      0: ok, others: fail
  */
 int
