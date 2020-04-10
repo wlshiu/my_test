@@ -13,6 +13,7 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <time.h>
 #include <pthread.h>
 
 #include "sys_time.h"
@@ -62,6 +63,7 @@ _task_schedule(void *argv)
     while( *pIs_running )
     {
         scheduler_proc();
+        Sleep(3);
     }
 
     pthread_exit(0);
@@ -101,12 +103,13 @@ _task_watcher(void *argv)
             bytes = rbi_pop(watcher.msgq, pCmd_msg, cmd_msg_len);
             if( !bytes )
             {
-                Sleep(5);
+                Sleep(3);
                 continue;
             }
 
             pCmd_msg[cmd_msg_len - 1] = '\0';
-            printf("[watcher_%d] rx: -%s-\n", watcher.watcher_uid, pCmd_msg);
+            log_out("[watcher_%d] rx: -%s-", watcher.watcher_uid, pCmd_msg);
+            Sleep(5);
         }
     } while(0);
 
@@ -129,7 +132,8 @@ _create_job_ctxt(scheduler_job_t *pJob, uint8_t **ppCtxt, int *pCtxt_len)
         }
         memset(pCtxt, 0x0, ctxt_len);
 
-        snprintf((char*)pCtxt, ctxt_len, "src=0x%x, dest=watcher_%d\n", pJob->src_uid, *pJob->pDest_uid);
+        snprintf((char*)pCtxt, ctxt_len, " job sn= %04d, src=0x%x\n",
+                 pJob->job_serial_number, pJob->src_uid);
 
         *ppCtxt    = (uint8_t*)pCtxt;
         *pCtxt_len = ctxt_len;
@@ -166,11 +170,14 @@ _log_job(scheduler_job_t *pJob)
 int main(int argc, char **argv)
 {
     int     rval = 0;
+
+    srand(time(0));
+
     do {
-        pthread_t   tscheduler;
-        int         is_running = 1;
-        uint32_t    time_scaling = 100;
-        sys_tmr_t   hSys_tm = 0;
+        pthread_t       tscheduler;
+        int             is_running = 1;
+        uint32_t        time_scaling = 100;
+        sys_tmr_t       hSys_tm = 0;
 
         scheduler_init(time_scaling);
 
@@ -181,11 +188,6 @@ int main(int argc, char **argv)
 
         rval = pthread_cond_init(&g_usr_cond, 0);
         if( rval )   break;
-
-        pthread_create(&tscheduler, 0, _task_schedule, &is_running);
-        pthread_mutex_lock(&g_usr_mtx);
-        pthread_cond_wait(&g_usr_cond, &g_usr_mtx);
-        pthread_mutex_unlock(&g_usr_mtx);
 
         for(int i = 0; i < CONFIG_WATCHER_NUM; i++)
         {
@@ -198,64 +200,82 @@ int main(int argc, char **argv)
             pthread_mutex_unlock(&g_usr_mtx);
         }
 
+        {   // thread scheduler
+            pthread_attr_t          attr;
+            struct sched_param      param;
+
+            // set thread priority
+            param.sched_priority = sched_get_priority_max(SCHED_OTHER);
+
+            pthread_attr_init(&attr);
+            pthread_attr_setschedparam(&attr, &param);
+            pthread_create(&tscheduler, &attr, _task_schedule, &is_running);
+
+            pthread_mutex_lock(&g_usr_mtx);
+            pthread_cond_wait(&g_usr_cond, &g_usr_mtx);
+            pthread_mutex_unlock(&g_usr_mtx);
+        }
+
         while(1)
         {
             uint32_t        duration = 0ul;
+
+            static int      cnt = 0;
+
+            if( cnt++ > 100 )
+            {
+//                break;
+            }
 
             duration = sys_tmr_get_duration(hSys_tm);
         #if 0
             if( duration > CONFIG_TEST_DURATION_MS )
             {
+                for(int i = 0; i < CONFIG_WATCHER_NUM; i++)
+                {
+                    g_watcher_attr[i].is_running = 0;
+                }
+
                 is_running = 0;
                 break;
             }
-            else if( duration > (CONFIG_TEST_DURATION_MS >> 1) )
-            {
-                static int      is_once = 0;
-
-                if( is_once ) continue;
-
-                // TODO: add a job
-            }
-            else if( duration > (CONFIG_TEST_DURATION_MS >> 2) )
+            else
         #endif
             {
-                static int          is_once = 0;
                 uint32_t            certificate = (uint32_t)-1;
                 uint32_t            dest_cnt = CONFIG_WATCHER_NUM;
                 scheduler_job_t     *pJob = 0;
                 uint32_t            len = 0;
 
-                if( is_once ) continue;
-
-//                is_once = 1;
-
                 // add a job
                 len = sizeof(scheduler_job_t) + sizeof(uint32_t) * dest_cnt;
                 if( !(pJob = malloc(len)) )
                 {
-                    printf("[%s:%d] fail\n", __func__, __LINE__);
+                    dbg_msg("fail\n");
                     break;
                 }
                 memset(pJob, 0x0, len);
 
                 pJob->ev_type               = SCHEDULER_EV_MODE_INTERVAL;
-                pJob->wait_time             = 2; // real waiting time = 2 * time_scaling (ms)
+                pJob->wait_time             = rand() & 0x3; // real waiting time = 2 * time_scaling (ms)
                 pJob->src_uid               = pthread_self();
                 pJob->cb_create_job_ctxt    = _create_job_ctxt;
                 pJob->cb_destroy_job_ctxt   = _destroy_job_ctxt;
+                pJob->pExtra_data           = 0;
                 pJob->destination_cnt       = dest_cnt;
                 for(int j = 0; j < dest_cnt; j++)
                 {
                     pJob->pDest_uid[j] = g_watcher_attr[j].watcher_id;
                 }
 
-                printf("tid(0x%x) add job\n", pJob->src_uid);
-
-                scheduler_add_job(pJob, &certificate);
+                rval = scheduler_add_job(pJob, &certificate);
+                if( rval )
+                    printf("job full...\n");
 
                 free(pJob);
             }
+
+            Sleep(time_scaling);
         }
 
         pthread_join(tscheduler, 0);

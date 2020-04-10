@@ -40,6 +40,8 @@ typedef struct scheduler_job
     scheduler_ev_t      ev_type;
     uint32_t            wait_time;  // waiting time (depend on time_quantum) to execute a job
 
+    uint32_t            job_serial_number; // for debug
+
     /**
      *  @brief  cb_create_job_ctxt
      *              create the context of this job to send to watchers

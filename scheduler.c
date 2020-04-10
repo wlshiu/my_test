@@ -16,6 +16,8 @@
 #include <pthread.h>
 #include "scheduler.h"
 #include "sys_time.h"
+
+#include "log.h"
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -150,6 +152,8 @@ scheduler_add_job(
         pNew->timeout = g_schedualer_tick + pJob->wait_time;
         pNew->uid     = job_uid;
 
+        pNew->pJob->job_serial_number = pNew->uid;
+
         pthread_mutex_lock(&g_schedualer_job_mtx);
 
         if( g_pScheduler_jobs_head )
@@ -186,7 +190,6 @@ scheduler_add_job(
                 g_job_cnt++;
                 pPrev->next = pNew;
             }
-
         }
         else
         {
@@ -346,16 +349,22 @@ scheduler_proc(void)
 
             if( pJob_list_act_head )
             {
+                g_job_cnt--;
+
                 pJob_list_act->next = pJob_list_cur;
                 pJob_list_act       = pJob_list_act->next;
             }
             else
             {
+                g_job_cnt--;
+
                 pJob_list_act_head = pJob_list_cur;
                 pJob_list_act      = pJob_list_cur;
             }
 
             pJob_list_cur = pJob_list_cur->next;
+
+            pJob_list_act->next = 0;
         }
 
         g_pScheduler_jobs_head = pJob_list_cur;
@@ -363,6 +372,68 @@ scheduler_proc(void)
         pthread_mutex_unlock(&g_schedualer_job_mtx);
 
         // process jobs
+    #if 1
+        /**
+         *  One job SHOULD send to multi-watchers (job order issue)
+         */
+        pJob_list_act = pJob_list_act_head;
+        while( pJob_list_act )
+        {
+            scheduler_job_t             *pJob = 0;
+            uint8_t                     *pJob_ctxt = 0;
+            int                         job_ctxt_len = 0;
+
+            pJob_list_cur = pJob_list_act;
+            pJob_list_act = pJob_list_act->next;
+
+            pJob = pJob_list_cur->pJob;
+
+            for(int i = 0; i < pJob->destination_cnt; i++)
+            {
+                scheduler_watcher_list_t    *pWatcher_cur = 0;
+
+                // search target destination UID
+                pthread_mutex_lock(&g_schedualer_mtx);
+
+                pWatcher_cur = g_pScheduler_watchers_head;
+                while( pWatcher_cur )
+                {
+                    if( pWatcher_cur->pWatcher->watcher_uid == pJob->pDest_uid[i] )
+                    {
+                        if( !pJob_ctxt )
+                        {
+                            if( pJob->cb_create_job_ctxt )
+                            {
+                                rval = pJob->cb_create_job_ctxt(pJob, &pJob_ctxt, &job_ctxt_len);
+                                if( rval < 0 ) break;
+                            }
+                        }
+
+                        rbi_push(pWatcher_cur->pWatcher->msgq, pJob_ctxt, job_ctxt_len);
+                        break;
+                    }
+
+                    pWatcher_cur = pWatcher_cur->next;
+                }
+
+                pthread_mutex_unlock(&g_schedualer_mtx);
+
+                // drop this job
+                if( rval ) break;
+            }
+
+            if( pJob_ctxt )
+            {
+                if( pJob->cb_destroy_job_ctxt )
+                {
+                    pJob->cb_destroy_job_ctxt(pJob, &pJob_ctxt, &job_ctxt_len);
+                }
+            }
+
+            free(pJob_list_cur);
+        }
+
+    #else
         pJob_list_act = pJob_list_act_head;
         while( pJob_list_act )
         {
@@ -389,6 +460,9 @@ scheduler_proc(void)
                     if( pWatcher_cur->pWatcher->watcher_uid != pJob->pDest_uid[i] )
                         continue;
 
+                    /**
+                     *  One job send to multi-watchers
+                     */
                     if( !pJob_ctxt )
                     {
                         if( pJob->cb_create_job_ctxt )
@@ -421,8 +495,7 @@ scheduler_proc(void)
 
             free(pJob_list_cur);
         }
-
-
+    #endif // 0
     } while(0);
     return rval;
 }
