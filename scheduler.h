@@ -117,6 +117,16 @@ scheduler_deinit(void);
 
 
 /**
+ *  @brief  scheduler_get_tick
+ *              the ticks depend on  time_quantum of scheduler_init
+ *  @return
+ *      the ticks of scheduler
+ */
+uint32_t
+scheduler_get_tick(void);
+
+
+/**
  *  @brief  scheduler_add_job
  *              this job will be executed after (now + pJob->wait_time)
  *
@@ -136,6 +146,14 @@ scheduler_del_job(
     uint32_t    job_uid);
 
 
+/**
+ *  @brief  scheduler_register_watcher
+ *              Register a watcher to scheduler
+ *
+ *  @param [in] pWatcher        target watcher info
+ *  @return
+ *      error code
+ */
 int
 scheduler_register_watcher(
     scheduler_watcher_t     *pWatcher);
@@ -146,6 +164,15 @@ scheduler_unregister_watcher(
     uint32_t    watcher_uid);
 
 
+/**
+ *  @brief  scheduler_proc
+ *              main process flow of scheduler
+ *  @param [in] cb_watcher_routine      the routine of watchers
+ *                                      - This callback is used at one thread case.
+ *                                        The routine is immediately called with watcher info after scheduler processing
+ *  @return
+ *      error code
+ */
 int
 scheduler_proc(
     cb_watcher_routine_t  cb_watcher_routine);

@@ -26,25 +26,6 @@
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
-#define ADD_NODE(struct_type, pHead, pCur, node_size, node_uid) \
-    do {struct_type    *pNew = malloc(node_size);               \
-        memset(pNew, 0x0, node_size);                           \
-        *pNew->pJob   = *pCur;                                  \
-        pNew->timeout = g_schedualer_tick + pCur->wait_time;    \
-        pNew->uid     = node_uid;                               \
-        if( pHead ) {                                           \
-            struct_type    *pTail = pHead;                      \
-            while( pTail ) {                                    \
-                if( !pTail->next ) {                            \
-                    pTail->next = pNew;                         \
-                    break;                                      \
-                }                                               \
-                pTail = pTail->next;                            \
-            }                                                   \
-        }                                                       \
-        else pHead = pNew;                                      \
-    } while(0)
-
 
 //=============================================================================
 //                  Structure Definition
@@ -132,6 +113,11 @@ scheduler_deinit(void)
     return;
 }
 
+uint32_t
+scheduler_get_tick(void)
+{
+    return (uint32_t)(g_schedualer_tick & 0xFFFFFFFF);
+}
 
 int
 scheduler_add_job(
