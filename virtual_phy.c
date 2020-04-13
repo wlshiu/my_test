@@ -78,7 +78,11 @@ _task_vphy_routine(void *argv)
         vphy_package_t      *pPackage = 0;
 
         rval = rbi_pop(g_vphy_q, (uint8_t*)g_vphy_buf, sizeof(g_vphy_buf));
-        if( !rval )  continue;
+        if( !rval )
+        {
+            Sleep(5);
+            continue;
+        }
 
         pPackage = (vphy_package_t*)&g_vphy_buf;
 
@@ -169,7 +173,17 @@ vphy_init(void)
         rval = pthread_cond_init(&g_vphy_cond, 0);
         if( rval )   break;
 
-        pthread_create(&g_task_vphy, 0, _task_vphy_routine, 0);
+        {   // thread scheduler
+            pthread_attr_t          attr;
+            struct sched_param      param;
+
+            // set thread priority
+            param.sched_priority = sched_get_priority_max(SCHED_OTHER);
+
+            pthread_attr_init(&attr);
+            pthread_attr_setschedparam(&attr, &param);
+            pthread_create(&g_task_vphy, &attr, _task_vphy_routine, 0);
+        }
 
         pthread_mutex_lock(&g_vphy_mtx);
         pthread_cond_wait(&g_vphy_cond, &g_vphy_mtx);

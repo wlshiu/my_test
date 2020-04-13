@@ -34,7 +34,6 @@ typedef enum scheduler_ev
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
-
 typedef struct scheduler_job
 {
     scheduler_ev_t      ev_type;
@@ -69,6 +68,12 @@ typedef struct scheduler_job
     void                *pExtra_data;
 
     uint32_t            src_uid;
+
+    /**
+     *  when destination_cnt == SCHEDULER_DESTINATION_ALL,
+     *  scheduler will broadcast this job to all watchers
+     */
+#define SCHEDULER_DESTINATION_ALL       -1
     uint32_t            destination_cnt;
     uint32_t            pDest_uid[];
 } scheduler_job_t;
@@ -79,7 +84,11 @@ typedef struct scheduler_watcher
 
     rbi_t       msgq; // It MUST be initialized before register to the scheduler
 
+    void        *pUsr_data;
+
 } scheduler_watcher_t;
+
+typedef void (*cb_watcher_routine_t)(scheduler_watcher_t *pWatcher);
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
@@ -138,7 +147,8 @@ scheduler_unregister_watcher(
 
 
 int
-scheduler_proc(void);
+scheduler_proc(
+    cb_watcher_routine_t  cb_watcher_routine);
 
 
 #ifdef __cplusplus

@@ -23,7 +23,9 @@
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-#define CONFIG_WATCHER_NUM                  2
+//#define CONFIG_ENABLE_MULTI_THREAD
+
+#define CONFIG_WATCHER_NUM                  10
 #define CONFIG_CMD_MSG_SIZE                 64
 #define CONFIG_TEST_DURATION_MS             5000
 //=============================================================================
@@ -50,26 +52,7 @@ static pthread_mutex_t      g_usr_mtx;
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
-
-static void*
-_task_schedule(void *argv)
-{
-    int                     *pIs_running = (int*)argv;
-
-    pthread_mutex_lock(&g_usr_mtx);
-    pthread_cond_signal(&g_usr_cond);
-    pthread_mutex_unlock(&g_usr_mtx);
-
-    while( *pIs_running )
-    {
-        scheduler_proc();
-        Sleep(3);
-    }
-
-    pthread_exit(0);
-    return 0;
-}
-
+#if defined(CONFIG_ENABLE_MULTI_THREAD)
 static void*
 _task_watcher(void *argv)
 {
@@ -118,6 +101,51 @@ _task_watcher(void *argv)
     pthread_exit(0);
     return 0;
 }
+#else
+static void
+_watcher_node(scheduler_watcher_t *pWatcher)
+{
+    static uint8_t      cmd_msg[CONFIG_CMD_MSG_SIZE] = {0};
+    do {
+        uint8_t     *pCmd_msg = cmd_msg;
+        int         cmd_msg_len = sizeof(cmd_msg);
+        uint32_t    bytes = 0;
+
+        memset(pCmd_msg, 0x0, cmd_msg_len);
+
+        bytes = rbi_pop(pWatcher->msgq, pCmd_msg, cmd_msg_len);
+        if( !bytes )    break;
+
+        pCmd_msg[cmd_msg_len - 1] = '\0';
+        log_out("[watcher_%d] rx: -%s-",pWatcher->watcher_uid, pCmd_msg);
+    } while(0);
+    return;
+}
+#endif
+
+static void*
+_task_schedule(void *argv)
+{
+    int                     *pIs_running = (int*)argv;
+
+    pthread_mutex_lock(&g_usr_mtx);
+    pthread_cond_signal(&g_usr_cond);
+    pthread_mutex_unlock(&g_usr_mtx);
+
+    while( *pIs_running )
+    {
+        #if defined(CONFIG_ENABLE_MULTI_THREAD)
+        scheduler_proc();
+        Sleep(3);
+        #else
+        scheduler_proc(_watcher_node);
+        #endif
+    }
+
+    pthread_exit(0);
+    return 0;
+}
+
 
 static int
 _create_job_ctxt(scheduler_job_t *pJob, uint8_t **ppCtxt, int *pCtxt_len)
@@ -189,6 +217,7 @@ int main(int argc, char **argv)
         rval = pthread_cond_init(&g_usr_cond, 0);
         if( rval )   break;
 
+        #if defined(CONFIG_ENABLE_MULTI_THREAD)
         for(int i = 0; i < CONFIG_WATCHER_NUM; i++)
         {
             g_watcher_attr[i].is_running = 1;
@@ -199,6 +228,25 @@ int main(int argc, char **argv)
             pthread_cond_wait(&g_usr_cond, &g_usr_mtx);
             pthread_mutex_unlock(&g_usr_mtx);
         }
+        #else
+        for(int i = 0; i < CONFIG_WATCHER_NUM; i++)
+        {
+            scheduler_watcher_t     watcher = {0};
+
+            g_watcher_attr[i].watcher_id = i;
+
+            watcher.watcher_uid = i;
+
+            watcher.msgq = rbi_init(4, CONFIG_CMD_MSG_SIZE);
+            if( !watcher.msgq )
+            {
+                dbg_msg("fail\n");
+                break;
+            }
+
+            scheduler_register_watcher(&watcher);
+        }
+        #endif
 
         {   // thread scheduler
             pthread_attr_t          attr;

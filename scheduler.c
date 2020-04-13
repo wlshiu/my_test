@@ -22,6 +22,7 @@
 //                  Constant Definition
 //=============================================================================
 #define CONFIG_SCHEDULER_JOB_MAX_NUM        10
+#define CONFIG_WATCHER_SHUFFLE_SIZE         100
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -67,6 +68,8 @@ typedef struct scheduler_watcher_list
 static scheduler_job_list_t         *g_pScheduler_jobs_head = 0;
 static scheduler_watcher_list_t     *g_pScheduler_watchers_head = 0;
 
+static scheduler_watcher_t          **g_ppScheduler_watcher_shuffle = 0;
+
 static uint32_t                     g_job_cnt = 0;
 
 static uint64_t                     g_schedualer_tick = 0;
@@ -95,6 +98,15 @@ scheduler_init(
         g_pScheduler_jobs_head     = 0;
         g_pScheduler_watchers_head = 0;
 
+        if( !(g_ppScheduler_watcher_shuffle
+                = malloc(sizeof(scheduler_watcher_t*) * CONFIG_WATCHER_SHUFFLE_SIZE)) )
+        {
+            rval = -1;
+            break;
+        }
+
+        memset(g_ppScheduler_watcher_shuffle, 0x0, sizeof(scheduler_watcher_t*) * CONFIG_WATCHER_SHUFFLE_SIZE);
+
         // scaling system time
         g_schedualer_tick = 0ull;
         sys_tmr_start(time_quantum, _time_observer, 0);
@@ -110,6 +122,10 @@ void
 scheduler_deinit(void)
 {
     sys_tmr_stop();
+
+    if( g_ppScheduler_watcher_shuffle )
+        free(g_ppScheduler_watcher_shuffle);
+    g_ppScheduler_watcher_shuffle = 0;
 
     pthread_mutex_destroy(&g_schedualer_job_mtx);
     pthread_mutex_destroy(&g_schedualer_mtx);
@@ -138,7 +154,9 @@ scheduler_add_job(
             break;
         }
 
-        len = sizeof(scheduler_job_list_t) + sizeof(scheduler_job_t) + sizeof(uint32_t) * pJob->destination_cnt;
+        len = (pJob->destination_cnt == SCHEDULER_DESTINATION_ALL)
+            ? sizeof(scheduler_job_list_t) + sizeof(scheduler_job_t)
+            : sizeof(scheduler_job_list_t) + sizeof(scheduler_job_t) + sizeof(uint32_t) * pJob->destination_cnt;
         if( !(pNew = malloc(len)) )
         {
             rval = -2;
@@ -147,7 +165,10 @@ scheduler_add_job(
 
         memset(pNew, 0x0, len);
 
-        memcpy(pNew->pJob, pJob, sizeof(scheduler_job_t) + sizeof(uint32_t) * pJob->destination_cnt);
+        memcpy(pNew->pJob, pJob,
+               (pJob->destination_cnt == SCHEDULER_DESTINATION_ALL)
+                ? sizeof(scheduler_job_t)
+                : sizeof(scheduler_job_t) + sizeof(uint32_t) * pJob->destination_cnt);
 
         pNew->timeout = g_schedualer_tick + pJob->wait_time;
         pNew->uid     = job_uid;
@@ -323,7 +344,8 @@ scheduler_unregister_watcher(
 }
 
 int
-scheduler_proc(void)
+scheduler_proc(
+    cb_watcher_routine_t  cb_watcher_routine)
 {
     int     rval = 0;
     do {
@@ -371,131 +393,130 @@ scheduler_proc(void)
 
         pthread_mutex_unlock(&g_schedualer_job_mtx);
 
-        // process jobs
-    #if 1
         /**
+         *  process jobs
          *  One job SHOULD send to multi-watchers (job order issue)
          */
+
+        memset(g_ppScheduler_watcher_shuffle, 0x0, sizeof(scheduler_watcher_t*) * CONFIG_WATCHER_SHUFFLE_SIZE);
+
         pJob_list_act = pJob_list_act_head;
         while( pJob_list_act )
         {
-            scheduler_job_t             *pJob = 0;
-            uint8_t                     *pJob_ctxt = 0;
-            int                         job_ctxt_len = 0;
+            scheduler_job_t     *pJob = 0;
+            uint8_t             *pJob_ctxt = 0;
+            int                 job_ctxt_len = 0;
+            int                 total_watcher = 0;
 
             pJob_list_cur = pJob_list_act;
             pJob_list_act = pJob_list_act->next;
 
             pJob = pJob_list_cur->pJob;
 
-            for(int i = 0; i < pJob->destination_cnt; i++)
+            if( pJob->destination_cnt == -1 )
             {
                 scheduler_watcher_list_t    *pWatcher_cur = 0;
 
-                // search target destination UID
                 pthread_mutex_lock(&g_schedualer_mtx);
 
                 pWatcher_cur = g_pScheduler_watchers_head;
                 while( pWatcher_cur )
                 {
-                    if( pWatcher_cur->pWatcher->watcher_uid == pJob->pDest_uid[i] )
+                    if( !pJob_ctxt && pJob->cb_create_job_ctxt )
                     {
-                        if( !pJob_ctxt )
-                        {
-                            if( pJob->cb_create_job_ctxt )
-                            {
-                                rval = pJob->cb_create_job_ctxt(pJob, &pJob_ctxt, &job_ctxt_len);
-                                if( rval < 0 ) break;
-                            }
-                        }
+                        rval = pJob->cb_create_job_ctxt(pJob, &pJob_ctxt, &job_ctxt_len);
+                        if( rval < 0 ) break;
+                    }
 
-                        rbi_push(pWatcher_cur->pWatcher->msgq, pJob_ctxt, job_ctxt_len);
+                    rbi_push(pWatcher_cur->pWatcher->msgq, pJob_ctxt, job_ctxt_len);
+
+                    g_ppScheduler_watcher_shuffle[total_watcher++] = pWatcher_cur->pWatcher;
+                    if( total_watcher == CONFIG_WATCHER_SHUFFLE_SIZE )
+                    {
+                        rval = -3;
                         break;
                     }
 
                     pWatcher_cur = pWatcher_cur->next;
                 }
-
                 pthread_mutex_unlock(&g_schedualer_mtx);
-
-                // drop this job
-                if( rval ) break;
             }
-
-            if( pJob_ctxt )
-            {
-                if( pJob->cb_destroy_job_ctxt )
-                {
-                    pJob->cb_destroy_job_ctxt(pJob, &pJob_ctxt, &job_ctxt_len);
-                }
-            }
-
-            free(pJob_list_cur);
-        }
-
-    #else
-        pJob_list_act = pJob_list_act_head;
-        while( pJob_list_act )
-        {
-            scheduler_watcher_list_t    *pWatcher_cur = 0;
-            scheduler_job_t             *pJob = 0;
-            uint8_t                     *pJob_ctxt = 0;
-            int                         job_ctxt_len = 0;
-
-            pJob_list_cur = pJob_list_act;
-            pJob_list_act = pJob_list_act->next;
-
-            pJob = pJob_list_cur->pJob;
-
-            rval = 0;
-
-            // search target destination UID
-            pthread_mutex_lock(&g_schedualer_mtx);
-
-            pWatcher_cur = g_pScheduler_watchers_head;
-            while( pWatcher_cur )
+            else
             {
                 for(int i = 0; i < pJob->destination_cnt; i++)
                 {
-                    if( pWatcher_cur->pWatcher->watcher_uid != pJob->pDest_uid[i] )
-                        continue;
+                    scheduler_watcher_list_t    *pWatcher_cur = 0;
 
-                    /**
-                     *  One job send to multi-watchers
-                     */
-                    if( !pJob_ctxt )
+                    // search target destination UID
+                    pthread_mutex_lock(&g_schedualer_mtx);
+
+                    pWatcher_cur = g_pScheduler_watchers_head;
+                    while( pWatcher_cur )
                     {
-                        if( pJob->cb_create_job_ctxt )
+                        if( pWatcher_cur->pWatcher->watcher_uid == pJob->pDest_uid[i] )
                         {
-                            rval = pJob->cb_create_job_ctxt(pJob, &pJob_ctxt, &job_ctxt_len);
-                            if( rval < 0 ) break;
+                            if( !pJob_ctxt && pJob->cb_create_job_ctxt )
+                            {
+                                rval = pJob->cb_create_job_ctxt(pJob, &pJob_ctxt, &job_ctxt_len);
+                                if( rval < 0 ) break;
+                            }
+
+                            rbi_push(pWatcher_cur->pWatcher->msgq, pJob_ctxt, job_ctxt_len);
+
+                            g_ppScheduler_watcher_shuffle[total_watcher++] = pWatcher_cur->pWatcher;
+                            if( total_watcher == CONFIG_WATCHER_SHUFFLE_SIZE )
+                            {
+                                rval = -3;
+                                break;
+                            }
+
+                            break;
                         }
+
+                        pWatcher_cur = pWatcher_cur->next;
                     }
 
-                    rval = rbi_push(pWatcher_cur->pWatcher->msgq, pJob_ctxt, job_ctxt_len);
+                    pthread_mutex_unlock(&g_schedualer_mtx);
 
-                    break;
+                    // drop this job
+                    if( rval ) break;
                 }
-
-                // drop this job
-                if( rval ) break;
-
-                pWatcher_cur = pWatcher_cur->next;
             }
 
-            pthread_mutex_unlock(&g_schedualer_mtx);
-
-            if( pJob_ctxt )
+            if( pJob_ctxt && pJob->cb_destroy_job_ctxt )
             {
-                if( pJob->cb_destroy_job_ctxt )
-                {
-                    pJob->cb_destroy_job_ctxt(pJob, &pJob_ctxt, &job_ctxt_len);
-                }
+                pJob->cb_destroy_job_ctxt(pJob, &pJob_ctxt, &job_ctxt_len);
             }
 
             free(pJob_list_cur);
+
+            /**
+             *  All watchers process the current job with one thread
+             */
+            if( cb_watcher_routine )
+            {
+                // shuffle order
+                srand(time(NULL));
+                for(int i = 0; i < total_watcher; i++)
+                {
+                    int                     j = rand() % total_watcher;
+                    scheduler_watcher_t     *a = g_ppScheduler_watcher_shuffle[j];
+
+                    g_ppScheduler_watcher_shuffle[j] = g_ppScheduler_watcher_shuffle[i];
+                    g_ppScheduler_watcher_shuffle[i] = (scheduler_watcher_t*)a;
+                }
+
+                // trigger watcher routine
+                for(int i = 0; i < CONFIG_WATCHER_SHUFFLE_SIZE; i++)
+                {
+                    if( !g_ppScheduler_watcher_shuffle[i] )
+                        continue;
+
+                    cb_watcher_routine(g_ppScheduler_watcher_shuffle[i]);
+                }
+            }
         }
-    #endif // 0
+
     } while(0);
     return rval;
 }

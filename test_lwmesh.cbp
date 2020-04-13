@@ -43,6 +43,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="log.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="msg_box.h" />
 		<Unit filename="rbi.c">
 			<Option compilerVar="CC" />
@@ -56,9 +59,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="sys_time.h" />
-		<Unit filename="test/test_scheduler.c">
+		<Unit filename="usr_ev_maker.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="usr_ev_maker.h" />
 		<Unit filename="virtual_phy.c">
 			<Option compilerVar="CC" />
 		</Unit>
