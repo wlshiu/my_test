@@ -12,6 +12,7 @@
 
 
 #include <stdlib.h>
+#include <time.h>
 #include <string.h>
 #include <pthread.h>
 #include "scheduler.h"
@@ -57,6 +58,7 @@ static uint64_t                     g_schedualer_tick = 0;
 static pthread_mutex_t              g_schedualer_job_mtx;
 static pthread_mutex_t              g_schedualer_mtx;
 
+uint32_t    halTimerIrqCount = 0;
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -64,6 +66,7 @@ static void
 _time_observer(void *pInfo)
 {
     g_schedualer_tick++;
+    halTimerIrqCount++;
     return;
 }
 //=============================================================================
@@ -408,13 +411,18 @@ scheduler_proc(
                 pWatcher_cur = g_pScheduler_watchers_head;
                 while( pWatcher_cur )
                 {
+                    int     is_invaild = 0;
+
                     if( !pJob_ctxt && pJob->cb_create_job_ctxt )
                     {
                         rval = pJob->cb_create_job_ctxt(pJob, &pJob_ctxt, &job_ctxt_len);
                         if( rval < 0 ) break;
                     }
 
-                    rbi_push(pWatcher_cur->pWatcher->msgq, pJob_ctxt, job_ctxt_len);
+                    if( pWatcher_cur->pWatcher->cb_watcher_policy )
+                        is_invaild = pWatcher_cur->pWatcher->cb_watcher_policy(pWatcher_cur->pWatcher, pJob);
+                    if( !is_invaild )
+                        rbi_push(pWatcher_cur->pWatcher->msgq, pJob_ctxt, job_ctxt_len);
 
                     g_ppScheduler_watcher_shuffle[total_watcher++] = pWatcher_cur->pWatcher;
                     if( total_watcher == CONFIG_WATCHER_SHUFFLE_SIZE )
@@ -441,13 +449,18 @@ scheduler_proc(
                     {
                         if( pWatcher_cur->pWatcher->watcher_uid == pJob->pDest_uid[i] )
                         {
+                            int     is_invaild = 0;
+
                             if( !pJob_ctxt && pJob->cb_create_job_ctxt )
                             {
                                 rval = pJob->cb_create_job_ctxt(pJob, &pJob_ctxt, &job_ctxt_len);
                                 if( rval < 0 ) break;
                             }
 
-                            rbi_push(pWatcher_cur->pWatcher->msgq, pJob_ctxt, job_ctxt_len);
+                            if( pWatcher_cur->pWatcher->cb_watcher_policy )
+                                is_invaild = pWatcher_cur->pWatcher->cb_watcher_policy(pWatcher_cur->pWatcher, pJob);
+                            if( !is_invaild )
+                                rbi_push(pWatcher_cur->pWatcher->msgq, pJob_ctxt, job_ctxt_len);
 
                             g_ppScheduler_watcher_shuffle[total_watcher++] = pWatcher_cur->pWatcher;
                             if( total_watcher == CONFIG_WATCHER_SHUFFLE_SIZE )

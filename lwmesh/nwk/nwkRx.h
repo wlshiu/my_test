@@ -1,7 +1,7 @@
 /**
- * \file nwk.h
+ * \file nwkRx.h
  *
- * \brief Network layer public interface
+ * \brief Receive routines interface
  *
  * Copyright (C) 2012-2014, Atmel Corporation. All rights reserved.
  *
@@ -40,77 +40,53 @@
  * Modification and other use of this code is subject to Atmel's Limited
  * License Agreement (license.txt).
  *
- * $Id: nwk.h 9267 2014-03-18 21:46:19Z ataradov $
+ * $Id: nwkRx.h 9267 2014-03-18 21:46:19Z ataradov $
  *
  */
 
-#ifndef _NWK_H_
-#define _NWK_H_
+#ifndef _NWK_RX_H_
+#define _NWK_RX_H_
 
 /*- Includes ---------------------------------------------------------------*/
 #include <stdint.h>
-#include <stdbool.h>
-#if 0
-    #include "sysConfig.h"
-#else
-    #include "nwk_config.h"
-#endif
-
-#include "nwkRoute.h"
-#include "nwkGroup.h"
-#include "nwkSecurity.h"
-#include "nwkDataReq.h"
-
-/*- Definitions ------------------------------------------------------------*/
-#define NWK_MAX_PAYLOAD_SIZE            (127 - 16/*NwkFrameHeader_t*/ - 2/*crc*/)
-
-#define NWK_BROADCAST_PANID             0xffff
-#define NWK_BROADCAST_ADDR              0xffff
-
-#define NWK_ENDPOINTS_AMOUNT            16
+//#include "sysTypes.h"
+#include "nwk_config.h"
+#include "nwkFrame.h"
 
 /*- Types ------------------------------------------------------------------*/
-typedef enum
+enum
 {
-    NWK_SUCCESS_STATUS                      = 0x00,
-    NWK_ERROR_STATUS                        = 0x01,
-    NWK_OUT_OF_MEMORY_STATUS                = 0x02,
+    NWK_IND_OPT_ACK_REQUESTED     = 1 << 0,
+    NWK_IND_OPT_SECURED           = 1 << 1,
+    NWK_IND_OPT_BROADCAST         = 1 << 2,
+    NWK_IND_OPT_LOCAL             = 1 << 3,
+    NWK_IND_OPT_BROADCAST_PAN_ID  = 1 << 4,
+    NWK_IND_OPT_LINK_LOCAL        = 1 << 5,
+    NWK_IND_OPT_MULTICAST         = 1 << 6,
+};
 
-    NWK_NO_ACK_STATUS                       = 0x10,
-    NWK_NO_ROUTE_STATUS                     = 0x11,
-
-    NWK_PHY_CHANNEL_ACCESS_FAILURE_STATUS   = 0x20,
-    NWK_PHY_NO_ACK_STATUS                   = 0x21,
-} NWK_Status_t;
-
-typedef struct NwkIb_t
+typedef struct NWK_DataInd_t
 {
-    uint16_t     addr;
-    uint16_t     panId;
-    uint8_t      nwkSeqNum;
-    uint8_t      macSeqNum;
-    bool         (*endpoint[NWK_ENDPOINTS_AMOUNT])(NWK_DataInd_t *ind);
-#if 1 //def NWK_ENABLE_SECURITY
-    uint32_t     key[4];
-#endif
-    uint16_t     lock;
-} NwkIb_t;
-
-/*- Variables --------------------------------------------------------------*/
-//extern NwkIb_t nwkIb;
+    uint16_t     srcAddr;
+    uint16_t     dstAddr;
+    uint8_t      srcEndpoint;
+    uint8_t      dstEndpoint;
+    uint8_t      options;
+    uint8_t      *data;
+    uint8_t      size;
+    uint8_t      lqi;
+    int8_t       rssi;
+} NWK_DataInd_t;
 
 /*- Prototypes -------------------------------------------------------------*/
-void NWK_Init(void);
-void NWK_SetAddr(uint16_t addr);
-void NWK_SetPanId(uint16_t panId);
-void NWK_OpenEndpoint(uint8_t id, bool (*handler)(NWK_DataInd_t *ind));
-bool NWK_Busy(void);
-void NWK_Lock(void);
-void NWK_Unlock(void);
-void NWK_SleepReq(void);
-void NWK_WakeupReq(void);
-void NWK_TaskHandler(void);
+void NWK_SetAckControl(uint8_t control);
 
-uint8_t NWK_LinearizeLqi(uint8_t lqi);
+#ifdef NWK_ENABLE_ADDRESS_FILTER
+bool NWK_FilterAddress(uint16_t addr, uint8_t *lqi);
+#endif
 
-#endif // _NWK_H_
+void nwkRxInit(void);
+void nwkRxDecryptConf(NwkFrame_t *frame, bool status);
+void nwkRxTaskHandler(void);
+
+#endif // _NWK_RX_H_

@@ -21,16 +21,26 @@ extern "C" {
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-#ifndef NWK_BUFFERS_AMOUNT
-#define NWK_BUFFERS_AMOUNT                       1
-#endif
+#define SYS_SECURITY_MODE                   1
 
-#ifndef NWK_MAX_ENDPOINTS_AMOUNT
-#define NWK_MAX_ENDPOINTS_AMOUNT                 1
+#define NWK_BUFFERS_AMOUNT                  3
+#define NWK_MAX_ENDPOINTS_AMOUNT            3
+#define NWK_DUPLICATE_REJECTION_TABLE_SIZE  10
+#define NWK_DUPLICATE_REJECTION_TTL         3000 // ms
+#define NWK_ROUTE_TABLE_SIZE                100
+#define NWK_ROUTE_DEFAULT_SCORE             3
+#define NWK_ACK_WAIT_TIME                   1000 // ms
+
+#define NWK_ENABLE_ROUTING
+#define NWK_ENABLE_SECURITY
+
+/*- Definitions ------------------------------------------------------------*/
+#ifndef NWK_BUFFERS_AMOUNT
+#define NWK_BUFFERS_AMOUNT                       5
 #endif
 
 #ifndef NWK_DUPLICATE_REJECTION_TABLE_SIZE
-#define NWK_DUPLICATE_REJECTION_TABLE_SIZE       1
+#define NWK_DUPLICATE_REJECTION_TABLE_SIZE       10
 #endif
 
 #ifndef NWK_DUPLICATE_REJECTION_TTL
@@ -38,7 +48,7 @@ extern "C" {
 #endif
 
 #ifndef NWK_ROUTE_TABLE_SIZE
-#define NWK_ROUTE_TABLE_SIZE                     0
+#define NWK_ROUTE_TABLE_SIZE                     10
 #endif
 
 #ifndef NWK_ROUTE_DEFAULT_SCORE
@@ -49,17 +59,38 @@ extern "C" {
 #define NWK_ACK_WAIT_TIME                        1000 // ms
 #endif
 
+#ifndef NWK_GROUPS_AMOUNT
+#define NWK_GROUPS_AMOUNT                        10
+#endif
+
+#ifndef NWK_ROUTE_DISCOVERY_TABLE_SIZE
+#define NWK_ROUTE_DISCOVERY_TABLE_SIZE           5
+#endif
+
+#ifndef NWK_ROUTE_DISCOVERY_TIMEOUT
+#define NWK_ROUTE_DISCOVERY_TIMEOUT              1000 // ms
+#endif
+
 //#define NWK_ENABLE_ROUTING
 //#define NWK_ENABLE_SECURITY
+//#define NWK_ENABLE_MULTICAST
+//#define NWK_ENABLE_ROUTE_DISCOVERY
+//#define NWK_ENABLE_SECURE_COMMANDS
 
 #ifndef SYS_SECURITY_MODE
 #define SYS_SECURITY_MODE                        0
 #endif
 
+#if 0
+/*- Sanity checks ----------------------------------------------------------*/
+#if defined(NWK_ENABLE_SECURITY) && (SYS_SECURITY_MODE == 0)
+  #define PHY_ENABLE_AES_MODULE
+#endif
+#endif
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
-
+#define PACK        __attribute__ ((packed))
 //=============================================================================
 //                  Structure Definition
 //=============================================================================

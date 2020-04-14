@@ -1,7 +1,7 @@
 /**
- * \file nwk.h
+ * \file nwkSecurity.h
  *
- * \brief Network layer public interface
+ * \brief Network layer security interface
  *
  * Copyright (C) 2012-2014, Atmel Corporation. All rights reserved.
  *
@@ -40,77 +40,33 @@
  * Modification and other use of this code is subject to Atmel's Limited
  * License Agreement (license.txt).
  *
- * $Id: nwk.h 9267 2014-03-18 21:46:19Z ataradov $
+ * $Id: nwkSecurity.h 9267 2014-03-18 21:46:19Z ataradov $
  *
  */
 
-#ifndef _NWK_H_
-#define _NWK_H_
+#ifndef _NWK_SECURITY_H_
+#define _NWK_SECURITY_H_
 
 /*- Includes ---------------------------------------------------------------*/
 #include <stdint.h>
 #include <stdbool.h>
-#if 0
-    #include "sysConfig.h"
-#else
-    #include "nwk_config.h"
-#endif
-
-#include "nwkRoute.h"
-#include "nwkGroup.h"
-#include "nwkSecurity.h"
-#include "nwkDataReq.h"
+//#include "sysConfig.h"
+#include "nwk_config.h"
 
 /*- Definitions ------------------------------------------------------------*/
-#define NWK_MAX_PAYLOAD_SIZE            (127 - 16/*NwkFrameHeader_t*/ - 2/*crc*/)
-
-#define NWK_BROADCAST_PANID             0xffff
-#define NWK_BROADCAST_ADDR              0xffff
-
-#define NWK_ENDPOINTS_AMOUNT            16
-
-/*- Types ------------------------------------------------------------------*/
-typedef enum
-{
-    NWK_SUCCESS_STATUS                      = 0x00,
-    NWK_ERROR_STATUS                        = 0x01,
-    NWK_OUT_OF_MEMORY_STATUS                = 0x02,
-
-    NWK_NO_ACK_STATUS                       = 0x10,
-    NWK_NO_ROUTE_STATUS                     = 0x11,
-
-    NWK_PHY_CHANNEL_ACCESS_FAILURE_STATUS   = 0x20,
-    NWK_PHY_NO_ACK_STATUS                   = 0x21,
-} NWK_Status_t;
-
-typedef struct NwkIb_t
-{
-    uint16_t     addr;
-    uint16_t     panId;
-    uint8_t      nwkSeqNum;
-    uint8_t      macSeqNum;
-    bool         (*endpoint[NWK_ENDPOINTS_AMOUNT])(NWK_DataInd_t *ind);
-#if 1 //def NWK_ENABLE_SECURITY
-    uint32_t     key[4];
-#endif
-    uint16_t     lock;
-} NwkIb_t;
-
-/*- Variables --------------------------------------------------------------*/
-//extern NwkIb_t nwkIb;
+#define NWK_SECURITY_MIC_SIZE        4
+#define NWK_SECURITY_KEY_SIZE        16
+#define NWK_SECURITY_BLOCK_SIZE      16
 
 /*- Prototypes -------------------------------------------------------------*/
-void NWK_Init(void);
-void NWK_SetAddr(uint16_t addr);
-void NWK_SetPanId(uint16_t panId);
-void NWK_OpenEndpoint(uint8_t id, bool (*handler)(NWK_DataInd_t *ind));
-bool NWK_Busy(void);
-void NWK_Lock(void);
-void NWK_Unlock(void);
-void NWK_SleepReq(void);
-void NWK_WakeupReq(void);
-void NWK_TaskHandler(void);
+#ifdef NWK_ENABLE_SECURITY
 
-uint8_t NWK_LinearizeLqi(uint8_t lqi);
+void NWK_SetSecurityKey(uint8_t *key);
 
-#endif // _NWK_H_
+void nwkSecurityInit(void);
+void nwkSecurityProcess(NwkFrame_t *frame, bool encrypt);
+void nwkSecurityTaskHandler(void);
+
+#endif // NWK_ENABLE_SECURITY
+
+#endif // _NWK_SECURITY_H_

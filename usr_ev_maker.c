@@ -11,6 +11,8 @@
  */
 
 
+#include <stdio.h>
+#include <string.h>
 #include "usr_ev_maker.h"
 
 //=============================================================================
@@ -37,21 +39,28 @@
 //                  Public Function Definition
 //=============================================================================
 int
-usr_ev_discovery(
+usr_ev_roll_call(
     usr_ev_script_t *pEv_script,
     uint8_t         *pBuf,
     int             *pBuf_len)
 {
     int     rval = 0;
     do {
+        usr_ev_base_t   *pEv_base = (usr_ev_base_t*)pBuf;
+
         if( !pBuf || !pBuf_len || *pBuf_len == 0 )
         {
             rval = -1;
             break;
         }
-        snprintf(pBuf, *pBuf_len, "%s", "discovery");
 
-        *pBuf_len = strlen((const char*)pBuf);
+        pEv_base->type = USR_EV_TYPE_ROLL_CALL;
+
+        snprintf((char*)pEv_base->pData, *pBuf_len - sizeof(usr_ev_base_t), "%s", "discovery");
+
+        *pBuf_len = sizeof(usr_ev_base_t) + strlen((const char*)pEv_base->pData);
+
+        pEv_base->length = *pBuf_len;
 
     } while(0);
     return rval;

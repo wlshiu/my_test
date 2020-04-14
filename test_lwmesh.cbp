@@ -16,6 +16,8 @@
 					<Add option="-g" />
 					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/include" />
 					<Add directory="../my_test" />
+					<Add directory="lwmesh" />
+					<Add directory="lwmesh/nwk" />
 				</Compiler>
 				<Linker>
 					<Add library="D:/_portable/codeblocks-17.12mingw/MinGW/lib/libkernel32.a" />
@@ -43,6 +45,53 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="log.h" />
+		<Unit filename="lwmesh/lwmesh.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwmesh/lwmesh.h" />
+		<Unit filename="lwmesh/nwk/nwk.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwmesh/nwk/nwk.h" />
+		<Unit filename="lwmesh/nwk/nwkCommand.h" />
+		<Unit filename="lwmesh/nwk/nwkDataReq.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwmesh/nwk/nwkDataReq.h" />
+		<Unit filename="lwmesh/nwk/nwkFrame.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwmesh/nwk/nwkFrame.h" />
+		<Unit filename="lwmesh/nwk/nwkGroup.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwmesh/nwk/nwkGroup.h" />
+		<Unit filename="lwmesh/nwk/nwkRoute.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwmesh/nwk/nwkRoute.h" />
+		<Unit filename="lwmesh/nwk/nwkRouteDiscovery.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwmesh/nwk/nwkRouteDiscovery.h" />
+		<Unit filename="lwmesh/nwk/nwkRx.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwmesh/nwk/nwkRx.h" />
+		<Unit filename="lwmesh/nwk/nwkSecurity.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwmesh/nwk/nwkSecurity.h" />
+		<Unit filename="lwmesh/nwk/nwkTx.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwmesh/nwk/nwkTx.h" />
+		<Unit filename="lwmesh/nwk/nwk_config.h" />
+		<Unit filename="lwmesh/nwk/nwk_dev.h" />
+		<Unit filename="lwmesh/nwk/sysTimer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwmesh/nwk/sysTimer.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

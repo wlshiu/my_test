@@ -24,8 +24,9 @@ extern "C" {
 //=============================================================================
 typedef enum usr_ev_type
 {
-    USR_EV_TYPE_NONE    = 0,
-    USR_EV_TYPE_,
+    USR_EV_TYPE_NONE    = 0x46,
+    USR_EV_TYPE_ROLL_CALL,
+    USR_EV_TYPE_PACKET,
 
 } usr_ev_type_t;
 //=============================================================================
@@ -40,11 +41,25 @@ typedef struct usr_ev_script
     uint32_t    time_offset;    // msec
     uint32_t    is_acted;
 
-    int (*pf_make_event)(struct ev_script *pEv_script, uint8_t *pBuf, int *pBuf_len);
+    int (*pf_make_event)(struct usr_ev_script *pEv_script, uint8_t *pBuf, int *pBuf_len);
 
     void        *pUsr_info;
 
 } usr_ev_script_t;
+
+typedef struct usr_ev_base
+{
+    usr_ev_type_t   type;
+    int             length; // all message length, e.g. (sizeof(usr_ev_base_t) + others)
+    uint8_t         pData[];
+
+} usr_ev_base_t;
+
+typedef struct usr_ev_msg
+{
+    usr_ev_base_t       base;
+
+} usr_ev_msg_t;
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
@@ -57,7 +72,7 @@ typedef struct usr_ev_script
 //                  Public Function Definition
 //=============================================================================
 int
-usr_ev_discovery(
+usr_ev_roll_call(
     usr_ev_script_t *pEv_script,
     uint8_t         *pBuf,
     int             *pBuf_len);

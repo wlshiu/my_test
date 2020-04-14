@@ -1,7 +1,7 @@
 /**
- * \file nwk.h
+ * \file sysTimer.h
  *
- * \brief Network layer public interface
+ * \brief System timer interface
  *
  * Copyright (C) 2012-2014, Atmel Corporation. All rights reserved.
  *
@@ -40,77 +40,41 @@
  * Modification and other use of this code is subject to Atmel's Limited
  * License Agreement (license.txt).
  *
- * $Id: nwk.h 9267 2014-03-18 21:46:19Z ataradov $
+ * $Id: sysTimer.h 9267 2014-03-18 21:46:19Z ataradov $
  *
  */
 
-#ifndef _NWK_H_
-#define _NWK_H_
+#ifndef _SYS_TIMER_H_
+#define _SYS_TIMER_H_
 
 /*- Includes ---------------------------------------------------------------*/
 #include <stdint.h>
 #include <stdbool.h>
-#if 0
-    #include "sysConfig.h"
-#else
-    #include "nwk_config.h"
-#endif
-
-#include "nwkRoute.h"
-#include "nwkGroup.h"
-#include "nwkSecurity.h"
-#include "nwkDataReq.h"
-
-/*- Definitions ------------------------------------------------------------*/
-#define NWK_MAX_PAYLOAD_SIZE            (127 - 16/*NwkFrameHeader_t*/ - 2/*crc*/)
-
-#define NWK_BROADCAST_PANID             0xffff
-#define NWK_BROADCAST_ADDR              0xffff
-
-#define NWK_ENDPOINTS_AMOUNT            16
 
 /*- Types ------------------------------------------------------------------*/
-typedef enum
+typedef enum SYS_TimerMode_t
 {
-    NWK_SUCCESS_STATUS                      = 0x00,
-    NWK_ERROR_STATUS                        = 0x01,
-    NWK_OUT_OF_MEMORY_STATUS                = 0x02,
+    SYS_TIMER_INTERVAL_MODE,
+    SYS_TIMER_PERIODIC_MODE,
+} SYS_TimerMode_t;
 
-    NWK_NO_ACK_STATUS                       = 0x10,
-    NWK_NO_ROUTE_STATUS                     = 0x11,
-
-    NWK_PHY_CHANNEL_ACCESS_FAILURE_STATUS   = 0x20,
-    NWK_PHY_NO_ACK_STATUS                   = 0x21,
-} NWK_Status_t;
-
-typedef struct NwkIb_t
+typedef struct SYS_Timer_t
 {
-    uint16_t     addr;
-    uint16_t     panId;
-    uint8_t      nwkSeqNum;
-    uint8_t      macSeqNum;
-    bool         (*endpoint[NWK_ENDPOINTS_AMOUNT])(NWK_DataInd_t *ind);
-#if 1 //def NWK_ENABLE_SECURITY
-    uint32_t     key[4];
-#endif
-    uint16_t     lock;
-} NwkIb_t;
+    // Internal data
+    struct SYS_Timer_t   *next;
+    uint32_t             timeout;
 
-/*- Variables --------------------------------------------------------------*/
-//extern NwkIb_t nwkIb;
+    // Timer parameters
+    uint32_t             interval;
+    SYS_TimerMode_t      mode;
+    void                 (*handler)(struct SYS_Timer_t *timer);
+} SYS_Timer_t;
 
 /*- Prototypes -------------------------------------------------------------*/
-void NWK_Init(void);
-void NWK_SetAddr(uint16_t addr);
-void NWK_SetPanId(uint16_t panId);
-void NWK_OpenEndpoint(uint8_t id, bool (*handler)(NWK_DataInd_t *ind));
-bool NWK_Busy(void);
-void NWK_Lock(void);
-void NWK_Unlock(void);
-void NWK_SleepReq(void);
-void NWK_WakeupReq(void);
-void NWK_TaskHandler(void);
+void SYS_TimerInit(void);
+void SYS_TimerStart(SYS_Timer_t *timer);
+void SYS_TimerStop(SYS_Timer_t *timer);
+bool SYS_TimerStarted(SYS_Timer_t *timer);
+void SYS_TimerTaskHandler(void);
 
-uint8_t NWK_LinearizeLqi(uint8_t lqi);
-
-#endif // _NWK_H_
+#endif // _SYS_TIMER_H_

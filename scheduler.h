@@ -84,6 +84,17 @@ typedef struct scheduler_watcher
 
     rbi_t       msgq; // It MUST be initialized before register to the scheduler
 
+    /**
+     *  @brief  cb_watcher_policy
+     *              if a job is invalid, scheduler will skip this job for watchers
+     *
+     *  @param [in] pWatcher        the current watcher info
+     *  @param [in] pJob            the job info
+     *  @return
+     *      0: valid, others: invalid
+     */
+    int (*cb_watcher_policy)(struct scheduler_watcher *pWatcher, scheduler_job_t *pJob);
+
     void        *pUsr_data;
 
 } scheduler_watcher_t;

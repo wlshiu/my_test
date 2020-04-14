@@ -21,12 +21,15 @@
 #include "sys_time.h"
 #include "scheduler.h"
 #include "usr_ev_maker.h"
+
+#include "nwk_dev.h"
+#include "lwmesh.h"
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
 //#define CONFIG_ENABLE_MULTI_THREAD
 
-#define CONFIG_EV_MSG_SIZE              128
+#define CONFIG_EV_MSG_SIZE              256
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -68,11 +71,13 @@ static pthread_mutex_t      g_usr_mtx;
 
 static usr_ev_script_t      g_ev_scenario[] =
 {
-    { .time_offset = 123, .pf_make_event = usr_ev_discovery, },
-    { .time_offset = 1550, .pf_make_event = usr_ev_discovery, },
-    { .time_offset = 3000, .pf_make_event = usr_ev_discovery, },
+    { .time_offset = 10, .pf_make_event = usr_ev_roll_call, },
+    { .time_offset = 20, .pf_make_event = usr_ev_roll_call, },
+    { .time_offset = 50, .pf_make_event = usr_ev_roll_call, },
     { .time_offset = -1, },
 };
+
+static nwk_dev_t            **g_ppNwk_dev_pool = 0;
 
 //=============================================================================
 //                  Private Function Definition
@@ -180,18 +185,51 @@ _task_node(void *argv)
 static void
 _node_routine(scheduler_watcher_t *pWatcher)
 {
-    static uint8_t      cmd_msg[CONFIG_EV_MSG_SIZE] = {0};
+    static uint8_t      cmd_msg[CONFIG_EV_MSG_SIZE] __attribute__ ((aligned(4))) = {0};
     do {
-        uint8_t     *pCmd_msg = cmd_msg;
-        int         cmd_msg_len = sizeof(cmd_msg);
-        uint32_t    bytes = 0;
+
+        usr_ev_base_t   *pEv_base = 0;
+        uint8_t         *pCmd_msg = cmd_msg;
+        int             cmd_msg_len = sizeof(cmd_msg);
+        uint32_t        bytes = 0;
 
         memset(pCmd_msg, 0x0, cmd_msg_len);
         bytes = rbi_pop(pWatcher->msgq, pCmd_msg, cmd_msg_len);
         if( !bytes )    break;
 
-        pCmd_msg[cmd_msg_len - 1] = '\0';
-        log_out("[watcher_%d] rx: -%s-\n", pWatcher->watcher_uid, pCmd_msg);
+        pEv_base = (usr_ev_base_t*)pCmd_msg;
+
+        switch( pEv_base->type )
+        {
+            case USR_EV_TYPE_ROLL_CALL:
+                {
+                    pCmd_msg[cmd_msg_len - 1] = '\0';
+
+                    log_out("[%+8u] watcher_%d, rx: -%s-\n",
+                            scheduler_get_tick(), pWatcher->watcher_uid, pEv_base->pData);
+                }
+                break;
+
+            case USR_EV_TYPE_PACKET:
+                {
+                    nwk_dev_t   *pNwk_dev = 0;
+
+                    pNwk_dev = (nwk_dev_t*)pWatcher->pUsr_data;
+
+                    memcpy(&g_nwk_dev, pNwk_dev, sizeof(nwk_dev_t));
+
+                    lwmesh_process(pWatcher->watcher_uid,
+                                   pEv_base->pData,
+                                   pEv_base->length - sizeof(usr_ev_base_t));
+
+                    memcpy(pNwk_dev, &g_nwk_dev, sizeof(nwk_dev_t));
+                }
+                break;
+            default:
+                break;
+        }
+
+
     } while(0);
 
     return;
@@ -228,7 +266,7 @@ _create_job_ctxt(scheduler_job_t *pJob, uint8_t **ppCtxt, int *pCtxt_len)
     do {
         usr_ev_script_t     *pEv_script_act = (usr_ev_script_t*)pJob->pExtra_data;
         int                 ctxt_len = CONFIG_EV_MSG_SIZE;
-        char                *pCtxt = 0;
+        uint8_t             *pCtxt = 0;
 
         if( !(pCtxt = malloc(ctxt_len)) )
         {
@@ -249,7 +287,7 @@ _create_job_ctxt(scheduler_job_t *pJob, uint8_t **ppCtxt, int *pCtxt_len)
 static int
 _destroy_job_ctxt(scheduler_job_t *pJob, uint8_t **ppCtxt, int *pCtxt_len)
 {
-    char    *pCtxt = (char*)(*ppCtxt);
+    uint8_t     *pCtxt = (uint8_t*)(*ppCtxt);
 
     if( pCtxt )     free(pCtxt);
 
@@ -316,6 +354,14 @@ _trigger_event(uint32_t time_offset)
     } while(0);
     return rval;
 }
+
+static int
+_is_watcher_offline(
+    scheduler_watcher_t     *pWatcher,
+    scheduler_job_t         *pJob)
+{
+    return 0;
+}
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
@@ -360,15 +406,18 @@ int main(int argc, char **argv)
         pthread_t   tscheduler;
         int         is_running = 1;
         uint32_t    time_scaling = 10;
-        sys_tmr_t   hSys_tm = 0;
+
+        if( !(g_ppNwk_dev_pool = malloc(sizeof(nwk_dev_t*) * node_number)) )
+        {
+            break;
+        }
+        memset(g_ppNwk_dev_pool, 0x0, sizeof(nwk_dev_t*) * node_number);
 
         if( !(g_pNode_attr = malloc(sizeof(node_attr_t) * node_number)) )
         {
             break;
         }
         memset(g_pNode_attr, 0x0, sizeof(node_attr_t) * node_number);
-
-        vphy_init();
 
         scheduler_init(time_scaling);
 
@@ -394,8 +443,15 @@ int main(int argc, char **argv)
         {
             scheduler_watcher_t     watcher = {0};
 
-            watcher.watcher_uid = i;
+            if( !(g_ppNwk_dev_pool[i] = malloc(sizeof(nwk_dev_t))) )
+            {
+                break;
+            }
+            memset(g_ppNwk_dev_pool[i], 0x0, sizeof(nwk_dev_t));
 
+            watcher.watcher_uid       = i;
+            watcher.cb_watcher_policy = _is_watcher_offline;
+            watcher.pUsr_data         = g_ppNwk_dev_pool[i];
             watcher.msgq = rbi_init(4, CONFIG_EV_MSG_SIZE);
             if( !watcher.msgq )
             {
@@ -423,15 +479,14 @@ int main(int argc, char **argv)
             pthread_mutex_unlock(&g_usr_mtx);
         }
 
-        hSys_tm = sys_tmr_get_time();
+        lwmesh_init();
 
         while(1)
         {
             uint32_t        duration = 0ul;
 
-            duration = sys_tmr_get_duration(hSys_tm);
-            #if 0
-            if( duration > 10000 )
+            duration = scheduler_get_tick();
+            if( duration > 1000 )
             {
                 for(int i = 0; i < node_number; i++)
                 {
@@ -441,7 +496,6 @@ int main(int argc, char **argv)
                 is_running = 0;
                 break;
             }
-            #endif
 
             _trigger_event(duration);
 
@@ -457,6 +511,20 @@ int main(int argc, char **argv)
         vphy_deinit();
 
     } while(0);
+
+    if( g_ppNwk_dev_pool )
+    {
+        for(int i = 0; i < node_number; i++)
+        {
+            if( g_ppNwk_dev_pool[i] )
+                free(g_ppNwk_dev_pool[i]);
+        }
+        free(g_ppNwk_dev_pool);
+    }
+
+    if( g_pNode_attr )  free(g_pNode_attr);
+
+    system("pause");
 
     return 0;
 }

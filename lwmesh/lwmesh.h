@@ -1,23 +1,23 @@
 /**
- * Copyright (C) 2012 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2020 Wei-Lun Hsu. All Rights Reserved.
  */
-/** @file nwk_route.h
+/** @file lwmesh.h
  *
  * @author Wei-Lun Hsu
  * @version 0.1
- * @date 2020/04/13
+ * @date 2020/04/14
  * @license
  * @description
  */
 
-#ifndef __nwk_route_H_wJ96DAUd_lwNP_HHLa_suUE_uSWjPWyPSuwx__
-#define __nwk_route_H_wJ96DAUd_lwNP_HHLa_suUE_uSWjPWyPSuwx__
+#ifndef __lwmesh_H_wDOJQaul_l6ab_HDws_sJK3_uKspwHl6rBHe__
+#define __lwmesh_H_wDOJQaul_l6ab_HDws_sJK3_uKspwHl6rBHe__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
+#include <stdint.h>
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -41,6 +41,12 @@ extern "C" {
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
+int lwmesh_init(void);
+
+int lwmesh_process(uint32_t uid, uint8_t *pData_in, int data_size);
+
+int lwmesh_send(uint8_t *pBuf, int length);
+
 
 #ifdef __cplusplus
 }
