@@ -27,8 +27,6 @@
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-//#define CONFIG_ENABLE_MULTI_THREAD
-
 #define CONFIG_EV_MSG_SIZE              256
 //=============================================================================
 //                  Macro Definition
@@ -105,83 +103,7 @@ _phy_recv(
     return;
 }
 
-#if defined(CONFIG_ENABLE_MULTI_THREAD)
-static void*
-_task_node(void *argv)
-{
-    int             rval = 0;
-    uint8_t         *pEv_msg = 0;
-    node_args_t     node_info = {0};
 
-    do {
-        node_attr_t             *pAttr = (node_attr_t*)argv;
-        scheduler_watcher_t     watcher = { .watcher_uid = pthread_self(), };
-
-        if( !(node_info.buf_rx.pBuf = malloc(CONFIG_VPHY_MSG_SIZE)) )
-            break;
-
-        if( !(node_info.buf_tx.pBuf = malloc((CONFIG_VPHY_MSG_SIZE - 32))) )
-            break;
-
-        if( !(pEv_msg = malloc(CONFIG_EV_MSG_SIZE)) )
-            break;
-
-        watcher.msgq = rbi_init(4, CONFIG_VPHY_MSG_SIZE);
-        if( !watcher.msgq )
-        {
-            break;
-        }
-
-        scheduler_register_watcher(&watcher);
-
-        pthread_mutex_lock(&g_usr_mtx);
-        pthread_cond_signal(&g_usr_cond);
-        pthread_mutex_unlock(&g_usr_mtx);
-
-        node_info.node_id        = pAttr->node_id;
-        node_info.buf_rx.buf_len = CONFIG_VPHY_MSG_SIZE;
-        node_info.buf_tx.buf_len = CONFIG_VPHY_MSG_SIZE - 32;
-
-        vphy_register_event_callback(_phy_recv, &node_info);
-
-        log_out("node id %d (tid= x%08x)\n", pAttr->node_id, pthread_self());
-
-        while( pAttr->is_running )
-        {
-            int     bytes = 0;
-
-            bytes = rbi_pop(watcher.msgq, pEv_msg, CONFIG_EV_MSG_SIZE);
-            if( bytes )
-            {
-                #if 1
-                log_out("[node %02d-th] cmd msg='%s'\n", pAttr->node_id, pEv_msg);
-                #else
-                memset((void*)node_info.buf_tx.pBuf, 0x0, node_info.buf_tx.buf_len);
-                snprintf((char*)node_info.buf_tx.pBuf, node_info.buf_tx.buf_len, "src node=%d", pAttr->node_id);
-
-                rval = vphy_send((uint8_t*)node_info.buf_tx.pBuf, strlen((char*)node_info.buf_tx.pBuf) + 1);
-                if( rval )
-                {
-                    log_out("=> node id %d (tid= x%08x) sent fail (%d)\n", pAttr->node_id, pthread_self(), rval);
-                }
-                #endif
-            }
-
-            // TODO: handle receive data
-
-            Sleep(10);
-        }
-
-    } while(0);
-
-    if( node_info.buf_rx.pBuf )    free(node_info.buf_rx.pBuf);
-    if( node_info.buf_tx.pBuf )    free(node_info.buf_tx.pBuf);
-    if( pEv_msg )                  free(pEv_msg);
-
-    pthread_exit(0);
-    return 0;
-}
-#else
 static void
 _node_routine(scheduler_watcher_t *pWatcher)
 {
@@ -234,7 +156,6 @@ _node_routine(scheduler_watcher_t *pWatcher)
 
     return;
 }
-#endif
 
 static void*
 _task_schedule(void *argv)
@@ -247,12 +168,7 @@ _task_schedule(void *argv)
 
     while( *pIs_running )
     {
-        #if defined(CONFIG_ENABLE_MULTI_THREAD)
-        scheduler_proc(0);
-        Sleep(3);
-        #else
         scheduler_proc(_node_routine);
-        #endif
     }
 
     pthread_exit(0);
@@ -427,18 +343,6 @@ int main(int argc, char **argv)
         rval = pthread_cond_init(&g_usr_cond, 0);
         if( rval )   break;
 
-#if defined(CONFIG_ENABLE_MULTI_THREAD)
-        for(int i = 0; i < node_number; i++)
-        {
-            g_pNode_attr[i].is_running = 1;
-            g_pNode_attr[i].node_id    = i;
-            pthread_create(&g_pNode_attr[i].tid, 0, _task_node, &g_pNode_attr[i]);
-
-            pthread_mutex_lock(&g_usr_mtx);
-            pthread_cond_wait(&g_usr_cond, &g_usr_mtx);
-            pthread_mutex_unlock(&g_usr_mtx);
-        }
-#else
         for(int i = 0; i < node_number; i++)
         {
             scheduler_watcher_t     watcher = {0};
@@ -461,7 +365,6 @@ int main(int argc, char **argv)
 
             scheduler_register_watcher(&watcher);
         }
-#endif
 
         {   // thread scheduler
             pthread_attr_t          attr;
