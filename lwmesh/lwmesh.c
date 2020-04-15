@@ -24,6 +24,10 @@
 //                  Constant Definition
 //=============================================================================
 #define CONFIG_LWMESH_MSG_SIZE      256
+
+#define PHY_CRC_SIZE                2
+#define PHY_RSSI_BASE_VAL           (-91)
+
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -69,14 +73,113 @@ _destroy_job_ctxt(scheduler_job_t *pJob, uint8_t **ppCtxt, int *pCtxt_len)
     return 0;
 }
 
+static void
+_PHY_DataInd(PHY_DataInd_t *ind)
+{
+    NwkFrame_t *frame;
+
+    if (0x88 != ind->data[1] || (0x61 != ind->data[0] && 0x41 != ind->data[0]) ||
+            ind->size < sizeof(NwkFrameHeader_t))
+        return;
+
+    if (NULL == (frame = nwkFrameAlloc()))
+        return;
+
+    frame->state   = NWK_RX_STATE_RECEIVED;
+    frame->size    = ind->size;
+    frame->rx.lqi  = ind->lqi;
+    frame->rx.rssi = ind->rssi;
+    memcpy(frame->data, ind->data, ind->size);
+}
+
+static void _APP_DataConf(NWK_DataReq_t *req);
+static void
+_APP_SendData(void)
+{
+    if( g_nwk_dev.appDataReqBusy /*|| !g_nwk_dev.appUartBufferPtr */ )
+        return;
+
+    memcpy(g_nwk_dev.appDataReqBuffer, g_nwk_dev.appUartBuffer, g_nwk_dev.appUartBufferPtr);
+
+    //appDataReq.dstAddr = 1-APP_ADDR;
+    g_nwk_dev.appDataReq.dstAddr     = 0xffff;
+    g_nwk_dev.appDataReq.dstEndpoint = APP_ENDPOINT;
+    g_nwk_dev.appDataReq.srcEndpoint = APP_ENDPOINT;
+    g_nwk_dev.appDataReq.options     = NWK_OPT_ENABLE_SECURITY;
+    g_nwk_dev.appDataReq.data        = g_nwk_dev.appDataReqBuffer;
+    g_nwk_dev.appDataReq.size        = g_nwk_dev.appUartBufferPtr;
+    g_nwk_dev.appDataReq.confirm     = _APP_DataConf;
+    NWK_DataReq(&g_nwk_dev.appDataReq);
+
+    g_nwk_dev.appUartBufferPtr = 0;
+    g_nwk_dev.appDataReqBusy = true;
+    return;
+}
+
+static void
+_APP_DataConf(NWK_DataReq_t *req)
+{
+    g_nwk_dev.appDataReqBusy = false;
+    _APP_SendData();
+    (void)req;
+}
+
+
+static void
+_app_timer_handler(SYS_Timer_t *timer)
+{
+    _APP_SendData();
+    (void)timer;
+}
+
+static bool
+_APP_DataInd(NWK_DataInd_t *ind)
+{
+    // console input
+    return true;
+}
+
+static void
+APP_TaskHandler(void)
+{
+    switch (g_nwk_dev.appState)
+    {
+        case APP_STATE_INITIAL:
+            {
+                #if 0
+                NWK_SetAddr(APP_ADDR);
+                #else
+                NWK_SetAddr((uint16_t)(g_act_uid & 0xFFFF));
+                #endif // 0
+
+                NWK_SetPanId(APP_PANID);
+
+                // End-point is like port number of network socket
+                NWK_OpenEndpoint(APP_ENDPOINT, _APP_DataInd);
+
+                g_nwk_dev.appTimer.interval = APP_FLUSH_TIMER_INTERVAL;
+                g_nwk_dev.appTimer.mode     = SYS_TIMER_PERIODIC_MODE;
+                g_nwk_dev.appTimer.handler  = _app_timer_handler;
+
+                SYS_TimerStart(&g_nwk_dev.appTimer);
+
+                g_nwk_dev.appState = APP_STATE_IDLE;
+            }
+            break;
+
+        case APP_STATE_IDLE:
+        default:
+            break;
+    }
+    return;
+}
+
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
 int lwmesh_init(void)
 {
     g_act_uid = -1;
-    SYS_TimerInit();
-    NWK_Init();
     return 0;
 }
 
@@ -84,14 +187,52 @@ int lwmesh_process(uint32_t uid, uint8_t *pData_in, int data_size)
 {
     g_act_uid = uid;
 
+    {
+        static int  is_nwk_initialized = 0;
+        if( !is_nwk_initialized )
+        {
+            g_nwk_dev.appState = APP_STATE_INITIAL;
+
+            SYS_TimerInit();
+            NWK_Init();
+            is_nwk_initialized = 1;
+        }
+    }
+
+    // data input
+    if( pData_in && data_size )
+    {
+        PHY_DataInd_t   ind = {0};
+        int8_t          rssi = (rand() % 10) + 26;
+
+        /**
+         *  input format:
+         *
+         *  +------------+-------------+----------+-------------+-----------+----------+
+         *  |    MAC     |   Network   |  payload |     MIC     |   CRC16   |   LQI    |
+         *  |   header   |    header   |          |             |           |          |
+         *  | (9 bytes)  | (7/9 bytes) |          | (0/4 bytes) | (2 bytes) | (1 byte) |
+         *  +------------+-------------+----------+-------------+-----------+----------+
+         *
+         */
+
+        ind.data = pData_in;
+        ind.size = data_size - PHY_CRC_SIZE - 1;
+        ind.lqi  = pData_in[data_size - 1];
+        ind.rssi = rssi + PHY_RSSI_BASE_VAL; // RSSI normal range: -55 ~ -65 dBm
+        _PHY_DataInd(&ind);
+    }
+
     NWK_TaskHandler();
     SYS_TimerTaskHandler();
-    return 10;
+    APP_TaskHandler();
+    return 0;
 }
 
 int lwmesh_send(uint8_t *pBuf, int length)
 {
     int     rval = 0;
+
     do {
         uint32_t            certificate = (uint32_t)-1;
         scheduler_job_t     *pJob = 0;

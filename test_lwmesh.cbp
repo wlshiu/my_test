@@ -14,6 +14,8 @@
 				<Option parameters="-n 3" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-DNWK_ENABLE_ROUTING" />
+					<Add option="-DNWK_ENABLE_SECURITY" />
 					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/include" />
 					<Add directory="../my_test" />
 					<Add directory="lwmesh" />
@@ -45,6 +47,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="log.h" />
+		<Unit filename="lwmesh/crc16.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lwmesh/crc16.h" />
 		<Unit filename="lwmesh/lwmesh.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -90,7 +90,7 @@ typedef struct NwkIb_t
     uint8_t      nwkSeqNum;
     uint8_t      macSeqNum;
     bool         (*endpoint[NWK_ENDPOINTS_AMOUNT])(NWK_DataInd_t *ind);
-#if 1 //def NWK_ENABLE_SECURITY
+#ifdef NWK_ENABLE_SECURITY
     uint32_t     key[4];
 #endif
     uint16_t     lock;

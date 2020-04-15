@@ -70,6 +70,7 @@
 #define NWK_SERVICE_ENDPOINT_ID    0
 
 /*- Types ------------------------------------------------------------------*/
+#if 0
 enum
 {
     NWK_RX_STATE_RECEIVED = 0x20,
@@ -79,7 +80,6 @@ enum
     NWK_RX_STATE_FINISH   = 0x24,
 };
 
-#if 0
 typedef struct NwkDuplicateRejectionEntry_t
 {
     uint16_t src;
@@ -117,6 +117,7 @@ void nwkRxInit(void)
     NWK_OpenEndpoint(NWK_SERVICE_ENDPOINT_ID, nwkRxServiceDataInd);
 }
 
+#if 0 // WL
 /****************************************************************************
  *****************************************************************************/
 void PHY_DataInd(PHY_DataInd_t *ind)
@@ -136,7 +137,7 @@ void PHY_DataInd(PHY_DataInd_t *ind)
     frame->rx.rssi = ind->rssi;
     memcpy(frame->data, ind->data, ind->size);
 }
-
+#endif
 /****************************************************************************
  *****************************************************************************/
 static void nwkRxSendAck(NwkFrame_t *frame)

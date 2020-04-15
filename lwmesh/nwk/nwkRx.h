@@ -54,6 +54,17 @@
 #include "nwkFrame.h"
 
 /*- Types ------------------------------------------------------------------*/
+#if 1 // WL
+enum
+{
+    NWK_RX_STATE_RECEIVED = 0x20,
+    NWK_RX_STATE_DECRYPT  = 0x21,
+    NWK_RX_STATE_INDICATE = 0x22,
+    NWK_RX_STATE_ROUTE    = 0x23,
+    NWK_RX_STATE_FINISH   = 0x24,
+};
+#endif // 1
+
 enum
 {
     NWK_IND_OPT_ACK_REQUESTED     = 1 << 0,

@@ -31,8 +31,11 @@ extern "C" {
 #define NWK_ROUTE_DEFAULT_SCORE             3
 #define NWK_ACK_WAIT_TIME                   1000 // ms
 
+// move to environment variables
+#if 0
 #define NWK_ENABLE_ROUTING
 #define NWK_ENABLE_SECURITY
+#endif // 0
 
 /*- Definitions ------------------------------------------------------------*/
 #ifndef NWK_BUFFERS_AMOUNT

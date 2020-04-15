@@ -51,13 +51,16 @@
 #include "sysTimer.h"
 
 #include "scheduler.h"
+#include "nwk_dev.h"
 
 #define HAL_TIMER_INTERVAL      1
 /*- Prototypes -------------------------------------------------------------*/
 static void placeTimer(SYS_Timer_t *timer);
 
 /*- Variables --------------------------------------------------------------*/
+#if 0
 static SYS_Timer_t *timers;
+#endif // 0
 
 /*- Implementations --------------------------------------------------------*/
 
@@ -65,7 +68,7 @@ static SYS_Timer_t *timers;
 *****************************************************************************/
 void SYS_TimerInit(void)
 {
-    timers = NULL;
+    g_nwk_dev.timers = NULL;
 }
 
 /****************************************************************************
@@ -82,14 +85,14 @@ void SYS_TimerStop(SYS_Timer_t *timer)
 {
     SYS_Timer_t *prev = NULL;
 
-    for (SYS_Timer_t *t = timers; t; t = t->next)
+    for (SYS_Timer_t *t = g_nwk_dev.timers; t; t = t->next)
     {
         if (t == timer)
         {
             if (prev)
                 prev->next = t->next;
             else
-                timers = t->next;
+                g_nwk_dev.timers = t->next;
 
             if (t->next)
                 t->next->timeout += timer->timeout;
@@ -104,7 +107,7 @@ void SYS_TimerStop(SYS_Timer_t *timer)
 *****************************************************************************/
 bool SYS_TimerStarted(SYS_Timer_t *timer)
 {
-    for (SYS_Timer_t *t = timers; t; t = t->next)
+    for (SYS_Timer_t *t = g_nwk_dev.timers; t; t = t->next)
         if (t == timer)
             return true;
     return false;
@@ -128,31 +131,31 @@ void SYS_TimerTaskHandler(void)
 
     elapsed = cnt * HAL_TIMER_INTERVAL;
 
-    while (timers && (timers->timeout <= elapsed))
+    while (g_nwk_dev.timers && (g_nwk_dev.timers->timeout <= elapsed))
     {
-        SYS_Timer_t *timer = timers;
+        SYS_Timer_t *timer = g_nwk_dev.timers;
 
-        elapsed -= timers->timeout;
-        timers = timers->next;
+        elapsed -= g_nwk_dev.timers->timeout;
+        g_nwk_dev.timers = g_nwk_dev.timers->next;
         if (SYS_TIMER_PERIODIC_MODE == timer->mode)
             placeTimer(timer);
         timer->handler(timer);
     }
 
-    if (timers)
-        timers->timeout -= elapsed;
+    if (g_nwk_dev.timers)
+        g_nwk_dev.timers->timeout -= elapsed;
 }
 
 /****************************************************************************
 *****************************************************************************/
 static void placeTimer(SYS_Timer_t *timer)
 {
-    if (timers)
+    if (g_nwk_dev.timers)
     {
         SYS_Timer_t *prev = NULL;
         uint32_t timeout = timer->interval;
 
-        for (SYS_Timer_t *t = timers; t; t = t->next)
+        for (SYS_Timer_t *t = g_nwk_dev.timers; t; t = t->next)
         {
             if (timeout < t->timeout)
             {
@@ -174,14 +177,14 @@ static void placeTimer(SYS_Timer_t *timer)
         }
         else
         {
-            timer->next = timers;
-            timers = timer;
+            timer->next = g_nwk_dev.timers;
+            g_nwk_dev.timers = timer;
         }
     }
     else
     {
         timer->next = NULL;
         timer->timeout = timer->interval;
-        timers = timer;
+        g_nwk_dev.timers = timer;
     }
 }

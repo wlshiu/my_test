@@ -34,7 +34,20 @@ extern "C" {
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
+#define APP_ADDR                    1
+#define APP_CHANNEL                 0x0f
+#define APP_PANID                   0x1234
+#define APP_ENDPOINT                1
+#define APP_SECURITY_KEY            "TestSecurityKey0"
+#define APP_FLUSH_TIMER_INTERVAL    20
 
+#define APP_BUFFER_SIZE             (127 - 16/*NwkFrameHeader_t*/ - 2/*crc*/)
+
+typedef enum App_State
+{
+    APP_STATE_INITIAL,
+    APP_STATE_IDLE,
+} App_State_t;
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -73,6 +86,9 @@ typedef struct nwk_dev
 {
     NwkIb_t         nwkIb;
 
+    // sysTime
+    SYS_Timer_t     *timers;
+
     // frame
     NwkFrame_t      nwkFrameFrames[NWK_BUFFERS_AMOUNT];
     NWK_DataReq_t   *nwkDataReqQueue;
@@ -104,6 +120,15 @@ typedef struct nwk_dev
     NwkDuplicateRejectionEntry_t    nwkRxDuplicateRejectionTable[NWK_DUPLICATE_REJECTION_TABLE_SIZE];
     uint8_t                         nwkRxAckControl;
     SYS_Timer_t                     nwkRxDuplicateRejectionTimer;
+
+    // APP
+    App_State_t      appState;
+    SYS_Timer_t      appTimer;
+    NWK_DataReq_t    appDataReq;
+    bool             appDataReqBusy;
+    uint8_t          appDataReqBuffer[APP_BUFFER_SIZE];
+    uint8_t          appUartBuffer[APP_BUFFER_SIZE];
+    uint8_t          appUartBufferPtr;
 } nwk_dev_t;
 //=============================================================================
 //                  Global Data Definition

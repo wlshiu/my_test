@@ -75,6 +75,11 @@ static usr_ev_script_t      g_ev_scenario[] =
     { .time_offset = -1, },
 };
 
+static usr_ev_script_t      g_ev_regular_send =
+{
+    .time_offset = 0, .pf_make_event = usr_ev_regular,
+};
+
 static nwk_dev_t            **g_ppNwk_dev_pool = 0;
 
 //=============================================================================
@@ -102,7 +107,6 @@ _phy_recv(
 
     return;
 }
-
 
 static void
 _node_routine(scheduler_watcher_t *pWatcher)
@@ -132,7 +136,8 @@ _node_routine(scheduler_watcher_t *pWatcher)
                 }
                 break;
 
-            case USR_EV_TYPE_PACKET:
+            case USR_EV_TYPE_PACKET_TX:
+            case USR_EV_TYPE_PACKET_RX:
                 {
                     nwk_dev_t   *pNwk_dev = 0;
 
@@ -140,9 +145,16 @@ _node_routine(scheduler_watcher_t *pWatcher)
 
                     memcpy(&g_nwk_dev, pNwk_dev, sizeof(nwk_dev_t));
 
-                    lwmesh_process(pWatcher->watcher_uid,
-                                   pEv_base->pData,
-                                   pEv_base->length - sizeof(usr_ev_base_t));
+                    if( pEv_base->type == USR_EV_TYPE_PACKET_RX )
+                    {
+                        lwmesh_process(pWatcher->watcher_uid,
+                                       pEv_base->pData,
+                                       pEv_base->length - sizeof(usr_ev_base_t));
+                    }
+                    else
+                    {
+                        lwmesh_process(pWatcher->watcher_uid, 0, 0);
+                    }
 
                     memcpy(pNwk_dev, &g_nwk_dev, sizeof(nwk_dev_t));
                 }
@@ -156,6 +168,7 @@ _node_routine(scheduler_watcher_t *pWatcher)
 
     return;
 }
+
 
 static void*
 _task_schedule(void *argv)
@@ -212,61 +225,56 @@ _destroy_job_ctxt(scheduler_job_t *pJob, uint8_t **ppCtxt, int *pCtxt_len)
 }
 
 static int
-_trigger_event(uint32_t time_offset)
+_trigger_event(
+    uint32_t        time_offset,
+    usr_ev_script_t *pEv_script_cur)
 {
-    int             rval = 0;
+    int     rval = 0;
     do {
-        usr_ev_script_t     *pEv_script_cur = g_ev_scenario;
-
-        while( pEv_script_cur->time_offset != -1 )
+        if( pEv_script_cur->time_offset < time_offset &&
+            !pEv_script_cur->is_acted )
         {
-            if( pEv_script_cur->time_offset < time_offset &&
-                !pEv_script_cur->is_acted )
+            uint32_t            certificate = (uint32_t)-1;
+            uint32_t            dest_cnt = SCHEDULER_DESTINATION_ALL;
+            scheduler_job_t     *pJob = 0;
+            uint32_t            len = 0;
+
+            // add a job
+            len = (dest_cnt == SCHEDULER_DESTINATION_ALL)
+                ? sizeof(scheduler_job_t)
+                : sizeof(scheduler_job_t) + sizeof(uint32_t) * dest_cnt;
+            if( !(pJob = malloc(len)) )
             {
-                uint32_t            certificate = (uint32_t)-1;
-                uint32_t            dest_cnt = SCHEDULER_DESTINATION_ALL;
-                scheduler_job_t     *pJob = 0;
-                uint32_t            len = 0;
-
-                // add a job
-                len = (dest_cnt == SCHEDULER_DESTINATION_ALL)
-                    ? sizeof(scheduler_job_t)
-                    : sizeof(scheduler_job_t) + sizeof(uint32_t) * dest_cnt;
-                if( !(pJob = malloc(len)) )
-                {
-                    dbg_msg("fail\n");
-                    break;
-                }
-                memset(pJob, 0x0, len);
-
-                // TODO: wait_time and destination list SHULD be assigned
-                pJob->ev_type               = SCHEDULER_EV_MODE_INTERVAL;
-                pJob->wait_time             = 0; // real waiting time = 2 * time_scaling (ms)
-                pJob->src_uid               = pthread_self();
-                pJob->cb_create_job_ctxt    = _create_job_ctxt;
-                pJob->cb_destroy_job_ctxt   = _destroy_job_ctxt;
-                pJob->pExtra_data           = pEv_script_cur;
-                pJob->destination_cnt       = dest_cnt;
-
-                if( dest_cnt != -1 )
-                {
-                    for(int j = 0; j < dest_cnt; j++)
-                    {
-                        pJob->pDest_uid[j] = g_pNode_attr[j].node_id;
-                    }
-                }
-
-                rval = scheduler_add_job(pJob, &certificate);
-                if( rval )
-                    printf("job full...\n");
-
-                free(pJob);
-
-                pEv_script_cur->is_acted = 1;
+                dbg_msg("fail\n");
+                break;
             }
-            pEv_script_cur++;
-        }
+            memset(pJob, 0x0, len);
 
+            // TODO: wait_time and destination list SHULD be assigned
+            pJob->ev_type               = SCHEDULER_EV_MODE_INTERVAL;
+            pJob->wait_time             = 0; // real waiting time = 2 * time_scaling (ms)
+            pJob->src_uid               = pthread_self();
+            pJob->cb_create_job_ctxt    = _create_job_ctxt;
+            pJob->cb_destroy_job_ctxt   = _destroy_job_ctxt;
+            pJob->pExtra_data           = pEv_script_cur;
+            pJob->destination_cnt       = dest_cnt;
+
+            if( dest_cnt != -1 )
+            {
+                for(int j = 0; j < dest_cnt; j++)
+                {
+                    pJob->pDest_uid[j] = g_pNode_attr[j].node_id;
+                }
+            }
+
+            rval = scheduler_add_job(pJob, &certificate);
+            if( rval )
+                printf("job full...\n");
+
+            free(pJob);
+
+            pEv_script_cur->is_acted = 1;
+        }
     } while(0);
     return rval;
 }
@@ -386,7 +394,8 @@ int main(int argc, char **argv)
 
         while(1)
         {
-            uint32_t        duration = 0ul;
+            uint32_t            duration = 0ul;
+            usr_ev_script_t     *pEv_script_cur = g_ev_scenario;
 
             duration = scheduler_get_tick();
             if( duration > 1000 )
@@ -400,7 +409,15 @@ int main(int argc, char **argv)
                 break;
             }
 
-            _trigger_event(duration);
+            _trigger_event(duration, &g_ev_regular_send);
+            g_ev_regular_send.is_acted = 0;
+
+            while( pEv_script_cur->time_offset != -1 )
+            {
+                _trigger_event(duration, pEv_script_cur);
+
+                pEv_script_cur++;
+            }
 
             Sleep(time_scaling);
         }

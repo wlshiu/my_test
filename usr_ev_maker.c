@@ -66,3 +66,28 @@ usr_ev_roll_call(
     return rval;
 }
 
+int
+usr_ev_regular(
+    usr_ev_script_t *pEv_script,
+    uint8_t         *pBuf,
+    int             *pBuf_len)
+{
+    int     rval = 0;
+    do {
+        usr_ev_base_t   *pEv_base = (usr_ev_base_t*)pBuf;
+
+        if( !pBuf || !pBuf_len || *pBuf_len == 0 )
+        {
+            rval = -1;
+            break;
+        }
+
+        pEv_base->type = USR_EV_TYPE_PACKET_TX;
+
+        *pBuf_len = sizeof(usr_ev_base_t);
+        pEv_base->length = *pBuf_len;
+
+    } while(0);
+    return rval;
+}
+

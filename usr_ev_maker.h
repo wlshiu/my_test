@@ -26,7 +26,8 @@ typedef enum usr_ev_type
 {
     USR_EV_TYPE_NONE    = 0x46,
     USR_EV_TYPE_ROLL_CALL,
-    USR_EV_TYPE_PACKET,
+    USR_EV_TYPE_PACKET_TX,
+    USR_EV_TYPE_PACKET_RX,
 
 } usr_ev_type_t;
 //=============================================================================
@@ -71,6 +72,13 @@ typedef struct usr_ev_msg
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
+int
+usr_ev_regular(
+    usr_ev_script_t *pEv_script,
+    uint8_t         *pBuf,
+    int             *pBuf_len);
+
+
 int
 usr_ev_roll_call(
     usr_ev_script_t *pEv_script,
