@@ -1,7 +1,64 @@
 lwmesh (Lightweight mesh)
 ---
 
-    It is implemented with the state machine algorithm on `bare machine`
+It is implemented with the state machine algorithm on `bare machine`
+
+# Architecture
+
+```
+    Application layer
+     ^    ^      ^
+     |    |      |
+     |    |      v
+     |    |   Network layer (network header)
+     |    |      ^
+     |    |      |
+     |    v      v
+     |  Physical layer (MAC header)
+     |           ^
+     |           |
+     v           v
+    Hardware Abstraction Layer (HAL)
+
+```
+
++ MAC header
+
+```c
+typedef struct __attribute__ ((packed)) mac_header
+{
+    uint16_t    macFcf;
+    uint8_t     macSeq;
+    uint16_t    macDstPanId;
+    uint16_t    macDstAddr;  // the destination address of the neighbor hop
+    uint16_t    macSrcAddr;  // the source address of the neighbor hop
+} mac_header_t;
+```
+
++ Network header
+
+```c
+typedef struct __attribute__ ((packed)) nwk_header
+{
+    struct __attribute__ ((packed)) {
+        uint8_t   ackRequest : 1;
+        uint8_t   security   : 1;
+        uint8_t   linkLocal  : 1;
+        uint8_t   multicast  : 1;
+        uint8_t   reserved   : 4;
+    } nwkFcf;
+
+    uint8_t     nwkSeq;
+    uint16_t    nwkSrcAddr; // the local address
+    uint16_t    nwkDstAddr; // the target destination address, it is maybe through multi-hops
+
+    struct __attribute__ ((packed)) {
+        uint8_t   nwkSrcEndpoint : 4;
+        uint8_t   nwkDstEndpoint : 4;
+    };
+
+} nwk_header_t;
+```
 
 # Directory
 
@@ -99,8 +156,11 @@ lwmesh (Lightweight mesh)
     - `nwk`
         > the common feature
 
+        1. Endpoint
+            > like port number of network socket
+
     - `nwkDataReq`
-        > request the local user data which sending to medium
+        > local user request the outgoing data which sending to medium
 
     - `nwkFrame`
         > the packet frame handler
@@ -109,10 +169,10 @@ lwmesh (Lightweight mesh)
         > handle routing table
 
     - `nwkRouteDiscovery`
-        >
+        > for `AODV` routing algorithm
 
     - `nwkGroup`
-        > multi-cast
+        > multicast
 
     - `nwkSecurity`
         > encrypt/decrypt package
@@ -122,3 +182,68 @@ lwmesh (Lightweight mesh)
 
     - `nwkTx`
         > transmit packages
+
+# Routing
+
+Routing table entry fields:
+
+| Name          | Size, bits    | Description   |
+| :-            | :-            | :-            |
+| fixed         | 1             | Indicates a fixed entry that cannot be removed even |
+|               |               | if destination node is no longer reachable. |
+|               |               | Stack will never create entries with this field set to 1, |
+|               |               | but application may use it for creating static routes |
+| multicast     | 1             | Indicates a multicast entry. |
+|               |               | If this field is set to one then dstAddr field contains a group ID |
+| reserved      | 2             |               |
+| score         | 4             | Indicates entry health. |
+|               |               | If the value of this field reaches 0, entry is removed from the Routing Table |
+| dstAddr       | 16            | Destination network address or a group ID as indicated by multicast field |
+| nextHopAddr   | 16            | Network address of the next node on the route towards the destination node |
+| rank          | 8             | Indicates how often entry is used. |
+|               |               | Entry with the lowest rank is replaced first |
+|               |               | if Routing Table is full and a new entry has to be added |
+| lqi           | 8             | Link quality of the route: |
+|               |               | * For native routing algorithm this field contains LQI of the last received |
+|               |               |   from the node with address nextHopAddr. |
+|               |               |   Value of this field might be updated by the stack in run time |
+|               |               | * For AODV routing algorithm this field contains a value of the Reverse Link Quality field |
+|               |               |   from the Route Reply Command that was used to establish this route. |
+|               |               |   Stack will not update value of this field after the route has been discovered |
+
+
++ Native Routing
+    > + This algorithm only makes sure the best LQI not shortest path.
+    > + Routes are discovered as part of normal data delivery.
+    The discovery mechanism is worked when receiving normal data packages.
+
+    - Add/update an entry
+        1. the `nwkSrcAddr` of the new entry does not exist in Routing Table.
+        1. the new entry is indicated leaf-node (only 1-hop) with specific mark of `macSrcAddr`.
+        1. the `nwkSrcAddr` of an entry is exist in Routing Table,
+            but the `macSrcAddr` or `lqi` are different. (Choice the best `lqi` entry)
+            > the `score` of this entry is set to `NWK_ROUTE_DEFAULT_SCORE`.
+        1. the `nwkSrcAddr` of an entry is exist in Routing Table,
+            but the `macSrcAddr` (next-hop) is different.
+            If this new entry is a broadcasts package (The `macDstAddr` is 0xFFFF and `macSrcAddr` is not 0xFFFF),
+            the `nextHopAddr` will be updated with `macSrcAddr` of the new entry.
+            (Does not check the lqi of the new entry ???)
+
+        1. only `lqi` change and other fields are the same
+        1. if the `nwkDstAddr` of an entry of routing table is the same with the `nwkDstAddr` of a new entry ,
+        the `score` of the entry of routing table should be decreased when a acknowledgement sent fail.
+        If the entry score drops to 0, then the entry is removed from the Routing Table.
+
+    - Delete an entry
+        > Routing Table entries never expire or timeout, but there are a few ways an entry can be altered
+
+        1. Routing Table entry is removed if its `score field` drops to 0.
+        1. If routing table is full, the new entry has to replace the least activer entry, which has the lowest rank value.
+
++ AODV routing
+
+
+# reference
+
++ [AVR2130: Lightweight Mesh Developer Guide](https://www.microchip.com/wwwAppNotes/AppNotes.aspx?appnote=en591088)
++ [ LWMesh network tools](http://www.rayzig.com/manual/rayzig.html?203LWMeshnetworkrouting.html)
