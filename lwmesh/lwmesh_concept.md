@@ -185,7 +185,52 @@ typedef struct __attribute__ ((packed)) nwk_header
 
 # Routing
 
-Routing table entry fields:
++ basic concept
+    > `macDstAddr` descripts the **neighbor** node and `nwkDstAddr` descripts the **final** node.
+
+    - case 1 (arrive the final node)
+        > `nwkDstAddr` check first
+
+        ```
+        if( (nwkDstAddr == local_addr) ||
+            (nwkDstAddr == NWK_BROADCAST_ADDR) )
+        {
+            // arrive the final node
+            notify_app()
+        }
+        ```
+
+    - case 2 (forward this package)
+
+        ```
+        if( nwkDstAddr != local_addr &&
+            (macDstAddr == local_addr ||
+                (macDstAddr == NWK_BROADCAST_ADDR)) )
+        {
+            // help to forwards this package
+        }
+        ```
+
+    - case 3
+
+        ```
+        if( macSrcAddr == nwkSrcAddr )
+        {
+            // the neighbor initiatively sends the package
+        }
+        ```
+
+    - case 4
+
+        ```
+        if( macSrcAddr != nwkSrcAddr )
+        {
+            // the neighbor forwards someone's package
+        }
+        ```
+
+
++ Routing table entry fields:
 
 | Name          | Size, bits    | Description   |
 | :-            | :-            | :-            |
