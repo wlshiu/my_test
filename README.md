@@ -52,6 +52,9 @@
     > mesh route [Atmel Lightweight Mesh](https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/Atmel%20Lightweight%20Mesh)
 + test_print
     > [Tiny print](https://github.com/mpaland/printf)
++ test_script
+    > generate bash script
+
 
 # MS Visual Studio
 
