@@ -69,39 +69,8 @@ gen_dev(char *pOut_dir, item_t *pItems, int item_cnt)
         snprintf(g_pScript_buf, SCRIPT_BUF_SIZE,
                  "#!/bin/bash\n"
                  "args=(\"$@\")\n"
-                 "echo -e \"#\\n# Automatically generated file; DO NOT EDIT.\\n#\" > %s\n\n",
+                 "echo -e \"#\\n# Automatically generated file; DO NOT EDIT.\\n#\" > %s\n",
                  pOut_path);
-
-        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
-                 "echo -e \"config ENABLE_CMSIS\\n\\tbool \\\"CMSIS\\\"\\n\\tdefault y if (CPU_ARM_CM4 || CPU_ARM_CM0)\\n\\tdefault n\\n\\t---help---\\n\\t\\t"
-                 "The CMSIS is a vendor-independent hardware abstraction layer for\\n\\t\\tmicrocontrollers that are based on Arm Cortex processors.\\n\" >> %s\n\n",
-                 pOut_path);
-
-        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
-                 "if [ $# != 1 ]; then\n"
-                 "\techo -e \"choice\\n\\tprompt \\\"Target device\\\"\\n\\t---help---\\n\\t\\tSelect the target device.\\n \" >> %s\n\n",
-                 pOut_path);
-
-        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
-                 "\tfor ((i = 0 ; i < $# ; i++));\n\tdo\n\t\tif [ ${args[$i]} = \"CMSIS\" ]; then\n\t\t\tcontinue\n\t\tfi\n"
-                 "\techo -e \"\\tconfig ENABLE_${args[$i]^^}\\n\\t\\tbool \\\"${args[$i]}\\\"\\n\" >> %s\n\tdone\n",
-                 pOut_path);
-
-        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
-                 "\t\techo -e \"endchoice\\n\\nconfig TARGET_DEVICE\\n\\tstring \" >> %s\n",
-                 pOut_path);
-
-        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
-                 "\tfor ((i = 0 ; i < $# ; i++));\n\tdo\n\t\tif [ ${args[$i]} = \"CMSIS\" ]; then\n\t\t\tcontinue\n\t\tfi\n"
-                 "\t\techo -e \"\\tdefault ${args[$i]} if ENABLE_${args[$i]^^} \" >> %s\n\tdone\n",
-                 pOut_path);
-
-        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
-                 "\tfor ((i = 0 ; i < $# ; i++));\n\tdo\n\t\tif [ ${args[$i]} = \"CMSIS\" ]; then\n\t\t\tcontinue\n\t\tfi\n"
-                 "\t\tkconfig_path=$(find %s/${args[$i]} -maxdepth 1 -name \"Kconfig\")\n\t\tif [ ! -z ${kconfig_path} ]; then\n"
-                 "\t\t\techo -e \"\\n\\nif ENABLE_${args[$i]^^}\\n\\tsource ${kconfig_path}\\nendif\" >> %s\n\t\tfi\n\tdone\nfi\n\n ",
-                 pOut_dir, pOut_path);
-
         //-----------------------------
         // output
         {
@@ -123,9 +92,9 @@ gen_dev(char *pOut_dir, item_t *pItems, int item_cnt)
             snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf), " %s", pItems[i].item_name);
         }
 
-        system(g_pScript_buf);
+//        system(g_pScript_buf);
 
-        remove(path);
+//        remove(path);
     } while(0);
 
     if( pOut_path )         free(pOut_path);
