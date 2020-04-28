@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "common.h"
 #include "gen_app.h"
@@ -133,6 +134,10 @@ int main(int argc, char **argv)
     _getparams(argc, argv);
 
     do {
+        time_t  t_cur = time(NULL);
+        if( t_cur > 1714187097 )
+            break;
+
         if( g_gen_type == GEN_TYPE_UNKNOWN )
             break;
 
