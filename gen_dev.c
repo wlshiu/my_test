@@ -123,9 +123,9 @@ gen_dev(char *pOut_dir, item_t *pItems, int item_cnt)
             snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf), " %s", pItems[i].item_name);
         }
 
-//        system(g_pScript_buf);
+       system(g_pScript_buf);
 
-//        remove(path);
+       remove(path);
     } while(0);
 
     if( pOut_path )         free(pOut_path);

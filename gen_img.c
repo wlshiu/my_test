@@ -69,9 +69,22 @@ gen_img(char *pOut_dir, item_t *pItems, int item_cnt)
         snprintf(g_pScript_buf, SCRIPT_BUF_SIZE,
                  "#!/bin/bash\n"
                  "args=(\"$@\")\n"
-                 "echo -e \"#\\n# Automatically generated file; DO NOT EDIT.\\n#\" > %s\n",
+                 "echo -e \"#\\n# Automatically generated file; DO NOT EDIT.\\n#\\n\\nconfig CORE_IMG_NUM\\n\\tint\\n\\tdefault $(($#))\\n\\n\" > %s\n",
                  pOut_path);
 
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "for ((i = 1 ; i < $(($# + 1)) ; i++));\ndo\n\t"
+                 "relative_path=$(echo ${args[$(($i - 1))]} | sed 's:'\"%s/\"'::g')\n\t"
+                 "echo -e \"config INSERT_CORE_IMAGE_$i\\n\\tbool \\\"Insert core image $i - ${relative_path}\\\"\\n\\tdefault n\\n\\n\" >> %s\n",
+                 pOut_dir, pOut_path);
+
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "\techo -e \"\\tconfig IMAGE_NAME_$i\\n\\t\\tstring \\\"image path\\\"\\n\\t\\tdepends on INSERT_CORE_IMAGE_$i\\n\\t\\tdefault \\\"${relative_path}\\\"\\n\" >> %s\n",
+                 pOut_path);
+
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "\techo -e \"\\tconfig SECTION_NAME_$i\\n\\t\\tstring \\\"section name\\\"\\n\\t\\tdepends on INSERT_CORE_IMAGE_$i\\n\\t\\tdefault \\\".img_$i\\\"\\n\\n\" >> %s\ndone\n",
+                 pOut_path);
         //-----------------------------
         // output
         {
@@ -93,9 +106,9 @@ gen_img(char *pOut_dir, item_t *pItems, int item_cnt)
             snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf), " %s", pItems[i].item_name);
         }
 
-//        system(g_pScript_buf);
+       system(g_pScript_buf);
 
-//        remove(path);
+       remove(path);
     } while(0);
 
     if( pOut_path )         free(pOut_path);

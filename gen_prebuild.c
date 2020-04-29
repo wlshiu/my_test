@@ -69,9 +69,38 @@ gen_prebuild(char *pOut_dir, item_t *pItems, int item_cnt)
         snprintf(g_pScript_buf, SCRIPT_BUF_SIZE,
                  "#!/bin/bash\n"
                  "args=(\"$@\")\n"
-                 "echo -e \"#\\n# Automatically generated file; DO NOT EDIT.\\n#\" > %s\n",
+                 "echo -e \"#\\n# Automatically generated file; DO NOT EDIT.\\n#\\n\\n\" > %s\n",
                  pOut_path);
 
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "if [ $# != 0 ]; then\n\t"
+                 "echo -e \"choice\\n\\tprompt \\\"Target Pre-build library\\\"\\n\\t---help---\\n\\t\\tSelect the target Pre-build library.\\n\" >> %s\n",
+                 pOut_path);
+
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "\tfor ((i = 0 ; i < $# ; i++));\n\tdo\n\t\t"
+                 "echo -e \"\\tconfig ENABLE_PRE_BUILD_${args[$i]^^}\\n\\t\\tbool \\\"${args[$i]}\\\"\\n\" >> %s\n\tdone\n\n",
+                 pOut_path);
+
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "\techo -e \"endchoice\\n\\nconfig TARGET_PRE_BUILD_LIBS\\n\\tstring\" >> %s\n",
+                 pOut_path);
+
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "\tfor ((i = 0 ; i < $# ; i++));\n\tdo\n\t\t"
+                 "echo -e \"\\tdefault ${args[$i]} if ENABLE_PRE_BUILD_${args[$i]^^} \" >> %s\n\tdone\n\n"
+                 "\techo -e \"\\n\\n\" >> %s\n\n",
+                 pOut_path, pOut_path);
+
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "\tfor ((i = 0 ; i < $# ; i++));\n\tdo\n\t\t"
+                 "kconfig_path=$(find %s/${args[$i]} -maxdepth 1 -name \"Kconfig\")\n"
+                 "\t\tif [ ! -z ${kconfig_path} ]; then\n\t\t\t",
+                 pOut_dir);
+
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "echo -e \"if ENABLE_PRE_BUILD_${args[$i]^^}\\n\\tsource ${kconfig_path}\\nendif\\n\\n\" >> %s\n\t\tfi\n\tdone\nfi\n\n",
+                 pOut_path);
         //-----------------------------
         // output
         {
@@ -93,9 +122,9 @@ gen_prebuild(char *pOut_dir, item_t *pItems, int item_cnt)
             snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf), " %s", pItems[i].item_name);
         }
 
-//        system(g_pScript_buf);
+       system(g_pScript_buf);
 
-//        remove(path);
+       remove(path);
     } while(0);
 
     if( pOut_path )         free(pOut_path);

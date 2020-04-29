@@ -62,16 +62,22 @@ gen_test(char *pOut_dir, item_t *pItems, int item_cnt)
         }
         memset(g_pScript_buf, 0x0, SCRIPT_BUF_SIZE);
 
-        snprintf(pOut_path, 1024, "%s/Kconfig.prebuild", pOut_dir);
+        snprintf(pOut_path, 1024, "%s/Kconfig.test", pOut_dir);
 
         //------------------------------
         // fit script
         snprintf(g_pScript_buf, SCRIPT_BUF_SIZE,
                  "#!/bin/bash\n"
                  "args=(\"$@\")\n"
-                 "echo -e \"#\\n# Automatically generated file; DO NOT EDIT.\\n#\" > %s\n",
+                 "echo -e \"#\\n# Automatically generated file; DO NOT EDIT.\\n#\\nmenu \\\"unittest\\\"\\n\\n\\tif APP_UNITTEST\\n\" > %s\n"
+                 "module_list=()\nfor ((i = 0 ; i < $# ; i++));\ndo\n\tif [ -d ${args[$i]} ]; then\n\t\tmodule_list+=($(find ${args[$i]} -type d -name 'test'))\n\tfi\ndone\n\n",
                  pOut_path);
 
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "for i in \"${module_list[@]}\"\ndo\n\tmodule=$(echo $i | xargs dirname | sed 's:^\\(.*/\\)\\?\\([^/]*\\):\\2:')\n"
+                 "\techo -e \"\\t\\tconfig ENABLE_TEST_${module^^}\\n\\t\\t\\tdepends on ENABLE_${module^^}\\n\\t\\t\\tbool \\\"enable test of $module\\\"\\n\\t\\t\\tdefault n\\n\" >> %s\ndone\n\n"
+                 "echo -e \"\\n\\tendif\\n\\nendmenu\\n\\n\" >> %s",
+                 pOut_path, pOut_path);
         //-----------------------------
         // output
         {
@@ -93,9 +99,9 @@ gen_test(char *pOut_dir, item_t *pItems, int item_cnt)
             snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf), " %s", pItems[i].item_name);
         }
 
-//        system(g_pScript_buf);
+       system(g_pScript_buf);
 
-//        remove(path);
+       remove(path);
     } while(0);
 
     if( pOut_path )         free(pOut_path);

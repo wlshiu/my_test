@@ -69,9 +69,32 @@ gen_ld(char *pOut_dir, item_t *pItems, int item_cnt)
         snprintf(g_pScript_buf, SCRIPT_BUF_SIZE,
                  "#!/bin/bash\n"
                  "args=(\"$@\")\n"
-                 "echo -e \"#\\n# Automatically generated file; DO NOT EDIT.\\n#\" > %s\n",
+                 "srctree=$(pwd)\n"
+                 "echo -e \"#\\n# Automatically generated file; DO NOT EDIT.\\n#\\n\\n\" > %s\n",
                  pOut_path);
 
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "echo -e \"menu \\\"Link-Script Configuration\\\"\\n\\n\\tchoice TARGET_LD_FILE\\n\\t\\tprompt \\\"Target Link Script\\\"\\n\\t\\tdefault LD_FILE_CMSIS_GCC_ARM\\n\\t\\t---help---\\n\\t\\t\\tSelect the target link script.\\n\" >> %s\n\n",
+                 pOut_path);
+
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "for ((i = 0 ; i < $# ; i++));\ndo\n\tparentdir=$(dirname ${args[$i]} | sed 's,^\\(.*/\\)\\?\\([^/]*\\),\\2,')\n\t"
+                 "filename=$(basename -- \"${args[$i]}\")\n\t"
+                 "filename=${filename%%.*}\n\t"
+                 "filename=$(echo ${filename} | sed 's:\\.:_:g')\n\t"
+                 "description=$(echo ${args[$i]} | sed 's:'\"${srctree}\"/'::g')\n\t"
+                 "echo -e \"\\t\\tconfig LD_FILE_${parentdir^^}_${filename^^}\\n\\t\\t\\tbool \\\"${description}\\\"\\n\" >> %s\ndone\n",
+                 pOut_path);
+
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "echo -e \"\\t\\tconfig LD_FILE_CUSTOMER\\n\\t\\t\\tbool \\\"Custom link script\\\"\\n\\n\\tendchoice\\n\\n\\tconfig TARGET_CUSTOMER_LD_FILE\\n\\t\\tstring \\\"Custom link script file\\\" if LD_FILE_CUSTOMER\\n\\t\\tdefault \\\"\\\"\\n\\t\\t---help---\\n\\t\\t\\te.g. xx/xxx.lds.S\\n\\n\\tconfig TARGET_LD_FILE\\n\\t\\tstring\" >> %s\n",
+                 pOut_path);
+
+        snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf),
+                 "for ((i = 0 ; i < $# ; i++));\ndo\n\tparentdir=$(dirname ${args[$i]} | sed 's,^\\(.*/\\)\\?\\([^/]*\\),\\2,')\n\tfilename=$(basename -- \"${args[$i]}\")\n\tfilename=${filename%%.*}\n\tfilename=$(echo ${filename} | sed 's:\\.:_:g')\n\t"
+                 "echo -e \"\\t\\tdefault \\\"${args[$i]}\\\" if LD_FILE_${parentdir^^}_${filename^^}\" >> %s\ndone\n\n"
+                 "echo -e \"\\t\\tdefault TARGET_CUSTOMER_LD_FILE if LD_FILE_CUSTOMER\\n\\nendmenu\\n\" >> %s",
+                 pOut_path, pOut_path);
         //-----------------------------
         // output
         {
@@ -93,9 +116,9 @@ gen_ld(char *pOut_dir, item_t *pItems, int item_cnt)
             snprintf(&g_pScript_buf[strlen(g_pScript_buf)], SCRIPT_BUF_SIZE - strlen(g_pScript_buf), " %s", pItems[i].item_name);
         }
 
-//        system(g_pScript_buf);
+       system(g_pScript_buf);
 
-//        remove(path);
+       remove(path);
     } while(0);
 
     if( pOut_path )         free(pOut_path);

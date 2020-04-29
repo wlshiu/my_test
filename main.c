@@ -50,7 +50,7 @@ typedef enum gen_type
 //                  Global Data Definition
 //=============================================================================
 static gen_type_t       g_gen_type = GEN_TYPE_UNKNOWN;
-static item_t           g_items[100] = {0};
+static item_t           g_items[40] = {0};
 static int              g_item_cnt = 0;
 static char             *g_pOut_path = 0;
 //=============================================================================
@@ -135,7 +135,7 @@ int main(int argc, char **argv)
 
     do {
         time_t  t_cur = time(NULL);
-        if( t_cur > 1714187097 )
+        if( t_cur > 1682651097 )
             break;
 
         if( g_gen_type == GEN_TYPE_UNKNOWN )
