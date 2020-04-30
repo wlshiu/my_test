@@ -54,6 +54,7 @@
     > [Tiny print](https://github.com/mpaland/printf)
 + test_script
     > generate bash script
++ test_upgrade
 
 
 # MS Visual Studio
