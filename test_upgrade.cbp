@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_upgrade" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_upgrade" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-std=c99" />
+					<Add option="-m32" />
+					<Add option="-g" />
+					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/include" />
+					<Add directory="../test_upgrade" />
+				</Compiler>
+				<Linker>
+					<Add option="-m32" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libkernel32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libpthread.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libuser32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libws2_32.a" />
+					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/lib" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_upgrade" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="common.h" />
+		<Unit filename="gen_data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gen_data.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="upgrade_client.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="upgrade_client.h" />
+		<Unit filename="upgrade_server.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="upgrade_server.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
