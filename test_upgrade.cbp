@@ -46,6 +46,10 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="common.h" />
+		<Unit filename="crc32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="crc32.h" />
 		<Unit filename="gen_data.c">
 			<Option compilerVar="CC" />
 		</Unit>
