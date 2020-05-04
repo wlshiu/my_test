@@ -86,7 +86,10 @@ upg_recv(
         }
 
         rval = pOp->cb_ll_recv(pOp);
-        if( rval ) break;
+        if( rval )
+        {
+            break;
+        }
 
         // TODO: pre-parsing data
 
