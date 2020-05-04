@@ -50,21 +50,29 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="crc32.h" />
+		<Unit filename="gateway.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gateway.h" />
 		<Unit filename="gen_data.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="gen_data.h" />
+		<Unit filename="leaf_end.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="leaf_end.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="upgrade_client.c">
+		<Unit filename="rbi.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="upgrade_client.h" />
-		<Unit filename="upgrade_server.c">
+		<Unit filename="rbi.h" />
+		<Unit filename="upgrade.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="upgrade_server.h" />
+		<Unit filename="upgrade.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

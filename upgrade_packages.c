@@ -1,23 +1,18 @@
 /**
  * Copyright (c) 2020 Wei-Lun Hsu. All Rights Reserved.
  */
-/** @file upgrade_client.h
+/** @file upgrade_packages.c
  *
  * @author Wei-Lun Hsu
  * @version 0.1
- * @date 2020/04/30
+ * @date 2020/05/04
  * @license
  * @description
  */
 
-#ifndef __upgrade_client_H_wYEVvj9o_leMb_HC1a_skzQ_u2lbRojLYOIz__
-#define __upgrade_client_H_wYEVvj9o_leMb_HC1a_skzQ_u2lbRojLYOIz__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "upgrade_packages.h"
 
-#include "common.h"
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -41,9 +36,3 @@ extern "C" {
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif

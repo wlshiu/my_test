@@ -1,17 +1,16 @@
 /**
- * Copyright (c) 2020 Wei-Lun Hsu. All Rights Reserved.
+ * Copyright (c) 2018 Wei-Lun Hsu. All Rights Reserved.
  */
-/** @file upgrade_server.h
+/** @file rbi.h
  *
  * @author Wei-Lun Hsu
  * @version 0.1
- * @date 2020/04/30
  * @license
  * @description
  */
 
-#ifndef __upgrade_server_H_wMpB4YSc_lodD_HIpv_sR7Z_uOGQLfsFfjLb__
-#define __upgrade_server_H_wMpB4YSc_lodD_HIpv_sR7Z_uOGQLfsFfjLb__
+#ifndef __rbi_H_wZZsqgW2_l3RS_Hrer_sH5Q_ushqu1NsbXds__
+#define __rbi_H_wZZsqgW2_l3RS_Hrer_sH5Q_ushqu1NsbXds__
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,11 +24,22 @@ extern "C" {
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
-
+#define RBI_CALC_POOL_SIZE(slot_size)       ((slot_size) * sizeof(void*))
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
+typedef struct rbi
+{
+//#define RB_SIZE_MASK    0x1
+    uint32_t        head;
+    uint32_t        pick;
+    uint32_t        tail;
 
+    uint32_t        slot_size;
+    uint32_t        unit_size;
+    uint32_t        *pBuf;
+
+} rbi_t;
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
@@ -41,6 +51,29 @@ extern "C" {
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
+void
+rbi_init(rbi_t *pRB, uint32_t *pArray, uint32_t slot_size);
+
+
+uint32_t
+rbi_is_empty(rbi_t *pRB);
+
+
+uint32_t
+rbi_is_full(rbi_t *pRB);
+
+
+uint32_t
+rbi_pick(rbi_t *pRB);
+
+
+uint32_t
+rbi_pop(rbi_t *pRB);
+
+
+int
+rbi_push(rbi_t *pRB, uint32_t data);
+
 
 #ifdef __cplusplus
 }

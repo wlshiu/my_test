@@ -50,3 +50,17 @@ upg_client_deinit()
     int     rval = 0;
     return rval;
 }
+
+int
+upg_client_send()
+{
+    int     rval = 0;
+    return rval;
+}
+
+int
+upg_client_recv()
+{
+    int     rval = 0;
+    return rval;
+}

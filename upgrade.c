@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2020 Wei-Lun Hsu. All Rights Reserved.
  */
-/** @file upgrade_client.h
+/** @file upgrade.c
  *
  * @author Wei-Lun Hsu
  * @version 0.1
@@ -10,14 +10,10 @@
  * @description
  */
 
-#ifndef __upgrade_client_H_wYEVvj9o_leMb_HC1a_skzQ_u2lbRojLYOIz__
-#define __upgrade_client_H_wYEVvj9o_leMb_HC1a_skzQ_u2lbRojLYOIz__
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "common.h"
+#include "upgrade.h"
+#include "upgrade_packages.h"
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -41,9 +37,59 @@ extern "C" {
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
-
-#ifdef __cplusplus
+int
+upg_init()
+{
+    int     rval = 0;
+    return rval;
 }
-#endif
 
-#endif
+int
+upg_deinit()
+{
+    int     rval = 0;
+    return rval;
+}
+
+int
+upg_send(
+    upg_operator_t  *pOp)
+{
+    int     rval = 0;
+    do {
+        if( !pOp || !pOp->cb_ll_send )
+        {
+            rval = -__LINE__;
+            break;
+        }
+
+        rval = pOp->cb_ll_send(pOp);
+        if( rval ) break;
+
+
+        // TODO: xxx
+
+    } while(0);
+    return rval;
+}
+
+int
+upg_recv(
+    upg_operator_t  *pOp)
+{
+    int     rval = 0;
+    do {
+        if( !pOp || !pOp->cb_ll_recv )
+        {
+            rval = -__LINE__;
+            break;
+        }
+
+        rval = pOp->cb_ll_recv(pOp);
+        if( rval ) break;
+
+        // TODO: pre-parsing data
+
+    } while(0);
+    return rval;
+}
