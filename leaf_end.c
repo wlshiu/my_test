@@ -14,6 +14,7 @@
 
 #include "upgrade.h"
 #include "leaf_end.h"
+#include "upgrade_packets.h"
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -141,13 +142,37 @@ leaf_routine(void)
 {
     int     rval = 0;
     do {
-        // receive from gateway
-        g_leaf_opr.port     = CONFIG_LEAF_SOURCE_PORT;
-        g_leaf_opr.length   = sizeof(g_leaf_buf);
-        rval = upg_recv(&g_leaf_opr);
-        if( g_leaf_opr.length > 0 )
-        {
-            log_msg("(rx gw) %s\n", g_leaf_opr.pData);
+        do {    // receive from gateway
+            g_leaf_opr.port     = CONFIG_LEAF_SOURCE_PORT;
+            g_leaf_opr.length   = sizeof(g_leaf_buf);
+            rval = upg_recv(&g_leaf_opr);
+            if( g_leaf_opr.length <= 0 )
+                break;
+
+            // TODO: assemble data slices in difference packets
+
+            upg_pkt_info_t      pkt_info = {0};
+
+            pkt_info.pBuf_pkt     = g_leaf_buf;
+            pkt_info.buf_pkt_len  = sizeof(g_leaf_buf);
+            rval = upg_pkt_unpack(&pkt_info);
+            if( rval )
+            {
+                log_msg("unpack fail \n");
+                break;
+            }
+
+            if( pkt_info.pPkt_hdr )
+            {
+                upg_pkt_hdr_t   *pPkt_hdr = pkt_info.pPkt_hdr;
+
+                switch( pPkt_hdr->cmd_opcode )
+                {
+                    case UPG_OPCODE_DISCOVERY_REQ:
+                        log_msg("(leaf rx gw) get disc req\n");
+                        break;
+                }
+            }
 
             // TODO: response received message
             #if 0
@@ -156,7 +181,8 @@ leaf_routine(void)
 
             upg_send(&g_leaf_opr);
             #endif
-        }
+        } while(0);
+
     } while(0);
     return rval;
 }

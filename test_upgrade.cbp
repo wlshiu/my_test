@@ -58,10 +58,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="gateway.h" />
-		<Unit filename="gen_data.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="gen_data.h" />
 		<Unit filename="leaf_end.c">
 			<Option compilerVar="CC" />
 		</Unit>

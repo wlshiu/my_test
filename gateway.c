@@ -176,14 +176,16 @@ gateway_routine(void)
 {
     int     rval = 0;
     do {
-        do {    // receive from controller
+        upg_pkt_info_t      pkt_info = { .cb_fill_data = _fill_req, };
+
+        do { // receive from controller
             g_gw_opr.port   = CONFIG_CONTROLLER_SINK_PORT;
             g_gw_opr.length = sizeof(g_gw_buf);
             rval = upg_recv(&g_gw_opr);
             if( g_gw_opr.length <= 0 )
                 break;
 
-            upg_pkt_info_t      pkt_info = {0};
+            // TODO: assemble data slices in difference packets
 
             pkt_info.pBuf_pkt     = g_gw_buf;
             pkt_info.buf_pkt_len  = sizeof(g_gw_buf);
@@ -194,6 +196,7 @@ gateway_routine(void)
                 break;
             }
 
+            // response received message
             if( pkt_info.pPkt_hdr )
             {
                 upg_pkt_hdr_t   *pPkt_hdr = pkt_info.pPkt_hdr;
@@ -201,18 +204,36 @@ gateway_routine(void)
                 switch( pPkt_hdr->cmd_opcode )
                 {
                     case UPG_OPCODE_DISCOVERY_REQ:
-                        log_msg("(rx gw) get disc req\n");
+                        log_msg("(gw rx ctlr) get disc req\n");
+
+                        //------------------------------
+                        // forward to leaf end
+                        g_gw_opr.length = sizeof(g_gw_buf);
+                        g_gw_opr.port   = CONFIG_LEAF_SOURCE_PORT;
+                        upg_send(&g_gw_opr);
+
+                        //------------------------------
+                        // response to controller
+                        pkt_info.opcode = UPG_OPCODE_DISCOVERY_RESP;
+                        rval = upg_pkt_pack(&pkt_info);
+                        if( rval )
+                        {
+                            printf("pack fail %d\n", rval);
+                            break;
+                        }
+
+                        log_msg("(gw resp disc)\n");
+
+                        g_gw_opr.length = sizeof(g_gw_buf);
+                        g_gw_opr.port   = CONFIG_CONTROLLER_SOURCE_PORT;
+                        upg_send(&g_gw_opr);
+                        break;
+
+                    default:
+                        log_msg("(rx gw) drop opcode= %02x\n", pPkt_hdr->cmd_opcode);
                         break;
                 }
             }
-
-            // TODO: response received message
-            #if 0
-            g_gw_opr.length = sizeof(g_gw_buf);
-            g_gw_opr.port   = CONFIG_CONTROLLER_SOURCE_PORT;
-
-            upg_send(&g_gw_opr);
-            #endif
         } while(0);
 
 
@@ -220,16 +241,34 @@ gateway_routine(void)
             g_gw_opr.port     = CONFIG_LEAF_SINK_PORT;
             g_gw_opr.length   = sizeof(g_gw_buf);
             rval = upg_recv(&g_gw_opr);
-            if( g_gw_opr.length > 0 )
-            {
-                log_msg("(rx leaf) %s\n", g_gw_opr.pData);
-                // TODO: response received message
-                #if 0
-                g_gw_opr.length = sizeof(g_gw_buf);
-                g_gw_opr.port   = CONFIG_LEAF_SOURCE_PORT;
+            if( g_gw_opr.length <= 0 )
+                break;
 
-                upg_send(&g_gw_opr);
-                #endif
+            // TODO: assemble data slices in difference packets
+
+            pkt_info.pBuf_pkt     = g_gw_buf;
+            pkt_info.buf_pkt_len  = sizeof(g_gw_buf);
+            rval = upg_pkt_unpack(&pkt_info);
+            if( rval )
+            {
+                log_msg("unpack fail \n");
+                break;
+            }
+
+            // response received message
+            if( pkt_info.pPkt_hdr )
+            {
+                upg_pkt_hdr_t   *pPkt_hdr = pkt_info.pPkt_hdr;
+
+                // TODO: send response to leaf end and forward to controller
+
+                switch( pPkt_hdr->cmd_opcode )
+                {
+                    case UPG_OPCODE_DISCOVERY_REQ:
+                    default:
+                        log_msg("(rx gw) drop opcode= %02x\n", pPkt_hdr->cmd_opcode);
+                        break;
+                }
             }
         } while(0);
 
