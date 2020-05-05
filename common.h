@@ -43,25 +43,13 @@ extern "C" {
 #define SOCK_LEAF_SINK       3
 #define SOCK_TOTAL           4
 
-
-typedef enum upg_opcode
-{
-    UPG_OPCODE_BASE         = 0x00,
-    UPG_OPCODE_DISCOVERY    = 0x01,
-
-
-    UPG_OPCODE_DATA         = 0xd0,
-    UPG_OPCODE_DATA_WR      = 0xd1,
-    UPG_OPCODE_DATA_REQ     = 0xd2,
-
-} upg_opcode_t;
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
 #define log_msg(str, ...)                   \
     do {                                    \
         pthread_mutex_lock(&g_log_mtx);     \
-        printf(str, ##__VA_ARGS__ );        \
+        printf("[%s:%d] " str, __func__, __LINE__, ##__VA_ARGS__ );        \
         pthread_mutex_unlock(&g_log_mtx);   \
     } while(0)
 //=============================================================================

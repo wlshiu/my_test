@@ -47,14 +47,13 @@ _leaf_send(upg_operator_t *pOp)
 {
     int     rval = 0;
     do {
-        sock_info_t         *pSock_info = (sock_info_t*)pOp->pTunnel_info;
-        struct sockaddr_in  *pSock_in = 0;
-        SOCKET              sd;
+        rbi_t       *pRBI = 0;
+        uint8_t     *pCur = 0;
 
         if( pOp->port == CONFIG_LEAF_SINK_PORT )
         {
-            sd       = pSock_info[SOCK_LEAF_SINK].sd;
-            pSock_in = &pSock_info[SOCK_LEAF_SINK].sock_in;
+            rval = common_get_rbi(SOCK_LEAF_SINK, &pRBI);
+            if( rval ) break;
         }
         else
         {
@@ -62,8 +61,14 @@ _leaf_send(upg_operator_t *pOp)
             break;
         }
 
-        rval = sendto(sd, (const char*)pOp->pData, pOp->length,
-                      0, (struct sockaddr*)pSock_in, sizeof(struct sockaddr_in));
+        *((uint32_t*)pCur) = pOp->length;
+
+        memcpy(pCur + 4, pOp->pData, pOp->length);
+
+        while( (rval = rbi_push(pRBI, (uint32_t)pCur)) )
+        {
+            Sleep(3);
+        }
     } while(0);
     return rval;
 }
@@ -73,14 +78,14 @@ _leaf_recv(upg_operator_t *pOp)
 {
     int     rval = 0;
     do {
-        sock_info_t         *pSock_info = (sock_info_t*)pOp->pTunnel_info;
-        SOCKET              sd;
-        struct sockaddr_in  remote_addr;
-        int                 addr_len = sizeof(remote_addr);
+        rbi_t       *pRBI = 0;
+        uint8_t     *pCur = 0;
+        int         len = 0;
 
         if( pOp->port == CONFIG_LEAF_SOURCE_PORT )
         {
-            sd = pSock_info[SOCK_LEAF_SOURCE].sd;
+            rval = common_get_rbi(SOCK_LEAF_SOURCE, &pRBI);
+            if( rval ) break;
         }
         else
         {
@@ -88,16 +93,21 @@ _leaf_recv(upg_operator_t *pOp)
             break;
         }
 
-        rval = recvfrom(sd, (char*)pOp->pData, pOp->length,
-                        0, (struct sockaddr*)&remote_addr, &addr_len);
-
-        pOp->length = (rval > 0) ? rval : 0;
-        if( pOp->length )
+        if( rbi_pick(pRBI) )
         {
-            pOp->pData[pOp->length - 1] = 0x00;
-            log_msg("[leaf:%d] from(%s) '%s' \n",
-                    pOp->port, inet_ntoa(remote_addr.sin_addr), pOp->pData);
+            uint32_t    raw_size = 0;
+
+            pCur = (uint8_t*)rbi_pop(pRBI);
+
+            raw_size = *((uint32_t*)pCur);
+            len = (raw_size < pOp->length) ? raw_size : pOp->length;
+
+            memset(pOp->pData, 0x0, pOp->length);
+            memcpy(pOp->pData, pCur + 4, len);
+            free(pCur);
         }
+
+        pOp->length = len;
     } while(0);
     return rval;
 }
@@ -115,49 +125,6 @@ leaf_init(void)
         g_leaf_opr.cb_ll_recv   = _leaf_recv;
         g_leaf_opr.cb_ll_send   = _leaf_send;
 
-        //-----------------------
-        // setup BSD sockets
-        for(int i = 0; i < SOCK_TOTAL; i++)
-        {
-            u_long  no_block = 1;
-
-            if( i == SOCK_CTLR_SOURCE ||
-                i == SOCK_CTLR_SINK )
-            {
-                g_leaf_sock_info[i].sd = -1;
-                continue;
-            }
-
-            g_leaf_sock_info[i].sd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-            if( g_leaf_sock_info[i].sd == INVALID_SOCKET )
-            {
-                rval = -1;
-                log_msg("socket error !");
-                break;
-            }
-
-            ioctlsocket(g_leaf_sock_info[i].sd, FIONBIO, &no_block);
-        }
-
-        if( rval ) break;
-
-        // socket server
-        g_leaf_sock_info[SOCK_LEAF_SOURCE].sock_in.sin_family           = AF_INET;
-        g_leaf_sock_info[SOCK_LEAF_SOURCE].sock_in.sin_port             = htons(g_leaf_sock_info[SOCK_LEAF_SOURCE].port);
-        g_leaf_sock_info[SOCK_LEAF_SOURCE].sock_in.sin_addr.S_un.S_addr = INADDR_ANY;
-        if( bind(g_leaf_sock_info[SOCK_LEAF_SOURCE].sd,
-                 (struct sockaddr*)&g_leaf_sock_info[SOCK_LEAF_SOURCE].sock_in,
-                 sizeof(struct sockaddr_in)) == SOCKET_ERROR )
-        {
-            rval = -1;
-            log_msg("bind error %d !\n");
-            break;
-        }
-
-        // socket client
-        g_leaf_sock_info[SOCK_LEAF_SINK].sock_in.sin_family           = AF_INET;
-        g_leaf_sock_info[SOCK_LEAF_SINK].sock_in.sin_port             = htons(g_leaf_sock_info[SOCK_LEAF_SINK].port);
-        g_leaf_sock_info[SOCK_LEAF_SINK].sock_in.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
     } while(0);
     return rval;
 }
@@ -166,16 +133,6 @@ int
 leaf_deinit(void)
 {
     int     rval = 0;
-    //-----------------------
-    // destroy BSD sockets
-    for(int i = 0; i < SOCK_TOTAL; i++)
-    {
-        if( g_leaf_sock_info[i].sd < 0 )
-            continue;
-
-        closesocket(g_leaf_sock_info[i].sd);
-    }
-
     return rval;
 }
 
@@ -188,8 +145,10 @@ leaf_routine(void)
         g_leaf_opr.port     = CONFIG_LEAF_SOURCE_PORT;
         g_leaf_opr.length   = sizeof(g_leaf_buf);
         rval = upg_recv(&g_leaf_opr);
-        if( rval > 0 )
+        if( g_leaf_opr.length > 0 )
         {
+            log_msg("(rx gw) %s\n", g_leaf_opr.pData);
+
             // TODO: response received message
             #if 0
             g_leaf_opr.length = sizeof(g_leaf_buf);

@@ -77,6 +77,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="upgrade.h" />
+		<Unit filename="upgrade_packets.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="upgrade_packets.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

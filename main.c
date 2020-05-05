@@ -17,6 +17,8 @@
 #include "upgrade.h"
 #include "gateway.h"
 #include "leaf_end.h"
+
+#include "upgrade_packets.h"
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -36,8 +38,6 @@ typedef struct ctlr_info
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
-pthread_mutex_t             g_log_mtx;
-
 static pthread_cond_t       g_usr_cond;
 static pthread_mutex_t      g_usr_mtx;
 
@@ -204,7 +204,6 @@ _ctlr_init(void)
         g_ctlr_opr.cb_ll_recv   = _ctlr_recv;
         g_ctlr_opr.cb_ll_send   = _ctlr_send;
 
-
     } while(0);
     return rval;
 }
@@ -216,6 +215,35 @@ _ctlr_deinit(void)
     return rval;
 }
 
+static int
+_fill_req(
+    upg_pkt_info_t  *pInfo)
+{
+    upg_pkt_hdr_t   *pPkt_hdr = pInfo->pPkt_hdr;
+
+    switch( pInfo->opcode )
+    {
+        default:    break;
+
+        case UPG_OPCODE_DATA_WR:
+            pPkt_hdr->short_data = 0x3333;
+
+            // payload is appended to packet header
+            snprintf((char*)pPkt_hdr->pPayload, pInfo->buf_pkt_len - pInfo->cur_pkt_len, "%s", "ctlr discovery");
+
+            pInfo->cur_pkt_len += (strlen((const char*)pPkt_hdr->pPayload) + 1);
+
+            if( pInfo->cur_pkt_len & 0x1 )
+            {
+                pPkt_hdr->pPayload[pInfo->cur_pkt_len] = 0;
+
+                // packet length MUST be 2-bytes alignment
+                pInfo->cur_pkt_len++;
+            }
+            break;
+    }
+    return 0;
+}
 
 static int
 _task_controller(void *argv)
@@ -225,6 +253,7 @@ _task_controller(void *argv)
 
     do {
         FILE     *fin = pInfo->fp;
+        int      step = 0;
 
         rval = _ctlr_init();
         if( rval ) break;
@@ -239,7 +268,7 @@ _task_controller(void *argv)
             rval = upg_recv(&g_ctlr_opr);
             if( g_ctlr_opr.length > 0 )
             {
-                printf("%s\n", (char*)g_ctlr_opr.pData);
+                log_msg("(rx gw) %s\n", (char*)g_ctlr_opr.pData);
 
                 // TODO: response received message
                 #if 0
@@ -252,18 +281,51 @@ _task_controller(void *argv)
 
             //--------------------
             // active
-        #if 1
-            static int cnt = 0;
-            if( cnt++ < 3 )
             {
-                snprintf((char*)g_ctlr_opr.pData, sizeof(g_ctlr_buf), "hi %d ~~~~", cnt);
-                g_ctlr_opr.length = strlen((const char*)g_ctlr_buf) + 1;
-//                g_ctlr_opr.port   = CONFIG_CONTROLLER_SINK_PORT;
-                g_ctlr_opr.port   = CONFIG_CONTROLLER_SOURCE_PORT;
-                upg_send(&g_ctlr_opr);
-            }
+                upg_pkt_info_t      pkt_info = {0};
 
-        #else
+                pkt_info.cur_pkt_len  = 0;
+                pkt_info.pPkt_hdr     = (upg_pkt_hdr_t*)g_ctlr_buf;
+                pkt_info.pBuf_pkt     = g_ctlr_buf;
+                pkt_info.buf_pkt_len  = sizeof(g_ctlr_buf);
+                pkt_info.cb_fill_data = _fill_req;
+
+                switch( step )
+                {
+                    case 0:
+                        pkt_info.opcode = UPG_OPCODE_DISCOVERY_REQ;
+                        step++;
+                        break;
+                    case 1:
+                        step++;
+                        break;
+                    default:
+                        step = -1;
+                        static int   is_done = 0;
+                        if( is_done == 0 )
+                        {
+                            log_msg("ctlr idle\n");
+                            is_done = 1;
+                        }
+                        break;
+                }
+
+                if( step > 0 )
+                {
+                    rval = upg_pkt_pack(&pkt_info);
+                    if( rval )
+                    {
+                        printf("pack fail %d\n", rval);
+                        step--; // retry
+                        continue;
+                    }
+
+	                g_ctlr_opr.length = pkt_info.cur_pkt_len;
+	                g_ctlr_opr.port   = CONFIG_CONTROLLER_SINK_PORT;
+	                upg_send(&g_ctlr_opr);
+                }
+            }
+        #if 0
             if( fin )
             {
                 int     slice_size = CONFIG_DATA_SLICE_SIZE;
@@ -309,17 +371,17 @@ int main(int argc, char **argv)
         rval = pthread_cond_init(&g_usr_cond, 0);
         if( rval )   break;
 
-//        pthread_create(&t_gw, 0, _task_gateway, &is_running);
-//
-//        pthread_mutex_lock(&g_usr_mtx);
-//        pthread_cond_wait(&g_usr_cond, &g_usr_mtx);
-//        pthread_mutex_unlock(&g_usr_mtx);
+        pthread_create(&t_gw, 0, _task_gateway, &is_running);
 
-//        pthread_create(&t_leaf, 0, _task_leaf_end, &is_running);
-//
-//        pthread_mutex_lock(&g_usr_mtx);
-//        pthread_cond_wait(&g_usr_cond, &g_usr_mtx);
-//        pthread_mutex_unlock(&g_usr_mtx);
+        pthread_mutex_lock(&g_usr_mtx);
+        pthread_cond_wait(&g_usr_cond, &g_usr_mtx);
+        pthread_mutex_unlock(&g_usr_mtx);
+
+        pthread_create(&t_leaf, 0, _task_leaf_end, &is_running);
+
+        pthread_mutex_lock(&g_usr_mtx);
+        pthread_cond_wait(&g_usr_cond, &g_usr_mtx);
+        pthread_mutex_unlock(&g_usr_mtx);
 
         common_init();
         //-----------------------
