@@ -62,6 +62,12 @@ _leaf_send(upg_operator_t *pOp)
             break;
         }
 
+        if( !(pCur = malloc(pOp->length + 4)) )
+        {
+            rval = -1;
+            break;
+        }
+
         *((uint32_t*)pCur) = pOp->length;
 
         memcpy(pCur + 4, pOp->pData, pOp->length);
@@ -112,6 +118,41 @@ _leaf_recv(upg_operator_t *pOp)
     } while(0);
     return rval;
 }
+
+static int
+_leaf_end_fill_req(
+    upg_pkt_info_t  *pInfo)
+{
+    upg_pkt_hdr_t   *pPkt_hdr = pInfo->pPkt_hdr;
+
+    switch( pInfo->opcode )
+    {
+        default:    break;
+
+        case UPG_OPCODE_DISCOVERY_RESP:
+            pInfo->pPkt_hdr->short_data = 0x111;
+            break;
+
+        case UPG_OPCODE_DATA_WR:
+            pPkt_hdr->short_data = UPG_DISCOVERY_ACK;
+
+            // payload is appended to packet header
+            snprintf((char*)pPkt_hdr->pPayload, pInfo->buf_pkt_len - pInfo->cur_pkt_len, "%s", "ctlr discovery");
+
+            pInfo->cur_pkt_len += (strlen((const char*)pPkt_hdr->pPayload) + 1);
+
+            if( pInfo->cur_pkt_len & 0x1 )
+            {
+                pPkt_hdr->pPayload[pInfo->cur_pkt_len] = 0;
+
+                // packet length MUST be 2-bytes alignment
+                pInfo->cur_pkt_len++;
+            }
+            break;
+    }
+    return 0;
+}
+
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
@@ -155,6 +196,7 @@ leaf_routine(void)
 
             pkt_info.pBuf_pkt     = g_leaf_buf;
             pkt_info.buf_pkt_len  = sizeof(g_leaf_buf);
+            pkt_info.cb_fill_data = 0;
             rval = upg_pkt_unpack(&pkt_info);
             if( rval )
             {
@@ -169,18 +211,31 @@ leaf_routine(void)
                 switch( pPkt_hdr->cmd_opcode )
                 {
                     case UPG_OPCODE_DISCOVERY_REQ:
-                        log_msg("(leaf rx gw) get disc req\n");
+                        log_msg("(leaf rx gw) disc req\n");
+
+                        //------------------------------
+                        // response to controller
+                        pkt_info.opcode       = UPG_OPCODE_DISCOVERY_RESP;
+                        pkt_info.buf_pkt_len  = sizeof(g_leaf_buf);
+                        pkt_info.cb_fill_data = _leaf_end_fill_req;
+                        rval = upg_pkt_pack(&pkt_info);
+                        if( rval )
+                        {
+                            printf("pack fail %d\n", rval);
+                            break;
+                        }
+
+                        log_msg("(leaf resp disc to gw)\n");
+
+                        g_leaf_opr.length = sizeof(g_leaf_buf);
+                        g_leaf_opr.port   = CONFIG_LEAF_SINK_PORT;
+                        upg_send(&g_leaf_opr);
+                        break;
+                    default:
+                        log_msg("(leaf rx) drop opcode= %02x\n", pPkt_hdr->cmd_opcode);
                         break;
                 }
             }
-
-            // TODO: response received message
-            #if 0
-            g_leaf_opr.length = sizeof(g_leaf_buf);
-            g_leaf_opr.port   = CONFIG_CONTROLLER_SOURCE_PORT;
-
-            upg_send(&g_leaf_opr);
-            #endif
         } while(0);
 
     } while(0);

@@ -216,7 +216,7 @@ _ctlr_deinit(void)
 }
 
 static int
-_fill_req(
+_ctlr_fill_req(
     upg_pkt_info_t  *pInfo)
 {
     upg_pkt_hdr_t   *pPkt_hdr = pInfo->pPkt_hdr;
@@ -262,13 +262,47 @@ _task_controller(void *argv)
         // controller routine
         while( *pInfo->pIs_running )
         {
-            // receive from gateway
-            g_ctlr_opr.port     = CONFIG_CONTROLLER_SOURCE_PORT;
-            g_ctlr_opr.length   = sizeof(g_ctlr_buf);
-            rval = upg_recv(&g_ctlr_opr);
-            if( g_ctlr_opr.length > 0 )
-            {
-                log_msg("(rx gw) %s\n", (char*)g_ctlr_opr.pData);
+            upg_pkt_info_t      pkt_info = {0};
+
+            pkt_info.cur_pkt_len  = 0;
+            pkt_info.pPkt_hdr     = (upg_pkt_hdr_t*)g_ctlr_buf;
+            pkt_info.pBuf_pkt     = g_ctlr_buf;
+            pkt_info.buf_pkt_len  = sizeof(g_ctlr_buf);
+            pkt_info.cb_fill_data = _ctlr_fill_req;
+
+            do { // receive from gateway
+                g_ctlr_opr.port     = CONFIG_CONTROLLER_SOURCE_PORT;
+                g_ctlr_opr.length   = sizeof(g_ctlr_buf);
+                rval = upg_recv(&g_ctlr_opr);
+                if( g_ctlr_opr.length <= 0 )
+                    break;
+
+                // TODO: assemble data slices in difference packets
+
+                pkt_info.pBuf_pkt     = g_ctlr_buf;
+                pkt_info.buf_pkt_len  = sizeof(g_ctlr_buf);
+                rval = upg_pkt_unpack(&pkt_info);
+                if( rval )
+                {
+                    log_msg("unpack fail \n");
+                    break;
+                }
+
+                // response received message
+                if( pkt_info.pPkt_hdr )
+                {
+                    upg_pkt_hdr_t   *pPkt_hdr = pkt_info.pPkt_hdr;
+
+                    switch( pPkt_hdr->cmd_opcode )
+                    {
+                        case UPG_OPCODE_DISCOVERY_RESP:
+                            log_msg("(ctlr get resp) 0x%x\n", pPkt_hdr->short_data);
+                            break;
+                        default:
+                            log_msg("(ctlr rx) drop opcode= %02x\n", pPkt_hdr->cmd_opcode);
+                            break;
+                    }
+                }
 
                 // TODO: response received message
                 #if 0
@@ -277,53 +311,45 @@ _task_controller(void *argv)
 
                 upg_send(&g_ctlr_opr);
                 #endif
-            }
+            } while(0);
+
+
 
             //--------------------
             // active
+            switch( step )
             {
-                upg_pkt_info_t      pkt_info = {0};
-
-                pkt_info.cur_pkt_len  = 0;
-                pkt_info.pPkt_hdr     = (upg_pkt_hdr_t*)g_ctlr_buf;
-                pkt_info.pBuf_pkt     = g_ctlr_buf;
-                pkt_info.buf_pkt_len  = sizeof(g_ctlr_buf);
-                pkt_info.cb_fill_data = _fill_req;
-
-                switch( step )
-                {
-                    case 0:
-                        pkt_info.opcode = UPG_OPCODE_DISCOVERY_REQ;
-                        step++;
-                        break;
-                    case 1:
-                        step++;
-                        break;
-                    default:
-                        step = -1;
-                        static int   is_done = 0;
-                        if( is_done == 0 )
-                        {
-                            log_msg("ctlr idle\n");
-                            is_done = 1;
-                        }
-                        break;
-                }
-
-                if( step > 0 )
-                {
-                    rval = upg_pkt_pack(&pkt_info);
-                    if( rval )
+                case 0:
+                    pkt_info.opcode = UPG_OPCODE_DISCOVERY_REQ;
+                    step++;
+                    break;
+//                case 1:
+//                    step++;
+//                    break;
+                default:
+                    step = -1;
+                    static int   is_done = 0;
+                    if( is_done == 0 )
                     {
-                        printf("pack fail %d\n", rval);
-                        step--; // retry
-                        continue;
+                        log_msg("ctlr idle\n");
+                        is_done = 1;
                     }
+                    break;
+            }
 
-	                g_ctlr_opr.length = pkt_info.cur_pkt_len;
-	                g_ctlr_opr.port   = CONFIG_CONTROLLER_SINK_PORT;
-	                upg_send(&g_ctlr_opr);
+            if( step > 0 )
+            {
+                rval = upg_pkt_pack(&pkt_info);
+                if( rval )
+                {
+                    printf("pack fail %d\n", rval);
+                    step--; // retry
+                    continue;
                 }
+
+                g_ctlr_opr.length = pkt_info.cur_pkt_len;
+                g_ctlr_opr.port   = CONFIG_CONTROLLER_SINK_PORT;
+                upg_send(&g_ctlr_opr);
             }
         #if 0
             if( fin )

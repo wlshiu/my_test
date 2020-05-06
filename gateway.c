@@ -18,7 +18,12 @@
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
+typedef enum gw_role
+{
+    GW_ROLE_SELF            = 1,
+    GW_ROLE_DOWN_STREAM,
 
+} gw_role_t;
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -131,16 +136,21 @@ _gateway_recv(upg_operator_t *pOp)
 
 
 static int
-_fill_req(
+_gateway_fill_req(
     upg_pkt_info_t  *pInfo)
 {
+    gw_role_t       *pRole = (gw_role_t*)pInfo->pExtra;
     upg_pkt_hdr_t   *pPkt_hdr = pInfo->pPkt_hdr;
 
     switch( pInfo->opcode )
     {
         default:    break;
         case UPG_OPCODE_DISCOVERY_RESP:
-            pPkt_hdr->short_data = UPG_DISCOVERY_ACK;
+            if( *pRole == GW_ROLE_SELF )
+            {
+                pPkt_hdr->short_data = 0x333;
+                break;
+            }
             break;
     }
     return 0;
@@ -176,7 +186,7 @@ gateway_routine(void)
 {
     int     rval = 0;
     do {
-        upg_pkt_info_t      pkt_info = { .cb_fill_data = _fill_req, };
+        upg_pkt_info_t      pkt_info = {0};
 
         do { // receive from controller
             g_gw_opr.port   = CONFIG_CONTROLLER_SINK_PORT;
@@ -199,12 +209,13 @@ gateway_routine(void)
             // response received message
             if( pkt_info.pPkt_hdr )
             {
+                gw_role_t       role = GW_ROLE_SELF;
                 upg_pkt_hdr_t   *pPkt_hdr = pkt_info.pPkt_hdr;
 
                 switch( pPkt_hdr->cmd_opcode )
                 {
                     case UPG_OPCODE_DISCOVERY_REQ:
-                        log_msg("(gw rx ctlr) get disc req\n");
+                        log_msg("(gw rx ctlr) disc req\n");
 
                         //------------------------------
                         // forward to leaf end
@@ -212,9 +223,13 @@ gateway_routine(void)
                         g_gw_opr.port   = CONFIG_LEAF_SOURCE_PORT;
                         upg_send(&g_gw_opr);
 
+                    case UPG_OPCODE_DISCOVERY_RESP:
                         //------------------------------
                         // response to controller
-                        pkt_info.opcode = UPG_OPCODE_DISCOVERY_RESP;
+                        pkt_info.opcode       = UPG_OPCODE_DISCOVERY_RESP;
+                        pkt_info.buf_pkt_len  = sizeof(g_gw_buf);
+                        pkt_info.cb_fill_data = _gateway_fill_req;
+                        pkt_info.pExtra       = &role;
                         rval = upg_pkt_pack(&pkt_info);
                         if( rval )
                         {
@@ -222,7 +237,7 @@ gateway_routine(void)
                             break;
                         }
 
-                        log_msg("(gw resp disc)\n");
+                        log_msg("(gw resp disc to ctlr)\n");
 
                         g_gw_opr.length = sizeof(g_gw_buf);
                         g_gw_opr.port   = CONFIG_CONTROLLER_SOURCE_PORT;
@@ -230,14 +245,14 @@ gateway_routine(void)
                         break;
 
                     default:
-                        log_msg("(rx gw) drop opcode= %02x\n", pPkt_hdr->cmd_opcode);
+                        log_msg("(gw rx) drop opcode= %02x\n", pPkt_hdr->cmd_opcode);
                         break;
                 }
             }
         } while(0);
 
 
-        do {    // receive from leaf end
+        do { // receive from leaf end
             g_gw_opr.port     = CONFIG_LEAF_SINK_PORT;
             g_gw_opr.length   = sizeof(g_gw_buf);
             rval = upg_recv(&g_gw_opr);
@@ -258,12 +273,36 @@ gateway_routine(void)
             // response received message
             if( pkt_info.pPkt_hdr )
             {
+                gw_role_t       role = GW_ROLE_DOWN_STREAM;
                 upg_pkt_hdr_t   *pPkt_hdr = pkt_info.pPkt_hdr;
 
                 // TODO: send response to leaf end and forward to controller
 
                 switch( pPkt_hdr->cmd_opcode )
                 {
+                    case UPG_OPCODE_DISCOVERY_RESP:
+                        log_msg("(gw rx leaf) disc resp\n");
+
+                        //------------------------------
+                        // forward to controller
+                        pkt_info.opcode       = UPG_OPCODE_DISCOVERY_RESP;
+                        pkt_info.buf_pkt_len  = sizeof(g_gw_buf);
+                        pkt_info.cb_fill_data = _gateway_fill_req;
+                        pkt_info.pExtra       = &role;
+                        rval = upg_pkt_pack(&pkt_info);
+                        if( rval )
+                        {
+                            printf("pack fail %d\n", rval);
+                            break;
+                        }
+
+                        log_msg("(gw forward leaf disc to ctlr)\n");
+
+                        g_gw_opr.length = sizeof(g_gw_buf);
+                        g_gw_opr.port   = CONFIG_CONTROLLER_SOURCE_PORT;
+                        upg_send(&g_gw_opr);
+                        break;
+
                     case UPG_OPCODE_DISCOVERY_REQ:
                     default:
                         log_msg("(rx gw) drop opcode= %02x\n", pPkt_hdr->cmd_opcode);

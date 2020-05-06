@@ -141,7 +141,6 @@ upg_pkt_pack(
         pPkt_hdr->cmd_opcode    = pInfo->opcode;
         pPkt_hdr->serial_num    = 1;
         pPkt_hdr->total_packets = 1;
-        pPkt_hdr->short_data    = UPG_IGNORE;
 
         pInfo->cur_pkt_len = sizeof(upg_pkt_hdr_t);
 
