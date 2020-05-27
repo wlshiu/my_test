@@ -56,6 +56,7 @@
     > generate bash script
 + test_upgrade
 + test_serial_port_win
+    > [Serial-Programming-Win32API-C](https://github.com/xanthium-enterprises/Serial-Programming-Win32API-C)
 
 
 # MS Visual Studio
