@@ -55,6 +55,7 @@
 + test_script
     > generate bash script
 + test_upgrade
++ test_serial_port_win
 
 
 # MS Visual Studio
