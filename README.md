@@ -43,6 +43,14 @@
 + test_rsa
     > Asymmetric Encryption: use Public and Private Key-pair
 
+    - host side (private keys)
+        > + select the PEM item of a customer with kconfig
+        > + PEM item list with share object (for easily updating)
+
+    - user side (a public key)
+        > release a PEM item or encapsulate to share object
+
+
 # MS Visual Studio
 
 + include libs
