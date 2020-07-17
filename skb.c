@@ -28,7 +28,8 @@
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
-
+static cb_malloc_t      g_malloc = 0;
+static cb_free_t        g_free = 0;
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -36,17 +37,61 @@
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
-skb_t*
-skb_create(skb_conf_t *pConf)
+/**
+ *  @brief  skb_init
+ *              initialize sk buffer mechanism
+ *
+ *  @param [in] pConf   the configuration of sk buffer mechanism
+ *  @return
+ *      0: ok, others: fail
+ */
+int
+skb_init(skb_conf_t *pConf)
 {
-    skb_t   *pDev = 0;
+    int     rval = 0;
+    return rval;
+}
 
-    return pDev;
+void
+skb_deinit()
+{
+    return;
+}
+
+/**
+ *  @brief  skb_create
+ *              create a skb item
+ *  @return
+ *      NULL or pointer of a skb item
+ */
+skb_t*
+skb_create(int length)
+{
+    skb_t   *pSkb = 0;
+    do {
+        if( !g_malloc || !g_free || !length )
+            break;
+
+        pSkb = g_malloc(sizeof(skb_t));
+        if( !pSkb ) break;
+
+        pSkb->ref_cnt = 1;
+
+    } while(0);
+
+    return pSkb;
 }
 
 void
 skb_destroy(skb_t *pSkb)
 {
+    do {
+        if( !pSkb || --pSkb->ref_cnt )
+            break;
+
+        // do free
+
+    } while(0);
     return;
 }
 
@@ -74,3 +119,15 @@ skb_align(
     int     rval = 0;
     return rval;
 }
+
+
+
+
+
+
+
+
+
+
+
+
