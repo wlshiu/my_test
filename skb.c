@@ -11,12 +11,16 @@
  */
 
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 #include "skb.h"
 
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-
+#define CONFIG_SKB_SLOT_NUM         3//16
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -24,15 +28,137 @@
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
+typedef struct skb_list
+{
+    skb_t   *head;
+    skb_t   *tail;
+} skb_list_t;
 
+typedef struct skb_dev
+{
+    cb_malloc_t     cb_malloc;
+    cb_free_t       cb_free;
+
+    skb_list_t      skb_used;
+    skb_list_t      skb_wild;
+
+} skb_dev_t;
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
-static cb_malloc_t      g_malloc = 0;
-static cb_free_t        g_free = 0;
+static skb_t            g_skb_pool[CONFIG_SKB_SLOT_NUM] = {0};
+static skb_dev_t        g_skb_dev = {0};
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
+static int
+_skb_enqueue(skb_list_t *pSkb_list, skb_t *pSkb)
+{
+    int     rval = 0;
+    do {
+        if( !pSkb )
+        {
+            rval = -1;
+            break;
+        }
+        pSkb->next = 0;
+
+        if( pSkb_list->head )
+            pSkb_list->tail->next = pSkb;
+        else
+            pSkb_list->head = pSkb;
+
+        pSkb_list->tail = pSkb;
+
+    } while(0);
+
+    return rval;
+}
+
+static skb_t*
+_skb_dequeue(skb_list_t *pSkb_list, skb_t *pSkb)
+{
+    do {
+        skb_t   *pCur = 0;
+        if( !pSkb )
+        {
+            // dequeue the first item
+            pSkb = pSkb_list->head;
+            pSkb_list->head = (pSkb) ? pSkb->next : 0;
+            break;
+        }
+
+        pCur = pSkb_list->head;
+
+        while( pCur )
+        {
+            if( pCur->next == pSkb )
+            {
+                pCur->next = pSkb->next;
+                break;
+            }
+
+            pCur = pCur->next;
+        }
+
+    } while(0);
+    return pSkb;
+}
+
+static void
+_skb_list_dump(skb_list_t *pSkb_list, char *prefix)
+{
+    skb_t   *pSkb = pSkb_list->head;
+    while( pSkb )
+    {
+        printf("%s: %p\n", prefix, pSkb);
+        pSkb = pSkb->next;
+    }
+    return;
+}
+
+
+static void
+_test_skb_queue()
+{
+#if 0
+    int     cnt = 10;
+    skb_t   *pSkb = 0;
+
+    srand(time(0));
+
+    for(int i = 0; i < CONFIG_SKB_SLOT_NUM; i++)
+    {
+        printf("%d-th: %08x\n", i, &g_skb_pool[i]);
+    }
+
+    printf("=========\n");
+    _skb_list_dump(&g_skb_dev.skb_wild, "wild");
+    _skb_list_dump(&g_skb_dev.skb_used, "used");
+
+    while( cnt-- )
+    {
+        switch( (rand() % 33) & 0x1 )
+        {
+            case 1:
+                printf("---%d: used(enq), wild(deq)\n", __LINE__);
+                pSkb = _skb_dequeue(&g_skb_dev.skb_wild, 0);
+                _skb_enqueue(&g_skb_dev.skb_used, pSkb);
+
+                break;
+            default:
+                printf("---%d: wild(enq), used(deq)\n", __LINE__);
+                pSkb = _skb_dequeue(&g_skb_dev.skb_used, 0);
+                _skb_enqueue(&g_skb_dev.skb_wild, pSkb);
+                break;
+        }
+
+        _skb_list_dump(&g_skb_dev.skb_wild, "wild");
+        _skb_list_dump(&g_skb_dev.skb_used, "used");
+    }
+#endif
+    return;
+}
 
 //=============================================================================
 //                  Public Function Definition
@@ -45,16 +171,46 @@ static cb_free_t        g_free = 0;
  *  @return
  *      0: ok, others: fail
  */
-int
+skb_err_t
 skb_init(skb_conf_t *pConf)
 {
-    int     rval = 0;
+    skb_err_t   rval = SKB_ERR_OK;
+
+    do {
+        if( !pConf || !pConf->pf_malloc || !pConf->pf_free )
+        {
+            rval = SKB_ERR_WRONG_PARAM;
+            break;
+        }
+
+        memset(&g_skb_dev, 0x0, sizeof(g_skb_dev));
+
+        g_skb_dev.cb_malloc = pConf->pf_malloc;
+        g_skb_dev.cb_free   = pConf->pf_free;
+
+        {
+            skb_list_t      *pSkb_list = &g_skb_dev.skb_wild;
+
+            pSkb_list->head = &g_skb_pool[0];
+            pSkb_list->tail = pSkb_list->head;
+
+            for(int i = 1; i < CONFIG_SKB_SLOT_NUM; i++)
+            {
+                pSkb_list->tail->next = &g_skb_pool[i];
+                pSkb_list->tail = pSkb_list->tail->next;
+            }
+        }
+
+        _test_skb_queue();
+    } while(0);
+
     return rval;
 }
 
 void
 skb_deinit()
 {
+    // TODO: destroy all skb items
     return;
 }
 
@@ -69,11 +225,37 @@ skb_create(int length)
 {
     skb_t   *pSkb = 0;
     do {
-        if( !g_malloc || !g_free || !length )
+        skb_err_t   rval = SKB_ERR_OK;
+        if( !length )
+        {
+            rval = SKB_ERR_WRONG_PARAM;
             break;
+        }
 
-        pSkb = g_malloc(sizeof(skb_t));
-        if( !pSkb ) break;
+        pSkb = _skb_dequeue(&g_skb_dev.skb_wild, 0);
+        if( !pSkb )
+        {
+            rval = SKB_ERR_FULL;
+            break;
+        }
+
+        memset(pSkb, 0x0, sizeof(skb_t));
+
+        pSkb->head = g_skb_dev.cb_malloc(0, length);
+        if( !pSkb->head )
+        {
+            _skb_enqueue(&g_skb_dev.skb_wild, pSkb);
+
+            pSkb = 0;
+            rval = SKB_ERR_NO_DATA_BUFFER;
+            break;
+        }
+
+        pSkb->transport_hdr = -1;
+        pSkb->network_hdr   = -1;
+        pSkb->mac_hdr       = -1;
+
+        _skb_enqueue(&g_skb_dev.skb_used, pSkb);
 
         pSkb->ref_cnt = 1;
 
@@ -89,7 +271,10 @@ skb_destroy(skb_t *pSkb)
         if( !pSkb || --pSkb->ref_cnt )
             break;
 
-        // do free
+        g_skb_dev.cb_free(0, pSkb->head);
+
+        pSkb = _skb_dequeue(&g_skb_dev.skb_used, pSkb);
+        _skb_enqueue(&g_skb_dev.skb_wild, pSkb);
 
     } while(0);
     return;

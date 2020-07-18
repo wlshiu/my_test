@@ -21,7 +21,13 @@ extern "C" {
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-
+typedef enum skb_err
+{
+    SKB_ERR_OK              = 0,
+    SKB_ERR_WRONG_PARAM,
+    SKB_ERR_FULL,
+    SKB_ERR_NO_DATA_BUFFER,
+} skb_err_t;
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -29,8 +35,8 @@ extern "C" {
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
-typedef void* (*cb_malloc_t)(uint32_t len);
-typedef void  (*cb_free_t)(void *p);
+typedef void* (*cb_malloc_t)(int type, uint32_t len);
+typedef void  (*cb_free_t)(int type, void *p);
 
 #pragma pack(1)
 /**
@@ -49,10 +55,9 @@ typedef struct skb
 {
     struct skb      *next;
 
-    uint8_t     ref_cnt;
-
-	uint16_t    len;
-	uint16_t    data_len;
+    uint32_t    ref_cnt  : 6;
+	uint32_t    len      : 13;
+	uint32_t    data_len : 13;
 
 #if 1
 	uint16_t    transport_hdr;
@@ -91,8 +96,8 @@ typedef struct skb_conf
     /**
      *  skb memory pool
      */
-    uint8_t     *pMem_pool;
-    uint32_t    mem_pool_len;
+//    uint8_t     *pMem_pool;
+//    uint32_t    mem_pool_len;
 } skb_conf_t;
 
 //=============================================================================
@@ -106,10 +111,33 @@ typedef struct skb_conf
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
+/**
+ *  @brief  skb_init
+ *              initialize sk buffer mechanism
+ *
+ *  @param [in] pConf   the configuration of sk buffer mechanism
+ *  @return
+ *      0: ok, others: fail
+ */
+skb_err_t
+skb_init(skb_conf_t *pConf);
 
 
+void
+skb_deinit(void);
+
+/**
+ *  @brief  skb_create
+ *              create a skb item
+ *  @return
+ *      NULL or pointer of a skb item
+ */
+skb_t*
+skb_create(int length);
 
 
+void
+skb_destroy(skb_t *pSkb);
 
 
 static inline void skb_ref(skb_t *pSkb)
