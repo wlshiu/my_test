@@ -20,6 +20,8 @@
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
+//#define CONFIG_TEST_SBK_QUEUE
+
 #define CONFIG_SKB_SLOT_NUM         3//16
 //=============================================================================
 //                  Macro Definition
@@ -39,7 +41,10 @@ typedef struct skb_dev
     cb_malloc_t     cb_malloc;
     cb_free_t       cb_free;
 
+#if defined(CONFIG_TEST_SBK_QUEUE)
     skb_list_t      skb_used;
+#endif
+
     skb_list_t      skb_wild;
 
 } skb_dev_t;
@@ -121,7 +126,7 @@ _skb_list_dump(skb_list_t *pSkb_list, char *prefix)
 static void
 _test_skb_queue()
 {
-#if 0
+#if defined(CONFIG_TEST_SBK_QUEUE)
     int     cnt = 10;
     skb_t   *pSkb = 0;
 
@@ -208,9 +213,17 @@ skb_init(skb_conf_t *pConf)
 }
 
 void
-skb_deinit()
+skb_deinit(void)
 {
-    // TODO: destroy all skb items
+    for(int i = 0; i < CONFIG_SKB_SLOT_NUM; i++)
+    {
+        skb_t   *pSkb = &g_skb_pool[i];
+
+        if( pSkb->head )
+            g_skb_dev.cb_free(0, pSkb->head);
+    }
+
+    memset(&g_skb_pool, 0x0, sizeof(g_skb_pool));
     return;
 }
 
@@ -251,11 +264,15 @@ skb_create(int length)
             break;
         }
 
+        pSkb->end = length;
+
         pSkb->transport_hdr = -1;
         pSkb->network_hdr   = -1;
         pSkb->mac_hdr       = -1;
 
+    #if defined(CONFIG_TEST_SBK_QUEUE)
         _skb_enqueue(&g_skb_dev.skb_used, pSkb);
+    #endif
 
         pSkb->ref_cnt = 1;
 
@@ -271,21 +288,19 @@ skb_destroy(skb_t *pSkb)
         if( !pSkb || --pSkb->ref_cnt )
             break;
 
-        g_skb_dev.cb_free(0, pSkb->head);
+        if( pSkb->head )
+            g_skb_dev.cb_free(0, pSkb->head);
 
+    #if defined(CONFIG_TEST_SBK_QUEUE)
         pSkb = _skb_dequeue(&g_skb_dev.skb_used, pSkb);
+    #endif
+
         _skb_enqueue(&g_skb_dev.skb_wild, pSkb);
 
     } while(0);
     return;
 }
 
-int
-skb_reserve(skb_t *pSkb)
-{
-    int     rval = 0;
-    return rval;
-}
 
 void*
 skb_push(

@@ -59,7 +59,7 @@
 + test_serial_port_linux
 + test_float_bits
 + test_skb
-    > analyze socket buffer of linux net sub-system
+    > my socket buffer implement (reference socket buffer of linux net sub-system)
 
 
 # MS Visual Studio

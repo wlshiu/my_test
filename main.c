@@ -67,6 +67,10 @@ int main(int argc, char **argv)
         pSkb = skb_create(100);
         if( !pSkb ) break;
 
+        skb_ref(pSkb);
+
+
+        skb_destroy(pSkb);
 
         skb_destroy(pSkb);
     } while(0);

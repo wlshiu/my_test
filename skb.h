@@ -140,6 +140,19 @@ void
 skb_destroy(skb_t *pSkb);
 
 
+static inline void skb_reserve(skb_t *pSkb, int len)
+{
+    if( !pSkb ) return;
+	pSkb->data += len;
+	pSkb->tail += len;
+	return;
+}
+
+static inline uint8_t* skb_get_data(skb_t *pSkb)
+{
+    return (pSkb) ? pSkb->head + pSkb->data : 0;
+}
+
 static inline void skb_ref(skb_t *pSkb)
 {
     if( pSkb ) pSkb->ref_cnt++;
