@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_fat" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_fat" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DFATFS_INC_FORMAT_SUPPORT" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_fat" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="fat_access.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="fat_access.h" />
+		<Unit filename="fat_cache.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="fat_cache.h" />
+		<Unit filename="fat_defs.h" />
+		<Unit filename="fat_filelib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="fat_filelib.h" />
+		<Unit filename="fat_format.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="fat_format.h" />
+		<Unit filename="fat_list.h" />
+		<Unit filename="fat_misc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="fat_misc.h" />
+		<Unit filename="fat_opts.h" />
+		<Unit filename="fat_string.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="fat_string.h" />
+		<Unit filename="fat_table.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="fat_table.h" />
+		<Unit filename="fat_types.h" />
+		<Unit filename="fat_write.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="fat_write.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
