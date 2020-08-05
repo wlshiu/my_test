@@ -19,7 +19,7 @@
 #define BPB_ROOTENTCNT          17    // Length = 2
 #define BPB_TOTSEC16            19    // Length = 2
 #define BPB_MEDIA               21    // Length = 1
-#define    BPB_FATSZ16          22    // Length = 2
+#define BPB_FATSZ16             22    // Length = 2
 #define BPB_SECPERTRK           24    // Length = 2
 #define BPB_NUMHEADS            26    // Length = 2
 #define BPB_HIDDSEC             28    // Length = 4
