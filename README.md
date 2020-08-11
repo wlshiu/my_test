@@ -1,107 +1,244 @@
-# my_test
+[![Join the chat at https://gitter.im/gkostka/lwext4](https://badges.gitter.im/gkostka/lwext4.svg)](https://gitter.im/gkostka/lwext4?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![License (GPL v2.0)](https://img.shields.io/badge/license-GPL%20(v2.0)-blue.svg?style=flat-square)](http://opensource.org/licenses/GPL-2.0)
+[![Build Status](https://travis-ci.org/gkostka/lwext4.svg)](https://travis-ci.org/gkostka/lwext4)
+[![](http://img.shields.io/gratipay/user/gkostka.svg)](https://gratipay.com/gkostka/)
 
-+ master
-+ test_avi
-+ test_bslot
-+ test_c_wrap_py
-+ test_combination
-+ test_crc32
-+ test_fatfs
-+ test_frame_buf
-+ test_libevent
-+ test_llist
-+ test_log2mem
-+ test_lwip
-+ test_msg_box
-+ test_ring_log
-+ test_sim_spifc
-+ test_string_reverse
-+ test_timer
-+ test_trace_malloc
-+ test_wsdiscovery
-+ test_xml
-+ test_tftp
-    - [reference](https://github.com/wlshiu/tftpx)
-+ test_uip
-+ test_elf2
-+ test_shell
-    - It MUST be on Windows 10 platform
-        > support `ENABLE_VIRTUAL_TERMINAL_PROCESSING`
-+ test_backtrace
-    > backtrace for MCU system
+![lwext4](https://cloud.githubusercontent.com/assets/8606098/11697327/68306d88-9eb9-11e5-8807-81a2887f077e.png)
 
-    - [reference](https://github.com/armink/CmBacktrace)
-+ test_rbuf
-    - ring buffer template
-        > if end_idx catches start_idx, replace the data and force start_idx forward
-+ test_protothreads
-    > Protothreads function as stackless, lightweight threads, or coroutines, providing a blocking context cheaply using minimal memory per protothread (on the order of single bytes).
-+ test_uart_term
-    > base on raspberry pi
-+ test_test_nodeq
-    > node queue base on share memory pool between 2 tasks
-+ test_rsa
-    > Asymmetric Encryption: use Public and Private Key-pair
-+ test_version_info
-    > import key-pair for authentication
-+ test_auto_script
-    > configure regiter of H/w module with script
-+ test_sw_time_event
-    > software time event trigger
-+ test_lwmesh
-    > mesh route [Atmel Lightweight Mesh](https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/Atmel%20Lightweight%20Mesh)
-+ test_print
-    > [Tiny print](https://github.com/mpaland/printf)
-+ test_script
-    > generate bash script
-+ test_upgrade
-+ test_serial_port_win
-+ test_serial_port_linux
-+ test_float_bits
-+ test_skb
-    > analyze socket buffer of linux net sub-system
-+ test_fat
-    > [fat_io_lib](https://github.com/ultraembedded/fat_io_lib)
-+ test_ext2
-    > [EXT2 Linux File System](https://github.com/yoonje/ext2-linux-file-system)
-+ test_lwext4
-    > [lwext4](https://github.com/gkostka/lwext4)
+About
+=====
 
-# MS Visual Studio
 
-+ include libs
-    - `shell32.lib`
-        > 用於打開網頁和文件, 建立文件時的默認文件名的設置等大量功能.嚴格來講, 它只是代碼的合集, 真正執行這些功能的是操作系統的相關程序, dll文件只是根據設置調用這些程序的相關功能罷了.
-    - `ws2_32.lib`
-        > Windows Sockets應用程序接口, 用於支持Internet和網絡應用程序
-        >>　bsd socket api, WSAxxx api
+The main goal of the lwext4 project is to provide ext2/3/4 filesystem for microcontrollers. It may be an interesting alternative for traditional MCU filesystem libraries (mostly based on FAT32). Library has some cool and unique features in microcontrollers world:
+ - directory indexing - fast file find and list operations
+ - extents - fast big file truncate
+ - journaling transactions & recovery - power loss resistance
 
-    ```
-    #include <winsock2.h>
-    #pragma comment (lib, "ws2_32.lib")  //加載 ws2_32.dll
-    ```
+Lwext4 is an excellent choice for SD/MMC card, USB flash drive or any other wear
+leveled memory types. However it is not good for raw flash devices.
 
-    - `comctl32.lib`
-        > 提供各種標準視窗介面元件.它提供對話框如開啟檔案, 存檔及另存新檔, 或視窗元件如按鈕和進度列.它倚靠 user32.dll 和 Gdi32.dll 來建立及管理這些介面元素
-    - `iphlpapi.lib`
-        > 用來獲取, 設置網絡相關參數, 比如設置IP地址, 獲取網卡是否被禁用, 還有一些和ARP, 路由表相關的參數, 比如nmap的windows port版本就利用了這個ip helper api.
-    - `mswsock.lib`
-        > 提供 Winsock 網絡服務相關元件
-    - `kernel32.lib`
-        > 提供應用程式一些Win32下的基底API, 包括記憶體管理, 輸入/輸出操作和同步函式
-    - `user32.lib`
-        > 提供建立和管理 Windows 圖形介面的功能, 例如桌面, 視窗和功能表.裡面的函式可以讓應用程式建立及管理視窗, 接收 Windows 訊息（(諸如使用者的輸入或系統的通知), 在視窗中顯示文字, 及顯示一個訊息視窗.
-          這個函式庫裡面大部份函式也需要倚靠 Gdi32.dll 提供的繪圖功能, 來對使用者介面進行彩現.有些程式還會直接使用GDI函式, 來對先前由 User32.dll 所建立的視窗進行底層繪圖.
-    - `gdi32.lib`
-        > 提供跟圖形裝置介面有關的函式, 例如輸出到顯示卡和列印機的原生繪圖功能
-    - `winspool.lib`
-        > 提供列印功能接口
-    - `comdlg32.lib`
-    - `advapi32.lib`
-    - `ole32.lib`
-    - `oleaut32.lib`
-    - `uuid.lib`
-    - `odbc32.lib`
-    - `odbccp32.lib`
-    - `libntdll`
+Feel free to contact me:
+kostka.grzegorz@gmail.com
+
+Credits
+=====
+
+The most of the source code of lwext4 was taken from HelenOS:
+* http://helenos.org/
+
+Some features are based on FreeBSD and Linux implementations.
+
+KaHo Ng (https://github.com/ngkaho1234):
+* advanced extents implementation
+* xattr support
+* metadata checksum support
+* journal recovery & transactions
+* many bugfixes & improvements
+
+Lwext4 could be used also as fuse internals. Here is a nice project which uses lwext4 as a filesystem base:
+* https://github.com/ngkaho1234/fuse-lwext4
+
+Some of the source files are licensed under GPLv2. It makes whole
+lwext4 GPLv2 licensed. To use library as a BSD3, GPLv2 licensed source
+files must be removed first. At this point there are two files
+licensed under GPLv2:
+* ext4_xattr.c
+* ext4_extents.c
+
+All other modules and headers are BSD-3-Clause licensed code.
+
+
+Features
+=====
+
+* filetypes: regular, directories, softlinks
+* support for hardlinks
+* multiple blocksize supported: 1KB, 2KB, 4KB ... 64KB
+* little/big endian architectures supported
+* multiple configurations (ext2/ext3/ext4)
+* only C standard library dependency
+* various CPU architectures supported (x86/64, cortex-mX, msp430 ...)
+* small memory footprint
+* flexible configurations
+
+Memory footprint
+------------
+
+Advanced ext4 filesystem features, like extents or journaling require some memory. 
+However most of the memory expensive features could be disabled at compile time.
+Here is a brief summary for cortex-m4 processor:
+
+* .text:  20KB - only ext2 fs support , 50KB - full ext4 fs feature set
+* .data:  8KB - minimum 8 x 1KB  block cache, 12KB - when journaling and extents are enabled
+* .stack: 2KB - is enough (not measured precisely)
+
+Blocks are allocated dynamically. Previous versions of library could work without
+malloc but from 1.0.0 dynamic memory allocation is required. However, block cache
+should not allocate more than CONFIG_BLOCK_DEV CACHE_SIZE.
+
+Supported ext2/3/4 features
+=====
+incompatible:
+------------
+*  filetype, recover, meta_bg, extents, 64bit, flex_bg: **yes**
+*  compression, journal_dev, mmp, ea_inode, dirdata, bg_meta_csum, largedir, inline_data: **no**
+
+compatible:
+------------
+*  has_journal, ext_attr, dir_index: **yes**
+*  dir_prealloc, imagic_inodes, resize_inode: **no**
+
+read-only:
+------------
+*  sparse_super, large_file, huge_file, gdt_csum, dir_nlink, extra_isize, metadata_csum: **yes**
+*  quota, bigalloc, btree_dir: **no**
+
+Project tree
+=====
+*  blockdev         - block devices set, supported blockdev
+*  fs_test          - test suite, mkfs and demo application
+*  src              - source files
+*  include          - header files
+*  toolchain        - cmake toolchain files
+*  CMakeLists.txt   - CMake config file
+*  ext_images.7z    - compressed ext2/3/4 100MB images
+*  fs_test.mk       - automatic tests definitions
+*  Makefile         - helper makefile to generate cmake and run test suite
+*  README.md       - readme file
+  
+Compile
+=====
+Dependencies
+------------
+* Windows 
+
+Download MSYS-2:  https://sourceforge.net/projects/msys2/
+
+Install required packages is MSYS2 Shell package manager:
+```bash
+ pacman -S make gcc cmake p7zip
+  ```
+  
+* Linux 
+
+Package installation (Debian):
+```bash
+ apt-get install make gcc cmake p7zip
+  ```
+ 
+Compile & install tools
+------------
+```bash
+ make generic
+ cd build_generic
+ make
+ sudo make install
+ ```
+
+lwext4-generic demo application
+=====
+Simple lwext4 library test application:
+* load ext2/3/4 images
+* load linux block device with ext2/3/4 part
+* load windows volume with ext2/3/4 filesystem 
+* directory speed test
+* file write/read speed test
+
+How to use for images/blockdevices:
+```bash
+ lwext4-generic -i ext_images/ext2 
+ lwext4-generic -i ext_images/ext3 
+ lwext4-generic -i ext_images/ext4 
+ ```
+ 
+Show full option set:
+```bash
+ lwext4-generic --help
+   ```
+
+Run automatic tests
+=====
+
+Execute tests for 100MB unpacked images:
+```bash
+ make test
+   ```
+Execute tests for autogenerated 1GB images (only on Linux targets) + fsck:
+```bash
+ make test_all
+   ```
+Using lwext4-mkfs tool
+=====
+It is possible to create ext2/3/4 partition by internal library tool.
+
+Generate empty file (1GB):
+```bash
+ dd if=/dev/zero of=ext_image bs=1M count=1024
+   ```
+Create ext2 partition:
+```bash
+ lwext4-mkfs -i ext_image -e 2
+   ```
+Create ext3 partition:
+```bash
+ lwext4-mkfs -i ext_image -e 3
+   ```
+Create ext4 partition:
+```bash
+ lwext4-mkfs -i ext_image -e 4
+   ```
+Show full option set:
+```bash
+ lwext4-mkfs --help
+   ```
+
+Cross compile standalone library
+=====
+Toolchains needed:
+------------
+
+Lwext4 could be compiled for many targets. Here are an examples for 8/16/32/64 bit architectures.
+* generic for x86 or amd64
+* arm-none-eabi-gcc for ARM cortex-m0/m3/m4 microcontrollers
+* avr-gcc for AVR xmega microcontrollers
+* bfin-elf-gcc for blackfin processors
+* msp430-gcc for msp430 microcontrollers
+
+Library has been tested only for generic (amd64) & ARM Cortex M architectures.
+For other targets compilation passes (with warnings somewhere) but tests are
+not done yet. Lwext4 code is written with endianes respect. Big endian
+behavior also hasn't been tested yet.
+
+Build avrxmega7 library:
+------------
+```bash
+ make avrxmega7
+ cd build_avrxmega7
+ make lwext4
+ ```
+
+Build cortex-m0 library:
+------------
+```bash
+ make cortex-m0
+ cd build_cortex-m0
+ make lwext4
+ ```
+
+Build cortex-m3 library:
+------------
+```bash
+ make cortex-m3
+ cd build_cortex-m3
+ make lwext4
+ ```
+
+Build cortex-m4 library:
+------------
+```bash
+ make cortex-m4
+ cd build_cortex-m4
+ make lwext4
+```
+
 
