@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_fdt" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_fdt" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DNO_YAML" />
+					<Add directory="dtc-1.6.0/libfdt" />
+					<Add directory="dtc-1.6.0" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_fdt" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="dtc-1.6.0/checks.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/data.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/dtc-lexer.lex.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/dtc-parser.tab.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/dtc-parser.tab.h" />
+		<Unit filename="dtc-1.6.0/dtc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/dtc.h" />
+		<Unit filename="dtc-1.6.0/flattree.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/fstree.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/libfdt/fdt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/libfdt/fdt.h" />
+		<Unit filename="dtc-1.6.0/libfdt/fdt_addresses.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/libfdt/fdt_check.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/libfdt/fdt_empty_tree.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/libfdt/fdt_overlay.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/libfdt/fdt_ro.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/libfdt/fdt_rw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/libfdt/fdt_strerror.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/libfdt/fdt_sw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/libfdt/fdt_wip.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/libfdt/libfdt.h" />
+		<Unit filename="dtc-1.6.0/libfdt/libfdt_env.h" />
+		<Unit filename="dtc-1.6.0/libfdt/libfdt_internal.h" />
+		<Unit filename="dtc-1.6.0/livetree.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/srcpos.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/treesource.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/util.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dtc-1.6.0/util.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
