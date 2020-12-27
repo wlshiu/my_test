@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_lzma" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_lzma" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="d unittest.lzma testout.bin " />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-D_CONSOLE" />
+					<Add option="-DWIN32" />
+					<Add option="-D_7ZIP_ST" />
+					<Add directory="liblzma" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_lzma" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="liblzma/7zFile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="liblzma/7zFile.h" />
+		<Unit filename="liblzma/7zStream.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="liblzma/7zVersion.h" />
+		<Unit filename="liblzma/Alloc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="liblzma/Alloc.h" />
+		<Unit filename="liblzma/LzFind.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="liblzma/LzFind.h" />
+		<Unit filename="liblzma/LzmaDec.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="liblzma/LzmaDec.h" />
+		<Unit filename="liblzma/LzmaEnc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="liblzma/LzmaEnc.h" />
+		<Unit filename="liblzma/Types.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -54,6 +54,7 @@ dkms.conf
 *.layout
 obj/*
 bin/*
+out/*
 *.7z
 *.gz
 cscope*
