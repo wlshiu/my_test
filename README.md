@@ -68,6 +68,8 @@
     > [lwext4](https://github.com/gkostka/lwext4)
 + test_fdt
     > linux device tree
++ test_lzma
+    > test lzma with lzma920
 
 # MS Visual Studio
 
