@@ -70,6 +70,8 @@
     > linux device tree
 + test_lzma
     > test lzma with lzma920
++ test_backtrace_nds32
+    > implement backtrace in nds32
 
 # MS Visual Studio
 
