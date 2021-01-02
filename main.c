@@ -22,7 +22,12 @@
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
-
+static backtrace_txt_range_t    g_txt_range[] =
+{
+    { .start = 0x30000000, .end = 0x30200000, },
+    { .start = 0x00000000, .end = 0x00020000, },
+    { .start = 0x60000000, .end = 0x00040000, },
+};
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
@@ -51,6 +56,8 @@ int main(int argc, char **argv)
         fread(pStack, 1, filesize, fin);
         fclose(fin);
         fin = 0;
+
+        backtrace_init(&g_txt_range, sizeof(g_txt_range)/sizeof(g_txt_range[0]));
 
         backtrace((unsigned long)pStack, (unsigned long)pStack + filesize, 0, 0);
 

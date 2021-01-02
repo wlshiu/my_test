@@ -31,8 +31,8 @@ extern "C" {
 //=============================================================================
 typedef struct backtrace_txt_range
 {
-    unsigned long       *star;
-    unsigned long       *end;
+    unsigned long       start;
+    unsigned long       end;
 } backtrace_txt_range_t;
 //=============================================================================
 //                  Global Data Definition

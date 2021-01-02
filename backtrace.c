@@ -13,7 +13,9 @@
 
 #include <stdio.h>
 #include "backtrace.h"
-
+#if 0
+#include <nds32_intrinsic.h>
+#endif
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -34,6 +36,9 @@
 
     #define portFPU_REGS    32
 #endif
+
+
+#define SP_BASE     0x110550
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -132,7 +137,36 @@ static backtrace_mgr_t      g_backtrace_mgr = {0};
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
-#define SP_BASE     0x110550
+static unsigned long
+_backtrace_check_txt_addr(unsigned long addr)
+{
+    unsigned long    is_in_range = 0ll;
+    for(int i = 0; i < g_backtrace_mgr.range_num; i++)
+    {
+        backtrace_txt_range_t   *pRange = &g_backtrace_mgr.pTxt_range[i];
+        if( pRange->start <= addr && addr < pRange->end )
+        {
+            is_in_range = (unsigned long)-1;
+            break;
+        }
+    }
+    return is_in_range;
+}
+
+static unsigned long
+_backtrace_is_active_task(
+    unsigned long sp_cur,
+    unsigned long sp_start)
+{
+    #if 0
+    unsigned long   sp = __nds32__get_current_sp();
+    #else
+    unsigned long   sp = (unsigned long)-1;
+    #endif
+
+    return ( sp_cur <= sp && sp < sp_start) ? 1ll : 0ll;
+}
+
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
@@ -146,43 +180,88 @@ backtrace_init(
     return;
 }
 
+
+/**
+ *  @brief  backtrace
+ *              try to search the backtrace of a task
+ *  @param [in] sp_cur              the current stack pointer
+ *  @param [in] sp_start            the max stack pointer
+ *  @param [in] pBacktrace_symbols  output buffer of link-pointers
+ *  @param [in] backtrace_level     the max output frame level, pFrame[frame_level]
+ *  @return
+ *      none
+ *
+ *  @details
+ *
+ *      low +------+
+ *          |      |
+ *          +------+ <--- sp_cur
+ *          |  ^   |
+ *          |  |   |
+ *          +------+ <--- sp_start
+ *          |      |
+ *     high +------+
+ */
 void
 backtrace(
     unsigned long   sp_cur,
     unsigned long   sp_start,
-    unsigned long   *pFrame,
-    int             frame_level)
+    unsigned long   *pBacktrace_symbols,
+    int             backtrace_level)
 {
     stack_nds32_t   *pStack_cntxt_switch = (stack_nds32_t*)sp_cur;
 
     do {
         stack_frame_t   *pFrame = 0;
 
-        printf("size = 0x%x\n", sizeof(stack_nds32_t));
-        printf(" sp   = 0x%08x\n", pStack_cntxt_switch->sp);
-        printf(" psw  = 0x%08x\n", pStack_cntxt_switch->psw);
-        printf(" ipc  = 0x%08x\n", pStack_cntxt_switch->ipc);
-        printf(" ipsw = 0x%08x\n", pStack_cntxt_switch->ipsw);
-        printf(" r27 = 0x%08x\n", pStack_cntxt_switch->r27);
+        if( !_backtrace_is_active_task(sp_cur, sp_start) )
+        {
+            printf("size = 0x%x\n", sizeof(stack_nds32_t));
+            printf(" sp   = 0x%08x\n", pStack_cntxt_switch->sp);
+            printf(" psw  = 0x%08x\n", pStack_cntxt_switch->psw);
+            printf(" ipc  = 0x%08x\n", pStack_cntxt_switch->ipc);
+            printf(" ipsw = 0x%08x\n", pStack_cntxt_switch->ipsw);
+            printf(" r27 = 0x%08x\n", pStack_cntxt_switch->r27);
 
-        printf(" fp = 0x%08x, 0x%08x\n", pStack_cntxt_switch->fp, pStack_cntxt_switch->fp - SP_BASE);
-        printf(" gp = 0x%08x\n", pStack_cntxt_switch->gp);
-        printf(" lp = 0x%08x\n", pStack_cntxt_switch->lp);
+            printf(" fp = 0x%08x, 0x%08x\n", pStack_cntxt_switch->fp, pStack_cntxt_switch->fp - SP_BASE);
+            printf(" gp = 0x%08x\n", pStack_cntxt_switch->gp);
+            printf(" lp = 0x%08x\n", pStack_cntxt_switch->lp);
 
-        frame_level = (frame_level > 0) ? frame_level : 5;
+            backtrace_level = (backtrace_level > 0) ? backtrace_level : 5;
 
-        if( (pStack_cntxt_switch->fp & 0x3) )
-            break;
+            if( (pStack_cntxt_switch->fp & 0x3) ||
+                !_backtrace_check_txt_addr(pStack_cntxt_switch->lp) )
+                break;
 
-        #if 0
-        pFrame = (stack_frame_t*)(pStack_cntxt_switch->fp - sizeof(stack_frame_t));
-        #else
-        //-------- for test
-        pFrame = (stack_frame_t*)(pStack_cntxt_switch->fp - sizeof(stack_frame_t) - SP_BASE + sp_cur);
-        #endif
+            if( pBacktrace_symbols && backtrace_level )
+            {
+                *pBacktrace_symbols++ = pStack_cntxt_switch->lp;
+                backtrace_level--;
+            }
+            else
+            {
+                printf("caller: 0x%08x \n");
+            }
 
+            #if 0
+            pFrame = (stack_frame_t*)(pStack_cntxt_switch->fp - sizeof(stack_frame_t));
+            #else
+            //-------- for test
+            pFrame = (stack_frame_t*)(pStack_cntxt_switch->fp - sizeof(stack_frame_t) - SP_BASE + sp_cur);
+            #endif
+        }
+        else
+        {
+            unsigned long   *fp_reg = 0;
 
-        for(int level = 0; level < frame_level; level++)
+            #if 0
+            __asm__ __volatile__("ori  %0, $fp, #0\n": "=r"(fp_reg));
+            #endif
+
+            pFrame = (stack_frame_t*)fp_reg;
+        }
+
+        for(int level = 0; level < backtrace_level; level++)
         {
             printf("--- frame %d (0x%08x)---\n", level, pFrame);
             printf("fp = 0x%08x\n", pFrame->fp);
@@ -191,6 +270,9 @@ backtrace(
 
             if( (pFrame->fp & 0x3) ||
                 pFrame->fp > sp_start || pFrame->fp < sp_cur)
+                break;
+
+            if( !_backtrace_check_txt_addr(pFrame->lp) )
                 break;
 
             #if 0
@@ -204,7 +286,15 @@ backtrace(
                 break;
             #endif
 
-
+            if( pBacktrace_symbols && backtrace_level )
+            {
+                *pBacktrace_symbols++ = pFrame->lp;
+                backtrace_level--;
+            }
+            else
+            {
+                printf("caller: 0x%08x \n");
+            }
         }
 
 
