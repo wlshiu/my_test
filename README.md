@@ -72,6 +72,8 @@
     > test lzma with lzma920
 + test_backtrace_nds32
     > implement backtrace in nds32
++ test_mem_watermark
+    > the stack usage detection
 
 # MS Visual Studio
 
