@@ -76,6 +76,9 @@
     > the stack usage detection
 + test_tlsf
     > Two-Level Segregated Fit memory allocator [TLSF](https://github.com/mattconte/tlsf)
++ test_xlsxio
+    > read xlsx file
+
 
 # MS Visual Studio
 
