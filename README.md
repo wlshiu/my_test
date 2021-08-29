@@ -78,7 +78,8 @@
     > Two-Level Segregated Fit memory allocator [TLSF](https://github.com/mattconte/tlsf)
 + test_xlsxio
     > read xlsx file
-
++ test_lsh
+    > [LSH](https://github.com/brenns10/lsh) is a simple implementation of a shell in C
 
 # MS Visual Studio
 
