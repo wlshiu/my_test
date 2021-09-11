@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="pin_table.json" />
+				<Option parameters="pin_table.json --oh table.h --ob table2.bin" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -43,6 +43,7 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="ut_common.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
