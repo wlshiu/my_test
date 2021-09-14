@@ -66,52 +66,55 @@ typedef enum ut_method
 
 } ut_method_t;
 
+
+#define PIN_IGNORE          0
+
 /**
  *  uart pin
  */
-typedef enum uart_pin
+typedef enum pin_uart
 {
-    UART_PIN_TX = UT_UID_UART | 0x1,
-    UART_PIN_RX = UT_UID_UART | 0x2,
-} uart_pin_t;
+    PIN_UART_TX = UT_UID_UART | 0x1,
+    PIN_UART_RX = UT_UID_UART | 0x2,
+} pin_uart_t;
 
 
 /**
  *  i2c pin
  */
-typedef enum i2c_pin
+typedef enum pin_i2c
 {
-    I2C_PIN_SCL = UT_UID_I2C | 0x1,
-    I2C_PIN_SDA = UT_UID_I2C | 0x2,
-} i2c_pin_t;
+    PIN_I2C_SCL = UT_UID_I2C | 0x1,
+    PIN_I2C_SDA = UT_UID_I2C | 0x2,
+} pin_i2c_t;
 
 /**
  *  spi pin
  */
-typedef enum spi_pin
+typedef enum pin_spi
 {
-    SPI_PIN_CS    = UT_UID_SPI | 0x1,
-    SPI_PIN_CLK   = UT_UID_SPI | 0x2,
-    SPI_PIN_MISO  = UT_UID_SPI | 0x3,
-    SPI_PIN_MOSI  = UT_UID_SPI | 0x4,
-} spi_pin_t;
+    PIN_SPI_CS    = UT_UID_SPI | 0x1,
+    PIN_SPI_CLK   = UT_UID_SPI | 0x2,
+    PIN_SPI_MISO  = UT_UID_SPI | 0x3,
+    PIN_SPI_MOSI  = UT_UID_SPI | 0x4,
+} pin_spi_t;
 
 /**
  *  timer pin
  */
-typedef enum tim_pin
+typedef enum pin_tim
 {
-    TIM_PIN_PWM      = UT_UID_TIM | 0x1,
-    TIM_PIN_CAPTURE  = UT_UID_TIM | 0x2,
-} tim_pin_t;
+    PIN_TIM_PWM      = UT_UID_TIM | 0x1,
+    PIN_TIM_CAPTURE  = UT_UID_TIM | 0x2,
+} pin_tim_t;
 
 /**
  *  gpio pin
  */
-typedef enum gpio_pin
+typedef enum pin_gpio
 {
-    GPIO_IO_PIN      = UT_UID_MISC | 0x1,
-} gpio_pin_t;
+    PIN_GPIO_IO      = UT_UID_MISC | 0x1,
+} pin_gpio_t;
 //=============================================================================
 //                  Macro Definition
 //=============================================================================

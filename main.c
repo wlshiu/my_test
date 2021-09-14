@@ -227,7 +227,7 @@ int main(int argc, char **argv)
                                cJSON_GetStringValue(pJType),
                                (int)cJSON_GetNumberValue(pJAF));
 
-                        if( g_pin_attr_cnt < CONFIG_SUPPORT_MAX_NUM )
+                        if( g_pin_attr_cnt < (CONFIG_SUPPORT_MAX_NUM - 1) )
                         {
                             char    *pPort = cJSON_GetStringValue(pJPort);
                             char    *pType = cJSON_GetStringValue(pJType);
@@ -267,38 +267,38 @@ int main(int argc, char **argv)
                             if( !strncmp(g_hw_ip[i], CONFIG_KEY_UART, strlen(CONFIG_KEY_UART)) )
                             {
                                 if( !strncmp(pType, CONFIG_TYPE_TX, strlen(CONFIG_TYPE_TX)) )
-                                    g_pin_attr[g_pin_attr_cnt].pin_type = UART_PIN_TX;
+                                    g_pin_attr[g_pin_attr_cnt].pin_type = PIN_UART_TX;
                                 else if( !strncmp(pType, CONFIG_TYPE_RX, strlen(CONFIG_TYPE_RX)) )
-                                    g_pin_attr[g_pin_attr_cnt].pin_type = UART_PIN_RX;
+                                    g_pin_attr[g_pin_attr_cnt].pin_type = PIN_UART_RX;
                             }
                             else if( !strncmp(g_hw_ip[i], CONFIG_KEY_I2C, strlen(CONFIG_KEY_I2C)) )
                             {
                                 if( !strncmp(pType, CONFIG_TYPE_CLK, strlen(CONFIG_TYPE_CLK)) )
-                                    g_pin_attr[g_pin_attr_cnt].pin_type = I2C_PIN_SCL;
+                                    g_pin_attr[g_pin_attr_cnt].pin_type = PIN_I2C_SCL;
                                 else if( !strncmp(pType, CONFIG_TYPE_DAT, strlen(CONFIG_TYPE_DAT)) )
-                                    g_pin_attr[g_pin_attr_cnt].pin_type = I2C_PIN_SDA;
+                                    g_pin_attr[g_pin_attr_cnt].pin_type = PIN_I2C_SDA;
                             }
                             else if( !strncmp(g_hw_ip[i], CONFIG_KEY_SPI, strlen(CONFIG_KEY_SPI)) )
                             {
                                 if( !strncmp(pType, CONFIG_TYPE_CLK, strlen(CONFIG_TYPE_CLK)) )
-                                    g_pin_attr[g_pin_attr_cnt].pin_type = SPI_PIN_CLK;
+                                    g_pin_attr[g_pin_attr_cnt].pin_type = PIN_SPI_CLK;
                                 else if( !strncmp(pType, CONFIG_TYPE_CS, strlen(CONFIG_TYPE_CS)) )
-                                    g_pin_attr[g_pin_attr_cnt].pin_type = SPI_PIN_CS;
+                                    g_pin_attr[g_pin_attr_cnt].pin_type = PIN_SPI_CS;
                                 else if( !strncmp(pType, CONFIG_TYPE_MOSI, strlen(CONFIG_TYPE_MOSI)) )
-                                    g_pin_attr[g_pin_attr_cnt].pin_type = SPI_PIN_MOSI;
+                                    g_pin_attr[g_pin_attr_cnt].pin_type = PIN_SPI_MOSI;
                                 else if( !strncmp(pType, CONFIG_TYPE_MISO, strlen(CONFIG_TYPE_MISO)) )
-                                    g_pin_attr[g_pin_attr_cnt].pin_type = SPI_PIN_MISO;
+                                    g_pin_attr[g_pin_attr_cnt].pin_type = PIN_SPI_MISO;
                             }
                             else if( !strncmp(g_hw_ip[i], CONFIG_KEY_GPIO, strlen(CONFIG_KEY_GPIO)) )
                             {
-                                g_pin_attr[g_pin_attr_cnt].pin_type = GPIO_IO_PIN;
+                                g_pin_attr[g_pin_attr_cnt].pin_type = PIN_GPIO_IO;
                             }
                             else if( !strncmp(g_hw_ip[i], CONFIG_KEY_TIMER, strlen(CONFIG_KEY_TIMER)) )
                             {
                                 if( !strncmp(pType, CONFIG_TYPE_PWM, strlen(CONFIG_TYPE_PWM)) )
-                                    g_pin_attr[g_pin_attr_cnt].pin_type = TIM_PIN_PWM;
+                                    g_pin_attr[g_pin_attr_cnt].pin_type = PIN_TIM_PWM;
                                 else if( !strncmp(pType, CONFIG_TYPE_CAP, strlen(CONFIG_TYPE_CAP)) )
-                                    g_pin_attr[g_pin_attr_cnt].pin_type = TIM_PIN_CAPTURE;
+                                    g_pin_attr[g_pin_attr_cnt].pin_type = PIN_TIM_CAPTURE;
                             }
 
                             g_pin_attr[g_pin_attr_cnt].index        = j;
@@ -328,7 +328,7 @@ int main(int argc, char **argv)
                 }
 
             #if 1
-                fwrite(pCur, 1, sizeof(pin_attr_t) * g_pin_attr_cnt, fbin);
+                fwrite(pCur, 1, sizeof(pin_attr_t) * (g_pin_attr_cnt + 1), fbin);
             #else
                 fprintf(fbin, "uint8_t const   g_pin_table_bin[] =\n{\n    ");
 
@@ -370,21 +370,22 @@ int main(int argc, char **argv)
 
                 fprintf(fhdr, "\nconst ut_pin_attr_t      g_pin_table[] =\n{\n");
 
-                for(int i = 0; i < g_pin_attr_cnt; i++)
+                for(int i = 0; i < (g_pin_attr_cnt + 1); i++)
                 {
                     char    *pType = 0;
 
-                    if( g_pin_attr[i].pin_type == UART_PIN_TX )             pType = "UART_PIN_TX";
-                    else if( g_pin_attr[i].pin_type == UART_PIN_RX )        pType = "UART_PIN_RX";
-                    else if( g_pin_attr[i].pin_type == I2C_PIN_SCL )        pType = "I2C_PIN_SCL";
-                    else if( g_pin_attr[i].pin_type == I2C_PIN_SDA )        pType = "I2C_PIN_SDA";
-                    else if( g_pin_attr[i].pin_type == SPI_PIN_CS )         pType = "SPI_PIN_CS";
-                    else if( g_pin_attr[i].pin_type == SPI_PIN_CLK )        pType = "SPI_PIN_CLK";
-                    else if( g_pin_attr[i].pin_type == SPI_PIN_MISO )       pType = "SPI_PIN_MISO";
-                    else if( g_pin_attr[i].pin_type == SPI_PIN_MOSI )       pType = "SPI_PIN_MOSI";
-                    else if( g_pin_attr[i].pin_type == TIM_PIN_PWM )        pType = "TIM_PIN_PWM";
-                    else if( g_pin_attr[i].pin_type == TIM_PIN_CAPTURE )    pType = "TIM_PIN_CAPTURE";
-                    else if( g_pin_attr[i].pin_type == GPIO_IO_PIN )        pType = "GPIO_IO_PIN";
+                    if( g_pin_attr[i].pin_type == PIN_UART_TX )             pType = "PIN_UART_TX";
+                    else if( g_pin_attr[i].pin_type == PIN_UART_RX )        pType = "PIN_UART_RX";
+                    else if( g_pin_attr[i].pin_type == PIN_I2C_SCL )        pType = "PIN_I2C_SCL";
+                    else if( g_pin_attr[i].pin_type == PIN_I2C_SDA )        pType = "PIN_I2C_SDA";
+                    else if( g_pin_attr[i].pin_type == PIN_SPI_CS )         pType = "PIN_SPI_CS";
+                    else if( g_pin_attr[i].pin_type == PIN_SPI_CLK )        pType = "PIN_SPI_CLK";
+                    else if( g_pin_attr[i].pin_type == PIN_SPI_MISO )       pType = "PIN_SPI_MISO";
+                    else if( g_pin_attr[i].pin_type == PIN_SPI_MOSI )       pType = "PIN_SPI_MOSI";
+                    else if( g_pin_attr[i].pin_type == PIN_TIM_PWM )        pType = "PIN_TIM_PWM";
+                    else if( g_pin_attr[i].pin_type == PIN_TIM_CAPTURE )    pType = "PIN_TIM_CAPTURE";
+                    else if( g_pin_attr[i].pin_type == PIN_GPIO_IO )        pType = "PIN_GPIO_IO";
+                    else                                                    pType = "PIN_IGNORE";
 
 
                     fprintf(fhdr, "    { .index = %d, .pin_type = %+17s,  .attr = { .port = 0x%X, .pin = %d, .af_mode = 0x%X }, },\n",
