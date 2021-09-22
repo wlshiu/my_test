@@ -1,73 +1,76 @@
 {
-    "GPIO": [{
+    "UART": [{
             "attr": [{
-                    "type": "IO",
-                    "port": "A",
-                    "pin": 5,
-                    "af": 0
-                }, {
-                    "type": "IO",
-                    "port": "A",
-                    "pin": 6,
-                    "af": 0
-                }, {
-                    "type": "IO",
-                    "port": "C",
-                    "pin": 3,
-                    "af": 0
-                }, {
-                    "type": "IO",
+                    "type": "TX",
                     "port": "D",
-                    "pin": 0,
-                    "af": 0
+                    "pin": 5,
+                    "af": 7
+                }, {
+                    "type": "TX",
+                    "port": "A",
+                    "pin": 2,
+                    "af": 5
+                }, {
+                    "type": "RX",
+                    "port": "A",
+                    "pin": 1,
+                    "af": 5
+                }, {
+                    "type": "RX",
+                    "port": "D",
+                    "pin": 6,
+                    "af": 7
                 }
             ]
         }
     ],
-    "UART": [{
+    "TIMER": [{
+            "index": "1A",
             "attr": [{
-                    "type": "TX",
-                    "port": "A",
-                    "pin": 5,
-                    "af": 3
-                }, {
-                    "type": "TX",
-                    "port": "A",
-                    "pin": 6,
-                    "af": 2
-                }, {
-                    "type": "RX",
-                    "port": "C",
-                    "pin": 3,
-                    "af": 4
-                }, {
-                    "type": "RX",
+                    "type": "PWM",
                     "port": "D",
-                    "pin": 0,
-                    "af": 15
+                    "pin": 4,
+                    "af": 1,
+                    "channel": 1
+                }, {
+                    "type": "PWM",
+                    "port": "A",
+                    "pin": 2,
+                    "af": 1,
+                    "channel": 3
+                }, {
+                    "type": "PWM_NOUT",
+                    "port": "A",
+                    "pin": 1,
+                    "af": 1,
+                    "channel": 2
+                }, {
+                    "type": "TIM_OUT",
+                    "port": "A",
+                    "pin": 2,
+                    "af": 0
                 }
             ]
         }, {
+            "index": "11",
             "attr": [{
-                    "type": "TX",
-                    "port": "B",
+                    "type": "EXT",
+                    "port": "C",
                     "pin": 6,
-                    "af": 3
+                    "af": 6,
+                    "channel": 1
                 }, {
-                    "type": "TX",
+                    "type": "GATE",
+                    "port": "C",
+                    "pin": 5,
+                    "af": 6,
+                    "channel": 3
+                }, {
+                    "type": "TOG",
                     "port": "B",
-                    "pin": 1,
-                    "af": 2
-                }, {
-                    "type": "RX",
-                    "port": "B",
-                    "pin": 0,
-                    "af": 6
-                }, {
-                    "type": "RX",
-                    "port": "D",
-                    "pin": 0,
-                    "af": 15
+                    "pin": 5,
+                    "af": 6,
+                    "channel": 1
                 }
             ]
         }

@@ -24,7 +24,38 @@ extern "C" {
 //=============================================================================
 #define CONFIG_COMM_DEV_BAUDRATE        19200//9600
 
+typedef enum ut_err
+{
+    UT_ERR_EXIT                 = 5,
+    UT_ERR_SEND_DATA            = 4,
+    UT_ERR_DATA_READY           = 3,
+    UT_ERR_WAIT_DATA            = 2,
+    UT_ERR_FINISH               = 1,
 
+    UT_ERR_OK                   = 0,
+    UT_ERR_NULL_POINTER         = -1,
+    UT_ERR_WRONG_PARAM          = -2,
+    UT_ERR_TIMEOUT              = -3,
+    UT_ERR_COMM_DEV_OPEN_FAIL   = -4,
+    UT_ERR_COMM_DEV_TX_FAIL     = -5,
+    UT_ERR_COMM_DEV_RX_FAIL     = -6,
+    UT_ERR_UNKNOWN              = -7,
+    UT_ERR_CRC_FAIL             = -8,
+    UT_ERR_OUT_BUF_LEN          = -9,
+    UT_ERR_UT_INIT_FAIL         = -10,
+    UT_ERR_UT_READ_FAIL         = -11,
+    UT_ERR_UT_WRITE_FAIL        = -12,
+    UT_ERR_UT_PROC_FAIL         = -13,
+    UT_ERR_UT_ITEM_FULL         = -14,
+    UT_ERR_BUF_TOO_SMALL        = -15,
+    UT_ERR_HW_IP_INIT_FAIL      = -16,
+    UT_ERR_FAIL                 = -17,
+    UT_ERR_WRANG_PARAM          = -18,
+    UT_ERR_DATA_NOT_MATCH       = -19,
+
+} ut_err_t;
+
+#define UT_UID_MASK            0xFFFFFF00
 #define UT_UID_UART            0x75727400
 #define UT_UID_SPI             0x73706900
 #define UT_UID_I2C             0x69326300
@@ -46,7 +77,11 @@ typedef enum ut_hw_type
 
 typedef enum ut_tcase
 {
-    UT_TCASE_PING       = 3,
+    UT_TCASE_RESET      = 2,
+    UT_TCASE_PING,
+    UT_TCASE_TIMER_PERIOD,
+    UT_TCASE_TIMER_PWM,
+    UT_TCASE_TIMER_CAP,
 
 } ut_tcase_t;
 
@@ -105,7 +140,13 @@ typedef enum pin_spi
 typedef enum pin_tim
 {
     PIN_TIM_PWM      = UT_UID_TIM | 0x1,
-    PIN_TIM_CAPTURE  = UT_UID_TIM | 0x2,
+    PIN_TIM_PWM_NOUT = UT_UID_TIM | 0x2,
+    PIN_TIM_CAPTURE  = UT_UID_TIM | 0x3,
+    PIN_TIM_EXT      = UT_UID_TIM | 0x4,
+    PIN_TIM_GATE     = UT_UID_TIM | 0x5,
+    PIN_TIM_TOG      = UT_UID_TIM | 0x6,
+    PIN_TIM_TOG_NOUT = UT_UID_TIM | 0x7,
+    PIN_TIM_GPIO_OUT = UT_UID_TIM | 0x8,
 } pin_tim_t;
 
 /**
@@ -137,6 +178,7 @@ typedef struct pin_attr
             uint32_t    port    : 8;
             uint32_t    pin     : 8;
             uint32_t    af_mode : 8;
+            uint32_t    channel : 4;
         } attr;
     };
 
