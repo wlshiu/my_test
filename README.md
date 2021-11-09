@@ -6,6 +6,7 @@
 + test_c_wrap_py
 + test_combination
 + test_crc32
++ test_crc16
 + test_fatfs
 + test_frame_buf
 + test_libevent
