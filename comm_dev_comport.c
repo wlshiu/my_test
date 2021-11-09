@@ -16,6 +16,8 @@
 #include <windows.h>
 #include <unistd.h>         //Used for UART
 #include "log.h"
+
+#include <pthread.h>
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -52,6 +54,8 @@ static uint8_t      g_rx_buf[CONFIG_UART_RX_BUF_SIZE] = {0};
 
 static uart_dev_t   g_uart_dev = {};
 static uint32_t     g_baudrate = CBR_19200;
+
+static HANDLE       g_Mutex;
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -67,9 +71,20 @@ _uart_data_listener(PVOID pM)
     while( pDev->is_rx_running )
     {
         DWORD       len = 0;
-        uint32_t    rd_idx = pDev->rd_idx;
-        uint32_t    wr_idx = pDev->wr_idx;
+        DWORD       dwWaitResult;
+        uint32_t    rd_idx = 0;
+        uint32_t    wr_idx = 0;
         uint32_t    pos = 0;
+
+        Sleep(1);
+
+        dwWaitResult = WaitForSingleObject(g_Mutex,   // handle to mutex
+                                           INFINITE); // no time-out interval
+        if( dwWaitResult != WAIT_OBJECT_0 )
+            continue;
+
+        rd_idx = pDev->rd_idx;
+        wr_idx = pDev->wr_idx;
 
         pos = (wr_idx + 1) & (pDev->rx_buf_len - 1);
         if( pos == rd_idx )
@@ -93,7 +108,8 @@ _uart_data_listener(PVOID pM)
             wr_idx += len;
             pDev->wr_idx = (uint16_t)wr_idx;
         }
-        else    Sleep(1);
+
+        ReleaseMutex(g_Mutex);
     }
 
     return 0;
@@ -120,6 +136,15 @@ _comport_init(comm_cfg_t *pCfg)
             case 57600:  g_baudrate = CBR_57600;     break;
             default:
             case 115200: g_baudrate = CBR_115200;    break;
+        }
+
+        g_Mutex = CreateMutex(NULL,  // default security attributes
+                              FALSE, // initially not owned
+                              NULL); // unnamed mutex
+        if( g_Mutex == NULL )
+        {
+            msg("CreateMutex() error %u\n", (unsigned int)GetLastError());
+            break;
         }
 
         msg("\ncomport '%s' (%d) init\n", UartName, pCfg->comport.baudrate);
@@ -274,8 +299,18 @@ _comport_recv_bytes(
         uart_dev_t     *pHDev = (uart_dev_t*)pHandle;
         int             len = 0;
         int             buf_len = 0;
-        int             rd_idx = pHDev->rd_idx;
-        int             wr_idx = pHDev->wr_idx;
+        int             rd_idx = 0;
+        int             wr_idx = 0;
+
+        DWORD       dwWaitResult;
+        dwWaitResult = WaitForSingleObject(g_Mutex,   // handle to mutex
+                                           INFINITE); // no time-out interval
+
+        if( dwWaitResult != WAIT_OBJECT_0 )
+            break;
+
+        rd_idx = pHDev->rd_idx;
+        wr_idx = pHDev->wr_idx;
 
         buf_len = *pData_len;
         *pData_len = 0;
@@ -294,6 +329,8 @@ _comport_recv_bytes(
         }
 
         pHDev->rd_idx = rd_idx;
+
+        ReleaseMutex(g_Mutex);
 
         *pData_len = len;
         rval = 0;

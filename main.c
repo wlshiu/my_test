@@ -21,7 +21,11 @@
 //=============================================================================
 #define CONFIG_ARG_MAX_NUM          3
 
-#define CONFIG_RX_TIMEOUT_SEC       5
+#define CONFIG_RX_TIMEOUT_SEC       8
+
+#define NC          "\033[m"
+#define RED         "\033[0;32;31m"
+#define GREEN       "\033[0;32;32m"
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -53,6 +57,8 @@ static uint32_t             g_baudrate = 0;
 static comm_handle_t        g_hComm = 0;
 static HANDLE               g_hRecv;
 static bool                 g_is_rx_idle = false;
+
+static HANDLE               g_Mutex;
 
 static usr_argv_t           g_usr_argv = {};
 //=============================================================================
@@ -148,9 +154,14 @@ _comport_recv(PVOID pM)
         comm_dev_recv(g_hComm, (uint8_t*)g_rx_buf, &length);
         if( length )
         {
+            WaitForSingleObject(g_Mutex,   // handle to mutex
+                                INFINITE); // no time-out interval
+
             printf("%s", g_rx_buf);
             g_is_rx_idle = false;
             cnt = 0;
+
+            ReleaseMutex(g_Mutex);
         }
         else
         {
@@ -191,6 +202,15 @@ int main(int argc, char **argv)
             break;
         }
 
+        g_Mutex = CreateMutex(NULL,  // default security attributes
+                              FALSE, // initially not owned
+                              NULL); // unnamed mutex
+        if( g_Mutex == NULL )
+        {
+            printf("CreateMutex() error %u\n", (unsigned int)GetLastError());
+            break;
+        }
+
         if( !(fin = fopen(g_pFile_name, "r")) )
         {
             printf("open %s fail !\n", g_pFile_name);
@@ -206,6 +226,8 @@ int main(int argc, char **argv)
             break;
         }
 
+        printf("\n\n=========================\n");
+
         g_usr_argv.is_running = true;
         g_hRecv = CreateThread(NULL, 0 /* use default stack size */,
                                (LPTHREAD_START_ROUTINE)_comport_recv,
@@ -218,12 +240,18 @@ int main(int argc, char **argv)
             break;
         }
 
-        printf("\n\n=========================\n");
-
         while( fgets(g_line_buf, sizeof(g_line_buf), fin) != NULL )
         {
             char    ch = 0;
             _trim_leading_spaces(g_line_buf);
+
+            #if 0
+            WaitForSingleObject(g_Mutex, INFINITE);
+
+            printf(GREEN "%s" NC, g_line_buf);
+
+            ReleaseMutex(g_Mutex);
+            #endif
 
             ch = g_line_buf[0];
             if( ch == ';' || ch == '//' || ch == '#' ||
@@ -231,6 +259,13 @@ int main(int argc, char **argv)
                 continue;
 
 //            printf(g_line_buf);
+
+            if( !_strncasecmp(g_line_buf, "break", strlen("break")) ||
+                !_strncasecmp(g_line_buf, "exit", strlen("exit")) ||
+                !_strncasecmp(g_line_buf, "return", strlen("return")) )
+            {
+                break;
+            }
 
             if( !_strncasecmp(g_line_buf, "wait", strlen("wait")) ||
                 !_strncasecmp(g_line_buf, "delay", strlen("delay")) )
@@ -271,6 +306,8 @@ int main(int argc, char **argv)
 
             comm_dev_send(g_hComm, (uint8_t*)g_line_buf, strlen(g_line_buf));
             memset(g_line_buf, 0x0, sizeof(g_line_buf));
+
+            Sleep(100);
         }
     } while(0);
 
