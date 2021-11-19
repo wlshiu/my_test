@@ -83,7 +83,8 @@
     > [LSH](https://github.com/brenns10/lsh) is a simple implementation of a shell in C
 + test_gen_pin_table
     > generate a pin table with JSON file.
-
++ test_aes
++ test_aes_KDF
 
 # MS Visual Studio
 
