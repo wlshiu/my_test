@@ -157,7 +157,10 @@ _comport_recv(PVOID pM)
             WaitForSingleObject(g_Mutex,   // handle to mutex
                                 INFINITE); // no time-out interval
 
-            printf("%s", g_rx_buf);
+            fprintf(stdout, "%s", g_rx_buf);
+//            printf("%s", g_rx_buf);
+
+            fflush(stdout);
             g_is_rx_idle = false;
             cnt = 0;
 
@@ -307,7 +310,7 @@ int main(int argc, char **argv)
             comm_dev_send(g_hComm, (uint8_t*)g_line_buf, strlen(g_line_buf));
             memset(g_line_buf, 0x0, sizeof(g_line_buf));
 
-            Sleep(100);
+            Sleep(20);
         }
     } while(0);
 

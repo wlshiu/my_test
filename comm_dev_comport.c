@@ -21,7 +21,7 @@
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-#define CONFIG_UART_RX_BUF_POW2             12
+#define CONFIG_UART_RX_BUF_POW2             20
 #define CONFIG_UART_RX_BUF_SIZE             (0x1ul << CONFIG_UART_RX_BUF_POW2)
 
 /**
@@ -39,8 +39,8 @@
 typedef struct uart_dev
 {
     HANDLE              fd_uart;
-    volatile uint16_t   rd_idx;
-    volatile uint16_t   wr_idx;
+    volatile uint32_t   rd_idx;
+    volatile uint32_t   wr_idx;
 
     int                 is_rx_running;
     uint8_t             *pRx_buf;
@@ -106,13 +106,27 @@ _uart_data_listener(PVOID pM)
         else if( len )
         {
             wr_idx += len;
-            pDev->wr_idx = (uint16_t)wr_idx;
+            pDev->wr_idx = (uint32_t)wr_idx;
         }
 
         ReleaseMutex(g_Mutex);
     }
 
     return 0;
+}
+
+static void
+_usleep(unsigned int usec)
+{
+	HANDLE timer;
+	LARGE_INTEGER ft;
+
+	ft.QuadPart = -(10 * (__int64)usec);
+
+	timer = CreateWaitableTimer(NULL, TRUE, NULL);
+	SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
+	WaitForSingleObject(timer, INFINITE);
+	CloseHandle(timer);
 }
 
 static comm_handle_t
@@ -281,7 +295,11 @@ _comport_send_bytes(
                 break;
             }
 
+        #if 1
+            _usleep(300);
+        #else
             Sleep(1);
+        #endif
         }
     } while(0);
 
@@ -303,6 +321,10 @@ _comport_recv_bytes(
         int             wr_idx = 0;
 
         DWORD       dwWaitResult;
+
+        buf_len = *pData_len;
+        *pData_len = 0;
+
         dwWaitResult = WaitForSingleObject(g_Mutex,   // handle to mutex
                                            INFINITE); // no time-out interval
 
@@ -311,9 +333,6 @@ _comport_recv_bytes(
 
         rd_idx = pHDev->rd_idx;
         wr_idx = pHDev->wr_idx;
-
-        buf_len = *pData_len;
-        *pData_len = 0;
 
         if( !pHDev )   break;
 
