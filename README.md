@@ -85,6 +85,8 @@
     > generate a pin table with JSON file.
 + test_aes
 + test_aes_KDF
++ test_convolution-2D
+    > [convolution-2D](https://github.com/attilach/convolution-2D)
 
 # MS Visual Studio
 
