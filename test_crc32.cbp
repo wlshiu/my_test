@@ -31,6 +31,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="crc32_generic.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="crc32_generic.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>

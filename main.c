@@ -106,6 +106,8 @@ uint32_t crc32_be(uint32_t crc, unsigned char const *p, size_t len)
     return crc32_be_generic(crc, p, len, CRCPOLY_BE);
 }
 
+#include "crc32_generic.h"
+
 int main()
 {
 #define SEED    (-1U)
@@ -117,5 +119,14 @@ int main()
     printf("crc32: x%x\n", value);
     value = crc32_le(value, (unsigned char const*)pData_2, strlen(pData_2) + 1);
     printf("crc32: x%x\n", value);
+
+    uint32_t    crc32_val = 0;
+    uint32_t    data = 0x12345678;
+    CRC_Init(CONFIG_TARGET_CRC_ALGO, &crc32_val);
+
+
+    crc32_val = CRC_Calc(crc32_val, (uint8_t*)&data, 4);
+    printf("%X\n", crc32_val);
+
     return 0;
 }
