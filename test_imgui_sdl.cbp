@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_imgui_sdl" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_imgui_sdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++1y" />
+					<Add option="-g" />
+					<Add directory="imgui-1.87" />
+					<Add directory="imgui-1.87/backends" />
+					<Add directory="SDL2-2.0.20/include/SDL2" />
+				</Compiler>
+				<Linker>
+					<Add library="SDL2-2.0.20/lib/libSDL2.a" />
+					<Add library="SDL2-2.0.20/lib/libSDL2main.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libgdi32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libglu32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libkernel32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libmingw32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libvfw32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libwinmm.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libsetupapi.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libimm32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libversion.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libole32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/liboleaut32.a" />
+					<Add directory="SDL2-2.0.20/lib" />
+					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/lib" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_imgui_sdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="imgui-1.87" />
+					<Add directory="imgui-1.87/backends" />
+					<Add directory="SDL2-2.0.20/include/SDL2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="SDL2-2.0.20/lib/libSDL2.a" />
+					<Add library="SDL2-2.0.20/lib/libSDL2main.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libgdi32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libglu32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libkernel32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libmingw32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libvfw32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libwinmm.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libsetupapi.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libimm32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libversion.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libole32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/liboleaut32.a" />
+					<Add directory="SDL2-2.0.20/lib" />
+					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/lib" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="imgui-1.87/backends/imgui_impl_sdl.cpp" />
+		<Unit filename="imgui-1.87/backends/imgui_impl_sdl.h" />
+		<Unit filename="imgui-1.87/backends/imgui_impl_sdlrenderer.cpp" />
+		<Unit filename="imgui-1.87/backends/imgui_impl_sdlrenderer.h" />
+		<Unit filename="imgui-1.87/imconfig.h" />
+		<Unit filename="imgui-1.87/imgui.cpp" />
+		<Unit filename="imgui-1.87/imgui.h" />
+		<Unit filename="imgui-1.87/imgui_demo.cpp" />
+		<Unit filename="imgui-1.87/imgui_draw.cpp" />
+		<Unit filename="imgui-1.87/imgui_internal.h" />
+		<Unit filename="imgui-1.87/imgui_tables.cpp" />
+		<Unit filename="imgui-1.87/imgui_widgets.cpp" />
+		<Unit filename="imgui-1.87/imstb_rectpack.h" />
+		<Unit filename="imgui-1.87/imstb_textedit.h" />
+		<Unit filename="imgui-1.87/imstb_truetype.h" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
