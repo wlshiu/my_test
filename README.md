@@ -93,6 +93,10 @@
     > [glfw](https://www.glfw.org/)
 + test_rc5
     > RC5 Encrypt/Decrypt
++ test_xmodem
+    > simulate xmodem transmission
+
+    - [reference](https://www.menie.org/georges/embedded/)
 
 
 # MS Visual Studio
