@@ -2,3 +2,4 @@
 
 bist rreg
 
+send   ./test.bin

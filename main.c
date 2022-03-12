@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include "comm_dev.h"
 #include <windows.h>
 //=============================================================================
@@ -184,6 +185,9 @@ _comport_recv(PVOID pM)
 void usage(char *pProg)
 {
     printf("%s [option] [value]\n"
+           "  --file        script file\n"
+           "  --comport     COM port name\n"
+           "  --baudrate    target baudrate\n"
            "\n", pProg);
 
     system("pause");
@@ -263,6 +267,87 @@ int main(int argc, char **argv)
 
 //            printf(g_line_buf);
 
+            if( !_strncasecmp(g_line_buf, "send", strlen("send")) )
+            {
+                char    *pCur = &g_line_buf[strlen("send")];
+                char    *pTmp = 0;
+
+                _trim_leading_spaces(pCur);
+
+                pTmp = pCur;
+                while( 1 )
+                {
+                    if( *pTmp == '/' )
+                        *pTmp = '\\';
+
+                    if( *pTmp == ' ' || *pTmp == '\n' )
+                    {
+                        *pTmp = 0;
+                        break;
+                    }
+
+                    pTmp++;
+                }
+
+                {
+                    FILE        *fdata = 0;
+                    int         file_size = 0;
+                    int         cur_idx = 0;
+                    uint8_t     *pBuf = 0;
+
+                    if( !(fdata = fopen(pCur, "rb")) )
+                    {
+                        printf("Open %s fail !\n", pCur);
+                        break;
+                    }
+
+                    fseek(fdata, 0, SEEK_END);
+                    file_size = ftell(fdata);
+                    fseek(fdata, 0, SEEK_SET);
+
+                    file_size = (file_size + 0x3) & ~0x3;   // 4-align
+
+                    if( !(pBuf = malloc(file_size + sizeof(uint32_t))) )
+                    {
+                        printf("allocate %d bytes fail !\n", file_size);
+                        if( fdata )     fclose(fdata);
+                        break;
+                    }
+
+                    memset(pBuf, 0xFF, file_size);
+                    fread(pBuf, 1, file_size, fdata);
+                    fclose(fdata);
+                    fdata = 0;
+
+                    pBuf[file_size + 0] = 0xA5;
+                    pBuf[file_size + 1] = 0xA5;
+                    pBuf[file_size + 2] = 0x5A;
+                    pBuf[file_size + 3] = 0x5A;
+
+                    file_size += sizeof(uint32_t);
+                    cur_idx = 0;
+
+                    while( cur_idx < file_size )
+                    {
+                        comm_dev_send(g_hComm, (uint8_t*)&pBuf[cur_idx], 4);
+                        cur_idx += sizeof(uint32_t);
+
+                        #if 0
+                        /**
+                         *  In baud rate 115200,  8 ~ 9 bytes spend 800 useconds.
+                         */
+                        usleep(800);
+                        #else
+                        usleep(400); // for flash program
+                        #endif
+                    }
+
+                    if( pBuf )  free(pBuf);
+                }
+
+                continue;
+            }
+
             if( !_strncasecmp(g_line_buf, "break", strlen("break")) ||
                 !_strncasecmp(g_line_buf, "exit", strlen("exit")) ||
                 !_strncasecmp(g_line_buf, "return", strlen("return")) )
@@ -310,7 +395,7 @@ int main(int argc, char **argv)
             comm_dev_send(g_hComm, (uint8_t*)g_line_buf, strlen(g_line_buf));
             memset(g_line_buf, 0x0, sizeof(g_line_buf));
 
-            Sleep(20);
+            usleep(1000);
         }
     } while(0);
 
