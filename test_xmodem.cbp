@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="./test.jpg" />
+				<Option parameters="./test.cry 123@456" />
 				<Compiler>
 					<Add option="-g" />
 					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/include" />
@@ -42,6 +42,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="crc16.h" />
+		<Unit filename="crypto.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="crypto.h" />
+		<Unit filename="hmac_sha1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="hmac_sha1.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -50,6 +58,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="rbuf.h" />
+		<Unit filename="rc5.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="rc5.h" />
 		<Unit filename="timer.c">
 			<Option compilerVar="CC" />
 		</Unit>

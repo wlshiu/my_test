@@ -34,10 +34,14 @@
 
  */
 
+#include <stdio.h>
 #include <string.h>
 #include "crc16.h"
+#include "xmodem.h"
 
 #include "rbuf.h"
+#include "crypto.h"
+
 
 #define SOH     0x01
 #define STX     0x02
@@ -101,7 +105,7 @@ static void flushinput(xfer_mode_t mode)
     return;
 }
 
-int xmodemReceive(unsigned char *dest, int destsz)
+xmodem_state_t xmodemReceive(unsigned char *dest, int destsz)
 {
     unsigned char xbuff[1030]; /* 1024 for XModem 1k + 3 head chars + 2 crc + nul */
     unsigned char *p;
@@ -137,7 +141,7 @@ int xmodemReceive(unsigned char *dest, int destsz)
                         {
                             flushinput(XFER_MODE_RX);
                             rx_outbyte(ACK);
-                            return -1; /* canceled by remote */
+                            return XMODEM_STATE_CANCELED_BY_REMOTE; /* canceled by remote */
                         }
                         break;
                     default:
@@ -154,7 +158,7 @@ int xmodemReceive(unsigned char *dest, int destsz)
         rx_outbyte(CAN);
         rx_outbyte(CAN);
         rx_outbyte(CAN);
-        return -2; /* sync error */
+        return XMODEM_STATE_SYNC_ERROR; /* sync error */
 
 start_recv:
         if (trychar == 'C')
@@ -183,7 +187,37 @@ start_recv:
 
                 if (count > 0)
                 {
+                    #if 1
+                    /* decryption */
+                    crypto_err_t    rval = CRYPTO_ERR_OK;
+                    crypto_param_t  param;
+
+                    param.pCiphertext       = (uint32_t*)&xbuff[3];
+                    param.ciphertext_nbytes = count;
+                    param.pPlaintext        = (uint32_t*)&xbuff[3]; // (uint32_t*)&dest[len];
+                    param.plaintext_nbytes  = count;
+                    param.packetno          = packetno - 1;
+
+                    rval = crypto_decrypt(&param);
+                    if( rval != CRYPTO_ERR_OK )
+                    {
+                        if( rval == CRYPTO_ERR_AUTH_FAIL )
+                            printf("auth fail \n");
+                        else
+                            printf("decrypt fail \n");
+
+                        while(1);
+                        goto reject;
+                    }
+
+                    count = param.plaintext_nbytes;
+
                     memcpy(&dest[len], &xbuff[3], count);
+
+                    #else
+                    memcpy(&dest[len], &xbuff[3], count);
+                    #endif
+
                     len += count;
                 }
                 ++packetno;
@@ -195,7 +229,7 @@ start_recv:
                 rx_outbyte(CAN);
                 rx_outbyte(CAN);
                 rx_outbyte(CAN);
-                return -3; /* too many retry error */
+                return XMODEM_STATE_OVER_RETRY_TIMES; /* too many retry error */
             }
             rx_outbyte(ACK);
             continue;
@@ -206,7 +240,7 @@ reject:
     }
 }
 
-int xmodemTransmit(unsigned char *src, int srcsz)
+xmodem_state_t xmodemTransmit(unsigned char *src, int srcsz)
 {
     unsigned char xbuff[1030]; /* 1024 for XModem 1k + 3 head chars + 2 crc + nul */
     int bufsz, crc = -1;
@@ -233,7 +267,7 @@ int xmodemTransmit(unsigned char *src, int srcsz)
                         {
                             tx_outbyte(ACK);
                             flushinput(XFER_MODE_TX);
-                            return -1; /* canceled by remote */
+                            return XMODEM_STATE_CANCELED_BY_REMOTE; /* canceled by remote */
                         }
                         break;
                     default:
@@ -245,7 +279,7 @@ int xmodemTransmit(unsigned char *src, int srcsz)
         tx_outbyte(CAN);
         tx_outbyte(CAN);
         flushinput(XFER_MODE_TX);
-        return -2; /* no sync */
+        return XMODEM_STATE_SYNC_ERROR; /* no sync */
 
         for(;;)
         {
@@ -305,7 +339,7 @@ start_trans:
                                 {
                                     tx_outbyte(ACK);
                                     flushinput(XFER_MODE_TX);
-                                    return -1; /* canceled by remote */
+                                    return XMODEM_STATE_CANCELED_BY_REMOTE; /* canceled by remote */
                                 }
                                 break;
                             case NAK:
@@ -318,7 +352,7 @@ start_trans:
                 tx_outbyte(CAN);
                 tx_outbyte(CAN);
                 flushinput(XFER_MODE_TX);
-                return -4; /* xmit error */
+                return XMODEM_STATE_XMIT_ERR; /* xmit error */
             }
             else
             {
@@ -329,7 +363,7 @@ start_trans:
                         break;
                 }
                 flushinput(XFER_MODE_TX);
-                return (c == ACK) ? len : -5;
+                return (c == ACK) ? len : XMODEM_STATE_FAIL;
             }
         }
     }

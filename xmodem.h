@@ -28,7 +28,17 @@
 #ifndef _XMODEM_H_
 #define _XMODEM_H_
 
-int xmodemReceive(unsigned char *dest, int destsz);
-int xmodemTransmit(unsigned char *src, int srcsz);
+typedef enum xmodem_state
+{
+    XMODEM_STATE_CANCELED_BY_REMOTE = -1,
+    XMODEM_STATE_SYNC_ERROR         = -2,
+    XMODEM_STATE_OVER_RETRY_TIMES   = -3,
+    XMODEM_STATE_XMIT_ERR           = -4,
+    XMODEM_STATE_FAIL               = -5,
+    XMODEM_STATE_AUTH_FAIL          = -6,
+} xmodem_state_t;
+
+xmodem_state_t xmodemReceive(unsigned char *dest, int destsz);
+xmodem_state_t xmodemTransmit(unsigned char *src, int srcsz);
 
 #endif /* _XMODEM_H_ */

@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <pthread.h>
@@ -9,6 +10,8 @@
 #include "xmodem.h"
 #include "rbuf.h"
 #include "my_timer.h"
+
+#include "crypto.h"
 
 #define err(str, ...)       do{ printf("[%s:%d]" str, __func__, __LINE__, ##__VA_ARGS__); while(1); }while(0)
 
@@ -180,6 +183,7 @@ int main(int argc, char **argv)
 
     rbi_init(&g_rbi_tx);
     rbi_init(&g_rbi_rx);
+    crypto_init(argv[2], strlen(argv[2]));
 
     if( timer_start(1, &_timer_handler) )
     {
