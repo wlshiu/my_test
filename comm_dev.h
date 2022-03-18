@@ -104,6 +104,10 @@ typedef struct comm_dev_desc
      */
     int     (*get_state)(comm_handle_t pHandle, comm_state_t state);
 
+#define COMM_CMD_NORMAL_TX      0
+#define COMM_CMD_FORCE_TX       1
+    int     (*ctrl)(comm_handle_t pHandle, uint32_t cmd, void *pExtra);
+
 } comm_dev_desc_t;
 
 //=============================================================================

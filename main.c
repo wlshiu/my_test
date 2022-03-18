@@ -16,6 +16,9 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include "comm_dev.h"
+
+#include "timer.h"
+#include "xmodem.h"
 #include <windows.h>
 //=============================================================================
 //                  Constant Definition
@@ -35,6 +38,7 @@
 #define comm_dev_recv(pHandle, pData, pLength)      g_pComm_dev->recv_bytes(pHandle, pData, pLength)
 #define comm_dev_get_state(pHandle, stype)          g_pComm_dev->get_state(pHandle, stype)
 #define comm_dev_reset_buf(pHandle, pbuf, len)      g_pComm_dev->reset_buf(pHandle, pbuf, len)
+#define comm_dev_ctrl(pHandle, cmd, pExtra)         g_pComm_dev->ctrl(pHandle, cmd, pExtra)
 #define comm_dev_deinit(pHandle)                    g_pComm_dev->deinit(pHandle)
 //=============================================================================
 //                  Structure Definition
@@ -60,8 +64,9 @@ static HANDLE               g_hRecv;
 static bool                 g_is_rx_idle = false;
 
 static HANDLE               g_Mutex;
-
+static bool                 g_has_pause_comport_listening = false;
 static usr_argv_t           g_usr_argv = {};
+static uint32_t             g_tick_ms = 0;
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -151,6 +156,12 @@ _comport_recv(PVOID pM)
         int     sleep_ms = 5;
         int     length = sizeof(g_rx_buf);
 
+        if( g_has_pause_comport_listening == true )
+        {
+            usleep(500);
+            continue;
+        }
+
         memset(g_rx_buf, 0x0, length);
         comm_dev_recv(g_hComm, (uint8_t*)g_rx_buf, &length);
         if( length )
@@ -178,6 +189,29 @@ _comport_recv(PVOID pM)
     }
 
     return 0;
+}
+
+int tx_inbyte(unsigned short timeout) // msec timeout
+{
+    int         rval = -1;
+    uint8_t     value = 0;
+    int         len = 1;
+
+    rval = comm_dev_recv(g_hComm, (uint8_t*)&value, &len);
+    return (rval < 0) ? -1 : (int)value;
+}
+
+void tx_outbyte(int c)
+{
+    uint8_t     ch = c & 0xFF;
+    comm_dev_send(g_hComm, (uint8_t*)&ch, 1);
+    return;
+}
+
+static void _timer_handler(void)
+{
+    g_tick_ms++;
+    return;
 }
 //=============================================================================
 //                  Public Function Definition
@@ -233,6 +267,8 @@ int main(int argc, char **argv)
             break;
         }
 
+        comm_dev_ctrl(g_hComm, COMM_CMD_NORMAL_TX, 0);
+
         printf("\n\n=========================\n");
 
         g_usr_argv.is_running = true;
@@ -246,6 +282,13 @@ int main(int argc, char **argv)
             printf("CreateThread fail\n");
             break;
         }
+
+        g_tick_ms = 0;
+        if( timer_start(1, &_timer_handler) )
+	    {
+	        printf("\n timer error\n");
+	        break;
+	    }
 
         while( fgets(g_line_buf, sizeof(g_line_buf), fin) != NULL )
         {
@@ -266,6 +309,70 @@ int main(int argc, char **argv)
                 continue;
 
 //            printf(g_line_buf);
+
+            g_has_pause_comport_listening = false;
+
+            if( !_strncasecmp(g_line_buf, "xmodemsend ", strlen("xmodemsend ")) )
+            {
+                char    *pCur = &g_line_buf[strlen("send")];
+                char    *pTmp = 0;
+
+                _trim_leading_spaces(pCur);
+
+                pTmp = pCur;
+                while( 1 )
+                {
+                    if( *pTmp == '/' )
+                        *pTmp = '\\';
+
+                    if( *pTmp == ' ' || *pTmp == '\n' )
+                    {
+                        *pTmp = 0;
+                        break;
+                    }
+
+                    pTmp++;
+                }
+
+                {
+                    FILE        *fdata = 0;
+                    int         file_size = 0;
+                    int         nbytes = 0;
+                    uint8_t     *pBuf = 0;
+
+                    if( !(fdata = fopen(pCur, "rb")) )
+                    {
+                        printf("Open %s fail !\n", pCur);
+                        break;
+                    }
+
+                    fseek(fdata, 0, SEEK_END);
+                    file_size = ftell(fdata);
+                    fseek(fdata, 0, SEEK_SET);
+
+                    if( !(pBuf = malloc(file_size + sizeof(uint32_t))) )
+                    {
+                        printf("allocate %d bytes fail !\n", file_size);
+                        if( fdata )     fclose(fdata);
+                        break;
+                    }
+
+                    // XmodemSend
+                    g_has_pause_comport_listening = true;
+
+                    nbytes = (int)xmodemTransmit(pBuf, file_size);
+                    if( nbytes < 0 )
+                        printf("xmodem send fail (err: %d)\n", nbytes);
+                    else
+                        printf("xmodem send %d bytes\n", nbytes);
+
+                    if( pBuf )  free(pBuf);
+
+                    g_has_pause_comport_listening = false;
+                }
+
+                continue;
+            }
 
             if( !_strncasecmp(g_line_buf, "send", strlen("send")) )
             {
@@ -294,10 +401,12 @@ int main(int argc, char **argv)
                     int         file_size = 0;
                     int         cur_idx = 0;
                     uint8_t     *pBuf = 0;
+                    uint32_t    start_ms = 0;
 
                     if( !(fdata = fopen(pCur, "rb")) )
                     {
-                        printf("Open %s fail !\n", pCur);
+                        fprintf(stdout, "Open %s fail !\n", pCur);
+                        fflush(stdout);
                         break;
                     }
 
@@ -309,7 +418,9 @@ int main(int argc, char **argv)
 
                     if( !(pBuf = malloc(file_size + sizeof(uint32_t))) )
                     {
-                        printf("allocate %d bytes fail !\n", file_size);
+                        fprintf(stdout, "allocate %d bytes fail !\n", file_size);
+                        fflush(stdout);
+
                         if( fdata )     fclose(fdata);
                         break;
                     }
@@ -327,6 +438,10 @@ int main(int argc, char **argv)
                     file_size += sizeof(uint32_t);
                     cur_idx = 0;
 
+                    comm_dev_ctrl(g_hComm, COMM_CMD_FORCE_TX, 0);
+
+                    start_ms = g_tick_ms;
+
                     while( cur_idx < file_size )
                     {
                         comm_dev_send(g_hComm, (uint8_t*)&pBuf[cur_idx], 4);
@@ -338,9 +453,14 @@ int main(int argc, char **argv)
                          */
                         usleep(800);
                         #else
-                        usleep(400); // for flash program
+//                        usleep(20); // for flash program
+//                        for(int i = 100000; i != 0; i--);
                         #endif
                     }
+
+                    comm_dev_ctrl(g_hComm, COMM_CMD_NORMAL_TX, 0);
+                    fprintf(stdout, "spent %d ms\n", g_tick_ms - start_ms);
+                    fflush(stdout);
 
                     if( pBuf )  free(pBuf);
                 }

@@ -56,6 +56,7 @@ static uart_dev_t   g_uart_dev = {};
 static uint32_t     g_baudrate = CBR_19200;
 
 static HANDLE       g_Mutex;
+static bool         g_has_force_tx = false;
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -141,6 +142,7 @@ _comport_init(comm_cfg_t *pCfg)
         CHAR        *pcCommPort;
         BOOL        fSuccess;
 
+        g_has_force_tx = false;
         sprintf((char *)UartName, "\\\\.\\%s", (const char *)pCfg->comport.pComport_name);
 
         switch( pCfg->comport.baudrate )
@@ -251,7 +253,7 @@ _comport_init(comm_cfg_t *pCfg)
         CommTimeouts.ReadIntervalTimeout = -1;
         CommTimeouts.ReadTotalTimeoutConstant = 0;
         CommTimeouts.ReadTotalTimeoutMultiplier = 0;
-        CommTimeouts.WriteTotalTimeoutConstant = 500;
+        CommTimeouts.WriteTotalTimeoutConstant = 1000;
         CommTimeouts.WriteTotalTimeoutMultiplier = 0;
 
         fSuccess = SetCommTimeouts(g_uart_dev.fd_uart, &CommTimeouts);
@@ -295,11 +297,16 @@ _comport_send_bytes(
                 break;
             }
 
-        #if 1
-            _usleep(300);
-        #else
-            Sleep(1);
-        #endif
+
+            if( g_has_force_tx == false)
+            {
+            #if 1
+                _usleep(1);
+            #else
+                Sleep(1);
+            #endif
+            }
+
         }
     } while(0);
 
@@ -419,6 +426,18 @@ _comport_deinit(
     return rval;
 }
 
+static int
+_comport_ctrl(
+    comm_handle_t   pHandle,
+    uint32_t        cmd,
+    void            *pExtra)
+{
+    if( cmd == COMM_CMD_FORCE_TX )
+        g_has_force_tx = true;
+
+    return 0;
+}
+
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
@@ -429,6 +448,7 @@ comm_dev_desc_t      g_comm_dev_comport =
     .recv_bytes    = _comport_recv_bytes,
     .reset_buf     = _comport_reset_buf,
     .get_state     = _comport_get_state,
+    .ctrl          = _comport_ctrl,
     .deinit        = _comport_deinit,
 };
 #endif
