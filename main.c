@@ -24,6 +24,7 @@
 //                  Constant Definition
 //=============================================================================
 #define CONFIG_ARG_MAX_NUM          3
+#define CONFIG_MAX_VAR_NUM          10
 
 #define CONFIG_RX_TIMEOUT_SEC       8
 
@@ -47,6 +48,15 @@ typedef struct usr_argv
 {
     bool        is_running;
 } usr_argv_t;
+
+typedef struct loop_var
+{
+    int     value;
+    int     limit;
+    int     increment;
+    bool    is_hex;
+    char    name[32];
+} loop_var_t;
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
@@ -67,6 +77,17 @@ static HANDLE               g_Mutex;
 static bool                 g_has_pause_comport_listening = false;
 static usr_argv_t           g_usr_argv = {};
 static uint32_t             g_tick_ms = 0;
+
+static uint32_t             g_cur_file_pos = 0;
+
+static uint32_t             g_loop_start_pos = 0;
+static uint32_t             g_loop_end_pos = 0;
+
+static char                 g_loop_init_str[100] = {0};
+static char                 g_loop_cond_str[100] = {0};
+static char                 g_loop_update_str[100] = {0};
+static char                 g_replace_buf[200] = {0};
+static loop_var_t           g_var_symbols[CONFIG_MAX_VAR_NUM];
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -114,6 +135,18 @@ _trim_leading_spaces(char* str)
 
         pDest[len] = '\0';
     }
+
+    return;
+}
+
+static void
+_trim_all_spaces(char* str)
+{
+    char    *dest = str;
+    do {
+        while( *dest == ' ' )
+            ++dest;
+    } while( *str++ = *dest++ );
 
     return;
 }
@@ -213,6 +246,284 @@ static void _timer_handler(void)
     g_tick_ms++;
     return;
 }
+
+static char*
+_str_replace(char *src, char *dst, size_t dst_size, char *search, char *replace_with)
+{
+    char    *replace_buf = g_replace_buf;
+
+//    memset(g_replace_buf, 0x0, sizeof(g_replace_buf));
+
+    if( replace_buf )
+    {
+        char   *p = (char *)src;
+        char   *pos = 0;
+
+        replace_buf[0] = 0;
+
+        while( (pos = strstr(p, search)) )
+        {
+            size_t      n = (size_t)(pos - p);
+
+            strncat(replace_buf, p, n > dst_size ? dst_size : n);
+            strncat(replace_buf, replace_with, dst_size - strlen(replace_buf) - 1);
+            p = pos + strlen(search);
+        }
+
+        strncat(replace_buf, p, strlen(p));
+
+        snprintf(dst, dst_size, "%s", replace_buf);
+    }
+    return dst;
+}
+
+static int
+_parse_init_express(char *pStr)
+{
+    int     rval = 0;
+    char    *pCur = pStr;
+    char    *pEnd = 0;
+
+    pEnd = pStr + strlen(pStr);
+
+    for(int i = 0; i < CONFIG_MAX_VAR_NUM; i++)
+    {
+        char    *pTmp = 0;
+
+        if( pCur > pEnd )
+            break;
+
+        pCur = strchr(pCur, '$');
+        if( !pCur ) break;
+
+        pTmp = strchr(pCur, '=');
+        if( !pTmp )
+        {
+            rval = -1;
+            break;
+        }
+
+        *pTmp = '\0';
+        snprintf(&g_var_symbols[i].name, sizeof(g_var_symbols[i].name), "%s", pCur);
+
+        pCur = pTmp + 1;
+        pTmp = strchr(pCur, ',');
+        if( pTmp )
+            *pTmp = '\0';
+
+//        g_var_symbols[i].value = (*(pCur + 1) == 'x')
+//                                ? strtol(pCur + 2, 0, 16)
+//                                : strtol(pCur, 0, 10);
+
+        if( (*(pCur + 1) == 'x') )
+        {
+            g_var_symbols[i].is_hex = true;
+            g_var_symbols[i].value = strtol(pCur + 2, 0, 16);
+        }
+        else
+        {
+            g_var_symbols[i].value = strtol(pCur, 0, 10);
+        }
+
+        if( pTmp )  pCur = pTmp + 1;
+        else        break;
+    }
+
+    return rval;
+}
+
+static int
+_parse_cond_express(char *pStr)
+{
+    int     rval = 0;
+    char    *pCur = pStr;
+    char    *pEnd = pStr + strlen(pStr);
+
+    while( pCur < pEnd )
+    {
+        bool    is_ge = false; // >=
+        bool    is_le = false; // <=
+        char    *pTmp = 0;
+
+        pCur = strchr(pCur, '$');
+        if( !pCur ) break;
+
+        do {
+            pTmp = strchr(pCur, '<');
+            if( pTmp )
+            {
+                if( *(pTmp + 1) == '=' )
+                    is_le = true;
+
+                break;
+            }
+
+            pTmp = strchr(pCur, '>');
+            if( pTmp )
+            {
+                if( *(pTmp + 1) == '=' )
+                    is_ge = true;
+
+                break;
+            }
+
+            return -1;
+        } while(0);
+
+
+        *pTmp = '\0';
+        if( is_ge || is_le )
+        {
+            *(++pTmp) = '\0';
+        }
+
+        for(int i = 0; i < CONFIG_MAX_VAR_NUM; i++)
+        {
+            if( g_var_symbols[i].name[0] == 0 )
+                break;
+
+            if( !strncmp(pCur, g_var_symbols[i].name, strlen(g_var_symbols[i].name)) )
+            {
+                pCur = pTmp + 1;
+                pTmp = strchr(pCur, ',');
+
+                if( pTmp )
+                    *pTmp = '\0';
+
+                g_var_symbols[i].limit = (*(pCur + 1) == 'x')
+                                        ? strtol(pCur + 2, 0, 16)
+                                        : strtol(pCur, 0, 10);
+
+                if( is_ge == true )
+                    g_var_symbols[i].limit--;
+                else if( is_le == true )
+                    g_var_symbols[i].limit++;
+
+                break;
+            }
+        }
+
+        if( pTmp )  pCur = pTmp + 1;
+        else        break;
+    }
+
+    return rval;
+}
+
+static int
+_parse_update_express(char *pStr)
+{
+    int     rval = 0;
+    char    *pCur = pStr;
+    char    *pEnd = pStr + strlen(pStr);
+
+    while( pCur < pEnd )
+    {
+        bool    is_minus = false; // -=
+        char    *pTmp = 0;
+
+        pCur = strchr(pCur, '$');
+        if( !pCur ) break;
+
+        pTmp = strstr(pCur, "+=");
+        if( !pTmp )
+        {
+            pTmp = strstr(pCur, "-=");
+            if( !pTmp )
+            {
+                rval = -1;
+                break;
+            }
+
+            is_minus = true;
+        }
+
+        *pTmp++ = '\0';
+        *pTmp = '\0';
+
+        for(int i = 0; i < CONFIG_MAX_VAR_NUM; i++)
+        {
+            if( g_var_symbols[i].name[0] == 0 )
+                break;
+
+            if( !strncmp(pCur, g_var_symbols[i].name, strlen(g_var_symbols[i].name)) )
+            {
+                pCur = pTmp + 1;
+                pTmp = strchr(pCur, ',');
+                if( pTmp )
+                    *pTmp = '\0';
+
+                g_var_symbols[i].increment = (*(pCur + 1) == 'x')
+                                            ? strtol(pCur + 2, 0, 16)
+                                            : strtol(pCur, 0, 10);
+                if( is_minus == true )
+                    g_var_symbols[i].increment *= (-1);
+
+                break;
+            }
+        }
+
+        if( pTmp )  pCur = pTmp + 1;
+        else        break;
+    }
+    return rval;
+}
+
+static int
+_parse_loop_line(char *pLine_buf)
+{
+    int     rval = 0;
+
+    do {
+        char    *pCur = pLine_buf;
+        char    *pEnd = 0;
+
+        pCur = &pLine_buf[strlen("loop ")];
+        pEnd = strchr(pCur, ';');
+        if( !pEnd || (pEnd - pCur) > sizeof(g_loop_init_str) - 1 )
+        {
+            printf("loop expression is too long \n");
+            break;
+        }
+
+        memset(g_loop_init_str, 0x0, sizeof(g_loop_init_str));
+        memcpy(g_loop_init_str, pCur, (pEnd - pCur));
+        _trim_all_spaces(g_loop_init_str);
+
+        pCur = pEnd + 1;
+        pEnd = strchr(pCur, ';');
+        if( !pEnd || (pEnd - pCur) > sizeof(g_loop_init_str) - 1 )
+        {
+            printf("loop expression is too long \n");
+            break;
+        }
+        memset(g_loop_cond_str, 0x0, sizeof(g_loop_cond_str));
+        memcpy(g_loop_cond_str, pCur, (pEnd - pCur));
+        _trim_all_spaces(g_loop_cond_str);
+
+        pCur = pEnd + 1;
+        if( strlen(pCur) > sizeof(g_loop_update_str) - 1 )
+        {
+            printf("loop expression is too long \n");
+            break;
+        }
+        memset(g_loop_update_str, 0x0, sizeof(g_loop_update_str));
+        memcpy(g_loop_update_str, pCur, strlen(pCur));
+        _trim_all_spaces(g_loop_update_str);
+
+        rval = _parse_init_express(g_loop_init_str);
+        if( rval )  break;
+
+        rval = _parse_cond_express(g_loop_cond_str);
+        if( rval )  break;
+
+        rval = _parse_update_express(g_loop_update_str);
+        if( rval )  break;
+
+    } while(0);
+
+    return rval;
+}
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
@@ -235,6 +546,8 @@ int main(int argc, char **argv)
 
     do {
         comm_cfg_t  com_cft = {};
+
+        memset((void*)&g_var_symbols, 0x0, sizeof(g_var_symbols));
 
         rval = _get_params(argc, argv);
         if( rval )
@@ -290,9 +603,17 @@ int main(int argc, char **argv)
 	        break;
 	    }
 
+        g_loop_start_pos = ~0u;
+        g_loop_end_pos = ~0u;
+
+        g_cur_file_pos = 0;
+
         while( fgets(g_line_buf, sizeof(g_line_buf), fin) != NULL )
         {
             char    ch = 0;
+
+            g_cur_file_pos += strlen(g_line_buf);
+
             _trim_leading_spaces(g_line_buf);
 
             #if 0
@@ -311,6 +632,64 @@ int main(int argc, char **argv)
 //            printf(g_line_buf);
 
             g_has_pause_comport_listening = false;
+
+            if( g_loop_start_pos == ~0u &&
+                !_strncasecmp(g_line_buf, "loop ", strlen("loop ")) )
+            {
+                g_loop_start_pos = g_cur_file_pos;
+                if( _parse_loop_line(g_line_buf) )
+                    break;
+
+                continue;
+            }
+
+
+            if( !_strncasecmp(g_line_buf, "endloop", strlen("endloop")) )
+            {
+                g_loop_end_pos = g_cur_file_pos;
+
+                // check loop condition
+                for(int i = 0; i < CONFIG_MAX_VAR_NUM; i++)
+                {
+                    loop_var_t      *pVar_cur = &g_var_symbols[i];
+
+                    pVar_cur->value += pVar_cur->increment;
+                    if( (pVar_cur->increment > 0 &&
+                         pVar_cur->value >= pVar_cur->limit) ||
+                        (pVar_cur->increment < 0 &&
+                         pVar_cur->value <= pVar_cur->limit) )
+                    {
+                        g_loop_start_pos = ~0u;
+                        break;
+                    }
+                }
+
+                if( g_loop_start_pos != ~0u )
+                {
+                    fseek(fin, g_loop_start_pos, SEEK_SET);
+                    g_cur_file_pos = g_loop_start_pos;
+                }
+
+                continue;
+            }
+
+            if( g_loop_start_pos != ~0u )
+            {
+                char    value_str[40] = {0};
+
+                for(int i = 0; i < CONFIG_MAX_VAR_NUM; i++)
+                {
+                    if( g_var_symbols[i].name[0] == 0 )
+                        break;
+
+                    if( g_var_symbols[i].is_hex )
+                        snprintf(value_str, sizeof(value_str), "0x%X", g_var_symbols[i].value);
+                    else
+                        snprintf(value_str, sizeof(value_str), "%d", g_var_symbols[i].value);
+
+                    _str_replace(g_line_buf, g_line_buf, sizeof(g_line_buf), g_var_symbols[i].name, value_str);
+                }
+            }
 
             if( !_strncasecmp(g_line_buf, "xmodemsend ", strlen("xmodemsend ")) )
             {
@@ -512,7 +891,11 @@ int main(int argc, char **argv)
                 continue;
             }
 
+        #if 0 // for debug
+            printf("%s", g_line_buf);
+        #else
             comm_dev_send(g_hComm, (uint8_t*)g_line_buf, strlen(g_line_buf));
+        #endif
             memset(g_line_buf, 0x0, sizeof(g_line_buf));
 
             usleep(1000);
