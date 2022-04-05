@@ -99,6 +99,7 @@
     - [reference](https://www.menie.org/georges/embedded/)
 
 + test_winsocket
++ test_winthread
 
 # MS Visual Studio
 
