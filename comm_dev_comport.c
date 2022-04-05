@@ -122,7 +122,7 @@ _usleep(unsigned int usec)
 	HANDLE timer;
 	LARGE_INTEGER ft;
 
-	ft.QuadPart = -(10 * (__int64)usec);
+	ft.QuadPart = -(10 * (__int64)usec); // -1 * 10,000,000 = 1sec
 
 	timer = CreateWaitableTimer(NULL, TRUE, NULL);
 	SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
@@ -281,11 +281,14 @@ _comport_send_bytes(
         uart_dev_t     *pHDev = (uart_dev_t*)pHandle;
         int             count = 0;
         DWORD           dNoOfBytesWritten = 0;     // No of bytes written to the port
+        LARGE_INTEGER   li;
 
         if( !pHDev )   break;
 
         while( data_len-- )
         {
+            uint32_t    start_ms = 0;
+
             count = WriteFile(pHDev->fd_uart,       // Handle to the Serial port
                               pData++,                // Data to be written to the port
                               1,             //No of bytes to write
@@ -297,6 +300,23 @@ _comport_send_bytes(
                 break;
             }
 
+            #if 1
+            if( g_has_force_tx == false)
+            {
+                _usleep(1);
+            }
+            else
+            {
+                clock_t     c_beg = clock();
+                clock_t     c_end = clock();
+                clock_t     timeout = (g_has_force_tx == false) ? 8 : 8;
+                while( (c_end - c_beg) < timeout )
+                {
+                    c_end = clock();
+                }
+            }
+            #else
+
 
             if( g_has_force_tx == false)
             {
@@ -306,7 +326,7 @@ _comport_send_bytes(
                 Sleep(1);
             #endif
             }
-
+            #endif
         }
     } while(0);
 
@@ -434,6 +454,8 @@ _comport_ctrl(
 {
     if( cmd == COMM_CMD_FORCE_TX )
         g_has_force_tx = true;
+    else if( cmd == COMM_CMD_NORMAL_TX )
+        g_has_force_tx = false;
 
     return 0;
 }

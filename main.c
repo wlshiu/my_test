@@ -68,7 +68,9 @@ static char                 g_line_buf[1024] = {0};
 static char                 g_rx_buf[1024] = {0};
 static char                 *g_pFile_name = 0;
 static char                 *g_comport = 0;
+static char                 *g_outpath = 0;
 static uint32_t             g_baudrate = 0;
+static FILE                 *g_fout = 0;
 static comm_handle_t        g_hComm = 0;
 static HANDLE               g_hRecv;
 static bool                 g_is_rx_idle = false;
@@ -102,6 +104,9 @@ _get_params(int argc, char **argv)
     while(argc) {
         if (!strcmp(argv[0], "--file")) {
             g_pFile_name = argv[1];
+        } else if (!strcmp(argv[0], "--outpath")) {
+            argv++; argc--;
+            g_outpath = argv[0];
         } else if (!strcmp(argv[0], "--comport")) {
             argv++; argc--;
             g_comport = argv[0];
@@ -184,6 +189,14 @@ _comport_recv(PVOID pM)
     usr_argv_t      *pArgv = (usr_argv_t*)pM;
     uint32_t        cnt = 0;
 
+    if( g_outpath )
+    {
+        if( !(g_fout = fopen(g_outpath, "w")) )
+        {
+            printf("open log file '%s' fail \n", g_outpath);
+        }
+    }
+
     while( pArgv->is_running )
     {
         int     sleep_ms = 5;
@@ -206,10 +219,15 @@ _comport_recv(PVOID pM)
 //            printf("%s", g_rx_buf);
 
             fflush(stdout);
+            if( g_fout )
+                fprintf(g_fout, "%s", g_rx_buf);
+
             g_is_rx_idle = false;
             cnt = 0;
 
             ReleaseMutex(g_Mutex);
+
+            Sleep(10);
         }
         else
         {
@@ -533,6 +551,7 @@ void usage(char *pProg)
            "  --file        script file\n"
            "  --comport     COM port name\n"
            "  --baudrate    target baudrate\n"
+           "  --outpath     save log\n"
            "\n", pProg);
 
     system("pause");
@@ -547,6 +566,7 @@ int main(int argc, char **argv)
     do {
         comm_cfg_t  com_cft = {};
 
+        g_outpath = 0;
         memset((void*)&g_var_symbols, 0x0, sizeof(g_var_symbols));
 
         rval = _get_params(argc, argv);
@@ -915,6 +935,8 @@ int main(int argc, char **argv)
 //    WaitForSingleObject(g_hRecv, INFINITE);
 
     Sleep(200);
+
+    if( g_fout )    fclose(g_fout);
 
     // Close the thread handle and free memory allocation.
     CloseHandle(g_hRecv);
