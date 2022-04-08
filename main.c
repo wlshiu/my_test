@@ -55,6 +55,7 @@ typedef struct loop_var
     int     limit;
     int     increment;
     bool    is_hex;
+    bool    has_limit;
     char    name[32];
 } loop_var_t;
 //=============================================================================
@@ -408,6 +409,7 @@ _parse_cond_express(char *pStr)
                 if( pTmp )
                     *pTmp = '\0';
 
+                g_var_symbols[i].has_limit = true;
                 g_var_symbols[i].limit = (*(pCur + 1) == 'x')
                                         ? strtol(pCur + 2, 0, 16)
                                         : strtol(pCur, 0, 10);
@@ -674,7 +676,8 @@ int main(int argc, char **argv)
                     loop_var_t      *pVar_cur = &g_var_symbols[i];
 
                     pVar_cur->value += pVar_cur->increment;
-                    if( (pVar_cur->increment > 0 &&
+                    if( pVar_cur->has_limit == true &&
+                        (pVar_cur->increment > 0 &&
                          pVar_cur->value >= pVar_cur->limit) ||
                         (pVar_cur->increment < 0 &&
                          pVar_cur->value <= pVar_cur->limit) )
