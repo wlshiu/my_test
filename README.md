@@ -100,6 +100,7 @@
 
 + test_winsocket
 + test_winthread
++ test_ymodem
 
 # MS Visual Studio
 
