@@ -101,6 +101,8 @@
 + test_winsocket
 + test_winthread
 + test_ymodem
++ test_tinyUSB
+    > Host and device
 
 # MS Visual Studio
 
