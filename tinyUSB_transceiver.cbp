@@ -176,6 +176,11 @@
 		<Unit filename="tinyUSB/src/portable/simulator/ci_hs/hcd_ci_hs.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="tinyUSB/src/portable/simulator/ci_hs/queue.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/portable/simulator/ci_hs/queue.h" />
+		<Unit filename="tinyUSB/src/portable/simulator/ci_hs/sim_common.h" />
 		<Unit filename="tinyUSB/src/tusb.c">
 			<Option compilerVar="CC" />
 		</Unit>

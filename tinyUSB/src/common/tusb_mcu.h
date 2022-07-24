@@ -271,7 +271,7 @@
     /* OPT_MCU_LPC18XX Configuration */
     // TODO USB0 has 6, USB1 has 4
     #define TUP_USBIP_CHIPIDEA_HS
-    #define TUP_USBIP_EHCI
+//    #define TUP_USBIP_EHCI
 
     #define TUP_DCD_ENDPOINT_MAX    6
     #define TUP_RHPORT_HIGHSPEED    1 // Port0 HS, Port1 FS
