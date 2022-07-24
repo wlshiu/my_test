@@ -59,7 +59,7 @@
 //--------------------------------------------------------------------
 
 // defined by compiler flags for flexibility
-#ifndef CFG_TUSB_MCU
+#if !defined(CFG_TUSB_MCU) && !defined(TUP_SIM_HS)
 #error CFG_TUSB_MCU must be defined
 #endif
 

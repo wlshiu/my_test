@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="tinyUSB_transceiver" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/tinyUSB_transceiver" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DCFG_TUH_ENABLED=1" />
+					<Add option="-DCFG_TUD_ENABLED=1" />
+					<Add option="-DTUP_SIM_HS" />
+					<Add directory="tinyUSB/src" />
+					<Add directory="../test_tinyUSB" />
+					<Add directory="tinyUSB/examples/dual/host_hid_to_device_cdc/src" />
+				</Compiler>
+				<Linker>
+					<Add option="-DCFG_TUH_ENABLED=1" />
+					<Add option="-DCFG_TUD_ENABLED=1" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/tinyUSB_transceiver" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="tinyUSB/examples/dual/host_hid_to_device_cdc/src/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/examples/dual/host_hid_to_device_cdc/src/tusb_config.h" />
+		<Unit filename="tinyUSB/examples/dual/host_hid_to_device_cdc/src/usb_descriptors.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/examples/host/cdc_msc_hid/src/tusb_config.h" />
+		<Unit filename="tinyUSB/src/class/audio/audio.h" />
+		<Unit filename="tinyUSB/src/class/audio/audio_device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/audio/audio_device.h" />
+		<Unit filename="tinyUSB/src/class/bth/bth_device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/bth/bth_device.h" />
+		<Unit filename="tinyUSB/src/class/cdc/cdc.h" />
+		<Unit filename="tinyUSB/src/class/cdc/cdc_device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/cdc/cdc_device.h" />
+		<Unit filename="tinyUSB/src/class/cdc/cdc_host.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/cdc/cdc_host.h" />
+		<Unit filename="tinyUSB/src/class/cdc/cdc_rndis.h" />
+		<Unit filename="tinyUSB/src/class/cdc/cdc_rndis_host.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/cdc/cdc_rndis_host.h" />
+		<Unit filename="tinyUSB/src/class/dfu/dfu.h" />
+		<Unit filename="tinyUSB/src/class/dfu/dfu_device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/dfu/dfu_device.h" />
+		<Unit filename="tinyUSB/src/class/dfu/dfu_rt_device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/dfu/dfu_rt_device.h" />
+		<Unit filename="tinyUSB/src/class/hid/hid.h" />
+		<Unit filename="tinyUSB/src/class/hid/hid_device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/hid/hid_device.h" />
+		<Unit filename="tinyUSB/src/class/hid/hid_host.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/hid/hid_host.h" />
+		<Unit filename="tinyUSB/src/class/midi/midi.h" />
+		<Unit filename="tinyUSB/src/class/midi/midi_device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/midi/midi_device.h" />
+		<Unit filename="tinyUSB/src/class/msc/msc.h" />
+		<Unit filename="tinyUSB/src/class/msc/msc_device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/msc/msc_device.h" />
+		<Unit filename="tinyUSB/src/class/msc/msc_host.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/msc/msc_host.h" />
+		<Unit filename="tinyUSB/src/class/net/ecm_rndis_device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/net/ncm.h" />
+		<Unit filename="tinyUSB/src/class/net/ncm_device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/net/net_device.h" />
+		<Unit filename="tinyUSB/src/class/usbtmc/usbtmc.h" />
+		<Unit filename="tinyUSB/src/class/usbtmc/usbtmc_device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/usbtmc/usbtmc_device.h" />
+		<Unit filename="tinyUSB/src/class/vendor/vendor_device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/vendor/vendor_device.h" />
+		<Unit filename="tinyUSB/src/class/vendor/vendor_host.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/vendor/vendor_host.h" />
+		<Unit filename="tinyUSB/src/class/video/video.h" />
+		<Unit filename="tinyUSB/src/class/video/video_device.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/class/video/video_device.h" />
+		<Unit filename="tinyUSB/src/common/tusb_common.h" />
+		<Unit filename="tinyUSB/src/common/tusb_compiler.h" />
+		<Unit filename="tinyUSB/src/common/tusb_debug.h" />
+		<Unit filename="tinyUSB/src/common/tusb_fifo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/common/tusb_fifo.h" />
+		<Unit filename="tinyUSB/src/common/tusb_mcu.h" />
+		<Unit filename="tinyUSB/src/common/tusb_private.h" />
+		<Unit filename="tinyUSB/src/common/tusb_timeout.h" />
+		<Unit filename="tinyUSB/src/common/tusb_types.h" />
+		<Unit filename="tinyUSB/src/common/tusb_verify.h" />
+		<Unit filename="tinyUSB/src/device/dcd.h" />
+		<Unit filename="tinyUSB/src/device/usbd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/device/usbd.h" />
+		<Unit filename="tinyUSB/src/device/usbd_control.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/device/usbd_pvt.h" />
+		<Unit filename="tinyUSB/src/host/hcd.h" />
+		<Unit filename="tinyUSB/src/host/hub.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/host/hub.h" />
+		<Unit filename="tinyUSB/src/host/usbh.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/host/usbh.h" />
+		<Unit filename="tinyUSB/src/host/usbh_classdriver.h" />
+		<Unit filename="tinyUSB/src/portable/ehci/ehci.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/portable/ehci/ehci.h" />
+		<Unit filename="tinyUSB/src/portable/ehci/ehci_api.h" />
+		<Unit filename="tinyUSB/src/portable/ohci/ohci.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/portable/ohci/ohci.h" />
+		<Unit filename="tinyUSB/src/portable/simulator/ci_hs/dcd_ci_hs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/portable/simulator/ci_hs/hcd_ci_hs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/tusb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinyUSB/src/tusb.h" />
+		<Unit filename="tinyUSB/src/tusb_option.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

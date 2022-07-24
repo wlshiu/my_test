@@ -268,8 +268,6 @@
 #endif
 
 #if defined(TUP_SIM_HS)
-    #define TUP_DCD_ENDPOINT_MAX    1
-
     /* OPT_MCU_LPC18XX Configuration */
     // TODO USB0 has 6, USB1 has 4
     #define TUP_USBIP_CHIPIDEA_HS
