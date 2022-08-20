@@ -105,6 +105,7 @@
     > Host and device
 
 + teset_cpu_pipeline_sim
++ test_ARM_CortexM_Sim
 + ARM cpu simulator
     - test_arm_sim
     - test_ARMSim
