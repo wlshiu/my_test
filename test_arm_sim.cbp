@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_arm_sim" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_arm_sim" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="ARM-Simulator/test/Array_Sum.mem" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="ARM-Simulator/include" />
+					<Add directory="ARM-Simulator/src" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_arm_sim" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="ARM-Simulator/ARMSIM.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/decode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/decode_branch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/decode_dataproc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/decode_datatrans.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/execute.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/execute_branch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/execute_data_proc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/execute_data_trans.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/fetch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/init_memory.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/load_program_memory.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/mem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/read_word.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/run_armsim.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/shift_operand2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/swi_exit.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/update_flags.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/write_back.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/write_data_memory.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ARM-Simulator/src/write_word.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
