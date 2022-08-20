@@ -1,0 +1,17 @@
+/apex_cpu.o
+/apex_sim
+/file_parser.o
+/main.o
+.idea
+/cmake-build-debug
+/b_apex_cpu.o
+/b_apex_sim
+/apex_sim_b
+/apex_cpu_b.o
+/apex_sim.tar.gz
+/old_input.asm
+/old_1.asm
+/old_3.asm
+/old_2.asm
+/old_4.asm
+/Deore_B00817386.tar.gz
