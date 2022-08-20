@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_ARM_CortexM_Sim" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_ARM_CortexM_Sim" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="CortexM_Simulator/src/ARMSimulator" />
+					<Add directory="CortexM_Simulator/src/ElfReader" />
+					<Add directory="CortexM_Simulator/src/FloatingPointInstructions" />
+					<Add directory="CortexM_Simulator/src" />
+					<Add directory="CortexM_Simulator/src/GDB" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_ARM_CortexM_Sim" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ADCImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ADCImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ADCRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ADCRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ADDImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ADDImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ADDRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ADDRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ADDSPImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ADDSPImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ADR.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ADR.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ANDImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ANDImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ANDRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ANDRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ARMRegisters.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ARMRegisters.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ARMSimulator.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ARMSimulator.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ASRImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ASRImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ASRRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ASRRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BFIandBFC.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BFIandBFC.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BICImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BICImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BICRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BICRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BKPT.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BKPT.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BL.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BL.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BLXRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BLXRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BX.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/BX.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/CBZandCBNZ.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/CBZandCBNZ.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/CLZ.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/CLZ.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/CMNImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/CMNImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/CMNRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/CMNRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/CMPImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/CMPImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/CMPRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/CMPRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ConditionalExecution.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ConditionalExecution.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/EORImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/EORImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/EORRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/EORRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ITandHints.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ITandHints.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LDRImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LDRImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LDRLiteral.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LDRLiteral.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LDRRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LDRRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LSLImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LSLImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LSLRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LSLRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LSRImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LSRImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LSRRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LSRRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LoadAndWriteMemory.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/LoadAndWriteMemory.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MLA.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MLA.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MLS.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MLS.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MOVImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MOVImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MOVRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MOVRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MOVT.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MOVT.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MULRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MULRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MVNImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MVNImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MVNRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MVNRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MiscellaneousInstructions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/MiscellaneousInstructions.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ModifiedImmediateConstant.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ModifiedImmediateConstant.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/NOP.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/NOP.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ORNImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ORNImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ORNRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ORNRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ORRImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ORRImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ORRRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ORRRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/POP.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/POP.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/PUSH.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/PUSH.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/REV.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/REV.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/RORImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/RORImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/RORRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/RORRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/RRX.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/RRX.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/RSBImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/RSBImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/RSBRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/RSBRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SBCImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SBCImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SBCRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SBCRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/STRImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/STRImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/STRRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/STRRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SUBImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SUBImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SUBRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SUBRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SUBSPImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SUBSPImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SVC.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SVC.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SaturateOperation.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SaturateOperation.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ShiftOperation.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/ShiftOperation.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SignedAndUnsignedBitFieldExtract.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SignedAndUnsignedBitFieldExtract.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SignedAndUnsignedExtend.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SignedAndUnsignedExtend.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SignedAndUnsignedSaturate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SignedAndUnsignedSaturate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SignedUnsignedLongMultiplyDivide.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/SignedUnsignedLongMultiplyDivide.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/StatusRegisters.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/StatusRegisters.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/TEQImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/TEQImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/TEQRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/TEQRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/TSTImmediate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/TSTImmediate.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/TSTRegister.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/TSTRegister.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/Thumb16bitsTable.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/Thumb16bitsTable.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/Thumb32bitsTable.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/Thumb32bitsTable.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/UnconditionalAndConditionalBranch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/UnconditionalAndConditionalBranch.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/getAndSetBits.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/getAndSetBits.h" />
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/getMask.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ARMSimulator/getMask.h" />
+		<Unit filename="CortexM_Simulator/src/CException.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/CException.h" />
+		<Unit filename="CortexM_Simulator/src/ErrorSignal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/ErrorSignal.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VABS.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VABS.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VADD.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VADD.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VCMP.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VCMP.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VCVTBandVCVTT.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VCVTBandVCVTT.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VCVTandVCVTR.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VCVTandVCVTR.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VDIV.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VDIV.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VLDM.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VLDM.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VLDR.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VLDR.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VMLAandVMLS.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VMLAandVMLS.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VMOV.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VMOV.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VMRS.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VMRS.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VMSR.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VMSR.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VMUL.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VMUL.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VNEG.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VNEG.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VNMLAandVNMLSandVNMUL.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VNMLAandVNMLSandVNMUL.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VPOP.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VPOP.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VPUSH.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VPUSH.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VSQRT.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VSQRT.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VSTM.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VSTM.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VSTR.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VSTR.h" />
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VSUB.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/FloatingPointInstructions/VSUB.h" />
+		<Unit filename="CortexM_Simulator/src/GDB/CExceptionConfig.h" />
+		<Unit filename="CortexM_Simulator/src/GDB/ExceptionObject.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/GDB/ExceptionObject.h" />
+		<Unit filename="CortexM_Simulator/src/GDB/FileOperation.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/GDB/FileOperation.h" />
+		<Unit filename="CortexM_Simulator/src/MemoryBlock.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/MemoryBlock.h" />
+		<Unit filename="CortexM_Simulator/src/MemoryMapping.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CortexM_Simulator/src/MemoryMapping.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
