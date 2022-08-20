@@ -104,6 +104,12 @@
 + test_tinyUSB
     > Host and device
 
++ ARM cpu simulator
+    - test_arm_sim
+    - test_ARMSim
+    - test_armv8_sim
+
+
 # MS Visual Studio
 
 + include libs
