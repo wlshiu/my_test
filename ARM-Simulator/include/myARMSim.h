@@ -23,10 +23,28 @@
 ******************************************************************************/
 
 #include <stdint.h>
+#include <stdio.h>
 
 #define DEBUG 1         // Comment to switch off debug
 
 #define STATUS 1        // Comment to switch off status messages
+
+#undef dbg
+#if defined(STATUS) && (STATUS)
+#define dbg(str, ...)               printf(str, ##__VA_ARGS__)
+#else
+#define dbg(str, ...)
+#endif
+
+/**
+ *  General Purpose Registers
+ */
+typedef enum GPR
+{
+    REG_SP  = 13,
+    REG_LR  = 14,
+    REG_PC  = 15,
+} GPR_t;
 
 // Mmemory, flags, registers for ARMSim
 typedef struct _armsimvar

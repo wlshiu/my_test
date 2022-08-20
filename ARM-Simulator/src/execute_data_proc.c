@@ -32,88 +32,64 @@ void execute_data_proc(armsimvariables *var)
     if (var->opcode == 0)
     {
         var->answer = var->operand1 & var->operand2;
-#ifdef STATUS
-        printf("EXECUTE : Operation is : AND\n");
-        printf("EXECUTE : AND %zu and %zu\n", var->operand1, var->operand2);
-#endif
-    }
 
+        dbg("Execute    : AND 0x%x and 0x%x\n", var->operand1, var->operand2);
+    }
     else if (var->opcode == 1)
     {
         var->answer = var->operand1 ^ var->operand2;
-#ifdef STATUS
-        printf("EXECUTE : Operation is : XOR\n");
-        printf("EXECUTE : XOR %zu and %zu\n", var->operand1, var->operand2);
-#endif
-    }
 
+        dbg("Execute    : XOR 0x%x and 0x%x\n", var->operand1, var->operand2);
+    }
     else if (var->opcode == 2)
     {
         var->answer = var->operand1 - var->operand2;
-#ifdef STATUS
-        printf("EXECUTE : Operation is : SUBTRACT\n");
-        printf("EXECUTE : SUBTRACT %zu and %zu\n", var->operand1, var->operand2);
-#endif
-    }
 
+        dbg("Execute    : SUBTRACT 0x%x and 0x%x\n", var->operand1, var->operand2);
+    }
     else if (var->opcode == 4)
     {
         var->answer = var->operand1 + var->operand2;
-#ifdef STATUS
-        printf("EXECUTE : Operation is : ADD\n");
-        printf("EXECUTE : ADD %zu and %zu\n", var->operand1, var->operand2);
-#endif
-    }
 
+        dbg("Execute    : ADD 0x%x and 0x%x\n", var->operand1, var->operand2);
+    }
     else if (var->opcode == 5)
     {
         var->answer = var->operand1 + var->operand2 + 1;
-#ifdef STATUS
-        printf("EXECUTE : Operation is : ADD WITH CARRY\n");
-        printf("EXECUTE : ADD WITH CARRY %zu and %zu\n", var->operand1, var->operand2);
-#endif
-    }
 
+        dbg("Execute    : ADD with Carry 0x%x and 0x%x\n", var->operand1, var->operand2);
+    }
     else if (var->opcode == 10)
     {
         var->answer = var->operand1 - var->operand2;
         update_flags(var);
-#ifdef STATUS
-        printf("EXECUTE : Operation is : SUBTRACT with SET FLAG\n");
-        printf("EXECUTE : SUBTRACT %zu and %zu\n", var->operand1, var->operand2);
-#endif
-    }
 
+//        dbg("EXECUTE : Operation is : SUBTRACT with SET FLAG\n");
+        dbg("Execute    : SUBTRACT 0x%x and 0x%x\n", var->operand1, var->operand2);
+    }
     else if (var->opcode == 12)
     {
         var->answer = var->operand1 | var->operand2;
-#ifdef STATUS
-        printf("EXECUTE : Operation is : OR\n");
-        printf("EXECUTE : OR %zu and %zu\n", var->operand1, var->operand2);
-#endif
-    }
 
+        dbg("Execute    : OR 0x%x and 0x%x\n", var->operand1, var->operand2);
+    }
     else if (var->opcode == 13)
     {
         var->answer = var->operand2;
-#ifdef STATUS
-        printf("EXECUTE : Operation is : MOVE\n");
-        printf("EXECUTE : MOVE %zu TO R%zu\n", var->operand1, var->register_dest);
-#endif
-    }
 
+        dbg("Execute    : MOVE 0x%x to R%u\n", var->operand1, var->register_dest);
+
+    }
     else if (var->opcode == 15)
     {
         var->answer = ~(var->operand2);
-#ifdef STATUS
-        printf("EXECUTE : Operation is : NOT\n");
-        printf("EXECUTE : NOT %zu\n", var->operand2);
-#endif
+
+        dbg("Execute    : NOT 0x%x\n", var->operand2);
+    }
+    else
+    {
+        dbg("Opcode wrong in case of execute_data_proc, given is %d\n", var->opcode);
     }
 
-#ifdef DEBUG
-    else
-        printf("Opcode wrong in case of execute_data_proc, given is %d\n", var->opcode);
-#endif
-
+    return;
 }

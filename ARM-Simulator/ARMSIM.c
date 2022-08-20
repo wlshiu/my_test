@@ -37,6 +37,7 @@ int main(int argc, char **argv)
     if(argc < 2)
     {
         printf("Incorrect number of arguments. Please invoke the simulator with the mem file as an argument\n");
+        system("pause");
         exit(1);
     }
 
@@ -45,8 +46,8 @@ int main(int argc, char **argv)
     init_memory(var);
     load_program_memory(argv[1], var);
     run_armsim(var);
-    write_data_memory(var);
-    system("pause");
+//    write_data_memory(var);
+//    system("pause");
     return 0;
 }
 

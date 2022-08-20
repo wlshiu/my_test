@@ -32,8 +32,8 @@ void execute_data_trans(armsimvariables *var)
     var->register1 = ((var->instruction_word & 0x000F0000) >> 16);          // base address
 
     var->register_dest = ((var->instruction_word & 0x0000F000) >> 12);      // in case of STR, value to be stored
+
     // in case of LDR, designation register
-#ifdef STATUS
-    printf("EXECUTE : NOTHING TO EXECUTE\n");
-#endif
+    dbg("Execute    :       Nothing to execute\n");
+    return;
 }

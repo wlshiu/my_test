@@ -33,14 +33,10 @@ void decode_datatrans(armsimvariables *var)
 
     if (option == 0)           // STR
         var->store_true = 1;
-
     else if (option == 1)      // LDR
         var->load_true = 1;
-
-#ifdef DEBUG
-
     else
-        printf("Something wrong in Data transfer load store %lu\n", option);
+        dbg("Something wrong in Data transfer load store %lu\n", option);
 
-#endif
+    return;
 }

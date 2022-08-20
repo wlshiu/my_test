@@ -35,20 +35,16 @@ void write_back(armsimvariables *var)
         if (!(var->store_true || var->load_true))
         {
             var->R[var->register_dest] = var->answer;
-#ifdef STATUS
-            printf("WRITEBACK : WRITE %zu TO R%zu\n", var->answer, var->register_dest);
-#endif
+
+            dbg("Writeback  : Write 0x%x to R%u\n", var->answer, var->register_dest);
         }
         else
         {
-#ifdef STATUS
-            printf("WRITEBACK : NOTHING TO WRITE BACK\n");
-#endif
+            dbg("Writeback  : Nothing to Write-Back\n");
         }
     }
-#ifdef STATUS
-    printf("\n\n\n");
-#endif
+
+    dbg("\n");
     var->is_datatrans = 0;
     var->is_dataproc = 0;
     var->is_branch = 0;
@@ -57,5 +53,6 @@ void write_back(armsimvariables *var)
     var->load_true = 0;
     var->store_true = 0;
     var->branch_true = 0;
+    return;
 }
 

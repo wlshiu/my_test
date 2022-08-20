@@ -49,23 +49,23 @@ void mem(armsimvariables *var)
         if (var->store_true)         // STR instruction
         {
             write_word(var->MEM_HEAP, var->R[var->register1] + offset, var->R[var->register_dest]);
-#ifdef STATUS
-            printf("MEMORY : STORE TO ADDRESS 0x%x VALUE 0x%x\n", var->R[var->register1] + offset, var->R[var->register_dest]);
-#endif
+
+            dbg("Memory     : Store to address[0x%08x] = 0x%x\n", var->R[var->register1] + offset, var->R[var->register_dest]);
         }
 
         else if (var->load_true)     // LDR instruction
         {
             var->R[var->register_dest] = read_word(var->MEM_HEAP, var->R[var->register1] + offset);
-#ifdef STATUS
-            printf("MEMORY : LOAD TO REGISTER R%zu VALUE 0x%x FROM MEM 0x%x\n", var->register_dest, var->R[var->register_dest], var->R[var->register1] + offset);
-#endif
+
+            dbg("Memory     : Load to R%u = 0x%x (from mem 0x%08x)\n",
+                var->register_dest,
+                var->R[var->register_dest],
+                var->R[var->register1] + offset);
         }
     }
     else
     {
-#ifdef STATUS
-        printf("MEMORY : NO MEMORY OPERATION\n");
-#endif
+        dbg("Memory     :       No memory operation\n");
     }
+    return;
 }

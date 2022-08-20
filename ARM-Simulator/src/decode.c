@@ -37,33 +37,23 @@ void decode(armsimvariables *var)
     if (temp == 0)
     {
         var->is_dataproc = 1;
-#ifdef STATUS
-        printf("DECODE : Instruction decoded, type : data processing\n");
-#endif
-    }
 
+        dbg("Decode     :           => data processing\n");
+    }
     else if (temp == 1)
     {
         var->is_datatrans = 1;
-#ifdef STATUS
-        printf("DECODE : Instruction decoded, type : data transfer\n");
-#endif
+        dbg("Decode     :           => data transfer\n");
     }
-
     else if (temp == 2)
     {
         var->is_branch = 1;
-#ifdef STATUS
-        printf("DECODE : Instruction decoded, type : branch\n");
-#endif
+        dbg("Decode     :           => branch\n");
     }
-
     else if (temp == 3)
     {
         var->swi_exit = 1;
-#ifdef STATUS
-        printf("DECODE : Instruction decoded, SWI_EXIT\n");
-#endif
+        dbg("Decode     :           => SWI_EXIT\n");
     }
 
     if (var->is_dataproc)
@@ -74,4 +64,6 @@ void decode(armsimvariables *var)
 
     if (var->is_branch)
         decode_branch(var);
+
+    return;
 }

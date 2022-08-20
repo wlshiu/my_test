@@ -32,13 +32,10 @@ uint8_t execute(armsimvariables *var)
 {
     if (var->swi_exit == 1)
         return 0;
-
     else if (var->is_dataproc)
         execute_data_proc(var);
-
     else if (var->is_datatrans)
         execute_data_trans(var);
-
     else if (var->is_branch && var->branch_true)
         execute_branch(var);
 
