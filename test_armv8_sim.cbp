@@ -11,6 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters=".\pipeline_simulator\test\fibonacci.x" />
 				<Compiler>
 					<Add option="-g" />
 					<Add directory="pipeline_simulator" />

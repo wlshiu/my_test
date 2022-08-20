@@ -528,7 +528,6 @@ void initialize(char *program_filename, int num_prog_files)
     int i;
 
     init_memory();
-    pipe_init();
 
     CPUS = malloc(NUM_CPUS * sizeof(CPU));
 
@@ -538,6 +537,8 @@ void initialize(char *program_filename, int num_prog_files)
         dbg("-*-*- initializing cpu #%d -*-*-\n", i);
         CPUS[i] = cpu_new(CONIFG_IMG_BASE_ADDR);
         CPUS[i]->CURR_CPU_NUM = i;
+
+        pipe_init(CPUS[i]);
 
         dbg("initialized cpu #%d\n", i);
     }
