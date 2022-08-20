@@ -104,6 +104,7 @@
 + test_tinyUSB
     > Host and device
 
++ teset_cpu_pipeline_sim
 + ARM cpu simulator
     - test_arm_sim
     - test_ARMSim
