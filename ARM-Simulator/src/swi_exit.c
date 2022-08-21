@@ -29,7 +29,7 @@
 
 //should be called when instruction is swi_exit
 
-void swi_exit(armsimvariables *var)
+void swi_exit(armsim_cpu *var)
 {
 
     write_data_memory(var);

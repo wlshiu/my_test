@@ -27,11 +27,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void execute_branch(armsimvariables *var)        // PC = PC + offset * 4 + 8
+void execute_branch(armsim_cpu *cpu)        // PC = PC + offset * 4 + 8
 {
-    var->R[REG_PC] -= 4;                         // Incremented from fetch
+    cpu->R[REG_PC] -= 4;                         // Incremented from fetch
 
-    uint32_t offset = (var->instruction_word & 0x00FFFFFF);
+    uint32_t offset = (cpu->instruction_word & 0x00FFFFFF);
     uint8_t sign = ((offset & 0x800000) >> 23);  // Extract sign
 
     if (sign == 1)                               // Sign extension
@@ -41,8 +41,8 @@ void execute_branch(armsimvariables *var)        // PC = PC + offset * 4 + 8
 
     offset <<= 2;
     offset += 8;
-    var->R[REG_PC] += offset;
+    cpu->R[REG_PC] += offset;
 
-    dbg("Execute    : Branch to 0x%x\n", var->R[REG_PC]);
+    dbg("Execute    : Branch to 0x%x\n", cpu->R[REG_PC]);
     return;
 }

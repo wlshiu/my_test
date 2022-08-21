@@ -27,43 +27,46 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void decode(armsimvariables *var)
+void decode(armsim_cpu *cpu)
 {
     uint8_t temp;
     uint8_t shift;
 
-    temp = (var->instruction_word & 0x0C000000) >> 26;    // 27, 26
+    if( cpu->instruction_word == 0 )
+    {
+        dbg("Decode                : wait\n");
+        return;
+    }
 
-    if (temp == 0)
-    {
-        var->is_dataproc = 1;
+    temp = (cpu->instruction_word & 0x0C000000) >> 26;    // 27, 26
 
-        dbg("Decode     :           => data processing\n");
-    }
-    else if (temp == 1)
+    if( temp == 0 )
     {
-        var->is_datatrans = 1;
-        dbg("Decode     :           => data transfer\n");
+        cpu->is_dataproc = 1;
+
+        /* data processing */
+        decode_dataproc(cpu);
     }
-    else if (temp == 2)
+    else if( temp == 1 )
     {
-        var->is_branch = 1;
-        dbg("Decode     :           => branch\n");
+        cpu->is_datatrans = 1;
+
+        /* data transfer  */
+        decode_datatrans(cpu);
     }
-    else if (temp == 3)
+    else if( temp == 2 )
     {
-        var->swi_exit = 1;
+        cpu->is_branch = 1;
+
+        /* branch */
+        decode_branch(cpu);
+    }
+    else if( temp == 3 )
+    {
+        /* S/w trigger interrupt */
+        cpu->swi_exit = 1;
         dbg("Decode     :           => SWI_EXIT\n");
     }
-
-    if (var->is_dataproc)
-        decode_dataproc(var);
-
-    if (var->is_datatrans)
-        decode_datatrans(var);
-
-    if (var->is_branch)
-        decode_branch(var);
 
     return;
 }

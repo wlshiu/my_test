@@ -41,13 +41,12 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    armsimvariables *var = (armsimvariables *) malloc(sizeof(armsimvariables));
+    armsim_cpu *cpu = (armsim_cpu *) malloc(sizeof(armsim_cpu));
 
-    init_memory(var);
-    load_program_memory(argv[1], var);
-    run_armsim(var);
-//    write_data_memory(var);
-//    system("pause");
+    init_memory(cpu);
+    load_program_memory(argv[1], cpu);
+    run_armsim(cpu);
+//    write_data_memory(cpu);
     return 0;
 }
 

@@ -27,34 +27,37 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void init_memory(armsimvariables *var)
+void init_memory(armsim_cpu *cpu)
 {
     int i;
 
     for (i = 0; i < 16; i++)        //Resting registers
-        var->R[i] = 0;
+        cpu->R[i] = 0;
+
+     cpu->R[REG_PC] = -1ul;
 
     for (i = 0; i < 4000; i++)      //Reseting instruction memory
-        var->MEM_INST[i] = 0;
+        cpu->MEM_INST[i] = 0;
 
     for (i = 0; i < 4000; i++)      //Reseting heap memory
-        var->MEM_HEAP[i] = 0;
+        cpu->MEM_HEAP[i] = 0;
 
-    var->instruction_word = 0;
-    var->operand1 = 0;
-    var->operand2 = 0;
-    var->answer = 0;
-    var->register1 = 0;
-    var->register2 = 0;
-    var->register_dest = 0;
-    var->condition = 0;
-    var->is_dataproc = 0;
-    var->is_branch = 0;
-    var->opcode = 0;
-    var->immediate = 0;
-    var->branch_true = 0;
-    var->is_datatrans = 0;
-    var->load_true = 0;
-    var->store_true = 0;
-    var->swi_exit = 0;
+    cpu->instruction_word = 0;
+    cpu->operand1 = 0xFFFFFFFFul;
+    cpu->operand2 = 0xFFFFFFFFul;
+    cpu->answer = 0;
+    cpu->register1 = 0;
+    cpu->register2 = 0;
+    cpu->register_dest = 0;
+    cpu->condition = 0;
+    cpu->is_dataproc = 0;
+    cpu->is_branch = 0;
+    cpu->opcode = 0;
+    cpu->immediate = 0;
+    cpu->branch_true = 0;
+    cpu->is_datatrans = 0;
+    cpu->load_true = 0;
+    cpu->store_true = 0;
+    cpu->swi_exit = 0;
+    return;
 }

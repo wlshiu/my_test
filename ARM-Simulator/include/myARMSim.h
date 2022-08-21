@@ -47,7 +47,7 @@ typedef enum GPR
 } GPR_t;
 
 // Mmemory, flags, registers for ARMSim
-typedef struct _armsimvar
+typedef struct _armsim_cpu
 {
 
     //Register file, r15 -> PC
@@ -82,63 +82,63 @@ typedef struct _armsimvar
     uint8_t opcode;
     uint8_t immediate;
 
-} armsimvariables;
+} armsim_cpu;
 
 /* Support Functions */
 
 // Initiates variables to 0;
-void init_memory(armsimvariables *var);
+void init_memory(armsim_cpu *cpu);
 
 // Initates ARMSim
-void run_armsim(armsimvariables *var);
+void run_armsim(armsim_cpu *cpu);
 
 // Used to read instructions from mem file
-void load_program_memory(char *file_name, armsimvariables *var);
+void load_program_memory(char *file_name, armsim_cpu *cpu);
 
 // Write back data from heap to file
-void write_data_memory(armsimvariables *var);
+void write_data_memory(armsim_cpu *cpu);
 
 // Exit ARMSim
-void swi_exit(armsimvariables *var);
+void swi_exit(armsim_cpu *cpu);
 
 //reads from the instruction memory and updates the instruction register
-uint32_t fetch(armsimvariables *var);
+uint32_t fetch(armsim_cpu *cpu);
 
 // decides whether data process or ...
-void decode(armsimvariables *var);
+void decode(armsim_cpu *cpu);
 
 // decode in case instruction has data proccessing
-void decode_dataproc(armsimvariables *var);
+void decode_dataproc(armsim_cpu *cpu);
 
 // decode in case instruction has branch
-void decode_branch(armsimvariables *var);
+void decode_branch(armsim_cpu *cpu);
 
 // decode in case instruction is of data transfer type
-void decode_datatrans(armsimvariables *var);
+void decode_datatrans(armsim_cpu *cpu);
 
 // In case operand two requires shifting
-void shift_operand2(armsimvariables *var);
+void shift_operand2(armsim_cpu *cpu);
 
 //executes the ALU operation based on ALUop
-uint8_t execute(armsimvariables *var);
+uint8_t execute(armsim_cpu *cpu);
 
 // executes in case data processing instruction
-void execute_data_proc(armsimvariables *var);
+void execute_data_proc(armsim_cpu *cpu);
 
 // executes in case data processing instruction
-void execute_data_trans(armsimvariables *var);
+void execute_data_trans(armsim_cpu *cpu);
 
 // executes in case of branch instruction
-void execute_branch(armsimvariables *var);
+void execute_branch(armsim_cpu *cpu);
 
 // Updates N, Z flags in case of CMP
-void update_flags(armsimvariables *var);
+void update_flags(armsim_cpu *cpu);
 
 //perform the memory operation
-void mem(armsimvariables *var);
+void mem(armsim_cpu *cpu);
 
 //writes the results back to register file
-void write_back(armsimvariables *var);
+void write_back(armsim_cpu *cpu);
 
 // reads one word from array mem
 uint32_t read_word(char *mem, uint32_t address);

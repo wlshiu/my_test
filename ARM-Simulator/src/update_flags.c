@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void update_flags(armsimvariables *var)
+void update_flags(armsim_cpu *var)
 {
     if (var->answer == 0)
         var->Z = 1;

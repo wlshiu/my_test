@@ -27,36 +27,46 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void decode_branch(armsimvariables *var)
+void decode_branch(armsim_cpu *cpu)
 {
-    var->condition = (var->instruction_word & 0xF0000000) >> 28;  // 31, 30, 29, 28
+    char    *pInstruction_name = 0;
 
-    if (var->condition == 0 && var->Z)          // BEQ, zero flag is true
-        var->branch_true = 1;
+    cpu->branch_true = 1;
+    cpu->condition   = (cpu->instruction_word & 0xF0000000) >> 28;  // 31, 30, 29, 28
 
-    else if (var->condition == 1 && !(var->Z))  // BNE, zero flag is false
-        var->branch_true = 1;
-
-    else if (var->condition == 10 && !(var->N)) // BGE, not negative
-        var->branch_true = 1;
-
-    else if (var->condition == 11 && var->N)    // BLT, negative flag is true
-        var->branch_true = 1;
-
-    else if (var->condition == 12 && !(var->N) && !(var->Z))    // BGT, not negative, not zero
-        var->branch_true = 1;
-
-    else if (var->condition == 13 && (var->N || var->Z))        // BLE, either negative or zero
-        var->branch_true = 1;
-
-    else if (var->condition == 14 )             // Unconditional
-        var->branch_true = 1;
-
+    if (cpu->condition == 0 && cpu->Z)          // BEQ, zero flag is true
+    {
+        pInstruction_name = "BEQ";
+    }
+    else if (cpu->condition == 1 && !(cpu->Z))  // BNE, zero flag is false
+    {
+        pInstruction_name = "BNE";
+    }
+    else if (cpu->condition == 10 && !(cpu->N)) // BGE, not negative
+    {
+        pInstruction_name = "BGE";
+    }
+    else if (cpu->condition == 11 && cpu->N)    // BLT, negative flag is true
+    {
+        pInstruction_name = "BLT";
+    }
+    else if (cpu->condition == 12 && !(cpu->N) && !(cpu->Z))    // BGT, not negative, not zero
+    {
+        pInstruction_name = "BGT";
+    }
+    else if (cpu->condition == 13 && (cpu->N || cpu->Z))        // BLE, either negative or zero
+    {
+        pInstruction_name = "BLE";
+    }
+    else if (cpu->condition == 14 )             // Unconditional
+    {
+        pInstruction_name = "B"; // B, BL, BX, BLX
+    }
     else
-        var->branch_true = 0;
+        cpu->branch_true = 0;
 
-    if (var->branch_true)
-        dbg("Execute    : Taking branch\n");
+    if( cpu->branch_true )
+        dbg("Execute    : %s\n", pInstruction_name);
 //    else
 //        dbg("Execute    : NOT Taking branch\n");
 

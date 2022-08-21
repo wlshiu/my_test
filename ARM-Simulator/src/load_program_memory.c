@@ -29,10 +29,11 @@
 
 // load_program_memory reads the input memory, and pupulates the instruction memory
 
-void load_program_memory(char *file_name, armsimvariables *var)
+void load_program_memory(char *file_name, armsim_cpu *cpu)
 {
     FILE *fp;
     uint32_t address, instruction;
+
     fp = fopen(file_name, "r");
     if(fp == NULL)
     {
@@ -41,7 +42,8 @@ void load_program_memory(char *file_name, armsimvariables *var)
     }
 
     while(fscanf(fp, "%x %x", &address, &instruction) != EOF)
-        write_word(var->MEM_INST, address, instruction);
+        write_word(cpu->MEM_INST, address, instruction);
 
     fclose(fp);
+    return;
 }

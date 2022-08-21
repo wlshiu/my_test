@@ -27,11 +27,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void execute_data_trans(armsimvariables *var)
+void execute_data_trans(armsim_cpu *cpu)
 {
-    var->register1 = ((var->instruction_word & 0x000F0000) >> 16);          // base address
+    cpu->register1 = ((cpu->instruction_word & 0x000F0000) >> 16);          // base address
 
-    var->register_dest = ((var->instruction_word & 0x0000F000) >> 12);      // in case of STR, value to be stored
+    cpu->register_dest = ((cpu->instruction_word & 0x0000F000) >> 12);      // in case of STR, value to be stored
 
     // in case of LDR, designation register
     dbg("Execute    :       Nothing to execute\n");

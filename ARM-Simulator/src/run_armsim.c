@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define CONFIG_ORG_FLOW     0
+
 #define _tolowcase(chr)      (((chr) >='A' && (chr) <='Z') ? ((chr) + 32) : (chr))
 
 static int strncasecmp(const char *s1, const char *s2, size_t n)
@@ -45,36 +47,61 @@ static int strncasecmp(const char *s1, const char *s2, size_t n)
 }
 
 uint32_t
-ARM_cpu_run(armsimvariables *var, int count)
+ARM_cpu_run(armsim_cpu *cpu, int count)
 {
     static uint32_t     clock = 0;
-    uint32_t    val = 0;
+    uint32_t    val = 1;
 
     while( count-- )
     {
         dbg("\n--------------------------------------------\n");
-        dbg("Clock Cycle #: %d\n", clock++);
+        dbg("Clock Cycle #: %d, machine code= 0x%08X\n", clock++, cpu->instruction_word);
         dbg("--------------------------------------------\n");
 
-        val = fetch(var);
+        #if defined(CONFIG_ORG_FLOW) && (CONFIG_ORG_FLOW)
+        val = fetch(cpu);
         if (!val)   break;
 
-        decode(var);
-        val = execute(var);
+        decode(cpu);
+        val = execute(cpu);
         if (!val)   break;
 
-        mem(var);
-        write_back(var);
+        mem(cpu);
+        write_back(cpu);
+        #else
+        mem(cpu);
+        write_back(cpu);
+
+        execute(cpu);
+        decode(cpu);
+        fetch(cpu);
+        #endif
     }
     return val;
 }
 
-void run_armsim(armsimvariables *var)
+void run_armsim(armsim_cpu *cpu)
 {
     uint32_t    val;
 
-#if 1
-    char        cmd_line[50];
+#if defined(CONFIG_ORG_FLOW) && (CONFIG_ORG_FLOW)
+    // org flow
+    while(cpu->R[REG_PC] < 4000)
+    {
+        val = fetch(cpu);
+        if (!val)
+            return;
+
+        decode(cpu);
+        val = execute(cpu);
+        if (!val)
+            return;
+
+        mem(cpu);
+        write_back(cpu);
+    }
+#else
+    char    cmd_line[50];
 
     while( 1 )
     {
@@ -88,7 +115,7 @@ void run_armsim(armsimvariables *var)
         else if( strncasecmp(cmd_line, "n", strlen("n")) == 0 ||
                  strncasecmp(cmd_line, "next", strlen("next")) == 0 )
         {
-            val = ARM_cpu_run(var, 1);
+            val = ARM_cpu_run(cpu, 1);
             if (!val)   break;
         }
         else if( strncasecmp(cmd_line, "sim", strlen("sim")) == 0 ||
@@ -98,7 +125,7 @@ void run_armsim(armsimvariables *var)
             printf("\n  Set cycles> ");
             scanf("%d", &count);
 
-            val = ARM_cpu_run(var, count);
+            val = ARM_cpu_run(cpu, count);
             if (!val)   break;
         }
         else
@@ -115,22 +142,8 @@ void run_armsim(armsimvariables *var)
         }
 
     }
-#else
-    while(var->R[REG_PC] < 4000)
-    {
-        val = fetch(var);
-        if (!val)
-            return;
-
-        decode(var);
-        val = execute(var);
-        if (!val)
-            return;
-
-        mem(var);
-        write_back(var);
-    }
 #endif
+
     return;
 }
 

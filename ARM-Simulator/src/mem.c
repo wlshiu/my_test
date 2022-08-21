@@ -27,45 +27,44 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void mem(armsimvariables *var)
+void mem(armsim_cpu *cpu)
 {
-    if (var->is_datatrans)
+    if (cpu->is_datatrans)
     {
-        uint8_t immediate = 1 - ((var->instruction_word & 0x02000000) >> 25);
+        uint8_t immediate = 1 - ((cpu->instruction_word & 0x02000000) >> 25);
         uint16_t offset;
 
         if (immediate)
         {
-            offset = (var->instruction_word & 0x0FFF);
+            offset = (cpu->instruction_word & 0x0FFF);
         }
         else
         {
-            var->register2 = (var->instruction_word & 0x0000000F);
-            var->operand2 = var->R[var->register2];
-            shift_operand2(var);
-            offset = var->operand2;
+            cpu->register2 = (cpu->instruction_word & 0x0000000F);
+            cpu->operand2 = cpu->R[cpu->register2];
+            shift_operand2(cpu);
+            offset = cpu->operand2;
         }
 
-        if (var->store_true)         // STR instruction
+        if (cpu->store_true)         // STR instruction
         {
-            write_word(var->MEM_HEAP, var->R[var->register1] + offset, var->R[var->register_dest]);
+            write_word(cpu->MEM_HEAP, cpu->R[cpu->register1] + offset, cpu->R[cpu->register_dest]);
 
-            dbg("Memory     : Store to address[0x%08x] = 0x%x\n", var->R[var->register1] + offset, var->R[var->register_dest]);
+            dbg("Memory                :       Store to address[0x%08x] = 0x%x\n", cpu->R[cpu->register1] + offset, cpu->R[cpu->register_dest]);
         }
-
-        else if (var->load_true)     // LDR instruction
+        else if (cpu->load_true)     // LDR instruction
         {
-            var->R[var->register_dest] = read_word(var->MEM_HEAP, var->R[var->register1] + offset);
+            cpu->R[cpu->register_dest] = read_word(cpu->MEM_HEAP, cpu->R[cpu->register1] + offset);
 
-            dbg("Memory     : Load to R%u = 0x%x (from mem 0x%08x)\n",
-                var->register_dest,
-                var->R[var->register_dest],
-                var->R[var->register1] + offset);
+            dbg("Memory                :       Load to R%u = 0x%x (from mem 0x%08x)\n",
+                cpu->register_dest,
+                cpu->R[cpu->register_dest],
+                cpu->R[cpu->register1] + offset);
         }
     }
     else
     {
-        dbg("Memory     :       No memory operation\n");
+        dbg("Memory                :       No memory operation\n");
     }
     return;
 }

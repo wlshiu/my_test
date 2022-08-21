@@ -28,31 +28,28 @@
 #include <stdlib.h>
 
 //writes the results back to register file
-void write_back(armsimvariables *var)
+void write_back(armsim_cpu *cpu)
 {
-    if (var->is_dataproc)
+    if( cpu->is_dataproc && !(cpu->store_true || cpu->load_true) )
     {
-        if (!(var->store_true || var->load_true))
-        {
-            var->R[var->register_dest] = var->answer;
+        cpu->R[cpu->register_dest] = cpu->answer;
 
-            dbg("Writeback  : Write 0x%x to R%u\n", var->answer, var->register_dest);
-        }
-        else
-        {
-            dbg("Writeback  : Nothing to Write-Back\n");
-        }
+        dbg("Writeback             :       Write 0x%x to R%u\n", cpu->answer, cpu->register_dest);
+    }
+    else
+    {
+        dbg("Writeback             :       Nothing to Write-Back\n");
     }
 
-    dbg("\n");
-    var->is_datatrans = 0;
-    var->is_dataproc = 0;
-    var->is_branch = 0;
-    var->swi_exit = 0;
+//    dbg("\n");
+    cpu->is_datatrans = 0;
+    cpu->is_dataproc = 0;
+    cpu->is_branch = 0;
+    cpu->swi_exit = 0;
 
-    var->load_true = 0;
-    var->store_true = 0;
-    var->branch_true = 0;
+    cpu->load_true = 0;
+    cpu->store_true = 0;
+    cpu->branch_true = 0;
     return;
 }
 

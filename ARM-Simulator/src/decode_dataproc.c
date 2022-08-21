@@ -27,28 +27,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void decode_dataproc(armsimvariables *var)
+void decode_dataproc(armsim_cpu *cpu)
 {
-    var->opcode = (var->instruction_word & 0x1E00000) >> 21;      // 24, 23, 22, 21
-    var->immediate = (var->instruction_word & 0x02000000) >> 25;   // 25
+    cpu->opcode    = (cpu->instruction_word & 0x1E00000) >> 21;    // 24, 23, 22, 21
+    cpu->immediate = (cpu->instruction_word & 0x02000000) >> 25;   // 25
 
-    var->register1 = (var->instruction_word & 0x000F0000) >> 16;      // 19, 18, 17, 16
-    var->operand1 = var->R[var->register1];
-    var->register_dest = (var->instruction_word & 0x0000F000) >> 12;  // 15, 14, 13, 12
+    cpu->register1 = (cpu->instruction_word & 0x000F0000) >> 16;      // 19, 18, 17, 16
+    cpu->operand1  = cpu->R[cpu->register1];
+    cpu->register_dest = (cpu->instruction_word & 0x0000F000) >> 12;  // 15, 14, 13, 12
 
-    if (var->immediate)         // 11, 10, 9, 8 ->shift; 7 - 0 -> value
+    if( cpu->immediate )         // 11, 10, 9, 8 ->shift; 7 - 0 -> value
     {
-        var->operand2 = (var->instruction_word & 0x000000FF);
-        int shift = (var->instruction_word & 0x00000F00) >> 8;
-        var->operand2 <<= shift;
+        int shift = (cpu->instruction_word & 0x00000F00) >> 8;
+
+        cpu->operand2 = (cpu->instruction_word & 0x000000FF);
+        cpu->operand2 <<= shift;
     }
-    else if (!var->immediate)   //
+    else if( !cpu->immediate )   //
     {
-        var->register2 = (var->instruction_word & 0x0000000F);
-        var->operand2 = var->R[var->register2];
-        shift_operand2(var);
+        cpu->register2 = (cpu->instruction_word & 0x0000000F);
+        cpu->operand2 = cpu->R[cpu->register2];
+        shift_operand2(cpu);
     }
 
-    dbg("Decode     :           => Reg1= R%u, Reg2= R%u, Dest Reg= R%u\n", var->register1, var->register2, var->register_dest);
+    dbg("Decode                : Rn= R%u, Rm= R%u, Rd= R%u\n", cpu->register1, cpu->register2, cpu->register_dest);
     return;
 }

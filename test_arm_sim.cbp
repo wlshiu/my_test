@@ -37,6 +37,7 @@
 		<Unit filename="ARM-Simulator/ARMSIM.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="ARM-Simulator/include/myARMSim.h" />
 		<Unit filename="ARM-Simulator/src/decode.c">
 			<Option compilerVar="CC" />
 		</Unit>

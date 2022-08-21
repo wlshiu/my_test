@@ -27,9 +27,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void shift_operand2(armsimvariables *var)        // In case shift is given for operand2
+void shift_operand2(armsim_cpu *cpu)        // In case shift is given for operand2
 {
-    uint8_t shiftbits = ((var->instruction_word & 0x00000FF0) >> 4);
+    uint8_t shiftbits = ((cpu->instruction_word & 0x00000FF0) >> 4);
     uint8_t type = shiftbits & 0x01;
 
     if (!type)  // 00 LSL, 01 LSR, 10 arith right, 11 rot right
@@ -39,11 +39,11 @@ void shift_operand2(armsimvariables *var)        // In case shift is given for o
 
         if (what == 0)      // LSL
         {
-            var->operand2 <<= amount;
+            cpu->operand2 <<= amount;
         }
         else if (what == 1) // RSL
         {
-            var->operand2 >>= amount;
+            cpu->operand2 >>= amount;
         }
         else if (what == 2)
         {
@@ -51,22 +51,22 @@ void shift_operand2(armsimvariables *var)        // In case shift is given for o
         }
         else if (what == 3) // Rot R
         {
-            var->operand2 = (var->operand2 >> amount) | (var->operand2 << (64 - amount));
+            cpu->operand2 = (cpu->operand2 >> amount) | (cpu->operand2 << (64 - amount));
         }
     }
     else if (type)
     {
         uint8_t what = (shiftbits & 0x06) >> 1;
         uint8_t rno = (shiftbits & 0xF0) >> 4;
-        uint8_t amount = (var->R[rno] & 0x0000000F);  // bottom byte of R[rno]
+        uint8_t amount = (cpu->R[rno] & 0x0000000F);  // bottom byte of R[rno]
 
         if (what == 0)      // LSL
         {
-            var->operand2 <<= amount;
+            cpu->operand2 <<= amount;
         }
         else if (what == 1) // LSR
         {
-            var->operand2 >>= amount;
+            cpu->operand2 >>= amount;
         }
         else if (what == 2)
         {
@@ -74,7 +74,8 @@ void shift_operand2(armsimvariables *var)        // In case shift is given for o
         }
         else if (what == 3) // Rot R
         {
-            var->operand2 = (var->operand2 >> amount) | (var->operand2 << (64 - amount));
+            cpu->operand2 = (cpu->operand2 >> amount) | (cpu->operand2 << (64 - amount));
         }
     }
+    return;
 }

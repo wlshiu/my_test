@@ -29,7 +29,7 @@
 
 //writes the data memory in "data_out.mem" file
 
-void write_data_memory(armsimvariables *var)
+void write_data_memory(armsim_cpu *var)
 {
     FILE *fp;
     uint32_t i;

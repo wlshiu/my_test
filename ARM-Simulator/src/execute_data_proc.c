@@ -27,68 +27,68 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void execute_data_proc(armsimvariables *var)
+void execute_data_proc(armsim_cpu *cpu)
 {
-    if (var->opcode == 0)
+    if (cpu->opcode == 0)
     {
-        var->answer = var->operand1 & var->operand2;
+        cpu->answer = cpu->operand1 & cpu->operand2;
 
-        dbg("Execute    : AND 0x%x and 0x%x\n", var->operand1, var->operand2);
+        dbg("Execute    : AND 0x%x and 0x%x\n", cpu->operand1, cpu->operand2);
     }
-    else if (var->opcode == 1)
+    else if (cpu->opcode == 1)
     {
-        var->answer = var->operand1 ^ var->operand2;
+        cpu->answer = cpu->operand1 ^ cpu->operand2;
 
-        dbg("Execute    : XOR 0x%x and 0x%x\n", var->operand1, var->operand2);
+        dbg("Execute    : XOR 0x%x and 0x%x\n", cpu->operand1, cpu->operand2);
     }
-    else if (var->opcode == 2)
+    else if (cpu->opcode == 2)
     {
-        var->answer = var->operand1 - var->operand2;
+        cpu->answer = cpu->operand1 - cpu->operand2;
 
-        dbg("Execute    : SUBTRACT 0x%x and 0x%x\n", var->operand1, var->operand2);
+        dbg("Execute    : SUBTRACT 0x%x and 0x%x\n", cpu->operand1, cpu->operand2);
     }
-    else if (var->opcode == 4)
+    else if (cpu->opcode == 4)
     {
-        var->answer = var->operand1 + var->operand2;
+        cpu->answer = cpu->operand1 + cpu->operand2;
 
-        dbg("Execute    : ADD 0x%x and 0x%x\n", var->operand1, var->operand2);
+        dbg("Execute    : ADD 0x%x and 0x%x\n", cpu->operand1, cpu->operand2);
     }
-    else if (var->opcode == 5)
+    else if (cpu->opcode == 5)
     {
-        var->answer = var->operand1 + var->operand2 + 1;
+        cpu->answer = cpu->operand1 + cpu->operand2 + 1;
 
-        dbg("Execute    : ADD with Carry 0x%x and 0x%x\n", var->operand1, var->operand2);
+        dbg("Execute    : ADD with Carry 0x%x and 0x%x\n", cpu->operand1, cpu->operand2);
     }
-    else if (var->opcode == 10)
+    else if (cpu->opcode == 10)
     {
-        var->answer = var->operand1 - var->operand2;
-        update_flags(var);
+        cpu->answer = cpu->operand1 - cpu->operand2;
+        update_flags(cpu);
 
 //        dbg("EXECUTE : Operation is : SUBTRACT with SET FLAG\n");
-        dbg("Execute    : SUBTRACT 0x%x and 0x%x\n", var->operand1, var->operand2);
+        dbg("Execute    : SUBTRACT 0x%x and 0x%x\n", cpu->operand1, cpu->operand2);
     }
-    else if (var->opcode == 12)
+    else if (cpu->opcode == 12)
     {
-        var->answer = var->operand1 | var->operand2;
+        cpu->answer = cpu->operand1 | cpu->operand2;
 
-        dbg("Execute    : OR 0x%x and 0x%x\n", var->operand1, var->operand2);
+        dbg("Execute    : OR 0x%x and 0x%x\n", cpu->operand1, cpu->operand2);
     }
-    else if (var->opcode == 13)
+    else if (cpu->opcode == 13)
     {
-        var->answer = var->operand2;
+        cpu->answer = cpu->operand2;
 
-        dbg("Execute    : MOVE 0x%x to R%u\n", var->operand1, var->register_dest);
+        dbg("Execute    : MOVE 0x%x to R%u\n", cpu->operand1, cpu->register_dest);
 
     }
-    else if (var->opcode == 15)
+    else if (cpu->opcode == 15)
     {
-        var->answer = ~(var->operand2);
+        cpu->answer = ~(cpu->operand2);
 
-        dbg("Execute    : NOT 0x%x\n", var->operand2);
+        dbg("Execute    : NOT 0x%x\n", cpu->operand2);
     }
     else
     {
-        dbg("Opcode wrong in case of execute_data_proc, given is %d\n", var->opcode);
+        dbg("Opcode wrong in case of execute_data_proc, given is %d\n", cpu->opcode);
     }
 
     return;

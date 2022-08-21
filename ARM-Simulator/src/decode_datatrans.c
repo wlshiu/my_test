@@ -27,14 +27,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void decode_datatrans(armsimvariables *var)
+void decode_datatrans(armsim_cpu *cpu)
 {
-    uint8_t option = ((var->instruction_word & 0x00100000) >> 20);
+    uint8_t option = ((cpu->instruction_word & 0x00100000) >> 20);
 
     if (option == 0)           // STR
-        var->store_true = 1;
+        cpu->store_true = 1;
     else if (option == 1)      // LDR
-        var->load_true = 1;
+        cpu->load_true = 1;
     else
         dbg("Something wrong in Data transfer load store %lu\n", option);
 
