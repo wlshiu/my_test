@@ -208,21 +208,21 @@ _comport_init(comm_cfg_t *pCfg)
 
         //  Fill in some DCB values and set the com state:
         //  57,600 bps, 8 data bits, no parity, and 1 stop bit.
-        dcbSerialParams.BaudRate = g_baudrate;  //  baud rate
-        dcbSerialParams.ByteSize = 8;           //  data size, xmit and rcv
-        dcbSerialParams.Parity = NOPARITY;      //  parity bit
-        dcbSerialParams.StopBits = ONESTOPBIT;  //  stop bit
-        dcbSerialParams.fBinary = 1;            // force binary mode
-        dcbSerialParams.fParity = 0;            // no parity check
+        dcbSerialParams.BaudRate = g_baudrate;  // baud rate
+        dcbSerialParams.ByteSize = 8;           // data size, xmit and rcv
+        dcbSerialParams.Parity   = NOPARITY;    // parity bit
+        dcbSerialParams.StopBits = ONESTOPBIT;  // stop bit
+        dcbSerialParams.fBinary  = 1;           // force binary mode
+        dcbSerialParams.fParity  = 0;           // no parity check
 
-        dcbSerialParams.fOutxCtsFlow = 0;    // Disable CTS monitoring
-        dcbSerialParams.fOutxDsrFlow = 0;    // Disable DSR monitoring
-        dcbSerialParams.fDtrControl = 0;     // Disable DTR monitoring
-        dcbSerialParams.fOutX = 0;           // Disable XON/XOFF for transmission
-        dcbSerialParams.fInX = 0;            // Disable XON/XOFF for receiving
-        dcbSerialParams.fRtsControl = 0;     // Disable RTS (Ready To Send)
+        dcbSerialParams.fOutxCtsFlow    = 0;    // Disable CTS monitoring
+        dcbSerialParams.fOutxDsrFlow    = 0;    // Disable DSR monitoring
+        dcbSerialParams.fDtrControl     = DTR_CONTROL_ENABLE;    // Disable DTR monitoring
+        dcbSerialParams.fOutX           = 0;    // Disable XON/XOFF for transmission
+        dcbSerialParams.fInX            = 0;    // Disable XON/XOFF for receiving
+        dcbSerialParams.fRtsControl     = 0;    // Disable RTS (Ready To Send)
         dcbSerialParams.fDsrSensitivity = 0;
-        dcbSerialParams.fNull = 0;
+        dcbSerialParams.fNull           = 0;
 
         fSuccess = SetCommState(g_uart_dev.fd_uart, &dcbSerialParams);
         if (!fSuccess)
@@ -250,10 +250,10 @@ _comport_init(comm_cfg_t *pCfg)
             break;
         }
 
-        CommTimeouts.ReadIntervalTimeout = -1;
-        CommTimeouts.ReadTotalTimeoutConstant = 0;
-        CommTimeouts.ReadTotalTimeoutMultiplier = 0;
-        CommTimeouts.WriteTotalTimeoutConstant = 1000;
+        CommTimeouts.ReadIntervalTimeout         = -1;
+        CommTimeouts.ReadTotalTimeoutConstant    = 0;
+        CommTimeouts.ReadTotalTimeoutMultiplier  = 0;
+        CommTimeouts.WriteTotalTimeoutConstant   = 1000;
         CommTimeouts.WriteTotalTimeoutMultiplier = 0;
 
         fSuccess = SetCommTimeouts(g_uart_dev.fd_uart, &CommTimeouts);
@@ -281,14 +281,11 @@ _comport_send_bytes(
         uart_dev_t     *pHDev = (uart_dev_t*)pHandle;
         int             count = 0;
         DWORD           dNoOfBytesWritten = 0;     // No of bytes written to the port
-        LARGE_INTEGER   li;
 
         if( !pHDev )   break;
 
         while( data_len-- )
         {
-            uint32_t    start_ms = 0;
-
             count = WriteFile(pHDev->fd_uart,       // Handle to the Serial port
                               pData++,                // Data to be written to the port
                               1,             //No of bytes to write
@@ -300,7 +297,7 @@ _comport_send_bytes(
                 break;
             }
 
-            #if 1
+            #if 0
             if( g_has_force_tx == false)
             {
                 _usleep(1);
