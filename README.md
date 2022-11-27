@@ -113,6 +113,8 @@
 
 + test_basic_window
     > basic win32 window system
++ test_mingw_wmain
+    > mingw not support `wmain()`, this is a wrap
 
 # MS Visual Studio
 
