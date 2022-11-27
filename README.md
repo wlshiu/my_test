@@ -111,6 +111,8 @@
     - test_ARMSim
     - test_armv8_sim
 
++ test_basic_window
+    > basic win32 window system
 
 # MS Visual Studio
 
