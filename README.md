@@ -116,6 +116,9 @@
 + test_mingw_wmain
     > mingw not support `wmain()`, this is a wrap
 
++ test_flash_fs
+    > use LittleFS and Spiffs
+
 # MS Visual Studio
 
 + include libs
