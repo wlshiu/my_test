@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_flash_fs" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_flash_fs" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-D__LFS_NO_MALLOC" />
+					<Add option="-DCONFING_ENABLE_SIM" />
+					<Add directory="littlefs" />
+					<Add directory="spiffs/src" />
+					<Add directory="extfc" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_flash_fs" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="extfc/extfc.h" />
+		<Unit filename="extfc/extfc_sim.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="littlefs/lfs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="littlefs/lfs.h" />
+		<Unit filename="littlefs/lfs_port.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="littlefs/lfs_port.h" />
+		<Unit filename="littlefs/lfs_util.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="littlefs/lfs_util.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="spiffs/src/spiffs.h" />
+		<Unit filename="spiffs/src/spiffs_cache.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="spiffs/src/spiffs_check.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="spiffs/src/spiffs_config.h" />
+		<Unit filename="spiffs/src/spiffs_gc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="spiffs/src/spiffs_hydrogen.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="spiffs/src/spiffs_nucleus.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="spiffs/src/spiffs_nucleus.h" />
+		<Unit filename="spiffs/src/spiffs_port.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="spiffs/src/spiffs_port.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
