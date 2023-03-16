@@ -41,7 +41,7 @@ extern "C" {
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
-int lfs_fs_get_cfg(lfs_config_t *pCfg);
+int lfs_fs_get_dev_cfg(lfs_config_t *pCfg);
 
 int lfs_fs_init(lfs_t *phLFS, lfs_config_t *pCfg);
 

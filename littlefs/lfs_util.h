@@ -8,9 +8,9 @@
 #ifndef LFS_UTIL_H
 #define LFS_UTIL_H
 
-// #define LFS_NO_MALLOC
+#define LFS_NO_MALLOC
 // #define LFS_NO_ASSERT
-#define LFS_YES_TRACE
+//#define LFS_YES_TRACE
 #define LFS_NO_DEBUG
 #define LFS_NO_ERROR
 #define LFS_NO_WARN
@@ -100,6 +100,7 @@ extern "C"
 // Runtime assertions
 #ifndef LFS_ASSERT
 #ifndef LFS_NO_ASSERT
+#include <stdio.h>
 #define LFS_ASSERT(test)    do{ if(!(test)) { printf("[%s:%d]assert \n", __func__, __LINE__); while(1);} }while(0) //assert(test)
 #else
 #define LFS_ASSERT(test)

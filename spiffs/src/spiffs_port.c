@@ -27,11 +27,11 @@
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-#define CONFIG_EXT_FLASH_PHYS_SZ                    (512ul << 10)
-#define CONFIG_EXT_FLASH_PHYS_ERASE_SZ              (32ul << 10)
+
+#define CONFIG_EXT_FLASH_PHYS_SZ        (512ul << 10)//(512ul << 10)
+#define CONFIG_EXT_FLASH_BLOCK_SZ       (32ul << 10)//(64ul << 10)
 #define CONFIG_EXT_FLASH_PHYS_ADDR                  (0)
 #define CONFIG_EXT_FLASH_LOG_PAGE_SZ                (256)
-#define CONFIG_EXT_FLASH_LOG_BLOCK_SZ               (32ul << 10)
 
 #define EXT_FLASH_SECTOR_SZ                         (4ul << 10)
 #define EXT_FLASH_PAGE_SZ                           256
@@ -103,9 +103,13 @@
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
-static u8_t     g_spiffs_cache_buf[32 + (32 + CONFIG_EXT_FLASH_LOG_PAGE_SZ * 8)];
-static u8_t     g_spiffs_fd_buf[32 * 8];
-static u8_t     g_spiffs_work[CONFIG_EXT_FLASH_LOG_PAGE_SZ * 2];
+//static u8_t     g_spiffs_cache_buf[32 + (32 + CONFIG_EXT_FLASH_LOG_PAGE_SZ * 8)];
+//static u8_t     g_spiffs_fd_buf[32 * 8];
+//static u8_t     g_spiffs_work[CONFIG_EXT_FLASH_LOG_PAGE_SZ * 2];
+
+static u32_t     g_spiffs_work_buf[(CONFIG_EXT_FLASH_LOG_PAGE_SZ * 2) >> 2];
+static u32_t     g_spiffs_fds[(32 * 4) >> 2];
+static u32_t     g_spiffs_cache_buf[((CONFIG_EXT_FLASH_LOG_PAGE_SZ + 32) * 4) >> 2];
 
 #if defined(CONFING_ENABLE_SIM)
 
@@ -115,7 +119,6 @@ SPI_HandleTypeDef       g_HSpi = {0};
 
 #endif  /* CONFING_ENABLE_SIM */
 
-static spiffs           g_hFS = {0};
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -130,6 +133,9 @@ static s32_t _spiffs_erase(uint32_t addr, uint32_t len)
     for(int i = 0; i < count; i++)
     {
         extfc_erase(EXTFC_ERASE_SECTOR, addr + i * EXT_FLASH_SECTOR_SZ, 1);
+//        printf("[%s: %d] phy= 0x%08X\n",
+//               __func__, __LINE__,
+//               addr + i * EXT_FLASH_SECTOR_SZ);
     }
 
     return rval;
@@ -138,7 +144,7 @@ static s32_t _spiffs_erase(uint32_t addr, uint32_t len)
 static s32_t _spiffs_read(uint32_t addr, uint32_t size, uint8_t *dst)
 {
     int     rval = 0;
-
+//    printf("[%s: %d] phy= 0x%08X, size= %d, sysbuf= 0x%08X\n", __func__, __LINE__, addr, size, dst);
     extfc_read(dst, addr, size);
     return rval;
 }
@@ -146,87 +152,30 @@ static s32_t _spiffs_read(uint32_t addr, uint32_t size, uint8_t *dst)
 static s32_t _spiffs_write(uint32_t addr, uint32_t size, uint8_t *src)
 {
     int         rval = 0;
-
-    uint8_t *pBuffer = src;
     uint32_t WriteAddr = addr;
+    uint32_t    addr_end = 0;
+    int         length = 0;
+    uint8_t     *pData = src;
     uint16_t NBytes = size;
 
-    uint8_t NumOfPage = 0, NumOfSingle = 0, Addr = 0, count = 0;
+//    printf("[%s: %d] phy= 0x%08X, size= %d, sysbuf= 0x%08X\n", __func__, __LINE__, addr, size, src);
 
-    Addr = WriteAddr & (EXT_FLASH_PAGE_SZ - 1);
+    addr_end = (WriteAddr + EXT_FLASH_PAGE_SZ) & ~(EXT_FLASH_PAGE_SZ - 1);
 
-    count = EXT_FLASH_PAGE_SZ - Addr;
+    length = addr_end - addr;
+    length = (length > NBytes) ? NBytes : length;
 
-    NumOfPage =  NBytes / EXT_FLASH_PAGE_SZ;
+    addr_end = WriteAddr + NBytes;
+    do {
+        extfc_program(pData, WriteAddr, NBytes);
 
-    NumOfSingle = NBytes % EXT_FLASH_PAGE_SZ;
+        WriteAddr += length;
+        pData     += length;
 
-    if( Addr == 0 )
-    {
-        /* NBytes < EXT_FLASH_PAGE_SZ */
-        if (NumOfPage == 0)
-        {
-            extfc_program(pBuffer, WriteAddr, NBytes);
-        }
-        else /* NBytes > EXT_FLASH_PAGE_SZ */
-        {
-            while (NumOfPage--)
-            {
-                extfc_program(pBuffer, WriteAddr, EXT_FLASH_PAGE_SZ);
+        length = ((WriteAddr + EXT_FLASH_PAGE_SZ) > addr_end)
+               ? (addr_end - WriteAddr) : EXT_FLASH_PAGE_SZ;
 
-                WriteAddr +=  EXT_FLASH_PAGE_SZ;
-                pBuffer   += EXT_FLASH_PAGE_SZ;
-            }
-
-            extfc_program(pBuffer, WriteAddr, NumOfSingle);
-        }
-    }
-    else
-    {
-        /* NBytes < EXT_FLASH_PAGE_SZ */
-        if( NumOfPage == 0 )
-        {
-            if( NumOfSingle > count )
-            {
-                uint8_t     temp = NumOfSingle - count;
-
-                extfc_program(pBuffer, WriteAddr, count);
-
-                WriteAddr +=  count;
-                pBuffer   += count;
-
-                extfc_program(pBuffer, WriteAddr, temp);
-            }
-            else
-            {
-                extfc_program(pBuffer, WriteAddr, NBytes);
-            }
-        }
-        else /* NBytes > EXT_FLASH_PAGE_SZ */
-        {
-            NBytes -= count;
-            NumOfPage   = NBytes / EXT_FLASH_PAGE_SZ;
-            NumOfSingle = NBytes % EXT_FLASH_PAGE_SZ;
-
-            extfc_program(pBuffer, WriteAddr, count);
-
-            WriteAddr += count;
-            pBuffer   += count;
-
-            while( NumOfPage-- )
-            {
-                extfc_program(pBuffer, WriteAddr, EXT_FLASH_PAGE_SZ);
-
-                WriteAddr += EXT_FLASH_PAGE_SZ;
-                pBuffer   += EXT_FLASH_PAGE_SZ;
-            }
-
-            if( NumOfSingle )
-            {
-                extfc_program(pBuffer, WriteAddr, NumOfSingle);
-            }
-        }
-    }
+    } while( WriteAddr < addr_end );
 
     return rval;
 }
@@ -554,8 +503,8 @@ static const spiffs_config        g_spiffs_def_cfg =
 #if (SPIFFS_SINGLETON == 0)
     .phys_size          = CONFIG_EXT_FLASH_PHYS_SZ,
     .phys_addr          = CONFIG_EXT_FLASH_PHYS_ADDR,
-    .phys_erase_block   = CONFIG_EXT_FLASH_PHYS_ERASE_SZ,
-    .log_block_size     = CONFIG_EXT_FLASH_LOG_BLOCK_SZ,
+    .phys_erase_block   = CONFIG_EXT_FLASH_BLOCK_SZ,
+    .log_block_size     = CONFIG_EXT_FLASH_BLOCK_SZ,
     .log_page_size      = CONFIG_EXT_FLASH_LOG_PAGE_SZ,
 
 #if SPIFFS_FILEHDL_OFFSET
@@ -677,7 +626,7 @@ _spiffs_check_cb_f(
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
-int spiffs_init(spiffs_config *pCfg_user)
+int spiffs_init(spiffs *pHSpiffs, spiffs_config *pCfg_user)
 {
     int             rval = 0;
     spiffs_config   *pCfg = (spiffs_config*)&g_spiffs_def_cfg;
@@ -692,34 +641,37 @@ int spiffs_init(spiffs_config *pCfg_user)
         if( rval )  break;
     #endif  /* CONFING_ENABLE_SIM */
 
-        rval = SPIFFS_mount(&g_hFS,
+        rval = SPIFFS_mount(pHSpiffs,
                             pCfg,
-                            g_spiffs_work,
-                            g_spiffs_fd_buf, sizeof(g_spiffs_fd_buf),
+                            (u8_t*)&g_spiffs_work_buf,
+                            (u8_t*)&g_spiffs_fds, sizeof(g_spiffs_fds),
                             g_spiffs_cache_buf, sizeof(g_spiffs_cache_buf),
                             _spiffs_check_cb_f);
 
-        if( rval != SPIFFS_OK && SPIFFS_errno(&g_hFS) == SPIFFS_ERR_NOT_A_FS )
+        if( rval != SPIFFS_OK && SPIFFS_errno(pHSpiffs) == SPIFFS_ERR_NOT_A_FS )
         {
+            spiffs_err_log(SPIFFS_errno(pHSpiffs));
             msg("formatting file system ...\n");
-            rval = SPIFFS_format(&g_hFS);
+            rval = SPIFFS_format(pHSpiffs);
             if( rval != SPIFFS_OK )
             {
-                err("SPIFFS format failed: %i\n", SPIFFS_errno(&g_hFS));
+                msg("SPIFFS format failed: %i\n", SPIFFS_errno(pHSpiffs));
+                spiffs_err_log(SPIFFS_errno(pHSpiffs));
                 break;
             }
 
-            rval = SPIFFS_mount(&g_hFS,
+            rval = SPIFFS_mount(pHSpiffs,
                                 pCfg,
-                                g_spiffs_work,
-                                g_spiffs_fd_buf, sizeof(g_spiffs_fd_buf),
+                                (u8_t*)&g_spiffs_work_buf,
+                                (u8_t*)&g_spiffs_fds, sizeof(g_spiffs_fds),
                                 g_spiffs_cache_buf, sizeof(g_spiffs_cache_buf),
                                 _spiffs_check_cb_f);
         }
 
         if( rval != SPIFFS_OK )
         {
-            err("SPIFFS mount failed: %i\n", SPIFFS_errno(&g_hFS));
+            msg("SPIFFS mount failed: %i\n", SPIFFS_errno(pHSpiffs));
+            spiffs_err_log(SPIFFS_errno(pHSpiffs));
             break;
         }
 
@@ -730,4 +682,8 @@ int spiffs_init(spiffs_config *pCfg_user)
     return rval;
 }
 
-
+void spiffs_err_log(uint32_t err_code)
+{
+    printf("%s\n", spiffs_errstr(err_code));
+    return;
+}

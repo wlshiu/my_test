@@ -11,6 +11,7 @@
  */
 
 
+#include <stdio.h>
 #include "lfs_port.h"
 
 #if defined(CONFING_ENABLE_SIM)
@@ -22,7 +23,6 @@
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-
 #if defined(CONFING_ENABLE_SIM)
 
 #else   /* CONFING_ENABLE_SIM */
@@ -82,12 +82,7 @@ SPI_HandleTypeDef       g_hSpi = {0};
 
 #endif  /* CONFING_ENABLE_SIM */
 
-static lfs_t                g_hLFS = {0};
 static uint32_t             g_jedec_id = 0;
-
-static uint32_t             g_read_buf[16 >> 2];
-static uint32_t             g_prog_buf[16 >> 2];
-static uint32_t             g_lookahead_buf[16 >> 2];
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -426,9 +421,9 @@ static const struct lfs_config  g_lfs_cfg =
     /**
      *  static buffer for cache
      */
-    .read_buffer      = (void*)g_read_buf,
-    .prog_buffer      = (void*)g_prog_buf,
-    .lookahead_buffer = (void*)g_lookahead_buf,
+    .read_buffer      = 0, //(void*)g_read_buf,
+    .prog_buffer      = 0, //(void*)g_prog_buf,
+    .lookahead_buffer = 0, //(void*)g_lookahead_buf,
 };
 //=============================================================================
 //                  Public Function Definition
@@ -460,7 +455,7 @@ int lfs_fs_init(lfs_t *phLFS, lfs_config_t *pCfg)
     return rval;
 }
 
-int lfs_fs_get_cfg(lfs_config_t *pCfg)
+int lfs_fs_get_dev_cfg(lfs_config_t *pCfg)
 {
     int     rval = 0;
     if( pCfg )  *pCfg = g_lfs_cfg;

@@ -40,6 +40,16 @@
 		<Unit filename="extfc/extfc_sim.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="filesys.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="filesys.h" />
+		<Unit filename="filesys_littlefs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="filesys_spiffs.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="littlefs/lfs.c">
 			<Option compilerVar="CC" />
 		</Unit>

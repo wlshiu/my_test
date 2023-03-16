@@ -41,7 +41,9 @@ extern "C" {
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
-int spiffs_init(spiffs_config *pCfg_user);
+int spiffs_init(spiffs *pHSpiffs, spiffs_config *pCfg_user);
+
+void spiffs_err_log(uint32_t err_code);
 
 #ifdef __cplusplus
 }

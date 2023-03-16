@@ -45,7 +45,7 @@
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
-static uint8_t      g_flash_mem_sim[CONFIG_EXTFC_SIM_SIZE] __aligned(4) = {0};
+uint8_t      g_flash_mem_sim[CONFIG_EXTFC_SIM_SIZE] __aligned(4) = {0};
 static uint8_t      g_fc_sector_cache[CONFIG_EXTFC_1_SECTOR_SIZE] __aligned(4) = {0};
 //=============================================================================
 //                  Private Function Definition
@@ -53,16 +53,13 @@ static uint8_t      g_fc_sector_cache[CONFIG_EXTFC_1_SECTOR_SIZE] __aligned(4) =
 static void
 _fc_program_page(uint8_t *pData, uintptr_t flash_addr, uint32_t bytes)
 {
-    uint32_t    cnt = bytes >> 2;
-    uint32_t    *pCur = (uint32_t*)pData;
-
-    for(int i = 0; i < cnt; i++)
+    for(int i = 0; i < bytes; i++)
     {
-        uint32_t    *pDest = (uint32_t*)g_flash_mem_sim;
+        uint8_t     *pDest = (uint8_t*)g_flash_mem_sim;
 
-        pDest = (uint32_t*)((uintptr_t)pDest + (flash_addr + (i << 2)));
+        pDest = pDest + flash_addr + i;
 
-        *pDest &= *pCur++;
+        *pDest &= *pData++;
     }
     return;
 }

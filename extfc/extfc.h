@@ -23,7 +23,7 @@ extern "C" {
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-#define CONFIG_EXTFC_MEM_BASE       0x60000000
+#define CONFIG_EXTFC_MEM_BASE       0//0x60000000
 
 
 typedef enum extfc_err

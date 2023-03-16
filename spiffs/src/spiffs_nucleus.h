@@ -141,6 +141,26 @@
 #define SPIFFS_OBJ_ID_DELETED           ((spiffs_obj_id)0)
 #define SPIFFS_OBJ_ID_FREE              ((spiffs_obj_id)-1)
 
+
+
+#if defined(__GNUC__) || defined(__clang__)
+#define SPIFFS_PACKED __attribute__((packed))
+
+#elif defined(__ICCARM__) || defined(__CC_ARM)
+
+#define SPIFFS_PACKED
+
+#if defined(__CC_ARM)
+#pragma anon_unions
+#endif
+
+#else
+    /* Unknown compiler */
+#define SPIFFS_PACKED 
+#endif
+
+
+
 #if SPIFFS_USE_MAGIC
 #if !SPIFFS_USE_MAGIC_LENGTH
 #define SPIFFS_MAGIC(fs, bix)           \
@@ -381,9 +401,6 @@
 #define spiffs_get_cache_page(fs, c, ix) \
   ((u8_t *)(&((c)->cpages[(ix) * SPIFFS_CACHE_PAGE_SIZE(fs)])) + sizeof(spiffs_cache_page))
 
-#if defined(__CC_ARM)
-#pragma anon_unions
-#endif
 // cache page struct
 typedef struct {
   // cache flags
@@ -467,7 +484,7 @@ typedef struct {
 // page header, part of each page except object lookup pages
 // NB: this is always aligned when the data page is an object index,
 // as in this case struct spiffs_page_object_ix is used
-typedef struct __attribute(( packed )) {
+typedef struct SPIFFS_PACKED {
   // object id
   spiffs_obj_id obj_id;
   // object span index
@@ -477,7 +494,7 @@ typedef struct __attribute(( packed )) {
 } spiffs_page_header;
 
 // object index header page header
-typedef struct __attribute(( packed ))
+typedef struct SPIFFS_PACKED
 #if SPIFFS_ALIGNED_OBJECT_INDEX_TABLES
                 __attribute(( aligned(sizeof(spiffs_page_ix)) ))
 #endif
@@ -499,7 +516,7 @@ typedef struct __attribute(( packed ))
 } spiffs_page_object_ix_header;
 
 // object index page header
-typedef struct __attribute(( packed )) {
+typedef struct SPIFFS_PACKED {
  spiffs_page_header p_hdr;
  u8_t _align[4 - ((sizeof(spiffs_page_header)&3)==0 ? 4 : (sizeof(spiffs_page_header)&3))];
 } spiffs_page_object_ix;

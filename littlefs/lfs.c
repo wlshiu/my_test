@@ -5321,7 +5321,6 @@ int lfs_format(lfs_t *lfs, const struct lfs_config *cfg) {
             cfg->name_max, cfg->file_max, cfg->attr_max);
 
     err = lfs_rawformat(lfs, cfg);
-    lfs_err_string(err);
 
     LFS_TRACE("lfs_format -> %d", err);
     LFS_UNLOCK(cfg);
@@ -5352,7 +5351,6 @@ int lfs_mount(lfs_t *lfs, const struct lfs_config *cfg) {
             cfg->name_max, cfg->file_max, cfg->attr_max);
 
     err = lfs_rawmount(lfs, cfg);
-    lfs_err_string(err);
 
     LFS_TRACE("lfs_mount -> %d", err);
     LFS_UNLOCK(cfg);

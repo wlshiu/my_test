@@ -78,9 +78,11 @@ s32_t SPIFFS_mount(spiffs *fs, spiffs_config *config, u8_t *work,
                  " fdsz:"_SPIPRIi " cachesz:"_SPIPRIi
                  "\n",
                  __func__,
-                 SPIFFS_CFG_PHYS_SZ(fs), SPIFFS_CFG_LOG_PAGE_SZ(fs), SPIFFS_CFG_LOG_BLOCK_SZ(fs),
-                 SPIFFS_CFG_PHYS_ADDR(fs),
+                 SPIFFS_CFG_PHYS_SZ(fs),
+                 SPIFFS_CFG_LOG_PAGE_SZ(fs),
+                 SPIFFS_CFG_LOG_BLOCK_SZ(fs),
                  SPIFFS_CFG_PHYS_ERASE_SZ(fs),
+                 SPIFFS_CFG_PHYS_ADDR(fs),
                  fd_space_size, cache_size);
   void *user_data;
   SPIFFS_LOCK(fs);
@@ -479,7 +481,6 @@ s32_t SPIFFS_write(spiffs *fs, spiffs_file fh, void *buf, s32_t len) {
   if ((fd->flags & SPIFFS_O_APPEND)) {
     fd->fdoffset = fd->size == SPIFFS_UNDEFINED_LEN ? 0 : fd->size;
   }
-
   offset = fd->fdoffset;
 
 #if SPIFFS_CACHE_WR
