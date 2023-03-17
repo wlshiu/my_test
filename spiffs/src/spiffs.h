@@ -305,7 +305,7 @@ typedef struct {
 #endif
 } spiffs_stat;
 
-struct spiffs_dirent {
+typedef struct spiffs_dirent {
   spiffs_obj_id obj_id;
   u8_t name[SPIFFS_OBJ_NAME_LEN];
   spiffs_obj_type type;
@@ -314,7 +314,7 @@ struct spiffs_dirent {
 #if SPIFFS_OBJ_META_LEN
   u8_t meta[SPIFFS_OBJ_META_LEN];
 #endif
-};
+} spiffs_dirent_t;
 
 typedef struct {
   spiffs *fs;

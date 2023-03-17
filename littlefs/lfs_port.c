@@ -61,7 +61,7 @@
 #define SPI_FLASH_CS_L()
 #define SPI_FLASH_CS_H()
 
-#else   /* CONFING_ENABLE_SIM */
+#else  /* CONFING_ENABLE_SIM */
 
 #define SPI_FLASH_CS_L()       HAL_GPIO_WritePin(EXT_FLASH_CS_GPIO_PORT, EXT_FLASH_CS_PIN, GPIO_PIN_RESET)
 #define SPI_FLASH_CS_H()       HAL_GPIO_WritePin(EXT_FLASH_CS_GPIO_PORT, EXT_FLASH_CS_PIN, GPIO_PIN_SET)
@@ -80,9 +80,8 @@
 
 SPI_HandleTypeDef       g_hSpi = {0};
 
+static uint32_t     g_jedec_id = 0;
 #endif  /* CONFING_ENABLE_SIM */
-
-static uint32_t             g_jedec_id = 0;
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================

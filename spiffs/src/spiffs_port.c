@@ -30,13 +30,13 @@
 
 #define CONFIG_EXT_FLASH_PHYS_SZ        (512ul << 10)//(512ul << 10)
 #define CONFIG_EXT_FLASH_BLOCK_SZ       (32ul << 10)//(64ul << 10)
-#define CONFIG_EXT_FLASH_PHYS_ADDR                  (0)
-#define CONFIG_EXT_FLASH_LOG_PAGE_SZ                (256)
+#define CONFIG_EXT_FLASH_PHYS_ADDR      (0)
+#define CONFIG_EXT_FLASH_LOG_PAGE_SZ    (256)
 
-#define EXT_FLASH_SECTOR_SZ                         (4ul << 10)
-#define EXT_FLASH_PAGE_SZ                           256
+#define EXT_FLASH_SECTOR_SZ             (4ul << 10)
+#define EXT_FLASH_PAGE_SZ               256
 
-#define CONFIG_DUMMY_BYTE                           0xFF
+#define CONFIG_DUMMY_BYTE               0xFF
 
 #define SPIT_FLAG_TIMEOUT           ((uint32_t)0x1000)
 
@@ -152,11 +152,11 @@ static s32_t _spiffs_read(uint32_t addr, uint32_t size, uint8_t *dst)
 static s32_t _spiffs_write(uint32_t addr, uint32_t size, uint8_t *src)
 {
     int         rval = 0;
-    uint32_t WriteAddr = addr;
+    uint32_t    WriteAddr = addr;
     uint32_t    addr_end = 0;
     int         length = 0;
     uint8_t     *pData = src;
-    uint16_t NBytes = size;
+    uint16_t    NBytes = size;
 
 //    printf("[%s: %d] phy= 0x%08X, size= %d, sysbuf= 0x%08X\n", __func__, __LINE__, addr, size, src);
 
@@ -507,9 +507,9 @@ static const spiffs_config        g_spiffs_def_cfg =
     .log_block_size     = CONFIG_EXT_FLASH_BLOCK_SZ,
     .log_page_size      = CONFIG_EXT_FLASH_LOG_PAGE_SZ,
 
-#if SPIFFS_FILEHDL_OFFSET
+    #if SPIFFS_FILEHDL_OFFSET
     .fh_ix_offset = 1000,
-#endif
+    #endif
 
 #endif
 };
@@ -528,7 +528,7 @@ static const char *spiffs_errstr(s32_t err)
         case SPIFFS_ERR_DELETED               :     return " deleted";
         case SPIFFS_ERR_NOT_FINALIZED         :     return " not finalized";
         case SPIFFS_ERR_NOT_INDEX             :     return " not index";
-        case SPIFFS_ERR_OUT_OF_FILE_DESCS     :     return " out of filedescs";
+        case SPIFFS_ERR_OUT_OF_FILE_DESCS     :     return " out of file descs";
         case SPIFFS_ERR_FILE_CLOSED           :     return " file closed";
         case SPIFFS_ERR_FILE_DELETED          :     return " file deleted";
         case SPIFFS_ERR_BAD_DESCRIPTOR        :     return " bad descriptor";
@@ -682,7 +682,7 @@ int spiffs_init(spiffs *pHSpiffs, spiffs_config *pCfg_user)
     return rval;
 }
 
-void spiffs_err_log(uint32_t err_code)
+void spiffs_err_log(int err_code)
 {
     printf("%s\n", spiffs_errstr(err_code));
     return;

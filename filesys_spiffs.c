@@ -34,13 +34,14 @@
 //=============================================================================
 typedef struct hfile_spiffs
 {
-//    filesys_handle_t    *pHFilesys;
     spiffs              *pHSpiffs;
     spiffs_file         fd;
 } hfile_spiffs_t;
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
+extern filesys_ll_dev_t     g_filesys_dev;
+
 static spiffs   g_hSpiffs = {0};
 
 static u32_t     g_spiffs_work_buf[(CONFIG_EXT_FLASH_LOG_PAGE_SZ * 2) >> 2];
@@ -48,7 +49,7 @@ static u32_t     g_spiffs_fds[(32 * 4) >> 2];
 static u32_t     g_spiffs_cache_buf[((CONFIG_EXT_FLASH_LOG_PAGE_SZ + 32) * 4) >> 2];
 
 static hfile_spiffs_t       g_hfile[CONFIG_FILE_CNT] = {0};
-static uint32_t             g_file_cnt = 0;
+//static uint32_t             g_file_cnt = 0;
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -60,10 +61,7 @@ static s32_t _spiffs_ll_erase(uint32_t addr, uint32_t len)
 
     for(int i = 0; i < count; i++)
     {
-        extfc_erase(EXTFC_ERASE_SECTOR, addr + i * EXT_FLASH_SECTOR_SZ, 1);
-//        printf("[%s: %d] phy= 0x%08X\n",
-//               __func__, __LINE__,
-//               addr + i * EXT_FLASH_SECTOR_SZ);
+        g_filesys_dev.cb_sec_erase(addr + i * EXT_FLASH_SECTOR_SZ, 1);
     }
 
     return rval;
@@ -72,8 +70,9 @@ static s32_t _spiffs_ll_erase(uint32_t addr, uint32_t len)
 static s32_t _spiffs_ll_read(uint32_t addr, uint32_t size, uint8_t *dst)
 {
     int     rval = 0;
-//    printf("[%s: %d] phy= 0x%08X, size= %d, sysbuf= 0x%08X\n", __func__, __LINE__, addr, size, dst);
-    extfc_read(dst, addr, size);
+
+    g_filesys_dev.cb_flash_read(dst, addr, size);
+
     return rval;
 }
 
@@ -86,7 +85,6 @@ static s32_t _spiffs_ll_write(uint32_t addr, uint32_t size, uint8_t *src)
     uint8_t     *pData = src;
     uint16_t    NBytes = size;
 
-//    printf("[%s: %d] phy= 0x%08X, size= %d, sysbuf= 0x%08X\n", __func__, __LINE__, addr, size, src);
 
     addr_end = (WriteAddr + EXT_FLASH_PAGE_SZ) & ~(EXT_FLASH_PAGE_SZ - 1);
 
@@ -95,7 +93,7 @@ static s32_t _spiffs_ll_write(uint32_t addr, uint32_t size, uint8_t *src)
 
     addr_end = WriteAddr + NBytes;
     do {
-        extfc_program(pData, WriteAddr, NBytes);
+        g_filesys_dev.cb_flash_prog(pData, WriteAddr, NBytes);
 
         WriteAddr += length;
         pData     += length;
@@ -264,7 +262,7 @@ _spiffs_init(filesys_handle_t *pHFilesys, filesys_init_cfg_t *pCfg)
         for(int i = 0; i < CONFIG_FILE_CNT; i++)
             g_hfile[i].fd = -1;
 
-        g_file_cnt = 0;
+//        g_file_cnt = 0;
 
         pHFilesys->pHFS = (void*)&g_hSpiffs;
 
@@ -328,10 +326,80 @@ _spiffs_format(filesys_handle_t *pHFilesys)
     if( !pHFilesys )
         return FILESYS_ERR_NULL_POINTER;
 
-    SPIFFS_unmount((spiffs*)pHFilesys->pHFS);
-    rval = SPIFFS_format((spiffs*)pHFilesys->pHFS);
-    if( rval )
-        rval = FILESYS_ERR_FAIL;
+    do {
+        SPIFFS_unmount((spiffs*)pHFilesys->pHFS);
+        rval = SPIFFS_format((spiffs*)pHFilesys->pHFS);
+        if( rval )
+        {
+            rval = FILESYS_ERR_FAIL;
+            break;
+        }
+
+        rval = SPIFFS_mount((spiffs*)pHFilesys->pHFS,
+                            (spiffs_config*)&g_spiffs_def_cfg,
+                            (u8_t*)&g_spiffs_work_buf,
+                            (u8_t*)&g_spiffs_fds, sizeof(g_spiffs_fds),
+                            g_spiffs_cache_buf, sizeof(g_spiffs_cache_buf),
+                            _spiffs_check_cb_f);
+        if( rval )
+        {
+            rval = FILESYS_ERR_MOUNT_FAIL;
+            break;
+        }
+
+    } while(0);
+    return rval;
+}
+
+static filesys_err_t
+_spiffs_ls(filesys_handle_t *pHFilesys, char *pDir_name)
+{
+    int                 rval = FILESYS_ERR_OK;
+    spiffs_DIR          root_dir = {0};
+    spiffs_dirent_t     dir_cur = {0};
+    spiffs_dirent_t     *pdir_cur = &dir_cur;
+
+    if( !pHFilesys || !pHFilesys->cb_file_ls )
+        return FILESYS_ERR_NULL_POINTER;
+
+    SPIFFS_opendir((spiffs*)pHFilesys->pHFS, (pDir_name) ? pDir_name : "/", &root_dir);
+
+    while( (pdir_cur = SPIFFS_readdir(&root_dir, pdir_cur)) )
+    {
+        if( pHFilesys->cb_file_ls((char*)pdir_cur->name, pdir_cur->size) )
+            break;
+    }
+    SPIFFS_closedir(&root_dir);
+
+    return rval;
+}
+
+static filesys_err_t
+_spiffs_stat(filesys_handle_t *pHFilesys, char *path, filesys_stat_t *pStat)
+{
+    int     rval = FILESYS_ERR_OK;
+
+    if( !pHFilesys || !path || !pStat )
+        return FILESYS_ERR_NULL_POINTER;
+
+    {
+        spiffs_stat     stat = {0};
+
+        rval = SPIFFS_stat((spiffs*)pHFilesys->pHFS, path, &stat);
+        pStat->size = stat.size;
+        pStat->type = (stat.type == SPIFFS_TYPE_FILE) ? FILESYS_FTYPE_FILE
+                    : (stat.type == SPIFFS_TYPE_DIR)  ? FILESYS_FTYPE_DIR
+                    : FILESYS_FTYPE_UNKNOWN;
+
+        #if 1
+        int             len = 0;
+        len = strlen((char*)stat.name) + 1;
+        len = (len < sizeof(pStat->name)) ? len : sizeof(pStat->name);
+        memcpy(pStat->name, (char*)stat.name, len);
+        #else
+        snprintf(pStat->name, sizeof(pStat->name), "%s", (char*)stat.name);
+        #endif
+    }
 
     return rval;
 }
@@ -360,7 +428,7 @@ _spiffs_open(filesys_handle_t *pHFilesys, char *path, filesys_mode_t mode)
         if( fd < 0 )
         {
             printf("errno %i\n", SPIFFS_errno((spiffs*)pHFilesys->pHFS));
-            spiffs_err_log(SPIFFS_errno((spiffs*)pHFilesys->pHFS));
+            printf(" %s\n", _spiffs_errstr(SPIFFS_errno((spiffs*)pHFilesys->pHFS)));
             break;
         }
 
@@ -403,6 +471,10 @@ _spiffs_close(HAFILE hFile)
     hfile_spiffs_t  *pHFile_cur = (hfile_spiffs_t*)hFile;
 
     rval = SPIFFS_close((spiffs*)pHFile_cur->pHSpiffs, pHFile_cur->fd);
+
+    memset(pHFile_cur, 0x0, sizeof(hfile_spiffs_t));
+    pHFile_cur->fd = -1;
+
     return rval;
 }
 
@@ -449,9 +521,14 @@ filesys_fs_desc_t       g_filesys_spiffs =
     .init    = _spiffs_init,
     .deinit  = _spiffs_deinit,
     .format  = _spiffs_format,
+    .ls      = _spiffs_ls,
+    .stat    = _spiffs_stat,
     .open    = _spiffs_open,
     .close   = _spiffs_close,
     .read    = _spiffs_read,
     .write   = _spiffs_write,
 };
+
+
+
 

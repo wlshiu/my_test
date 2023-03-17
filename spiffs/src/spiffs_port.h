@@ -43,7 +43,7 @@ extern "C" {
 //=============================================================================
 int spiffs_init(spiffs *pHSpiffs, spiffs_config *pCfg_user);
 
-void spiffs_err_log(uint32_t err_code);
+void spiffs_err_log(int err_code);
 
 #ifdef __cplusplus
 }

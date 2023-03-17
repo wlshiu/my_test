@@ -31,7 +31,7 @@ extern "C" {
 #include "spiffs.h"
 #endif
 
-#define CONFIG_FILE_NAME_LEN    32
+#define CONFIG_FILE_NAME_LEN    22 // (CONFIG_FILE_NAME_LEN + 2) for align4
 #define CONFIG_FILE_CNT         10
 
 typedef enum filesys_err
@@ -42,8 +42,15 @@ typedef enum filesys_err
     FILESYS_ERR_TIMEOUT         = -3,
     FILESYS_ERR_WRONG_PARAM     = -4,
     FILESYS_ERR_NULL_POINTER    = -5,
+    FILESYS_ERR_MOUNT_FAIL      = -6,
 
 } filesys_err_t;
+
+typedef enum filesys_sys_type
+{
+    FILESYS_SYS_TYPE_SPIFFS,
+    FILESYS_SYS_TYPE_LFS,
+} filesys_sys_type_t;
 
 typedef enum filesys_mode
 {
@@ -53,6 +60,14 @@ typedef enum filesys_mode
     FILESYS_MODE_RDWR   = (FILESYS_MODE_RD | FILESYS_MODE_WR),
 
 } filesys_mode_t;
+
+typedef enum filesys_ftype
+{
+    FILESYS_FTYPE_UNKNOWN  = 0,
+    FILESYS_FTYPE_FILE,
+    FILESYS_FTYPE_DIR,
+} filesys_ftype_t;
+
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
@@ -62,36 +77,52 @@ typedef enum filesys_mode
 //=============================================================================
 typedef void*   HAFILE;
 
+typedef filesys_err_t (*cb_file_ls_t)(char *name, int size);
+typedef filesys_err_t (*cb_flash_sector_erase_t)(uint32_t flash_addr, int sector_cnt);
+typedef filesys_err_t (*cb_flash_read_t)(uint8_t *pSys_buf, uint32_t flash_addr, int nbytes);
+typedef filesys_err_t (*cb_flash_prog_t)(uint8_t *pSys_buf, uint32_t flash_addr, int nbytes);
+
+typedef struct filesys_ll_dev
+{
+    cb_flash_sector_erase_t     cb_sec_erase;
+    cb_flash_read_t             cb_flash_read;
+    cb_flash_prog_t             cb_flash_prog;
+} filesys_ll_dev_t;
+
 typedef struct filesys_handle
 {
     void      *pHFS;
+
+    cb_file_ls_t    cb_file_ls;
 
 } filesys_handle_t;
 
 typedef struct filesys_init_cfg
 {
-    #if defined(CONFIG_USE_LITTLEFS)
-    lfs_config       init_cfg;
-    #elif defined(CONFIG_USE_SPIFFS)
-    spiffs_config    init_cfg;
-    #endif
+    filesys_sys_type_t          sys_type;
+
+    cb_flash_sector_erase_t     cb_sec_erase;
+    cb_flash_read_t             cb_flash_read;
+    cb_flash_prog_t             cb_flash_prog;
 
 } filesys_init_cfg_t;
 
 typedef struct filesys_stat
 {
-    uint32_t    size;
-    char        name[CONFIG_FILE_NAME_LEN];
+    uint32_t            size;
+    char                name[CONFIG_FILE_NAME_LEN + 1];
+    filesys_ftype_t     type;
 } filesys_stat_t;
 
 typedef struct filesys_fs_desc
 {
-    filesys_err_t   (*init)(filesys_handle_t *hFilesys, filesys_init_cfg_t *pCfg);
-    filesys_err_t   (*deinit)(filesys_handle_t *hFilesys);
-    filesys_err_t   (*format)(filesys_handle_t *hFilesys);
-    filesys_err_t   (*ls)(filesys_handle_t *hFilesys);
+    filesys_err_t   (*init)(filesys_handle_t *pHFilesys, filesys_init_cfg_t *pCfg);
+    filesys_err_t   (*deinit)(filesys_handle_t *pHFilesys);
+    filesys_err_t   (*format)(filesys_handle_t *pHFilesys);
+    filesys_err_t   (*ls)(filesys_handle_t *pHFilesys, char *pDir_name);
+    filesys_err_t   (*stat)(filesys_handle_t *pHFilesys, char *path, filesys_stat_t *pStat);
 
-    HAFILE  (*open)(filesys_handle_t *hFilesys, char *path, filesys_mode_t mode);
+    HAFILE  (*open)(filesys_handle_t *pHFilesys, char *path, filesys_mode_t mode);
     int     (*close)(HAFILE hFile);
 
     int   (*read)(uint8_t *pBuf, int size, int nmemb, HAFILE hFile);
@@ -118,6 +149,12 @@ filesys_deinit(filesys_handle_t *pHFilesys);
 
 filesys_err_t
 filesys_format(filesys_handle_t *pHFilesys);
+
+filesys_err_t
+filesys_ls(filesys_handle_t *pHFilesys, char *pDir_name);
+
+filesys_err_t
+filesys_stat(filesys_handle_t *pHFilesys, char *path, filesys_stat_t *pStat);
 
 HAFILE
 filesys_open(filesys_handle_t *pHFilesys, char *path, filesys_mode_t mode);

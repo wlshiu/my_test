@@ -30,14 +30,12 @@
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
-#if defined(CONFIG_USE_LITTLEFS)
 extern filesys_fs_desc_t    g_filesys_littlefs;
-static filesys_fs_desc_t    *g_filesys_desc = &g_filesys_littlefs;
-#elif defined(CONFIG_USE_SPIFFS)
 extern filesys_fs_desc_t    g_filesys_spiffs;
-static filesys_fs_desc_t    *g_filesys_desc = &g_filesys_spiffs;
-#endif
 
+static filesys_fs_desc_t    *g_filesys_desc;
+
+filesys_ll_dev_t     g_filesys_dev = {0};
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -50,11 +48,24 @@ filesys_init(filesys_handle_t *pHFilesys, filesys_init_cfg_t *pCfg)
 {
     filesys_err_t       rval = FILESYS_ERR_OK;
     do {
-        if( !pHFilesys )
+        if( !pHFilesys || !pCfg ||
+            !pCfg->cb_flash_prog ||
+            !pCfg->cb_flash_read ||
+            !pCfg->cb_sec_erase )
         {
             rval = FILESYS_ERR_NULL_POINTER;
             break;
         }
+
+        memset(&g_filesys_dev, 0x0, sizeof(g_filesys_dev));
+
+        g_filesys_desc = (pCfg->sys_type == FILESYS_SYS_TYPE_LFS)
+                       ? &g_filesys_littlefs
+                       : &g_filesys_spiffs;
+
+        g_filesys_dev.cb_flash_prog = pCfg->cb_flash_prog;
+        g_filesys_dev.cb_flash_read = pCfg->cb_flash_read;
+        g_filesys_dev.cb_sec_erase  = pCfg->cb_sec_erase;
 
         if( g_filesys_desc && g_filesys_desc->init )
             rval = g_filesys_desc->init(pHFilesys, pCfg);
@@ -95,6 +106,41 @@ filesys_format(filesys_handle_t *pHFilesys)
         if( g_filesys_desc && g_filesys_desc->format )
             rval = g_filesys_desc->format(pHFilesys);
 
+    } while(0);
+    return rval;
+}
+
+filesys_err_t
+filesys_ls(filesys_handle_t *pHFilesys, char *pDir_name)
+{
+    filesys_err_t       rval = FILESYS_ERR_OK;
+    do {
+        if( !pHFilesys )
+        {
+            rval = FILESYS_ERR_NULL_POINTER;
+            break;
+        }
+
+        if( g_filesys_desc && g_filesys_desc->ls )
+            rval = g_filesys_desc->ls(pHFilesys, pDir_name);
+
+    } while(0);
+    return rval;
+}
+
+filesys_err_t
+filesys_stat(filesys_handle_t *pHFilesys, char *path, filesys_stat_t *pStat)
+{
+    filesys_err_t       rval = FILESYS_ERR_OK;
+    do {
+        if( !pHFilesys || !path || !pStat )
+        {
+            rval = FILESYS_ERR_NULL_POINTER;
+            break;
+        }
+
+        if( g_filesys_desc && g_filesys_desc->stat )
+            rval = g_filesys_desc->stat(pHFilesys, path, pStat);
     } while(0);
     return rval;
 }
@@ -168,3 +214,5 @@ filesys_write(uint8_t *pBuf, int size, int nmemb, HAFILE hFile)
     } while(0);
     return rval;
 }
+
+
