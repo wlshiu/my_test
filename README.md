@@ -119,6 +119,10 @@
 + test_flash_fs
     > use LittleFS and Spiffs
 
++ test_freertos
+    > windows simulation
+
+
 # MS Visual Studio
 
 + include libs
