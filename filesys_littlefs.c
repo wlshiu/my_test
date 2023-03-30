@@ -49,7 +49,11 @@
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
-
+#if 1
+#define _msg(str, ...)           printf(str, ##__VA_ARGS__)
+#else
+#define _msg(str, ...)
+#endif
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
@@ -81,22 +85,22 @@ static void _lfs_err_string(lfs_error_t err_code)
 {
     switch( err_code )
     {
-        case LFS_ERR_OK         :    printf("No error                      \n");    break;
-        case LFS_ERR_IO         :    printf("Error during device operation \n");    break;
-        case LFS_ERR_CORRUPT    :    printf("Corrupted                     \n");    break;
-        case LFS_ERR_NOENT      :    printf("No directory entry            \n");    break;
-        case LFS_ERR_EXIST      :    printf("Entry already exists          \n");    break;
-        case LFS_ERR_NOTDIR     :    printf("Entry is not a dir            \n");    break;
-        case LFS_ERR_ISDIR      :    printf("Entry is a dir                \n");    break;
-        case LFS_ERR_NOTEMPTY   :    printf("Dir is not empty              \n");    break;
-        case LFS_ERR_BADF       :    printf("Bad file number               \n");    break;
-        case LFS_ERR_FBIG       :    printf("File too large                \n");    break;
-        case LFS_ERR_INVAL      :    printf("Invalid parameter             \n");    break;
-        case LFS_ERR_NOSPC      :    printf("No space left on device       \n");    break;
-        case LFS_ERR_NOMEM      :    printf("No more memory available      \n");    break;
-        case LFS_ERR_NOATTR     :    printf("No data/attr available        \n");    break;
-        case LFS_ERR_NAMETOOLONG:    printf("File name too long            \n");    break;
-        default:                     printf("Unknown\n");                           break;
+        case LFS_ERR_OK         :    _msg("No error                      \n");    break;
+        case LFS_ERR_IO         :    _msg("Error during device operation \n");    break;
+        case LFS_ERR_CORRUPT    :    _msg("Corrupted                     \n");    break;
+        case LFS_ERR_NOENT      :    _msg("No directory entry            \n");    break;
+        case LFS_ERR_EXIST      :    _msg("Entry already exists          \n");    break;
+        case LFS_ERR_NOTDIR     :    _msg("Entry is not a dir            \n");    break;
+        case LFS_ERR_ISDIR      :    _msg("Entry is a dir                \n");    break;
+        case LFS_ERR_NOTEMPTY   :    _msg("Dir is not empty              \n");    break;
+        case LFS_ERR_BADF       :    _msg("Bad file number               \n");    break;
+        case LFS_ERR_FBIG       :    _msg("File too large                \n");    break;
+        case LFS_ERR_INVAL      :    _msg("Invalid parameter             \n");    break;
+        case LFS_ERR_NOSPC      :    _msg("No space left on device       \n");    break;
+        case LFS_ERR_NOMEM      :    _msg("No more memory available      \n");    break;
+        case LFS_ERR_NOATTR     :    _msg("No data/attr available        \n");    break;
+        case LFS_ERR_NAMETOOLONG:    _msg("File name too long            \n");    break;
+        default:                     _msg("Unknown\n");                           break;
     }
     return;
 }
@@ -109,8 +113,6 @@ _lfs_deskio_read(
     void                    *buffer,
     lfs_size_t              size)
 {
-//    extfc_read((uint8_t *)buffer, c->block_size * block + off, size);
-
     g_filesys_dev.cb_flash_read((uint8_t *)buffer, c->block_size * block + off, size);
 
     return LFS_ERR_OK;
@@ -137,7 +139,6 @@ _lfs_deskio_prog(
     while (1)
     {
         g_filesys_dev.cb_flash_prog(pBuffer, WriteAddr, page_remain);
-//        extfc_program(pBuffer, WriteAddr, page_remain);
 
         if( NumByteToWrite == page_remain )
             break;
@@ -160,7 +161,6 @@ _lfs_deskio_erase(
 {
     uint32_t    Dst_Addr = block * 4096;
 
-//    extfc_erase(EXTFC_ERASE_SECTOR, Dst_Addr, 1);
     g_filesys_dev.cb_sec_erase(Dst_Addr, 1);
     return LFS_ERR_OK;
 }
@@ -213,7 +213,7 @@ _lfs_init(filesys_handle_t *pHFilesys, filesys_init_cfg_t *pCfg)
         memset(&g_hfile, 0x0, sizeof(g_hfile));
         for(int i = 0; i < CONFIG_FILE_CNT; i++)
         {
-            g_hfile[i].fd.id             = -1;
+            g_hfile[i].fd.id             = (uint16_t)-1;
             g_hfile[i].fd_cfg.buffer     = (void*)&g_hfile[i].file_cache;
             g_hfile[i].fd_cfg.attr_count = 0;
         }
@@ -243,7 +243,7 @@ _lfs_init(filesys_handle_t *pHFilesys, filesys_init_cfg_t *pCfg)
             }
         }
     } while(0);
-    return rval;
+    return (filesys_err_t)rval;
 }
 
 static filesys_err_t
@@ -253,7 +253,7 @@ _lfs_deinit(filesys_handle_t *pHFilesys)
         return FILESYS_ERR_NULL_POINTER;
 
     lfs_unmount((lfs_t*)pHFilesys->pHFS);
-    return 0;
+    return FILESYS_ERR_OK;
 }
 
 static filesys_err_t
@@ -279,7 +279,7 @@ _lfs_format(filesys_handle_t *pHFilesys)
             break;
         }
     } while(0);
-    return rval;
+    return (filesys_err_t)rval;
 }
 
 
@@ -310,9 +310,9 @@ _lfs_ls(filesys_handle_t *pHFilesys, char *pDir_name)
         #else
             switch( finfo.type )
             {
-                case LFS_TYPE_REG: printf("reg "); break;
-                case LFS_TYPE_DIR: printf("dir "); break;
-                default:           printf("?   "); break;
+                case LFS_TYPE_REG: _msg("reg "); break;
+                case LFS_TYPE_DIR: _msg("dir "); break;
+                default:           _msg("?   "); break;
             }
 
             static const char   *prefixes[] = { "", "K", "M", "G" };
@@ -320,12 +320,12 @@ _lfs_ls(filesys_handle_t *pHFilesys, char *pDir_name)
             {
                 if( finfo.size >= ((1 << 10*i) - 1) )
                 {
-                    printf("%*u%sBytes ", 4 - (i != 0), finfo.size >> (10 * i), prefixes[i]);
+                    _msg("%*u%sBytes ", 4 - (i != 0), finfo.size >> (10 * i), prefixes[i]);
                     break;
                 }
             }
 
-            printf("%s\n", finfo.name);
+            _msg("%s\n", finfo.name);
         #endif
         }
 
@@ -333,7 +333,7 @@ _lfs_ls(filesys_handle_t *pHFilesys, char *pDir_name)
 
     } while(0);
 
-    return rval;
+    return (filesys_err_t)rval;
 }
 
 static filesys_err_t
@@ -344,10 +344,20 @@ _lfs_stat(filesys_handle_t *pHFilesys, char *path, filesys_stat_t *pStat)
     if( !pHFilesys || !path || !pStat )
         return FILESYS_ERR_NULL_POINTER;
 
-    {
+    do {
         lfs_info_t      finfo = {0};
 
         rval = lfs_stat((lfs_t*)pHFilesys->pHFS, path, &finfo);
+        if( rval == LFS_ERR_NOTDIR )
+        {
+            rval = FILESYS_ERR_NOT_FOUND;
+            break;
+        }
+        else if( rval < 0 )
+        {
+            rval = FILESYS_ERR_FAIL;
+            break;
+        }
 
         pStat->size = finfo.size;
         pStat->type = (finfo.type == LFS_TYPE_REG) ? FILESYS_FTYPE_FILE
@@ -362,8 +372,34 @@ _lfs_stat(filesys_handle_t *pHFilesys, char *path, filesys_stat_t *pStat)
         #else
         snprintf(pStat->name, sizeof(pStat->name), "%s", (char*)stat.name);
         #endif
-    }
-    return rval;
+    } while(0);
+    return (filesys_err_t)rval;
+}
+
+static filesys_err_t
+_lfs_capacity(filesys_handle_t *pHFilesys, uint32_t *pTotal_bytes, uint32_t *pUsed_bytes)
+{
+    int         rval = FILESYS_ERR_OK;
+    uint32_t    total_bytes = 0;
+    uint32_t    used_bytes = 0;
+
+    if( !pHFilesys )
+        return FILESYS_ERR_NULL_POINTER;
+
+    do {
+        rval = lfs_fs_size((lfs_t*)pHFilesys->pHFS);
+        if( rval < 0 )  break;
+
+        total_bytes = g_lfs_cfg.block_count * g_lfs_cfg.block_size;
+        used_bytes  = rval * g_lfs_cfg.block_size;
+
+        rval = FILESYS_ERR_OK;
+
+        if( pTotal_bytes )      *pTotal_bytes = total_bytes;
+        if( pUsed_bytes )       *pUsed_bytes = used_bytes;
+    } while(0);
+
+    return (filesys_err_t)rval;
 }
 
 static HAFILE
@@ -385,6 +421,8 @@ _lfs_open(filesys_handle_t *pHFilesys, char *path, filesys_mode_t mode)
 
         if(mode & FILESYS_MODE_APPEND)
             file_mode |= LFS_O_APPEND;
+        if( mode & FILESYS_MODE_TRUNC )
+            file_mode |= LFS_O_TRUNC;
 
         for(int i = 0; i < CONFIG_FILE_CNT; i++)
         {
@@ -397,7 +435,7 @@ _lfs_open(filesys_handle_t *pHFilesys, char *path, filesys_mode_t mode)
 
         if( !pHFile_cur )
         {
-            err("Count of opened files is max \n");
+            _msg("Count of opened files is max \n");
             break;
         }
 
@@ -427,7 +465,7 @@ _lfs_close(HAFILE hFile)
 
         memset(pHFile_cur, 0x0, sizeof(hfile_lfs_t));
 
-        pHFile_cur->fd.id         = -1;
+        pHFile_cur->fd.id         = (uint16_t)-1;
         pHFile_cur->fd_cfg.buffer = (void*)pHFile_cur->file_cache;
     } while(0);
 
@@ -457,8 +495,15 @@ _lfs_write(
 {
     hfile_lfs_t     *pHFile_cur = (hfile_lfs_t*)hFile;
     int             rval = 0;
+    do {
+        rval = lfs_file_write((lfs_t*)pHFile_cur->pHLfs, &pHFile_cur->fd, pBuf, size * nmemb);
+        if( rval )  break;
 
-    rval = lfs_file_write((lfs_t*)pHFile_cur->pHLfs, &pHFile_cur->fd, pBuf, size * nmemb);
+        rval = lfs_file_sync((lfs_t*)pHFile_cur->pHLfs, &pHFile_cur->fd);
+        if( rval )  break;
+
+    } while(0);
+
     return rval;
 }
 //=============================================================================
@@ -466,63 +511,14 @@ _lfs_write(
 //=============================================================================
 filesys_fs_desc_t       g_filesys_littlefs =
 {
-    .init    = _lfs_init,
-    .deinit  = _lfs_deinit,
-    .format  = _lfs_format,
-    .ls      = _lfs_ls,
-    .stat    = _lfs_stat,
-    .open    = _lfs_open,
-    .close   = _lfs_close,
-    .read    = _lfs_read,
-    .write   = _lfs_write,
+    .init     = _lfs_init,
+    .deinit   = _lfs_deinit,
+    .format   = _lfs_format,
+    .ls       = _lfs_ls,
+    .stat     = _lfs_stat,
+    .capacity = _lfs_capacity,
+    .open     = _lfs_open,
+    .close    = _lfs_close,
+    .read     = _lfs_read,
+    .write    = _lfs_write,
 };
-
-#if 0 // reference example
-
-int lfs_ls(lfs_t *lfs, const char *path)
-{
-    lfs_dir_t dir;
-    int err = lfs_dir_open(lfs, &dir, path);
-    if (err) {
-        return err;
-    }
-
-    struct lfs_info info;
-    while (true) {
-        int res = lfs_dir_read(lfs, &dir, &info);
-        if (res < 0) {
-            return res;
-        }
-
-        if (res == 0) {
-            break;
-        }
-
-        switch (info.type) {
-            case LFS_TYPE_REG: printf("reg "); break;
-            case LFS_TYPE_DIR: printf("dir "); break;
-            default:           printf("?   "); break;
-        }
-
-        static const char *prefixes[] = {"", "K", "M", "G"};
-        for (int i = sizeof(prefixes)/sizeof(prefixes[0])-1; i >= 0; i--) {
-            if (info.size >= (1 << 10*i)-1) {
-                printf("%*u%sB ", 4-(i != 0), info.size >> 10*i, prefixes[i]);
-                break;
-            }
-        }
-
-        printf("%s\n", info.name);
-    }
-
-    err = lfs_dir_close(lfs, &dir);
-    if (err) {
-        return err;
-    }
-
-    return 0;
-}
-
-lfs_ls(&lfs, "/");
-#endif
-

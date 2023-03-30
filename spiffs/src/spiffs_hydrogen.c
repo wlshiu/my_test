@@ -125,6 +125,22 @@ s32_t SPIFFS_mount(spiffs *fs, spiffs_config *config, u8_t *work,
   s32_t res;
 
 #if SPIFFS_USE_MAGIC
+///////////////////////////
+    printf("%d, %d, %d, %d\n",
+           SPIFFS_OBJ_LOOKUP_MAX_ENTRIES(fs),
+           SPIFFS_CFG_LOG_PAGE_SZ(fs),
+           sizeof(spiffs_obj_id),
+           SPIFFS_CFG_LOG_PAGE_SZ(fs));
+
+    printf("\(%d %% %d\) * %d <= %d \n",
+           SPIFFS_OBJ_LOOKUP_MAX_ENTRIES(fs),
+           (SPIFFS_CFG_LOG_PAGE_SZ(fs)/sizeof(spiffs_obj_id)),
+           sizeof(spiffs_obj_id),
+           (SPIFFS_CFG_LOG_PAGE_SZ(fs) - sizeof(spiffs_obj_id)*2));
+
+//  ( (SPIFFS_OBJ_LOOKUP_MAX_ENTRIES(fs) % (SPIFFS_CFG_LOG_PAGE_SZ(fs)/sizeof(spiffs_obj_id)) ) * sizeof(spiffs_obj_id)
+//    <= (SPIFFS_CFG_LOG_PAGE_SZ(fs) - sizeof(spiffs_obj_id)*2) )
+///////////////////////////
   res = SPIFFS_CHECK_MAGIC_POSSIBLE(fs) ? SPIFFS_OK : SPIFFS_ERR_MAGIC_NOT_POSSIBLE;
   SPIFFS_API_CHECK_RES_UNLOCK(fs, res);
 #endif

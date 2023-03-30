@@ -11,13 +11,13 @@
  */
 
 
+#include <string.h>
 #include "filesys.h"
-
-
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-
+//#define CONFIG_USE_LITTLEFS
+#define CONFIG_USE_SPIFFS
 
 //=============================================================================
 //                  Macro Definition
@@ -30,8 +30,13 @@
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
+#if defined(CONFIG_USE_LITTLEFS)
 extern filesys_fs_desc_t    g_filesys_littlefs;
+#endif  /* CONFIG_USE_LITTLEFS */
+
+#if defined(CONFIG_USE_SPIFFS)
 extern filesys_fs_desc_t    g_filesys_spiffs;
+#endif  /* CONFIG_USE_SPIFFS */
 
 static filesys_fs_desc_t    *g_filesys_desc;
 
@@ -59,13 +64,31 @@ filesys_init(filesys_handle_t *pHFilesys, filesys_init_cfg_t *pCfg)
 
         memset(&g_filesys_dev, 0x0, sizeof(g_filesys_dev));
 
+        #if defined(CONFIG_USE_SPIFFS) && defined(CONFIG_USE_LITTLEFS)
         g_filesys_desc = (pCfg->sys_type == FILESYS_SYS_TYPE_LFS)
                        ? &g_filesys_littlefs
                        : &g_filesys_spiffs;
+        #elif defined(CONFIG_USE_SPIFFS)
+        g_filesys_desc = &g_filesys_spiffs;       
+        #elif defined(CONFIG_USE_LITTLEFS)
+        g_filesys_desc = &g_filesys_littlefs;           
+        #endif
 
         g_filesys_dev.cb_flash_prog = pCfg->cb_flash_prog;
         g_filesys_dev.cb_flash_read = pCfg->cb_flash_read;
         g_filesys_dev.cb_sec_erase  = pCfg->cb_sec_erase;
+
+        if( pCfg->cb_ll_init )
+        {
+            rval = pCfg->cb_ll_init();
+            if( rval )  break;
+        }
+
+        if( pCfg->cb_ll_get_jedec_id )
+        {
+            rval = pCfg->cb_ll_get_jedec_id(&pHFilesys->jedec_id);
+            if( rval )  break;
+        }
 
         if( g_filesys_desc && g_filesys_desc->init )
             rval = g_filesys_desc->init(pHFilesys, pCfg);
@@ -145,6 +168,23 @@ filesys_stat(filesys_handle_t *pHFilesys, char *path, filesys_stat_t *pStat)
     return rval;
 }
 
+filesys_err_t
+filesys_capacity(filesys_handle_t *pHFilesys, uint32_t *pTotal_bytes, uint32_t *pUsed_bytes)
+{
+    filesys_err_t       rval = FILESYS_ERR_OK;
+    do {
+        if( !pHFilesys )
+        {
+            rval = FILESYS_ERR_NULL_POINTER;
+            break;
+        }
+
+        if( g_filesys_desc && g_filesys_desc->capacity )
+            rval = g_filesys_desc->capacity(pHFilesys, pTotal_bytes, pUsed_bytes);
+    } while(0);
+    return rval;
+}
+
 HAFILE
 filesys_open(filesys_handle_t *pHFilesys, char *path, filesys_mode_t mode)
 {
@@ -161,10 +201,10 @@ filesys_open(filesys_handle_t *pHFilesys, char *path, filesys_mode_t mode)
     return hAFile;
 }
 
-filesys_err_t
+int
 filesys_close(HAFILE hFile)
 {
-    filesys_err_t       rval = FILESYS_ERR_OK;
+    int     rval = 0;
     do {
         if( !hFile )
         {
@@ -182,13 +222,10 @@ filesys_close(HAFILE hFile)
 int
 filesys_read(uint8_t *pBuf, int size, int nmemb, HAFILE hFile)
 {
-    filesys_err_t       rval = FILESYS_ERR_OK;
+    int     rval = 0;
     do {
         if( !hFile )
-        {
-            rval = FILESYS_ERR_NULL_POINTER;
-            break;
-        }
+            return FILESYS_ERR_NULL_POINTER;
 
         if( g_filesys_desc && g_filesys_desc->read )
             rval = g_filesys_desc->read(pBuf, size, nmemb, hFile);
@@ -200,13 +237,10 @@ filesys_read(uint8_t *pBuf, int size, int nmemb, HAFILE hFile)
 int
 filesys_write(uint8_t *pBuf, int size, int nmemb, HAFILE hFile)
 {
-    filesys_err_t       rval = FILESYS_ERR_OK;
+    int     rval = 0;
     do {
         if( !hFile )
-        {
-            rval = FILESYS_ERR_NULL_POINTER;
-            break;
-        }
+            return FILESYS_ERR_NULL_POINTER;
 
         if( g_filesys_desc && g_filesys_desc->write )
             rval = g_filesys_desc->write(pBuf, size, nmemb, hFile);

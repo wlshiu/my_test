@@ -18,17 +18,21 @@
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
-#define CONFIG_EXT_FLASH_PHYS_SZ        (512ul << 10)//(512ul << 10)
-#define CONFIG_EXT_FLASH_BLOCK_SZ       (32ul << 10)//(64ul << 10)
-#define CONFIG_EXT_FLASH_PHYS_ADDR      (0)
-#define CONFIG_EXT_FLASH_LOG_PAGE_SZ    (256)
+#define CONFIG_VIRTUAL_FS_PHYS_SZ       (16ul << 20)//(512ul << 10)
+#define CONFIG_VIRTUAL_FS_BLOCK_SZ      (16ul << 10)//(64ul << 10)
+#define CONFIG_VIRTUAL_FS_PHYS_ADDR     (0)
+#define CONFIG_VIRTUAL_FS_LOG_PAGE_SZ   (256)
 
 #define EXT_FLASH_SECTOR_SZ             (4ul << 10)
 #define EXT_FLASH_PAGE_SZ               256
 //=============================================================================
 //                  Macro Definition
 //=============================================================================
-
+#if 1
+#define _msg(str, ...)           printf(str, ##__VA_ARGS__)
+#else
+#define _msg(str, ...)
+#endif
 //=============================================================================
 //                  Structure Definition
 //=============================================================================
@@ -44,12 +48,11 @@ extern filesys_ll_dev_t     g_filesys_dev;
 
 static spiffs   g_hSpiffs = {0};
 
-static u32_t     g_spiffs_work_buf[(CONFIG_EXT_FLASH_LOG_PAGE_SZ * 2) >> 2];
+static u32_t     g_spiffs_work_buf[(CONFIG_VIRTUAL_FS_LOG_PAGE_SZ * 2) >> 2];
 static u32_t     g_spiffs_fds[(32 * 4) >> 2];
-static u32_t     g_spiffs_cache_buf[((CONFIG_EXT_FLASH_LOG_PAGE_SZ + 32) * 4) >> 2];
+static u32_t     g_spiffs_cache_buf[((CONFIG_VIRTUAL_FS_LOG_PAGE_SZ + 32) * 4) >> 2];
 
 static hfile_spiffs_t       g_hfile[CONFIG_FILE_CNT] = {0};
-//static uint32_t             g_file_cnt = 0;
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -107,18 +110,18 @@ static s32_t _spiffs_ll_write(uint32_t addr, uint32_t size, uint8_t *src)
 }
 
 
-static const spiffs_config        g_spiffs_def_cfg =
+static spiffs_config        g_spiffs_def_cfg =
 {
     .hal_erase_f        = _spiffs_ll_erase,
     .hal_read_f         = _spiffs_ll_read,
     .hal_write_f        = _spiffs_ll_write,
 
 #if (SPIFFS_SINGLETON == 0)
-    .phys_size          = CONFIG_EXT_FLASH_PHYS_SZ,
-    .phys_addr          = CONFIG_EXT_FLASH_PHYS_ADDR,
-    .phys_erase_block   = CONFIG_EXT_FLASH_BLOCK_SZ,
-    .log_block_size     = CONFIG_EXT_FLASH_BLOCK_SZ,
-    .log_page_size      = CONFIG_EXT_FLASH_LOG_PAGE_SZ,
+    .phys_size          = CONFIG_VIRTUAL_FS_PHYS_SZ,
+    .phys_addr          = CONFIG_VIRTUAL_FS_PHYS_ADDR,
+    .phys_erase_block   = CONFIG_VIRTUAL_FS_BLOCK_SZ,
+    .log_block_size     = CONFIG_VIRTUAL_FS_BLOCK_SZ,
+    .log_page_size      = CONFIG_VIRTUAL_FS_LOG_PAGE_SZ,
 
     #if SPIFFS_FILEHDL_OFFSET
     .fh_ix_offset = 1000,
@@ -187,7 +190,7 @@ static const char* _spiffs_errstr(s32_t err)
 static void
 _spiffs_err_log(uint32_t err_code)
 {
-    printf("%s\n", _spiffs_errstr(err_code));
+    _msg("%s\n", _spiffs_errstr(err_code));
     return;
 }
 
@@ -205,40 +208,40 @@ _spiffs_check_cb_f(
     if( report == SPIFFS_CHECK_PROGRESS && old_perc != perc )
     {
         old_perc = perc;
-        printf("CHECK REPORT: ");
+        _msg("CHECK REPORT: ");
         switch(type)
         {
-            case SPIFFS_CHECK_LOOKUP:   printf("LU ");    break;
-            case SPIFFS_CHECK_INDEX:    printf("IX ");    break;
-            case SPIFFS_CHECK_PAGE:     printf("PA ");    break;
+            case SPIFFS_CHECK_LOOKUP:   _msg("LU ");    break;
+            case SPIFFS_CHECK_INDEX:    _msg("IX ");    break;
+            case SPIFFS_CHECK_PAGE:     _msg("PA ");    break;
         }
-        printf("%i%%\n", perc);
+        _msg("%i%%\n", perc);
     }
 
     if( report != SPIFFS_CHECK_PROGRESS )
     {
-        printf("   check: ");
+        _msg("   check: ");
         switch (type)
         {
-            case SPIFFS_CHECK_INDEX:    printf("INDEX  "); break;
-            case SPIFFS_CHECK_LOOKUP:   printf("LOOKUP "); break;
-            case SPIFFS_CHECK_PAGE:     printf("PAGE   "); break;
+            case SPIFFS_CHECK_INDEX:    _msg("INDEX  "); break;
+            case SPIFFS_CHECK_LOOKUP:   _msg("LOOKUP "); break;
+            case SPIFFS_CHECK_PAGE:     _msg("PAGE   "); break;
             default:
-                printf("????   ");
+                _msg("????   ");
                 break;
         }
 
         switch( report )
         {
-            case SPIFFS_CHECK_ERROR:                    printf("ERROR %i", arg1);                   break;
-            case SPIFFS_CHECK_DELETE_BAD_FILE:          printf("DELETE BAD FILE %04x", arg1);       break;
-            case SPIFFS_CHECK_DELETE_ORPHANED_INDEX:    printf("DELETE ORPHANED INDEX %04x", arg1); break;
-            case SPIFFS_CHECK_DELETE_PAGE:              printf("DELETE PAGE %04x", arg1);           break;
-            case SPIFFS_CHECK_FIX_INDEX:                printf("FIX INDEX %04x:%04x", arg1, arg2);  break;
-            case SPIFFS_CHECK_FIX_LOOKUP:               printf("FIX INDEX %04x:%04x", arg1, arg2);  break;
-            default:                                    printf("??");                               break;
+            case SPIFFS_CHECK_ERROR:                    _msg("ERROR %i", arg1);                   break;
+            case SPIFFS_CHECK_DELETE_BAD_FILE:          _msg("DELETE BAD FILE %04x", arg1);       break;
+            case SPIFFS_CHECK_DELETE_ORPHANED_INDEX:    _msg("DELETE ORPHANED INDEX %04x", arg1); break;
+            case SPIFFS_CHECK_DELETE_PAGE:              _msg("DELETE PAGE %04x", arg1);           break;
+            case SPIFFS_CHECK_FIX_INDEX:                _msg("FIX INDEX %04x:%04x", arg1, arg2);  break;
+            case SPIFFS_CHECK_FIX_LOOKUP:               _msg("FIX INDEX %04x:%04x", arg1, arg2);  break;
+            default:                                    _msg("??");                               break;
         }
-        printf("\n");
+        _msg("\n");
     }
     return;
 }
@@ -255,7 +258,7 @@ _spiffs_init(filesys_handle_t *pHFilesys, filesys_init_cfg_t *pCfg)
             break;
         }
 
-        memset(pHFilesys, 0x0, sizeof(filesys_handle_t));
+//        memset(pHFilesys, 0x0, sizeof(filesys_handle_t));
         memset(&g_hSpiffs, 0x0, sizeof(g_hSpiffs));
 
         memset(&g_hfile, 0x0, sizeof(g_hfile));
@@ -265,6 +268,10 @@ _spiffs_init(filesys_handle_t *pHFilesys, filesys_init_cfg_t *pCfg)
 //        g_file_cnt = 0;
 
         pHFilesys->pHFS = (void*)&g_hSpiffs;
+
+        #if 0 // it is real nor flash case
+        g_spiffs_def_cfg.phys_size = (0x1ul << (pHFilesys->jedec_id & 0xFF));
+        #endif
 
         rval = SPIFFS_mount((spiffs*)pHFilesys->pHFS,
                             (spiffs_config*)&g_spiffs_def_cfg,
@@ -276,12 +283,12 @@ _spiffs_init(filesys_handle_t *pHFilesys, filesys_init_cfg_t *pCfg)
         if( rval != SPIFFS_OK && SPIFFS_errno((spiffs*)pHFilesys->pHFS) == SPIFFS_ERR_NOT_A_FS )
         {
             _spiffs_err_log(SPIFFS_errno((spiffs*)pHFilesys->pHFS));
-            msg("formatting file system ...\n");
+            _msg("formatting file system ...\n");
             rval = SPIFFS_format((spiffs*)pHFilesys->pHFS);
             if( rval != SPIFFS_OK )
             {
                 rval = FILESYS_ERR_FAIL;
-                msg("SPIFFS format failed: %i\n", SPIFFS_errno((spiffs*)pHFilesys->pHFS));
+                _msg("SPIFFS format failed: %i\n", SPIFFS_errno((spiffs*)pHFilesys->pHFS));
                 _spiffs_err_log(SPIFFS_errno((spiffs*)pHFilesys->pHFS));
                 break;
             }
@@ -297,14 +304,14 @@ _spiffs_init(filesys_handle_t *pHFilesys, filesys_init_cfg_t *pCfg)
         if( rval != SPIFFS_OK )
         {
             rval = FILESYS_ERR_FAIL;
-            msg("SPIFFS mount failed: %i\n", SPIFFS_errno((spiffs*)pHFilesys->pHFS));
+            _msg("SPIFFS mount failed: %i\n", SPIFFS_errno((spiffs*)pHFilesys->pHFS));
             _spiffs_err_log(SPIFFS_errno((spiffs*)pHFilesys->pHFS));
             break;
         }
 
-        msg("SPIFFS mounted\n");
+        _msg("SPIFFS mounted\n");
     } while(0);
-    return rval;
+    return (filesys_err_t)rval;
 }
 
 static filesys_err_t
@@ -314,7 +321,7 @@ _spiffs_deinit(filesys_handle_t *pHFilesys)
         return FILESYS_ERR_NULL_POINTER;
 
     SPIFFS_unmount((spiffs*)pHFilesys->pHFS);
-    return 0;
+    return FILESYS_ERR_OK;
 }
 
 
@@ -348,7 +355,7 @@ _spiffs_format(filesys_handle_t *pHFilesys)
         }
 
     } while(0);
-    return rval;
+    return (filesys_err_t)rval;
 }
 
 static filesys_err_t
@@ -371,7 +378,7 @@ _spiffs_ls(filesys_handle_t *pHFilesys, char *pDir_name)
     }
     SPIFFS_closedir(&root_dir);
 
-    return rval;
+    return (filesys_err_t)rval;
 }
 
 static filesys_err_t
@@ -382,10 +389,21 @@ _spiffs_stat(filesys_handle_t *pHFilesys, char *path, filesys_stat_t *pStat)
     if( !pHFilesys || !path || !pStat )
         return FILESYS_ERR_NULL_POINTER;
 
-    {
+    do {
         spiffs_stat     stat = {0};
 
         rval = SPIFFS_stat((spiffs*)pHFilesys->pHFS, path, &stat);
+        if( rval == SPIFFS_ERR_NOT_FOUND )
+        {
+            rval = FILESYS_ERR_NOT_FOUND;
+            break;
+        }
+        else if( rval < 0 )
+        {
+            rval = FILESYS_ERR_FAIL;
+            break;
+        }
+
         pStat->size = stat.size;
         pStat->type = (stat.type == SPIFFS_TYPE_FILE) ? FILESYS_FTYPE_FILE
                     : (stat.type == SPIFFS_TYPE_DIR)  ? FILESYS_FTYPE_DIR
@@ -399,9 +417,36 @@ _spiffs_stat(filesys_handle_t *pHFilesys, char *path, filesys_stat_t *pStat)
         #else
         snprintf(pStat->name, sizeof(pStat->name), "%s", (char*)stat.name);
         #endif
-    }
+    } while(0);
 
-    return rval;
+    return (filesys_err_t)rval;
+}
+
+static filesys_err_t
+_spiffs_capacity(filesys_handle_t *pHFilesys, uint32_t *pTotal_bytes, uint32_t *pUsed_bytes)
+{
+    int         rval = FILESYS_ERR_OK;
+    uint32_t    total_bytes = 0;
+    uint32_t    used_bytes = 0;
+
+    if( !pHFilesys )
+        return FILESYS_ERR_NULL_POINTER;
+
+    do {
+        rval = SPIFFS_info((spiffs*)pHFilesys->pHFS, &total_bytes, &used_bytes);
+        if( rval )
+        {
+            _spiffs_err_log(SPIFFS_errno((spiffs*)pHFilesys->pHFS));
+            break;
+        }
+
+        rval = FILESYS_ERR_OK;
+
+        if( pTotal_bytes )      *pTotal_bytes = total_bytes;
+        if( pUsed_bytes )       *pUsed_bytes = used_bytes;
+    } while(0);
+
+    return (filesys_err_t)rval;
 }
 
 static HAFILE
@@ -421,8 +466,10 @@ _spiffs_open(filesys_handle_t *pHFilesys, char *path, filesys_mode_t mode)
         if( mode & FILESYS_MODE_WR )
             file_mode |= SPIFFS_O_WRONLY;
 
-        if(mode & FILESYS_MODE_APPEND)
+        if( mode & FILESYS_MODE_APPEND )
             file_mode |= SPIFFS_O_APPEND;
+        if( mode & FILESYS_MODE_TRUNC )
+            file_mode |= SPIFFS_O_TRUNC;
 
         fd = SPIFFS_open((spiffs*)pHFilesys->pHFS, path, file_mode, 0);
         if( fd < 0 )
@@ -518,15 +565,16 @@ _spiffs_write(
 //=============================================================================
 filesys_fs_desc_t       g_filesys_spiffs =
 {
-    .init    = _spiffs_init,
-    .deinit  = _spiffs_deinit,
-    .format  = _spiffs_format,
-    .ls      = _spiffs_ls,
-    .stat    = _spiffs_stat,
-    .open    = _spiffs_open,
-    .close   = _spiffs_close,
-    .read    = _spiffs_read,
-    .write   = _spiffs_write,
+    .init     = _spiffs_init,
+    .deinit   = _spiffs_deinit,
+    .format   = _spiffs_format,
+    .ls       = _spiffs_ls,
+    .stat     = _spiffs_stat,
+    .capacity = _spiffs_capacity,
+    .open     = _spiffs_open,
+    .close    = _spiffs_close,
+    .read     = _spiffs_read,
+    .write    = _spiffs_write,
 };
 
 

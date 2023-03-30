@@ -21,7 +21,7 @@
 //=============================================================================
 #define CONFIG_EXTFC_MEM_MASK               (0xFF000000u)
 
-#define CONFIG_EXTFC_SIM_SIZE               (1 << 20)
+#define CONFIG_EXTFC_SIM_SIZE               (16 << 20)
 #define CONFIG_EXTFC_1_SECTOR_SIZE          (4 << 10)
 #define CONFIG_EXTFC_1_BLOCK_SIZE           (64 << 10)
 

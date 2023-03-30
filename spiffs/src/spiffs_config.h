@@ -233,7 +233,7 @@ typedef int8_t    s8_t;
 // not on mount point. If not, SPIFFS_format must be called prior to mounting
 // again.
 #ifndef SPIFFS_USE_MAGIC
-#define SPIFFS_USE_MAGIC                (0)
+#define SPIFFS_USE_MAGIC                (1)
 #endif
 
 #if SPIFFS_USE_MAGIC
