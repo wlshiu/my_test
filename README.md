@@ -122,6 +122,7 @@
 + test_freertos
     > windows simulation
 
++ + test_combination_lite
 
 # MS Visual Studio
 
