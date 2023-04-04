@@ -124,6 +124,7 @@
 
 + test_combination_lite
 + test_tiny_regex
+    > 只支援 `1 local variable`, 故無法同時宣告多個 pattern 來使用
 
 # MS Visual Studio
 
