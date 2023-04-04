@@ -122,7 +122,8 @@
 + test_freertos
     > windows simulation
 
-+ + test_combination_lite
++ test_combination_lite
++ test_tiny_regex
 
 # MS Visual Studio
 
