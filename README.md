@@ -124,6 +124,17 @@
 
 + test_combination_lite
 + test_tiny_regex
+    > 只支援 `1 local variable`, 故無法同時宣告多個 pattern 來使用
++ test_mini_scanf
+    > Only supported control characters
+
+    ```
+    %c  - matches a character or a sequence of characters
+    %s  - matches a sequence of non-whitespace characters (a string)
+    %[] - matches a non-empty sequence of character from set of characters.
+    %d  - matches a decimal integer.
+    %u  - same as %d (You can enable ignoring the sign. nostd)
+    ```
 
 # MS Visual Studio
 
