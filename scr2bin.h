@@ -1,24 +1,23 @@
 /**
- * Copyright (c) 2019 Wei-Lun Hsu. All Rights Reserved.
+ * Copyright (c) 2023 Wei-Lun Hsu. All Rights Reserved.
  */
-/** @file auto_script.h
+/** @file scr2raw.h
  *
  * @author Wei-Lun Hsu
  * @version 0.1
- * @date 2019/12/20
+ * @date 2023/04/04
  * @license
  * @description
  */
 
-#ifndef __auto_script_H_wgJw5pNm_lv0V_HjKa_sVLm_u0fs8Oss4Kq0__
-#define __auto_script_H_wgJw5pNm_lv0V_HjKa_sVLm_u0fs8Oss4Kq0__
+#ifndef __scr2raw_H_wMuV5nWC_l2lj_HyU7_sQL8_uz8E3vZAzncv__
+#define __scr2raw_H_wMuV5nWC_l2lj_HyU7_sQL8_uz8E3vZAzncv__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include <stdint.h>
-#include <stdbool.h>
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -43,10 +42,7 @@ extern "C" {
 //                  Public Function Definition
 //=============================================================================
 int
-ascript_exec(
-    uint8_t     *pBuf_script,
-    uint32_t    buf_len);
-
+scr_to_bin(char *pLine, uint32_t *pBuf, int *pBuf_len);
 
 #ifdef __cplusplus
 }
