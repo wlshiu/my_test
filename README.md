@@ -136,6 +136,10 @@
     %u  - same as %d (You can enable ignoring the sign. nostd)
     ```
 
++ test_PocketSphinx
+    > A small speech recognizer
+
+
 # MS Visual Studio
 
 + include libs
