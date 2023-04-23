@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_Sphinxbase" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_Sphinxbase" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="sphinxbase/include/" />
+					<Add directory="sphinxbase/include/win32" />
+					<Add directory="sphinxbase/src" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_Sphinxbase" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/include/sphinxbase/ad.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/agc.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/bio.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/bitarr.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/bitvec.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/byteorder.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/case.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/ckd_alloc.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/clapack_lite.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/cmd_ln.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/cmn.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/err.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/f2c.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/fe.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/feat.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/filename.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/fixpoint.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/fsg_model.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/genrand.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/glist.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/hash_table.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/heap.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/jsgf.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/listelem_alloc.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/logmath.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/matrix.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/mmio.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/ngram_model.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/pio.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/prim_type.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/priority_queue.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/profile.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/sbthread.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/sphinxbase_export.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/strfuncs.h" />
+		<Unit filename="sphinxbase/include/sphinxbase/yin.h" />
+		<Unit filename="sphinxbase/include/win32/config.h" />
+		<Unit filename="sphinxbase/include/win32/sphinx_config.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_interface.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_internal.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_noise.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_noise.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_prespch_buf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_prespch_buf.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_sigproc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_type.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_warp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_warp.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_warp_affine.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_warp_affine.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_warp_inverse_linear.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_warp_inverse_linear.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_warp_piecewise_linear.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fe_warp_piecewise_linear.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/fixlog.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/fe/yin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/feat/agc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/feat/cmn.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/feat/cmn_live.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/feat/feat.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/feat/lda.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/fsg_model.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/jsgf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/jsgf_internal.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/jsgf_parser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/jsgf_parser.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/jsgf_scanner.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/jsgf_scanner.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/lm_trie.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/lm_trie.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/lm_trie_quant.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/ngram_model.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/ngram_model_internal.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/ngram_model_set.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/ngram_model_set.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/ngram_model_trie.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/ngram_model_trie.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/ngrams_raw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/lm/ngrams_raw.h" />
+		<Unit filename="sphinxbase/src/libsphinxbase/util/bio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/bitarr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/bitvec.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/blas_lite.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/case.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/ckd_alloc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/cmd_ln.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/dtoa.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/err.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/errno.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/f2c_lite.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/filename.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/genrand.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/glist.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/hash_table.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/heap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/listelem_alloc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/logmath.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/matrix.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/mmio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/pio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/priority_queue.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/profile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/sbthread.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/slamch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/slapack_lite.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sphinxbase/src/libsphinxbase/util/strfuncs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

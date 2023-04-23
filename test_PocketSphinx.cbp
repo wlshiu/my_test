@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_PocketSphinx" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_PocketSphinx" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="pocketsphinx/include" />
+					<Add directory="pocketsphinx/src" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_PocketSphinx" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/include/pocketsphinx.h" />
+		<Unit filename="pocketsphinx/include/pocketsphinx/alignment.h" />
+		<Unit filename="pocketsphinx/include/pocketsphinx/endpointer.h" />
+		<Unit filename="pocketsphinx/include/pocketsphinx/err.h" />
+		<Unit filename="pocketsphinx/include/pocketsphinx/export.h" />
+		<Unit filename="pocketsphinx/include/pocketsphinx/lattice.h" />
+		<Unit filename="pocketsphinx/include/pocketsphinx/logmath.h" />
+		<Unit filename="pocketsphinx/include/pocketsphinx/mllr.h" />
+		<Unit filename="pocketsphinx/include/pocketsphinx/model.h" />
+		<Unit filename="pocketsphinx/include/pocketsphinx/prim_type.h" />
+		<Unit filename="pocketsphinx/include/pocketsphinx/search.h" />
+		<Unit filename="pocketsphinx/include/pocketsphinx/vad.h" />
+		<Unit filename="pocketsphinx/src/acmod.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/acmod.h" />
+		<Unit filename="pocketsphinx/src/allphone_search.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/allphone_search.h" />
+		<Unit filename="pocketsphinx/src/bin_mdef.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/bin_mdef.h" />
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/cross_correlation.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/division_operations.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/downsample_fast.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/energy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/get_scaling_square.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/include/signal_processing_library.h" />
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/include/spl_inl.h" />
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/min_max_operations.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/resample.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/resample_48khz.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/resample_by_2_internal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/resample_by_2_internal.h" />
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/resample_fractional.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/spl_inl.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/signal_processing/vector_scaling_operations.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/vad/include/webrtc_vad.h" />
+		<Unit filename="pocketsphinx/src/common_audio/vad/vad_core.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/vad/vad_core.h" />
+		<Unit filename="pocketsphinx/src/common_audio/vad/vad_filterbank.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/vad/vad_filterbank.h" />
+		<Unit filename="pocketsphinx/src/common_audio/vad/vad_gmm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/vad/vad_gmm.h" />
+		<Unit filename="pocketsphinx/src/common_audio/vad/vad_sp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/common_audio/vad/vad_sp.h" />
+		<Unit filename="pocketsphinx/src/common_audio/vad/webrtc_vad.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/config_macro.h" />
+		<Unit filename="pocketsphinx/src/dict.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/dict.h" />
+		<Unit filename="pocketsphinx/src/dict2pid.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/dict2pid.h" />
+		<Unit filename="pocketsphinx/src/fe/fe.h" />
+		<Unit filename="pocketsphinx/src/fe/fe_interface.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/fe/fe_internal.h" />
+		<Unit filename="pocketsphinx/src/fe/fe_noise.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/fe/fe_noise.h" />
+		<Unit filename="pocketsphinx/src/fe/fe_sigproc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/fe/fe_type.h" />
+		<Unit filename="pocketsphinx/src/fe/fe_warp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/fe/fe_warp.h" />
+		<Unit filename="pocketsphinx/src/fe/fe_warp_affine.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/fe/fe_warp_affine.h" />
+		<Unit filename="pocketsphinx/src/fe/fe_warp_inverse_linear.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/fe/fe_warp_inverse_linear.h" />
+		<Unit filename="pocketsphinx/src/fe/fe_warp_piecewise_linear.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/fe/fe_warp_piecewise_linear.h" />
+		<Unit filename="pocketsphinx/src/fe/fixlog.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/fe/fixpoint.h" />
+		<Unit filename="pocketsphinx/src/fe/yin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/fe/yin.h" />
+		<Unit filename="pocketsphinx/src/feat/agc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/feat/agc.h" />
+		<Unit filename="pocketsphinx/src/feat/cmn.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/feat/cmn.h" />
+		<Unit filename="pocketsphinx/src/feat/cmn_live.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/feat/feat.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/feat/feat.h" />
+		<Unit filename="pocketsphinx/src/feat/lda.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/fsg_history.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/fsg_history.h" />
+		<Unit filename="pocketsphinx/src/fsg_lextree.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/fsg_lextree.h" />
+		<Unit filename="pocketsphinx/src/fsg_search.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/fsg_search_internal.h" />
+		<Unit filename="pocketsphinx/src/hmm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/hmm.h" />
+		<Unit filename="pocketsphinx/src/jsmn.h" />
+		<Unit filename="pocketsphinx/src/kws_detections.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/kws_detections.h" />
+		<Unit filename="pocketsphinx/src/kws_search.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/kws_search.h" />
+		<Unit filename="pocketsphinx/src/lm/bitarr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/lm/bitarr.h" />
+		<Unit filename="pocketsphinx/src/lm/fsg_model.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/lm/fsg_model.h" />
+		<Unit filename="pocketsphinx/src/lm/jsgf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/lm/jsgf.h" />
+		<Unit filename="pocketsphinx/src/lm/jsgf_internal.h" />
+		<Unit filename="pocketsphinx/src/lm/jsgf_parser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/lm/jsgf_parser.h" />
+		<Unit filename="pocketsphinx/src/lm/jsgf_scanner.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/lm/jsgf_scanner.h" />
+		<Unit filename="pocketsphinx/src/lm/lm_trie.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/lm/lm_trie.h" />
+		<Unit filename="pocketsphinx/src/lm/lm_trie_quant.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/lm/lm_trie_quant.h" />
+		<Unit filename="pocketsphinx/src/lm/ngram_model.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/lm/ngram_model.h" />
+		<Unit filename="pocketsphinx/src/lm/ngram_model_internal.h" />
+		<Unit filename="pocketsphinx/src/lm/ngram_model_set.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/lm/ngram_model_set.h" />
+		<Unit filename="pocketsphinx/src/lm/ngram_model_trie.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/lm/ngram_model_trie.h" />
+		<Unit filename="pocketsphinx/src/lm/ngrams_raw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/lm/ngrams_raw.h" />
+		<Unit filename="pocketsphinx/src/mdef.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/mdef.h" />
+		<Unit filename="pocketsphinx/src/ms_gauden.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/ms_gauden.h" />
+		<Unit filename="pocketsphinx/src/ms_mgau.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/ms_mgau.h" />
+		<Unit filename="pocketsphinx/src/ms_senone.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/ms_senone.h" />
+		<Unit filename="pocketsphinx/src/ngram_search.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/ngram_search.h" />
+		<Unit filename="pocketsphinx/src/ngram_search_fwdflat.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/ngram_search_fwdflat.h" />
+		<Unit filename="pocketsphinx/src/ngram_search_fwdtree.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/ngram_search_fwdtree.h" />
+		<Unit filename="pocketsphinx/src/phone_loop_search.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/phone_loop_search.h" />
+		<Unit filename="pocketsphinx/src/pocketsphinx.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/pocketsphinx_internal.h" />
+		<Unit filename="pocketsphinx/src/ps_alignment.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/ps_alignment_internal.h" />
+		<Unit filename="pocketsphinx/src/ps_config.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/ps_endpointer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/ps_lattice.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/ps_lattice_internal.h" />
+		<Unit filename="pocketsphinx/src/ps_mllr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/ps_vad.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/ptm_mgau.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/ptm_mgau.h" />
+		<Unit filename="pocketsphinx/src/rtc_base/checks.h" />
+		<Unit filename="pocketsphinx/src/rtc_base/compile_assert_c.h" />
+		<Unit filename="pocketsphinx/src/rtc_base/sanitizer.h" />
+		<Unit filename="pocketsphinx/src/rtc_base/system/arch.h" />
+		<Unit filename="pocketsphinx/src/rtc_base/typedefs.h" />
+		<Unit filename="pocketsphinx/src/s2_semi_mgau.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/s2_semi_mgau.h" />
+		<Unit filename="pocketsphinx/src/s3types.h" />
+		<Unit filename="pocketsphinx/src/state_align_search.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/state_align_search.h" />
+		<Unit filename="pocketsphinx/src/tied_mgau_common.h" />
+		<Unit filename="pocketsphinx/src/tmat.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/tmat.h" />
+		<Unit filename="pocketsphinx/src/util/bio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/bio.h" />
+		<Unit filename="pocketsphinx/src/util/bitvec.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/bitvec.h" />
+		<Unit filename="pocketsphinx/src/util/blas_lite.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/blkarray_list.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/blkarray_list.h" />
+		<Unit filename="pocketsphinx/src/util/byteorder.h" />
+		<Unit filename="pocketsphinx/src/util/case.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/case.h" />
+		<Unit filename="pocketsphinx/src/util/ckd_alloc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/ckd_alloc.h" />
+		<Unit filename="pocketsphinx/src/util/clapack_lite.h" />
+		<Unit filename="pocketsphinx/src/util/cmd_ln.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/cmd_ln.h" />
+		<Unit filename="pocketsphinx/src/util/dtoa.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/err.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/errno.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/f2c.h" />
+		<Unit filename="pocketsphinx/src/util/f2c_lite.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/filename.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/filename.h" />
+		<Unit filename="pocketsphinx/src/util/genrand.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/genrand.h" />
+		<Unit filename="pocketsphinx/src/util/glist.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/glist.h" />
+		<Unit filename="pocketsphinx/src/util/hash_table.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/hash_table.h" />
+		<Unit filename="pocketsphinx/src/util/heap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/heap.h" />
+		<Unit filename="pocketsphinx/src/util/listelem_alloc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/listelem_alloc.h" />
+		<Unit filename="pocketsphinx/src/util/logmath.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/matrix.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/matrix.h" />
+		<Unit filename="pocketsphinx/src/util/mmio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/mmio.h" />
+		<Unit filename="pocketsphinx/src/util/pio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/pio.h" />
+		<Unit filename="pocketsphinx/src/util/priority_queue.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/priority_queue.h" />
+		<Unit filename="pocketsphinx/src/util/profile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/profile.h" />
+		<Unit filename="pocketsphinx/src/util/slamch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/slapack_lite.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/soundfiles.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/strfuncs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/strfuncs.h" />
+		<Unit filename="pocketsphinx/src/util/vector.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="pocketsphinx/src/util/vector.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
