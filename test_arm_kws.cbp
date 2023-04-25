@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_arm_kws" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_arm_kws" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="CMSIS_5/CMSIS/Core/Include" />
+					<Add directory="CMSIS_5/CMSIS/DSP/Include" />
+					<Add directory="CMSIS_5/CMSIS/NN/Include" />
+					<Add directory="ML-KWS-for-MCU/Deployment/Source/local_NN" />
+					<Add directory="ML-KWS-for-MCU/Deployment/Source/KWS" />
+					<Add directory="ML-KWS-for-MCU/Deployment/Source/KWS/KWS_DS_CNN" />
+					<Add directory="ML-KWS-for-MCU/Deployment/Source/MFCC" />
+					<Add directory="ML-KWS-for-MCU/Deployment/Source/NN" />
+					<Add directory="ML-KWS-for-MCU/Deployment/Source/NN/DS_CNN" />
+					<Add directory="Examples" />
+					<Add directory="../my_test" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_arm_kws" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="CMSIS_5/CMSIS/Core/Include/cmsis_armcc.h" />
+		<Unit filename="CMSIS_5/CMSIS/Core/Include/cmsis_armclang.h" />
+		<Unit filename="CMSIS_5/CMSIS/Core/Include/cmsis_compiler.h" />
+		<Unit filename="CMSIS_5/CMSIS/Core/Include/cmsis_gcc.h" />
+		<Unit filename="CMSIS_5/CMSIS/Core/Include/cmsis_iccarm.h" />
+		<Unit filename="CMSIS_5/CMSIS/Core/Include/cmsis_version.h" />
+		<Unit filename="CMSIS_5/CMSIS/DSP/Include/arm_common_tables.h" />
+		<Unit filename="CMSIS_5/CMSIS/DSP/Include/arm_math.h" />
+		<Unit filename="CMSIS_5/CMSIS/DSP/Source/CommonTables/arm_common_tables.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/DSP/Source/SupportFunctions/arm_copy_q7.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/DSP/Source/TransformFunctions/arm_bitreversal2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/DSP/Source/TransformFunctions/arm_cfft_f32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/DSP/Source/TransformFunctions/arm_cfft_radix8_f32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/DSP/Source/TransformFunctions/arm_rfft_fast_f32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/DSP/Source/TransformFunctions/arm_rfft_fast_init_f32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/NN/Include/arm_nn_tables.h" />
+		<Unit filename="CMSIS_5/CMSIS/NN/Include/arm_nnfunctions.h" />
+		<Unit filename="CMSIS_5/CMSIS/NN/Include/arm_nnsupportfunctions.h" />
+		<Unit filename="CMSIS_5/CMSIS/NN/Source/ActivationFunctions/arm_relu_q7.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/NN/Source/ConvolutionFunctions/arm_convolve_1x1_HWC_q7_fast_nonsquare.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/NN/Source/ConvolutionFunctions/arm_convolve_HWC_q7_basic_nonsquare.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/NN/Source/ConvolutionFunctions/arm_depthwise_separable_conv_HWC_q7_nonsquare.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/NN/Source/ConvolutionFunctions/arm_nn_mat_mult_kernel_q7_q15.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/NN/Source/ConvolutionFunctions/arm_nn_mat_mult_kernel_q7_q15_reordered.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/NN/Source/FullyConnectedFunctions/arm_fully_connected_q7.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/NN/Source/NNSupportFunctions/arm_q7_to_q15_no_shift.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/NN/Source/NNSupportFunctions/arm_q7_to_q15_reordered_no_shift.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CMSIS_5/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Examples/simple_test_arm/wav_data.h" />
+		<Unit filename="Examples/sys_method_win32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Examples/sys_methods.h" />
+		<Unit filename="Examples/test_simple/main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Examples/test_simple/wav_data.h" />
+		<Unit filename="ML-KWS-for-MCU/Deployment/Source/KWS/kws.h" />
+		<Unit filename="ML-KWS-for-MCU/Deployment/Source/KWS/kws_ds_cnn.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ML-KWS-for-MCU/Deployment/Source/MFCC/mfcc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ML-KWS-for-MCU/Deployment/Source/MFCC/mfcc.h" />
+		<Unit filename="ML-KWS-for-MCU/Deployment/Source/NN/DS_CNN/ds_cnn.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ML-KWS-for-MCU/Deployment/Source/NN/DS_CNN/ds_cnn.h" />
+		<Unit filename="ML-KWS-for-MCU/Deployment/Source/NN/DS_CNN/ds_cnn_weights.h" />
+		<Unit filename="ML-KWS-for-MCU/Deployment/Source/NN/nn.h" />
+		<Unit filename="ML-KWS-for-MCU/Deployment/Source/local_NN/arm_avepool_q7_HWC_nonsquare.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ML-KWS-for-MCU/Deployment/Source/local_NN/local_NN.h" />
+		<Unit filename="yes.0ac15fe9_nohash_0.wav.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
