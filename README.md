@@ -142,6 +142,9 @@
 + test_arm_kws
     > Keyword spotting for MCU
 
++ test_Qfplib
+    > Qfplib is a S/w lib of float pointer of ARM Cortex-M
+
 # MS Visual Studio
 
 + include libs
