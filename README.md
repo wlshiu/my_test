@@ -139,6 +139,8 @@
 + test_PocketSphinx
     > A small speech recognizer
 
++ test_arm_kws
+    > Keyword spotting for MCU
 
 # MS Visual Studio
 
