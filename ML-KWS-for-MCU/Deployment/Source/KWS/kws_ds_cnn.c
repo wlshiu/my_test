@@ -48,19 +48,22 @@
 extern sys_methods_t       g_sys_methods_win32;
 static sys_methods_t       *g_pSys_call = &g_sys_methods_win32;
 
+int16_t     *g_audio_buffer;
+int         g_audio_buffer_size;
+int         g_frame_len;
+int         g_frame_shift;
+
 static int g_mfcc_buffer_size;
 static int g_recording_win;
 static int g_sliding_window_len;
 
-static int16_t  *g_audio_buffer;
 static q7_t     *g_mfcc_buffer;
 static q7_t     *g_output;
 static q7_t     *g_predictions;
 static q7_t     *g_averaged_output;
 static int  g_num_frames;
 static int  g_num_mfcc_features;
-static int  g_frame_len;
-static int  g_frame_shift;
+
 static int  g_num_out_classes;
 
 
@@ -85,9 +88,15 @@ static void _init_kws()
     g_predictions     = (q7_t *)sys_malloc(sizeof(q7_t) * g_sliding_window_len * g_num_out_classes, FOURCC('k', 'w', 'i', 'p'), 0);
 
     int  audio_block_size;
-    int  audio_buffer_size;
+
     audio_block_size  = g_recording_win * g_frame_shift;
-    audio_buffer_size = audio_block_size + g_frame_len - g_frame_shift;
+    g_audio_buffer_size = audio_block_size + g_frame_len - g_frame_shift;
+
+    if( !g_audio_buffer )
+    {
+        g_audio_buffer = sys_malloc(sizeof(int16_t) * g_audio_buffer_size, FOURCC('k', 'w', 'a', 'b'), 0);
+    }
+
     return;
 }
 //=============================================================================
@@ -97,16 +106,20 @@ void kws_ds_cnn_init(kws_ds_cnn_cfg_t *pCfg)
 {
     nn_init();
 
-#if 0
-    g_recording_win      = pCfg->record_win;
-    g_sliding_window_len = pCfg->sliding_win_len;
-#else
-    g_recording_win         = nn_get_num_frames();
-    g_audio_buffer          = pCfg->audio_data_buffer;
-    g_sliding_window_len    = 1;
-#endif
+    if( pCfg->audio_data_buffer )
+    {
+        g_recording_win         = nn_get_num_frames();
+        g_audio_buffer          = pCfg->audio_data_buffer;
+        g_sliding_window_len    = 1;
+    }
+    else
+    {
+        g_recording_win      = pCfg->record_win;
+        g_sliding_window_len = pCfg->sliding_win_len;
+    }
 
     _init_kws();
+
     return;
 }
 
