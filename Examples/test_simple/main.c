@@ -25,6 +25,8 @@
 #include "kws.h"
 
 #include "yes.0ac15fe9_nohash_0.wav.h"
+//#include "right_1.wav.h"
+//#include "right_2.wav.h"
 
 static char  g_classes[12][8] =
 {
