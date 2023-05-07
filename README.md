@@ -142,6 +142,9 @@
 + test_arm_kws
     > Keyword spotting for MCU
 
++ test_rand_mac
+    > random MAC address
+
 # MS Visual Studio
 
 + include libs
