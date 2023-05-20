@@ -148,6 +148,9 @@
 + test_rw_csv
     > read `wav` file and convert to `csv` file
 
++ test_findfile
+    > recursively find files on windows platform
+
 # MS Visual Studio
 
 + include libs
