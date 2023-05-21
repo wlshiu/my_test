@@ -151,6 +151,9 @@
 + test_findfile
     > recursively find files on windows platform
 
++ test_TinyMaix
+    > use [TinyMaix](https://github.com/sipeed/TinyMaix/tree/main)
+
 # MS Visual Studio
 
 + include libs
