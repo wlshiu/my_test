@@ -154,6 +154,12 @@
 + test_TinyMaix
     > use [TinyMaix](https://github.com/sipeed/TinyMaix/tree/main)
 
++ test_my_malloc
+    > SMM (Static Memory Management) is implemented to manage a static memory.
+    > This lib only support to allocate memory and record the pulse of memory usage.
+    > ps. free memory and merge memory leakage are NOT supported,
+    > and the memory fragmentation MUST be happened.
+
 # MS Visual Studio
 
 + include libs
