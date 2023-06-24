@@ -160,6 +160,10 @@
     > ps. free memory and merge memory leakage are NOT supported,
     > and the memory fragmentation MUST be happened.
 
++ test_overlay
+    > Keil example of overlay section of scatter
+
+
 # MS Visual Studio
 
 + include libs
