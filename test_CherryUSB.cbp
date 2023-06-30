@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_CherryUSB" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_CherryUSB" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="CherryUSB/core" />
+					<Add directory="CherryUSB/common" />
+					<Add directory="CherryUSB/osal" />
+					<Add directory="CherryUSB/port/sim" />
+					<Add directory="CherryUSB/class/cdc" />
+					<Add directory="CherryUSB/class/dfu" />
+					<Add directory="CherryUSB/class/hid" />
+					<Add directory="CherryUSB/class/audio" />
+					<Add directory="CherryUSB/class/msc" />
+					<Add directory="CherryUSB/class/hub" />
+					<Add directory="CherryUSB" />
+				</Compiler>
+				<Linker>
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libkernel32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libuser32.a" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_CherryUSB" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="CherryUSB/class/audio/usb_audio.h" />
+		<Unit filename="CherryUSB/class/audio/usbd_audio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/class/audio/usbd_audio.h" />
+		<Unit filename="CherryUSB/class/audio/usbh_audio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/class/audio/usbh_audio.h" />
+		<Unit filename="CherryUSB/class/cdc/usb_cdc.h" />
+		<Unit filename="CherryUSB/class/cdc/usbd_cdc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/class/cdc/usbd_cdc.h" />
+		<Unit filename="CherryUSB/class/cdc/usbh_cdc_acm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/class/cdc/usbh_cdc_acm.h" />
+		<Unit filename="CherryUSB/class/dfu/usb_dfu.h" />
+		<Unit filename="CherryUSB/class/dfu/usbd_dfu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/class/dfu/usbd_dfu.h" />
+		<Unit filename="CherryUSB/class/hid/usb_hid.h" />
+		<Unit filename="CherryUSB/class/hid/usbd_hid.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/class/hid/usbd_hid.h" />
+		<Unit filename="CherryUSB/class/hid/usbh_hid.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/class/hid/usbh_hid.h" />
+		<Unit filename="CherryUSB/class/hub/usb_hub.h" />
+		<Unit filename="CherryUSB/class/hub/usbh_hub.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/class/hub/usbh_hub.h" />
+		<Unit filename="CherryUSB/class/midi/usb_midi.h" />
+		<Unit filename="CherryUSB/class/msc/usb_msc.h" />
+		<Unit filename="CherryUSB/class/msc/usb_scsi.h" />
+		<Unit filename="CherryUSB/class/msc/usbd_msc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/class/msc/usbd_msc.h" />
+		<Unit filename="CherryUSB/class/msc/usbh_msc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/class/msc/usbh_msc.h" />
+		<Unit filename="CherryUSB/class/mtp/usb_mtp.h" />
+		<Unit filename="CherryUSB/class/mtp/usbd_mtp.h" />
+		<Unit filename="CherryUSB/class/mtp/usbd_mtp_config.h" />
+		<Unit filename="CherryUSB/class/mtp/usbh_mtp.h" />
+		<Unit filename="CherryUSB/class/printer/usb_printer.h" />
+		<Unit filename="CherryUSB/class/printer/usbd_printer.h" />
+		<Unit filename="CherryUSB/class/printer/usbh_printer.h" />
+		<Unit filename="CherryUSB/class/template/usb_xxx.h" />
+		<Unit filename="CherryUSB/class/template/usbd_xxx.h" />
+		<Unit filename="CherryUSB/class/template/usbh_xxx.h" />
+		<Unit filename="CherryUSB/class/vendor/asix.h" />
+		<Unit filename="CherryUSB/class/vendor/axusbnet.h" />
+		<Unit filename="CherryUSB/class/video/usb_video.h" />
+		<Unit filename="CherryUSB/class/video/usbd_video.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/class/video/usbd_video.h" />
+		<Unit filename="CherryUSB/class/video/usbh_video.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/class/video/usbh_video.h" />
+		<Unit filename="CherryUSB/class/wireless/ndis.h" />
+		<Unit filename="CherryUSB/class/wireless/rndis_protocol.h" />
+		<Unit filename="CherryUSB/class/wireless/usbd_rndis.h" />
+		<Unit filename="CherryUSB/class/wireless/usbh_rndis.h" />
+		<Unit filename="CherryUSB/common/usb_dc.h" />
+		<Unit filename="CherryUSB/common/usb_def.h" />
+		<Unit filename="CherryUSB/common/usb_errno.h" />
+		<Unit filename="CherryUSB/common/usb_hc.h" />
+		<Unit filename="CherryUSB/common/usb_list.h" />
+		<Unit filename="CherryUSB/common/usb_log.h" />
+		<Unit filename="CherryUSB/common/usb_mem.h" />
+		<Unit filename="CherryUSB/common/usb_util.h" />
+		<Unit filename="CherryUSB/core/usbd_core.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/core/usbd_core.h" />
+		<Unit filename="CherryUSB/core/usbh_core.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/core/usbh_core.h" />
+		<Unit filename="CherryUSB/demo/cdc_acm_hid_msc_template.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/demo/music_16k_ac1.h" />
+		<Unit filename="CherryUSB/demo/music_16k_ac2.h" />
+		<Unit filename="CherryUSB/demo/pic_data.h" />
+		<Unit filename="CherryUSB/demo/usb_host.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/osal/usb_osal.h" />
+		<Unit filename="CherryUSB/osal/usb_osal_bare_metal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/port/sim/usb_dc_sim.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/port/sim/usb_hc_sim.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/usb_config.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
