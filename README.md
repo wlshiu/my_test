@@ -163,6 +163,9 @@
 + test_overlay
     > Keil example of overlay section of scatter
 
++ test_CherryUSB
+    > simulate CherryUSB v0.9.0 (Only USB protocol layer)
+
 
 # MS Visual Studio
 
