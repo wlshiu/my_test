@@ -24,6 +24,7 @@
 					<Add directory="CherryUSB/class/msc" />
 					<Add directory="CherryUSB/class/hub" />
 					<Add directory="CherryUSB" />
+					<Add directory="../my_test" />
 				</Compiler>
 				<Linker>
 					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libkernel32.a" />
@@ -135,7 +136,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="CherryUSB/core/usbh_core.h" />
-		<Unit filename="CherryUSB/demo/cdc_acm_hid_msc_template.c">
+		<Unit filename="CherryUSB/demo/cdc_acm_template.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="CherryUSB/demo/music_16k_ac1.h" />
@@ -148,6 +149,10 @@
 		<Unit filename="CherryUSB/osal/usb_osal_bare_metal.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="CherryUSB/port/sim/sys_sim.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="CherryUSB/port/sim/sys_sim.h" />
 		<Unit filename="CherryUSB/port/sim/usb_dc_sim.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -158,6 +163,14 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="sys_udev.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sys_udev.h" />
+		<Unit filename="sys_uhost.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sys_uhost.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

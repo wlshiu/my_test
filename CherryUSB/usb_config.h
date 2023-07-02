@@ -57,7 +57,7 @@
 #endif
 
 /**
- *  Configurate classes of USB Device
+ *  Configure classes of USB Device
  */
 #define CONFIG_ENABLE_USBD_CDC          1
 #define CONFIG_ENABLE_USBD_MSC          0
@@ -165,7 +165,7 @@
 
 
 /**
- *  Configurate classes of USB Host
+ *  Configure classes of USB Host
  */
 #define CONFIG_ENABLE_USBH_CDC          1
 #define CONFIG_ENABLE_USBH_MSC          0
@@ -175,4 +175,4 @@
 #define CONFIG_ENABLE_USBH_VIDEO        0
 
 
-#endif
+#endif  /* CHERRYUSB_CONFIG_H */

@@ -1,4 +1,9 @@
+
 #include "usbd_core.h"
+
+#if defined(CONFIG_ENABLE_USBD_CDC) && (CONFIG_ENABLE_USBD_CDC)
+
+#include "sys_udev.h"
 #include "usbd_cdc.h"
 
 /*!< endpoint address */
@@ -178,7 +183,18 @@ void cdc_acm_data_send_with_dtr_test(void)
     if (dtr_enable) {
         ep_tx_busy_flag = true;
         usbd_ep_start_write(CDC_IN_EP, write_buffer, 2048);
-        while (ep_tx_busy_flag) {
+        while (ep_tx_busy_flag)
+        {
         }
     }
 }
+
+sys_udev_t      g_udev_cdc =
+{
+    .udev_id   = SYS_UDEV_TAG('C', 'D', 'C', '0'),
+    .udev_init = cdc_acm_init,
+    .udev_proc = cdc_acm_data_send_with_dtr_test,
+};
+
+#endif  /* CONFIG_ENABLE_USBD_CDC */
+

@@ -10,11 +10,10 @@
  * @description
  */
 
-#include <windows.h>
-
 #include "usbh_core.h"
 #include "usbh_hub.h"
 
+#include "sys_sim.h"
 
 //=============================================================================
 //                  Constant Definition
@@ -50,11 +49,14 @@ struct dwc2_hcd
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
+extern DWORD   g_th_uhost_id;
+extern DWORD   g_th_udev_id;
 
+static uint8_t      g_uhost_tx_buf[1024] = {0};
+static uint8_t      g_uhost_rx_buf[1024] = {0};
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
-
 static int dwc2_pipe_alloc(void)
 {
     int chidx;
@@ -390,15 +392,32 @@ static inline void dwc2_pipe_waitup(struct dwc2_pipe *pipe)
     }
 }
 
-void USBH_IRQHandler(uint8_t *pBuf_rx, int RxBytes, uint8_t *pBuf_tx, int *pTxBytes)
+void USBH_IRQHandler(void)
 {
-extern DWORD   g_th_uhost_id;
-extern DWORD   g_th_udev_id;
+    static sys_msg_info_t   msg_uhost;
+    int                     txbuf_size = sizeof(g_uhost_tx_buf);
+    int                     rxbuf_size = sizeof(g_uhost_rx_buf);
 
-    int     txBytes = *pTxBytes;
+    snprintf(g_uhost_tx_buf, sizeof(g_uhost_tx_buf), "H -> D");
 
-    snprintf(pBuf_tx, txBytes, "H -> D");
-    *pTxBytes = strlen(pBuf_tx);
+    msg_uhost.pMsg_buf = g_uhost_tx_buf;
+    msg_uhost.msg_len  = strlen(g_uhost_tx_buf);
+    sys_send_msg(g_th_udev_id, &msg_uhost);
+
+    sys_wait_msg((uint8_t*)g_uhost_rx_buf, &rxbuf_size);
+
+    #if 1
+    printf("===== uhost RX ====\n");
+    if( rxbuf_size )
+    {
+        for(int i = 0; i < rxbuf_size; i++)
+        {
+            printf("%c", g_uhost_rx_buf[i]);
+        }
+        printf("\n");
+    }
+    #endif // 1
+
 
     return;
 }

@@ -14,6 +14,7 @@
 #include <windows.h>
 #include "usbd_core.h"
 
+#include "sys_sim.h"
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -46,7 +47,11 @@ struct xxx_udc {
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
+extern DWORD   g_th_uhost_id;
+extern DWORD   g_th_udev_id;
 
+static uint8_t      g_udev_rxbuf[1024] = {0};
+static uint8_t      g_udev_txbuf[1024] = {0};
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -144,14 +149,31 @@ int usbd_ep_start_read(const uint8_t ep, uint8_t *data, uint32_t data_len)
     return 0;
 }
 
-void USBD_IRQHandler(uint8_t *pBuf_rx, int RxBytes, uint8_t *pBuf_tx, int *pTxBytes)
+void USBD_IRQHandler(void)
 {
-extern DWORD   g_th_uhost_id;
-extern DWORD   g_th_udev_id;
+    static sys_msg_info_t   msg_udev;
+    int                     rxbuf_size = sizeof(g_udev_rxbuf);
 
-    int     txBytes = *pTxBytes;
+    sys_wait_msg((uint8_t*)g_udev_rxbuf, &rxbuf_size);
 
-    snprintf(pBuf_tx, txBytes, "D -> H");
-    *pTxBytes = strlen(pBuf_tx);
+        #if 1
+        printf("===== uDev RX ====\n");
+        if( rxbuf_size )
+        {
+            for(int i = 0; i < rxbuf_size; i++)
+            {
+                printf("%c", g_udev_rxbuf[i]);
+            }
+
+            printf("\n");
+        }
+        #endif
+
+    snprintf(g_udev_txbuf, sizeof(g_udev_txbuf), "D -> H");
+
+    msg_udev.pMsg_buf = g_udev_txbuf;
+    msg_udev.msg_len  = strlen(g_udev_txbuf) + 1;
+    sys_send_msg(g_th_uhost_id, &msg_udev);
+
     return;
 }

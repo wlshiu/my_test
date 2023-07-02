@@ -1,6 +1,8 @@
 
 #include "usbh_core.h"
 
+#include "sys_uhost.h"
+
 #include "usbh_cdc_acm.h"
 
 #if defined(CONFIG_ENABLE_USBH_HID) && (CONFIG_ENABLE_USBH_HID)
@@ -19,7 +21,7 @@
 #include "usbh_audio.h"
 #endif /* CONFIG_ENABLE_USBH_AUDIO */
 
-#define TEST_USBH_CDC_ACM   CONFIG_ENABLE_USBH_CDC
+#define TEST_USBH_CDC_ACM   1 //CONFIG_ENABLE_USBH_CDC
 #define TEST_USBH_HID       CONFIG_ENABLE_USBH_HID
 #define TEST_USBH_MSC       CONFIG_ENABLE_USBH_MSC
 #define TEST_USBH_MSC_FATFS 0
@@ -270,42 +272,52 @@ find_class:
 
 void usbh_cdc_acm_run(struct usbh_cdc_acm *cdc_acm_class)
 {
+    printf("[%s:%d]\n", __func__, __LINE__);
 }
 
 void usbh_cdc_acm_stop(struct usbh_cdc_acm *cdc_acm_class)
 {
+    printf("[%s:%d]\n", __func__, __LINE__);
 }
 
 void usbh_hid_run(struct usbh_hid *hid_class)
 {
+    printf("[%s:%d]\n", __func__, __LINE__);
 }
 
 void usbh_hid_stop(struct usbh_hid *hid_class)
 {
+    printf("[%s:%d]\n", __func__, __LINE__);
 }
 
 void usbh_msc_run(struct usbh_msc *msc_class)
 {
+    printf("[%s:%d]\n", __func__, __LINE__);
 }
 
 void usbh_msc_stop(struct usbh_msc *msc_class)
 {
+    printf("[%s:%d]\n", __func__, __LINE__);
 }
 
 void usbh_audio_run(struct usbh_audio *audio_class)
 {
+    printf("[%s:%d]\n", __func__, __LINE__);
 }
 
 void usbh_audio_stop(struct usbh_audio *audio_class)
 {
+    printf("[%s:%d]\n", __func__, __LINE__);
 }
 
 void usbh_video_run(struct usbh_video *video_class)
 {
+    printf("[%s:%d]\n", __func__, __LINE__);
 }
 
 void usbh_video_stop(struct usbh_video *video_class)
 {
+    printf("[%s:%d]\n", __func__, __LINE__);
 }
 
 void usbh_class_test(void)
@@ -328,3 +340,82 @@ void usbh_class_test(void)
     usb_osal_thread_create("usbh_video", 2048, CONFIG_USBHOST_PSC_PRIO + 1, usbh_video_thread, NULL);
 #endif
 }
+
+
+#if 1 // my implement usb host
+extern sys_uhost_class_t   g_uhost_class_cdc;
+
+static int _uhost_cdc_proc(void)
+{
+    int                     ret;
+    struct usbh_cdc_acm     *cdc_acm_class;
+
+    // clang-format off
+    do {
+    find_class:
+        // clang-format on
+        cdc_acm_class = (struct usbh_cdc_acm *)usbh_find_class_instance("/dev/ttyACM0");
+        if (cdc_acm_class == NULL) {
+            USB_LOG_RAW("do not find /dev/ttyACM0\r\n");
+            usb_osal_msleep(1000);
+            if( g_uhost_class_cdc.uhost_err_callback )
+                g_uhost_class_cdc.uhost_err_callback(&g_uhost_class_cdc, SYS_UHOST_ERR_NO_DEV);
+            break;
+        }
+        memset(cdc_buffer, 0, 512);
+
+        usbh_bulk_urb_fill(&cdc_bulkin_urb, cdc_acm_class->bulkin, cdc_buffer, 64, 3000, NULL, NULL);
+        ret = usbh_submit_urb(&cdc_bulkin_urb);
+        if (ret < 0) {
+            USB_LOG_RAW("bulk in error,ret:%d\r\n", ret);
+        } else {
+            USB_LOG_RAW("recv over:%d\r\n", cdc_bulkin_urb.actual_length);
+            for (size_t i = 0; i < cdc_bulkin_urb.actual_length; i++) {
+                USB_LOG_RAW("0x%02x ", cdc_buffer[i]);
+            }
+        }
+
+        USB_LOG_RAW("\r\n");
+        const uint8_t data1[10] = { 0x02, 0x00, 0x00, 0x00, 0x02, 0x02, 0x08, 0x14 };
+
+        memcpy(cdc_buffer, data1, 8);
+        usbh_bulk_urb_fill(&cdc_bulkout_urb, cdc_acm_class->bulkout, cdc_buffer, 8, 3000, NULL, NULL);
+        ret = usbh_submit_urb(&cdc_bulkout_urb);
+        if (ret < 0) {
+            USB_LOG_RAW("bulk out error,ret:%d\r\n", ret);
+        } else {
+            USB_LOG_RAW("send over:%d\r\n", cdc_bulkout_urb.actual_length);
+        }
+
+        usbh_bulk_urb_fill(&cdc_bulkin_urb, cdc_acm_class->bulkin, cdc_buffer, 64, 3000, usbh_cdc_acm_callback, cdc_acm_class);
+        ret = usbh_submit_urb(&cdc_bulkin_urb);
+        if (ret < 0) {
+            USB_LOG_RAW("bulk in error,ret:%d\r\n", ret);
+        } else {
+        }
+
+        while (1) {
+            cdc_acm_class = (struct usbh_cdc_acm *)usbh_find_class_instance("/dev/ttyACM0");
+            if (cdc_acm_class == NULL) {
+                goto find_class;
+            }
+            usb_osal_msleep(1000);
+        }
+    } while(0);
+    return 0;
+}
+
+static void  _uhost_cdc_err(sys_uhost_class_t *pUHClass, int err_code)
+{
+    return;
+}
+
+sys_uhost_class_t   g_uhost_class_cdc =
+{
+    .uclass_id           = SYS_UHOST_TAG('H', 'C', 'D', 'C'),
+    .uhost_class_init    = 0,
+    .uhost_class_proc    = _uhost_cdc_proc,
+    .uhost_err_callback  = _uhost_cdc_err,
+};
+
+#endif // 1
