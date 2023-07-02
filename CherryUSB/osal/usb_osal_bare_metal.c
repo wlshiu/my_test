@@ -37,7 +37,13 @@
 //                  Public Function Definition
 //=============================================================================
 
-usb_osal_thread_t usb_osal_thread_create(const char *name, uint32_t stack_size, uint32_t prio, usb_thread_entry_t entry, void *args)
+usb_osal_thread_t
+usb_osal_thread_create(
+    const char          *name,
+    uint32_t            stack_size,
+    uint32_t            prio,
+    usb_thread_entry_t  entry,
+    void                *args)
 {
     usb_osal_thread_t   th;
     return (usb_osal_thread_t)th;

@@ -130,6 +130,8 @@
 //          USB Host Configuration
 //======================================================================================
 
+//#define CONFIG_USBHOST_WITH_OS
+
 #define CONFIG_USBHOST_MAX_RHPORTS              1
 #define CONFIG_USBHOST_MAX_EXTHUBS              1
 #define CONFIG_USBHOST_MAX_EHPORTS              4
