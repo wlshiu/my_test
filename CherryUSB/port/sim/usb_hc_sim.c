@@ -142,6 +142,9 @@ uint32_t        g_uhost_rx_buf[1024 >> 2] = {0};
 //=============================================================================
 __WEAK void usb_hc_low_level_init(void)
 {
+    g_USBH.TXIS |= USB_TXIE_EP0;
+    g_USBH.RXCOUNT = 8;
+    g_USBH.IS = USB_IS_CONN;
 }
 //=============================================================================
 //                  Public Function Definition
@@ -238,7 +241,7 @@ static void musb_write_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
     msg_uhost.pMsg_buf = g_uhost_tx_buf;
     msg_uhost.msg_len  = len;
     sys_send_msg(g_th_udev_id, &msg_uhost);
-    #elif 0
+    #elif 1
     sys_packet_hdr_t        *pHdr = (sys_packet_hdr_t*)&g_udev_rxbuf;
 
     sys_mutex_lock((void*)g_hMutexDC);
@@ -308,7 +311,7 @@ static void musb_read_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
     #if 0
     sys_wait_msg((uint8_t*)g_uhost_rx_buf, &rxbuf_size);
     memcpy(buffer, g_uhost_rx_buf, (len < rxbuf_size) ? len : rxbuf_size);
-    #elif 0
+    #elif 1
     sys_packet_hdr_t        *pHdr = (sys_packet_hdr_t*)&g_uhost_rx_buf;
 
     sys_mutex_lock((void*)g_hMutexHC);
@@ -316,7 +319,7 @@ static void musb_read_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
         trace(" len = %d\n", len);
 
     memcpy(buffer, pHdr->raw, (len < pHdr->len) ? len : pHdr->len);
-    memset(g_uhost_rx_buf, 0x0, sizeof(g_uhost_rx_buf));
+//    memset(g_uhost_rx_buf, 0x0, sizeof(g_uhost_rx_buf));
     sys_mutex_unlock((void*)g_hMutexHC);
     #else
     memcpy(buffer, g_uhost_rx_buf, len);
@@ -502,6 +505,11 @@ int usb_hc_init(void)
     HWREGB(USB_BASE + MUSB_IND_TXCSRL_OFFSET) = USB_CSRL0_TXRDY;
 #endif
 
+#if defined(CONFIG_USB_SIM)
+
+    #if 1
+    usb_hc_low_level_init();
+    #else
     {
         g_USBH.IS   = USB_IS_CONN;
         g_USBH.TXIS = USB_TXIE_EP0;
@@ -515,6 +523,8 @@ int usb_hc_init(void)
 
         sys_vmsgq_send(&g_dc_vmsgq, pNode);
     }
+    #endif
+#endif  /* CONFIG_USB_SIM */
     return 0;
 }
 
@@ -917,7 +927,21 @@ void hc_handle_ep0(void)
 
                     #if defined(CONFIG_USB_SIM)
 //                    g_USBH.CSR = 0;
-//                    g_USBH.CSR |= USB_CSRL0_RXRDY;
+//                    g_USBD.CSR |= USB_CSRL0_RXRDY;
+                    g_USBD.RXCOUNT = 0;
+                    #if 0
+
+                    /* usb_dc send ACK packet */
+                    sys_vmsg_node_t     *pNode = 0;
+
+                    pNode = malloc(sizeof(sys_vmsg_node_t));
+                    memset(pNode, 0x0, sizeof(sys_vmsg_node_t));
+
+                    memcpy(&pNode->usb_regs, &g_USBH, sizeof(pNode->usb_regs));
+
+                    sys_vmsgq_send(&g_dc_vmsgq, pNode);
+                    #endif
+
                     #else
 
                     HWREGB(USB_BASE + MUSB_IND_TXCSRL_OFFSET) = USB_CSRL0_REQPKT;
@@ -1025,7 +1049,7 @@ void USBH_IRQHandler(void)
     uint8_t ep_idx;
     uint8_t old_ep_idx;
 
-    #if defined(CONFIG_USB_SIM)
+    #if 0//defined(CONFIG_USB_SIM)
     sys_vmsg_node_t     *pNode = 0;
     sys_vmsgq_recv(&g_dc_vmsgq, &pNode);
     if( pNode == 0 )

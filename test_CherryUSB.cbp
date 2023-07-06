@@ -103,9 +103,6 @@
 		<Unit filename="CherryUSB/class/printer/usb_printer.h" />
 		<Unit filename="CherryUSB/class/printer/usbd_printer.h" />
 		<Unit filename="CherryUSB/class/printer/usbh_printer.h" />
-		<Unit filename="CherryUSB/class/template/usb_xxx.h" />
-		<Unit filename="CherryUSB/class/template/usbd_xxx.h" />
-		<Unit filename="CherryUSB/class/template/usbh_xxx.h" />
 		<Unit filename="CherryUSB/class/vendor/asix.h" />
 		<Unit filename="CherryUSB/class/vendor/axusbnet.h" />
 		<Unit filename="CherryUSB/class/video/usb_video.h" />

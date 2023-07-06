@@ -68,6 +68,8 @@ _thread_udev(PVOID pM)
         err("set event fail \n");
     }
 
+    sys_udev_init();
+
     while(1)
     {
         sys_msg_info_t   msg_udev;
@@ -76,9 +78,9 @@ _thread_udev(PVOID pM)
 
         sys_uhost_proc();
 
-        sys_udev_proc();
+//        sys_udev_proc();
 
-        Sleep(100);
+        Sleep(1000);
 
     }
 
@@ -93,7 +95,7 @@ int main()
     sys_udev_register(&g_udev_cdc);
 
     /* classes of USB Host */
-    sys_uhost_register(&g_uhost_class_cdc);
+//    sys_uhost_register(&g_uhost_class_cdc);
     sys_uhost_register(&g_uhost_vthreads);
 
     /* Class info */
@@ -161,7 +163,6 @@ int main()
 
 #endif
 
-    sys_udev_init();
 
     usbh_initialize();
 //	usbh_class_test();
