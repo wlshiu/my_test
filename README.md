@@ -166,6 +166,8 @@
 + test_CherryUSB
     > simulate CherryUSB v0.9.0 (Only USB protocol layer)
 
++ test_win32_mutex
+    > mutex of win32 api
 
 # MS Visual Studio
 
