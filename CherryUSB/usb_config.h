@@ -21,7 +21,7 @@
 #define usb_free(ptr)           free(ptr)
 
 /* Enable print with color */
-#define CONFIG_USB_PRINTF_COLOR_ENABLE
+//#define CONFIG_USB_PRINTF_COLOR_ENABLE
 
 /* data align size when use dma */
 #ifndef CONFIG_USB_ALIGN_SIZE
@@ -35,17 +35,19 @@
  *  Dubug Configuration
  */
 #ifndef CONFIG_USB_DBG_LEVEL
-#define CONFIG_USB_DBG_LEVEL    USB_DBG_INFO
+#define CONFIG_USB_DBG_LEVEL    USB_DBG_LOG //USB_DBG_INFO
 #endif
 
 /* Setup packet log for debug */
-// #define CONFIG_USBDEV_SETUP_LOG_PRINT
+#define CONFIG_USBDEV_SETUP_LOG_PRINT
 
 /* Check if the input descriptor is correct */
 // #define CONFIG_USBDEV_DESC_CHECK
 
 /* Enable test mode */
 // #define CONFIG_USBDEV_TEST_MODE
+
+
 
 //======================================================================================
 //          USB DEVICE Configuration
@@ -130,7 +132,7 @@
 //          USB Host Configuration
 //======================================================================================
 
-//#define CONFIG_USBHOST_WITH_OS
+#define CONFIG_USBHOST_WITH_BARE_METAL
 
 #define CONFIG_USBHOST_MAX_RHPORTS              1
 #define CONFIG_USBHOST_MAX_EXTHUBS              1
@@ -163,7 +165,7 @@
 #endif
 
 
-#define CONFIG_USBHOST_PIPE_NUM                 10
+#define CONFIG_USBHOST_PIPE_NUM                 2
 
 
 /**

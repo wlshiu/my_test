@@ -13,47 +13,6 @@
 #define HWREGB(x) \
     (*((volatile uint8_t *)(x)))
 
-#if defined(CONFIG_USB_MUSB_SUNXI)
-
-#ifndef USB_BASE
-#define USB_BASE (0x01c13000)
-#endif
-
-#ifndef USBD_IRQHandler
-#define USBD_IRQHandler USBD_IRQHandler //use actual usb irq name instead
-#endif
-
-#define MUSB_FADDR_OFFSET 0x98
-#define MUSB_POWER_OFFSET 0x40
-#define MUSB_TXIS_OFFSET  0x44
-#define MUSB_RXIS_OFFSET  0x46
-#define MUSB_TXIE_OFFSET  0x48
-#define MUSB_RXIE_OFFSET  0x4A
-#define MUSB_IS_OFFSET    0x4C
-#define MUSB_IE_OFFSET    0x50
-#define MUSB_EPIDX_OFFSET 0x42
-
-#define MUSB_IND_TXMAP_OFFSET   0x80
-#define MUSB_IND_TXCSRL_OFFSET  0x82
-#define MUSB_IND_TXCSRH_OFFSET  0x83
-#define MUSB_IND_RXMAP_OFFSET   0x84
-#define MUSB_IND_RXCSRL_OFFSET  0x86
-#define MUSB_IND_RXCSRH_OFFSET  0x87
-#define MUSB_IND_RXCOUNT_OFFSET 0x88
-
-#define MUSB_FIFO_OFFSET 0x00
-
-#define MUSB_DEVCTL_OFFSET 0x41
-
-#define MUSB_TXFIFOSZ_OFFSET  0x90
-#define MUSB_RXFIFOSZ_OFFSET  0x94
-#define MUSB_TXFIFOADD_OFFSET 0x92
-#define MUSB_RXFIFOADD_OFFSET 0x96
-
-#elif defined(CONFIG_USB_MUSB_CUSTOM)
-
-#else
-
 #ifndef USBD_IRQHandler
 #define USBD_IRQHandler USB_INT_Handler //use actual usb irq name instead
 #endif
@@ -90,7 +49,6 @@
 #define MUSB_TXFIFOADD_OFFSET 0x64
 #define MUSB_RXFIFOADD_OFFSET 0x66
 
-#endif // CONFIG_USB_MUSB_SUNXI
 
 #define USB_FIFO_BASE(ep_idx) (USB_BASE + MUSB_FIFO_OFFSET + 0x4 * ep_idx)
 

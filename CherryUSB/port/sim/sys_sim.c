@@ -12,7 +12,7 @@
 
 
 #include "sys_sim.h"
-
+#include "usb_errno.h"
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -69,7 +69,6 @@ int sys_wait_msg(uint8_t *pBuf, int *pBuf_size)
         if( !GetMessage(&msg, 0, 0, 0) ) //get msg from message queue
         {
             printf(" th %d wait\n", GetCurrentThreadId());
-            Sleep(1);
             continue;
         }
 
@@ -103,3 +102,44 @@ int sys_send_msg(DWORD th_id, uint8_t *pBuf)
     return 0;
 }
 
+
+void sys_mutex_lock(void *hMtx)
+{
+    WaitForSingleObject(hMtx, INFINITE);
+}
+
+
+void sys_mutex_unlock(void *hMtx)
+{
+    ReleaseMutex(hMtx);
+}
+
+
+int sys_vmsgq_send(sys_vmsgq_t *pVMsgq, sys_vmsg_node_t *pNode)
+{
+    uint32_t    head = pVMsgq->head;
+    uint32_t    tail = pVMsgq->tail;
+
+    if( ((head - tail) & (CONFIG_SYS_VMSGQ_CNT_MAX - 1)) == (CONFIG_SYS_VMSGQ_CNT_MAX - 1) )
+        return -ENOBUFS;
+
+    pVMsgq->pMsg[head] = pNode;
+    pVMsgq->head       = (head + 1) & (CONFIG_SYS_VMSGQ_CNT_MAX - 1);
+    return 0;
+}
+
+int sys_vmsgq_recv(sys_vmsgq_t *pVMsgq, sys_vmsg_node_t **ppNode)
+{
+    uint32_t    head = pVMsgq->head;
+    uint32_t    tail = pVMsgq->tail;
+
+    *ppNode = 0;
+
+    if( head == tail )
+        return -ENOMSG;
+
+    *ppNode      = pVMsgq->pMsg[tail];
+    pVMsgq->pMsg[tail] = 0;
+    pVMsgq->tail       = (tail + 1)  & (CONFIG_SYS_VMSGQ_CNT_MAX - 1);
+    return 0;
+}

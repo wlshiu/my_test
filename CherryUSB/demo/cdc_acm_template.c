@@ -152,7 +152,7 @@ struct usbd_endpoint cdc_in_ep = {
 struct usbd_interface intf0;
 struct usbd_interface intf1;
 
-void cdc_acm_init(void)
+int cdc_acm_init(void)
 {
     const uint8_t data[10] = { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30 };
 
@@ -165,6 +165,7 @@ void cdc_acm_init(void)
     usbd_add_endpoint(&cdc_out_ep);
     usbd_add_endpoint(&cdc_in_ep);
     usbd_initialize();
+    return 0;
 }
 
 volatile uint8_t dtr_enable = 0;
@@ -178,7 +179,7 @@ void usbd_cdc_acm_set_dtr(uint8_t intf, bool dtr)
     }
 }
 
-void cdc_acm_data_send_with_dtr_test(void)
+void cdc_acm_data_send_with_dtr_test(sys_udev_t *pUDev, int err_code)
 {
     if (dtr_enable) {
         ep_tx_busy_flag = true;
@@ -193,7 +194,7 @@ sys_udev_t      g_udev_cdc =
 {
     .udev_id   = SYS_UDEV_TAG('C', 'D', 'C', '0'),
     .udev_init = cdc_acm_init,
-    .udev_proc = cdc_acm_data_send_with_dtr_test,
+//    .udev_proc = cdc_acm_data_send_with_dtr_test,
 };
 
 #endif  /* CONFIG_ENABLE_USBD_CDC */

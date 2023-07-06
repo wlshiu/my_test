@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-DCONFIG_USB_SIM" />
 					<Add directory="CherryUSB/core" />
 					<Add directory="CherryUSB/common" />
 					<Add directory="CherryUSB/osal" />
@@ -139,9 +140,6 @@
 		<Unit filename="CherryUSB/demo/cdc_acm_template.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="CherryUSB/demo/music_16k_ac1.h" />
-		<Unit filename="CherryUSB/demo/music_16k_ac2.h" />
-		<Unit filename="CherryUSB/demo/pic_data.h" />
 		<Unit filename="CherryUSB/demo/usb_host.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -159,6 +157,7 @@
 		<Unit filename="CherryUSB/port/sim/usb_hc_sim.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="CherryUSB/port/sim/usb_musb_reg.h" />
 		<Unit filename="CherryUSB/usb_config.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />

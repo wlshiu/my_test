@@ -20,7 +20,46 @@ typedef struct {                                    /*!< USB0 Structure         
   __IO uint16_t  FRAME;                             /*!< (@ 0x0000000C) USB Frame Value                                                       */
   __IO uint8_t   EPIDX;                             /*!< (@ 0x0000000E) USB Endpoint Index                                                    */
   __IO uint8_t   TEST;                              /*!< (@ 0x0000000F) USB Test Mode                                                         */
-  __I  uint32_t  RESERVED0[4];
+  __IO uint16_t  TXMAXP;                            /*!< (@ 0x00000010) Maximum packet size for peripheral TX endpoint.                       */
+
+  union {
+    __IO uint16_t CSR;                              /*!< (@ 0x00000012) Control Status register for Endpoint 0.                             */
+    __IO uint16_t TXCSR;                            /*!< (@ 0x00000012) Control Status register for peripheral TX endpoint.                 */
+  };
+
+  __IO uint16_t  RXMAXP;                            /*!< (@ 0x00000014) Maximum packet size for host Rx endpoint.                           */
+  __IO uint16_t  RXCSR;                             /*!< (@ 0x00000016) Control Status register for peripheral Rx endpoint.                 */
+
+  union {
+    __IO uint16_t COUNT;                            /*!< (@ 0x00000018) Number of received bytes in Endpoint 0 FIFO.                        */
+    __IO uint16_t RXCOUNT;                          /*!< (@ 0x00000018) Number of bytes to be read from peripheral Rx endpoint FIFO.        */
+  };
+
+  union {
+    __IO uint8_t TYPE0;                             /*!< (@ 0x0000001A) Defines the speed of Endpoint 0                                     */
+    __IO uint8_t TXTYPE;                            /*!< (@ 0x0000001A) Sets the transaction protocol, speed and peripheral
+                                                                    endpoint number for the host TX endpoint                                */
+  };
+
+  union {
+    __IO uint8_t NAKLIMIT0;                         /*!< (@ 0x0000001B) Sets the NAK response timeout on Endpoint 0                     */
+    __IO uint8_t TXINTERVAL;                        /*!< (@ 0x0000001B) Sets the polling interval for Interrupt/ISOC
+                                                                    transactions or the NAK response timeout
+                                                                    on Bulk transactions for host TX endpoint                           */
+  };
+  __IO uint8_t   RXTYPE;                            /*!< (@ 0x0000001C) Sets the transaction protocol, speed and peripheral
+                                                                    endpoint number for the host Rx endpoint                            */
+  __IO uint8_t   RXINTERVAL;                        /*!< (@ 0x0000001D) Sets the polling interval for Interrupt/ISOC
+                                                                    transactions or the NAK response timeout
+                                                                    on Bulk transactions for host RX endpoint                           */
+  __I  uint8_t   RESERVED;
+
+  union {
+    __IO uint8_t CONFIGDATA;                        /*!< (@ 0x0000001F) Returns details of core configuration. (Index
+                                                                    register set to select Endpoint 0.)                             */
+    __IO uint8_t FIFOSIZE;                          /*!< (@ 0x0000001F) Returns the configured size of the selected Rx
+                                                                    FIFO and TX FIFOs (Endpoints 1 – 15 only).                      */
+  };
  union {
     __IO uint8_t   FIFO0_BYTE;                      /*!< (@ 0x00000020) USB FIFO Endpoint 0                                                   */
     __IO uint16_t  FIFO0_HALF;                      /*!< USB FIFO Endpoint 0                                                   */
@@ -151,7 +190,7 @@ typedef struct {                                    /*!< USB0 Structure         
   __I  uint16_t  RESERVED24[2];
   __IO uint8_t   COUNT0;                            /*!< (@ 0x00000108) USB Receive Byte Count Endpoint 0                                     */
   __I  uint8_t   RESERVED25;
-  __IO uint8_t   TYPE0;                             /*!< USB Type Endpoint 0                                                   */
+  __IO uint8_t   TYPE0_EP0;                         /*!< USB Type Endpoint 0                                                   */
   __IO uint8_t   NAKLMT;                            /*!< USB NAK Limit                                                         */
   __I  uint32_t  RESERVED26;
   __IO uint16_t  TXMAXP1;                           /*!< (@ 0x00000110) USB Maximum Transmit Data Endpoint 1                                  */

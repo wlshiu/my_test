@@ -646,30 +646,6 @@ static void usbh_hub_thread(void *argument)
     }
 }
 
-__WEAK void usbh_hub_routine(void *argument)
-{
-    /* Non-blocking routine */
-    static bool  is_usbh_hub_initialized = false;
-    struct usbh_hub *hub;
-    int ret = 0;
-
-    if( is_usbh_hub_initialized == false )
-    {
-        usb_hc_init();
-
-        is_usbh_hub_initialized = true;
-    }
-
-    do {
-        ret = usb_osal_mq_recv(hub_mq, (uintptr_t *)&hub, 0xffffffff);
-        if (ret < 0) {
-            break;
-        }
-        usbh_hub_events(hub);
-    } while(0);
-    return;
-}
-
 static void usbh_roothub_register(void)
 {
     memset(&roothub, 0, sizeof(struct usbh_hub));
@@ -695,6 +671,33 @@ void usbh_roothub_thread_wakeup(uint8_t port)
     usbh_hub_thread_wakeup(&roothub);
 }
 
+
+#if defined(CONFIG_USBHOST_WITH_BARE_METAL)
+__WEAK void usbh_hub_routine(void *argument)
+{
+    /* Non-blocking routine */
+    static bool  is_usbh_hub_initialized = false;
+    struct usbh_hub *hub;
+    int ret = 0;
+
+    if( is_usbh_hub_initialized == false )
+    {
+        usb_hc_init();
+
+        is_usbh_hub_initialized = true;
+    }
+
+    do {
+        ret = usb_osal_mq_recv(hub_mq, (uintptr_t *)&hub, 0xffffffff);
+        if (ret < 0) {
+            break;
+        }
+        usbh_hub_events(hub);
+    } while(0);
+    return;
+}
+#endif  /* CONFIG_USBHOST_WITH_BARE_METAL */
+
 int usbh_hub_initialize(void)
 {
     usbh_roothub_register();
@@ -704,10 +707,10 @@ int usbh_hub_initialize(void)
         return -1;
     }
 
-#if defined(CONFIG_USBHOST_WITH_OS)
-    hub_thread = usb_osal_thread_create("usbh_hub", CONFIG_USBHOST_PSC_STACKSIZE, CONFIG_USBHOST_PSC_PRIO, usbh_hub_thread, NULL);
-#else
+#if defined(CONFIG_USBHOST_WITH_BARE_METAL)
     hub_thread = usb_osal_thread_create("usbh_hub", CONFIG_USBHOST_PSC_STACKSIZE, CONFIG_USBHOST_PSC_PRIO, usbh_hub_routine, NULL);
+#else
+    hub_thread = usb_osal_thread_create("usbh_hub", CONFIG_USBHOST_PSC_STACKSIZE, CONFIG_USBHOST_PSC_PRIO, usbh_hub_thread, NULL);
 #endif
     if (hub_thread == NULL) {
         return -1;
