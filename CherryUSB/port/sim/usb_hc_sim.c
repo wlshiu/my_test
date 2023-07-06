@@ -232,9 +232,8 @@ static void musb_write_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
 
     g_USBD.RXCOUNT = len;
     g_USBD.TXCSR = USB_CSRL0_RXRDY;
-    g_USBD.TXIS = 0x1;
+    g_USBD.TXIS = USB_TXIE_EP0 | (0x1 << ep_idx);
     g_USBD.RXIS = 0x1 << ep_idx;
-
     #if 0
     memcpy(g_uhost_tx_buf, buffer, len);
 
@@ -247,6 +246,9 @@ static void musb_write_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
     sys_mutex_lock((void*)g_hMutexDC);
     pHdr->len = (len < sizeof(g_udev_rxbuf)) ? len : sizeof(g_udev_rxbuf);
     memcpy(pHdr->raw, buffer, pHdr->len);
+
+    sys_dump_mem(buffer, len, __func__, __LINE__);
+
     sys_mutex_unlock((void*)g_hMutexDC);
     #else
     sys_vmsg_node_t     *pNode = 0;
@@ -261,7 +263,7 @@ static void musb_write_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
 
     #endif // 0
 
-    trace("\n");
+//    trace("\n");
     #endif  /* CONFIG_USB_SIM */
 
     return;
@@ -320,12 +322,14 @@ static void musb_read_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
 
     memcpy(buffer, pHdr->raw, (len < pHdr->len) ? len : pHdr->len);
 //    memset(g_uhost_rx_buf, 0x0, sizeof(g_uhost_rx_buf));
+
+    sys_dump_mem(buffer, len, __func__, __LINE__);
     sys_mutex_unlock((void*)g_hMutexHC);
     #else
     memcpy(buffer, g_uhost_rx_buf, len);
     #endif
 
-    trace("\n");
+//    trace("\n");
     #endif  /* CONFIG_USB_SIM */
 
     return;
@@ -969,6 +973,10 @@ void hc_handle_ep0(void)
             {
                 usb_ep0_state = USB_EP0_STATE_IN_STATUS;
                 HWREGB(USB_BASE + MUSB_IND_TXCSRL_OFFSET) = (USB_CSRL0_REQPKT | USB_CSRL0_STATUS);
+
+                #if defined(CONFIG_USB_SIM)
+                g_USBH.CSR = USB_CSRL0_STATUS;
+                #endif /* CONFIG_USB_SIM */
             }
             break;
         case USB_EP0_STATE_IN_DATA:
@@ -995,6 +1003,9 @@ void hc_handle_ep0(void)
                 else
                 {
                     HWREGB(USB_BASE + MUSB_IND_TXCSRL_OFFSET) = USB_CSRL0_REQPKT;
+                    #if defined(CONFIG_USB_SIM)
+                    g_USBH.CSR = 0;
+                    #endif  /* CONFIG_USB_SIM */
                 }
             }
             break;
@@ -1018,6 +1029,10 @@ void hc_handle_ep0(void)
             {
                 usb_ep0_state = USB_EP0_STATE_IN_STATUS;
                 HWREGB(USB_BASE + MUSB_IND_TXCSRL_OFFSET) = (USB_CSRL0_REQPKT | USB_CSRL0_STATUS);
+
+                #if defined(CONFIG_USB_SIM)
+                g_USBH.CSR = USB_CSRL0_STATUS;
+                #endif  /* CONFIG_USB_SIM */
             }
             break;
         case USB_EP0_STATE_OUT_STATUS:
@@ -1025,7 +1040,7 @@ void hc_handle_ep0(void)
             musb_pipe_waitup(pipe);
             break;
         case USB_EP0_STATE_IN_STATUS:
-            if (ep0_status & (USB_CSRL0_RXRDY | USB_CSRL0_STATUS))
+            if (ep0_status & (USB_CSRL0_RXRDY | USB_CSRL0_STATUS) || 1)
             {
                 HWREGB(USB_BASE + MUSB_IND_TXCSRL_OFFSET) &= ~(USB_CSRL0_RXRDY | USB_CSRL0_STATUS);
                 urb->errorcode = 0;

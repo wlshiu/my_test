@@ -60,6 +60,21 @@ void sys_log(char *pStr)
     return;
 }
 
+void sys_dump_mem(uint8_t *pBuf, int len, const char *pFunc, int line_num)
+{
+    printf("\n\n");
+    printf("%s:%d\n", pFunc, line_num);
+    for(int i = 0; i < len; i++)
+    {
+        if( i && !(i & 0xF) )
+            printf("\n");
+
+        printf("%02X ", pBuf[i]);
+    }
+    printf("\n\n");
+    return;
+}
+
 int sys_wait_msg(uint8_t *pBuf, int *pBuf_size)
 {
     MSG     msg;

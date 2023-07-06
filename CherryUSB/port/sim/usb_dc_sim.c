@@ -183,6 +183,7 @@ static void musb_write_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
     static sys_msg_info_t   msg_udev;
 
     g_USBH.TXCSR = USB_CSRL0_RXRDY;
+    g_USBD.TXCSR = 0;
 
     #if 0
     memcpy(g_udev_txbuf, buffer, len);
@@ -198,6 +199,7 @@ static void musb_write_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
     pHdr->len = (len < sizeof(g_uhost_rx_buf)) ? len : sizeof(g_uhost_rx_buf);
     memcpy(pHdr->raw, buffer, pHdr->len);
 
+    sys_dump_mem(buffer, len, __func__, __LINE__);
     sys_mutex_unlock((void*)g_hMutexHC);
 
     #else
@@ -214,7 +216,8 @@ static void musb_write_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
 
     #endif // 0
 
-    trace("\n");
+//    trace("\n");
+
     #endif  /* CONFIG_USB_SIM */
     return;
 }
@@ -269,15 +272,15 @@ static void musb_read_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
 
     sys_mutex_lock((void*)g_hMutexDC);
     memcpy(buffer, pHdr->raw, (len < pHdr->len) ? len : pHdr->len);
-    memset(g_udev_rxbuf, 0x0, sizeof(g_udev_rxbuf));
-
+//    memset(g_udev_rxbuf, 0x0, sizeof(g_udev_rxbuf));
+    sys_dump_mem(buffer, len, __func__, __LINE__);
     sys_mutex_unlock((void*)g_hMutexDC);
 
     #else
     memcpy(buffer, g_udev_rxbuf, len);
     #endif // 0
 
-    trace("\n");
+//    trace("\n");
 
     #endif  /* CONFIG_USB_SIM */
     return;
@@ -327,8 +330,8 @@ int usb_dc_init(void)
 
     #if 1
     g_USBD.IS = USB_IS_RESET;
-    g_USBD.TXIS = USB_TXIE_EP0;
-    g_USBD.TXCSR = USB_CSRL0_RXRDY;
+    g_USBD.TXIS |= USB_TXIE_EP0;
+    g_USBD.TXCSR |= USB_CSRL0_RXRDY;
     #else
     {
         g_USBD.IS = USB_IS_RESET;
@@ -926,6 +929,10 @@ static void dc_handle_ep0(void)
                 }
 
                 usbd_event_ep0_setup_complete_handler((uint8_t *)&g_musb_udc.setup);
+
+                #if defined(CONFIG_USB_SIM)
+//                g_USBD.CSR |= USB_CSRL0_RXRDY;
+                #endif /* CONFIG_USB_SIM */
             }
             break;
 
@@ -1008,7 +1015,7 @@ void USBD_IRQHandler(void)
 
     #if defined(CONFIG_USB_SIM)
     g_USBD.IS = 0;
-    g_USBD.TXIS = 0;
+//    g_USBD.TXIS = 0;
     g_USBD.RXIS = 0;
     #endif  /* CONFIG_USB_SIM */
 

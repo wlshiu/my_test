@@ -104,6 +104,7 @@ extern sys_vmsgq_t     g_hc_vmsgq;
 //=============================================================================
 
 void sys_log(char *pStr);
+void sys_dump_mem(uint8_t *pBuf, int len, const char *pFunc, int line_num);
 
 int sys_wait_msg(uint8_t *pBuf, int *pBuf_size);
 
