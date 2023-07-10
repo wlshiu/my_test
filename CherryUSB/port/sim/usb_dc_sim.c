@@ -182,7 +182,9 @@ static void musb_write_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
     #if defined(CONFIG_USB_SIM)
     static sys_msg_info_t   msg_udev;
 
-    g_USBH.TXCSR = USB_CSRL0_RXRDY;
+    g_USBH.TXCSR   = USB_CSRL0_RXRDY;
+    g_USBH.RXCOUNT = len;
+
     g_USBD.TXCSR = 0;
 
     #if 0

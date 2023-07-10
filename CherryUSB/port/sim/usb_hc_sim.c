@@ -1040,7 +1040,9 @@ void hc_handle_ep0(void)
             musb_pipe_waitup(pipe);
             break;
         case USB_EP0_STATE_IN_STATUS:
-            if (ep0_status & (USB_CSRL0_RXRDY | USB_CSRL0_STATUS) || 1)
+            #if !defined(CONFIG_USB_SIM)
+            if (ep0_status & (USB_CSRL0_RXRDY | USB_CSRL0_STATUS))
+            #endif /* CONFIG_USB_SIM == false */
             {
                 HWREGB(USB_BASE + MUSB_IND_TXCSRL_OFFSET) &= ~(USB_CSRL0_RXRDY | USB_CSRL0_STATUS);
                 urb->errorcode = 0;
