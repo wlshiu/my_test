@@ -135,8 +135,8 @@ static volatile uint8_t usb_ep0_state = USB_EP0_STATE_SETUP;
 
 sys_vmsgq_t     g_hc_vmsgq = {0};
 
-uint32_t        g_uhost_tx_buf[1024 >> 2] = {0};
-uint32_t        g_uhost_rx_buf[1024 >> 2] = {0};
+uint32_t        g_uhost_tx_buf[2048 >> 2] = {0};
+uint32_t        g_uhost_rx_buf[2048 >> 2] = {0};
 //=============================================================================
 //                  Private Function Definition
 //=============================================================================
@@ -240,10 +240,19 @@ static void musb_write_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
     msg_uhost.pMsg_buf = g_uhost_tx_buf;
     msg_uhost.msg_len  = len;
     sys_send_msg(g_th_udev_id, &msg_uhost);
-    #elif 1
+
+    #elif 0
     sys_packet_hdr_t        *pHdr = (sys_packet_hdr_t*)&g_udev_rxbuf;
 
     sys_mutex_lock((void*)g_hMutexDC);
+
+//    for(int i = 0; i < 4; i++)
+//    {
+//        pHdr = (sys_packet_hdr_t*)&g_udev_rxbuf[i * CONFIG_USBHOST_REQUEST_BUFFER_LEN];
+//        if( (pHdr->flag & SYS_PACKET_RECEIVED) )
+//            break;
+//    }
+
     pHdr->len = (len < sizeof(g_udev_rxbuf)) ? len : sizeof(g_udev_rxbuf);
     memcpy(pHdr->raw, buffer, pHdr->len);
 
@@ -253,13 +262,19 @@ static void musb_write_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
     #else
     sys_vmsg_node_t     *pNode = 0;
 
+    sys_mutex_lock((void*)g_hMutexDC);
+
     pNode = malloc(sizeof(sys_vmsg_node_t));
     memset(pNode, 0x0, sizeof(sys_vmsg_node_t));
 
-    memcpy(&pNode->usb_regs, &g_USBH, sizeof(pNode->usb_regs));
-    memcpy(&pNode->raw, buffer, len);
+    pNode->length = len;
+    memcpy(&pNode->raw, buffer, pNode->length);
+
+    sys_dump_mem(buffer, len, __func__, __LINE__);
 
     sys_vmsgq_send(&g_hc_vmsgq, pNode);
+
+    sys_mutex_unlock((void*)g_hMutexDC);
 
     #endif // 0
 
@@ -313,12 +328,20 @@ static void musb_read_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
     #if 0
     sys_wait_msg((uint8_t*)g_uhost_rx_buf, &rxbuf_size);
     memcpy(buffer, g_uhost_rx_buf, (len < rxbuf_size) ? len : rxbuf_size);
-    #elif 1
+    #elif 0
     sys_packet_hdr_t        *pHdr = (sys_packet_hdr_t*)&g_uhost_rx_buf;
 
     sys_mutex_lock((void*)g_hMutexHC);
-    if( len == 0 )
-        trace(" len = %d\n", len);
+//    for(int i = 0; i < 4; i++)
+//    {
+//        pHdr = (sys_packet_hdr_t*)&g_uhost_rx_buf[i * CONFIG_USBHOST_REQUEST_BUFFER_LEN];
+//
+//        if( pHdr->len && !(pHdr->flag & SYS_PACKET_RECEIVED) )
+//        {
+//            pHdr->flag |= SYS_PACKET_RECEIVED;
+//            break;
+//        }
+//    }
 
     memcpy(buffer, pHdr->raw, (len < pHdr->len) ? len : pHdr->len);
 //    memset(g_uhost_rx_buf, 0x0, sizeof(g_uhost_rx_buf));
@@ -326,7 +349,16 @@ static void musb_read_packet(uint8_t ep_idx, uint8_t *buffer, uint16_t len)
     sys_dump_mem(buffer, len, __func__, __LINE__);
     sys_mutex_unlock((void*)g_hMutexHC);
     #else
-    memcpy(buffer, g_uhost_rx_buf, len);
+    sys_mutex_lock((void*)g_hMutexHC);
+
+    sys_vmsg_node_t     *pNode = 0;
+    sys_vmsgq_recv(&g_dc_vmsgq, &pNode);
+    if( pNode )
+    {
+        memcpy(buffer, (void*)&pNode->raw, pNode->length);
+        free(pNode);
+    }
+    sys_mutex_unlock((void*)g_hMutexHC);
     #endif
 
 //    trace("\n");
@@ -528,6 +560,9 @@ int usb_hc_init(void)
         sys_vmsgq_send(&g_dc_vmsgq, pNode);
     }
     #endif
+
+    sys_packet_hdr_t        *pHdr = (sys_packet_hdr_t*)&g_uhost_rx_buf;
+    pHdr->flag = SYS_PACKET_RECEIVED;
 #endif  /* CONFIG_USB_SIM */
     return 0;
 }

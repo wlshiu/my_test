@@ -63,7 +63,7 @@ void sys_log(char *pStr)
 void sys_dump_mem(uint8_t *pBuf, int len, const char *pFunc, int line_num)
 {
     printf("\n\n");
-    printf("%s:%d\n", pFunc, line_num);
+    printf("[%s:%d] mem len = %d\n", pFunc, line_num, len);
     for(int i = 0; i < len; i++)
     {
         if( i && !(i & 0xF) )

@@ -52,13 +52,16 @@ typedef struct sys_msg_info
 
 typedef struct sys_packet_hdr
 {
-    uint32_t    len;
+#define SYS_PACKET_RECEIVED     (0x1 << 0)
+    uint16_t    flag;
+    uint16_t    len;
     uint32_t    raw[];
 } sys_packet_hdr_t;
 
 typedef struct sys_vmsg_node
 {
-    USB0_Type       usb_regs;
+//    USB0_Type       usb_regs;
+    uint32_t        length;
     uint32_t        raw[512 >> 2];
 } sys_vmsg_node_t;
 
@@ -74,11 +77,11 @@ typedef struct sys_vmsgq
 //=============================================================================
 //                  Global Data Definition
 //=============================================================================
-extern uint32_t      g_udev_rxbuf[1024 >> 2];
-extern uint32_t      g_udev_txbuf[1024 >> 2];
+extern uint32_t      g_udev_rxbuf[2048 >> 2];
+extern uint32_t      g_udev_txbuf[2048 >> 2];
 
-extern uint32_t      g_uhost_tx_buf[1024 >> 2];
-extern uint32_t      g_uhost_rx_buf[1024 >> 2];
+extern uint32_t      g_uhost_tx_buf[2048 >> 2];
+extern uint32_t      g_uhost_rx_buf[2048 >> 2];
 
 extern HANDLE  g_hMutexHC;
 extern HANDLE  g_hMutexDC;
