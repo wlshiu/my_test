@@ -6,7 +6,22 @@
 #include "sys_udev.h"
 #include "usbd_cdc.h"
 
-/*!< endpoint address */
+/**
+ *  endpoint address
+ *
+ *  typedef struct ep_addr
+ *  {
+ *      union {
+ *          uint8_t     epaddr;
+ *          struct {
+ *              uint8_t     address  : 4;
+ *              uint8_t              : 3;
+ *              uint8_t     direction: 1; // 1: IN, 0: OUT
+ *          } EPADDRb;
+ *      };
+ *  } ep_addr_t;
+*/
+
 #define CDC_IN_EP  0x81
 #define CDC_OUT_EP 0x02
 #define CDC_INT_EP 0x83
@@ -194,7 +209,7 @@ sys_udev_t      g_udev_cdc =
 {
     .udev_id   = SYS_UDEV_TAG('C', 'D', 'C', '0'),
     .udev_init = cdc_acm_init,
-//    .udev_proc = cdc_acm_data_send_with_dtr_test,
+    .udev_proc = cdc_acm_data_send_with_dtr_test,
 };
 
 #endif  /* CONFIG_ENABLE_USBD_CDC */

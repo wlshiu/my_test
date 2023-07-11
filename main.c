@@ -11,6 +11,12 @@
 
 #include "usbh_core.h"
 
+#include "usbh_audio.h"
+//#include "usbh_video.h"
+#include "usbh_cdc_acm.h"
+#include "usbh_hid.h"
+#include "usbh_msc.h"
+
 
 DWORD   g_th_uhost_id;
 DWORD   g_th_udev_id;
@@ -21,7 +27,7 @@ UINT    g_msg_uhost_rx = 0;
 uint32_t __usbh_class_info_start__;
 uint32_t __usbh_class_info_end__;
 
-struct usbh_class_info      *g_class_info_pool[10] =
+struct usbh_class_info      g_class_info_pool[10] =
 {
     0
 };
@@ -58,6 +64,8 @@ extern const struct usbh_class_info     msc_class_info;
 bool     g_is_hc_end = false;
 bool     g_is_dc_end = false;
 
+static uint32_t     g_sys_mpool[2048 >> 2] = {0};
+
 static uint32_t __stdcall
 _thread_udev(PVOID pM)
 {
@@ -78,7 +86,7 @@ _thread_udev(PVOID pM)
 
         sys_uhost_proc();
 
-//        sys_udev_proc();
+        sys_udev_proc();
 
         Sleep(1000);
 
@@ -98,15 +106,24 @@ int main()
 //    sys_uhost_register(&g_uhost_class_cdc);
     sys_uhost_register(&g_uhost_vthreads);
 
+    usb_osal_mpool_init((uint32_t)&g_sys_mpool, sizeof(g_sys_mpool));
+
     /* Class info */
     int     cnt = 0;
     __usbh_class_info_start__ = (uint32_t)&g_class_info_pool[0];
-    g_class_info_pool[cnt++] = &cdc_acm_class_info;
-    g_class_info_pool[cnt++] = &cdc_data_class_info;
-    g_class_info_pool[cnt++] = &hub_class_info;
-    g_class_info_pool[cnt++] = &msc_class_info;
-    g_class_info_pool[cnt++] = &hid_custom_class_info;
+    g_class_info_pool[cnt++] = cdc_acm_class_info;
+    g_class_info_pool[cnt++] = cdc_data_class_info;
+    g_class_info_pool[cnt++] = hub_class_info;
+    g_class_info_pool[cnt++] = msc_class_info;
+    g_class_info_pool[cnt++] = hid_custom_class_info;
     __usbh_class_info_end__   = (uint32_t)&g_class_info_pool[cnt];
+
+    printf("sizeof(struct usbh_urb)= %d bytes\n", sizeof(struct usbh_urb));          // 48-Bytes
+    printf("sizeof(struct usbh_cdc_acm)= %d bytes\n", sizeof(struct usbh_cdc_acm));  // 24-Bytes
+    printf("sizeof(struct usbh_msc)= %d bytes\n", sizeof(struct usbh_msc));          // 120-Bytes
+    printf("sizeof(struct usbh_hid)= %d bytes\n", sizeof(struct usbh_hid));          // 144-Bytes
+//    printf("sizeof(struct usbh_video)= %d bytes\n", sizeof(struct usbh_video));
+    printf("sizeof(struct usbh_audio)= %d bytes\n", sizeof(struct usbh_audio));      // 120-Bytes
 
 #if 1
     /* Windows API */

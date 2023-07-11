@@ -17,8 +17,8 @@
  *  ToDo: implement memory pool
  */
 #include <stdlib.h>
-#define usb_malloc(size)        malloc(size)
-#define usb_free(ptr)           free(ptr)
+#define usb_malloc(size)        usb_osal_malloc(size)   //malloc(size)
+#define usb_free(ptr)           usb_osal_free(ptr)      //free(ptr)
 
 /* Enable print with color */
 //#define CONFIG_USB_PRINTF_COLOR_ENABLE
@@ -151,7 +151,7 @@
 #define CONFIG_USBHOST_PSC_STACKSIZE            2048
 #endif
 
-//#define CONFIG_USBHOST_GET_STRING_DESC
+#define CONFIG_USBHOST_GET_STRING_DESC
 
 /* Ep0 max transfer buffer */
 #define CONFIG_USBHOST_REQUEST_BUFFER_LEN       512
@@ -165,7 +165,7 @@
 #endif
 
 
-#define CONFIG_USBHOST_PIPE_NUM                 2
+#define CONFIG_USBHOST_PIPE_NUM                 4
 
 
 /**

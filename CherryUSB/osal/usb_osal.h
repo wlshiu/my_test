@@ -36,4 +36,17 @@ void usb_osal_leave_critical_section(size_t flag);
 
 void usb_osal_msleep(uint32_t delay);
 
+/* memory pool of system */
+/**
+ *  \brief  Initialize memory pool of OSAL
+ *
+ *  \param [in] pMPool          Pointer to a memory pool (It MUST be 4-align)
+ *  \param [in] pool_len        The length of a memory pool (It MUST be 4-align)
+ *  \return
+ *      errno
+ */
+int usb_osal_mpool_init(uint32_t *pMPool, int pool_len);
+void *usb_osal_malloc(int length);
+void usb_osal_free(void *pPtr);
+
 #endif /* USB_OSAL_H */

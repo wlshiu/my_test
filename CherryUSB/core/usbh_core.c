@@ -616,7 +616,11 @@ int usbh_enumerate(struct usbh_hubport *hport)
     for (uint8_t i = 0; i < hport->config.config_desc.bNumInterfaces; i++) {
         intf_desc = &hport->config.intf[i].altsetting[0].intf_desc;
 
-        struct usbh_class_driver *class_driver = (struct usbh_class_driver *)usbh_find_class_driver(intf_desc->bInterfaceClass, intf_desc->bInterfaceSubClass, intf_desc->bInterfaceProtocol, hport->device_desc.idVendor, hport->device_desc.idProduct);
+        struct usbh_class_driver *class_driver = (struct usbh_class_driver *)usbh_find_class_driver(intf_desc->bInterfaceClass,
+                                                                                                    intf_desc->bInterfaceSubClass,
+                                                                                                    intf_desc->bInterfaceProtocol,
+                                                                                                    hport->device_desc.idVendor,
+                                                                                                    hport->device_desc.idProduct);
 
         if (class_driver == NULL) {
             USB_LOG_ERR("do not support Class:0x%02x,Subclass:0x%02x,Protocl:0x%02x\r\n",
@@ -691,8 +695,17 @@ int usbh_initialize(void)
 #elif defined(__GNUC__)
     extern uint32_t __usbh_class_info_start__;
     extern uint32_t __usbh_class_info_end__;
+
+    #if defined(CONFIG_USB_SIM)
+    usbh_class_info_table_begin = (struct usbh_class_info *)__usbh_class_info_start__;
+    usbh_class_info_table_end = (struct usbh_class_info *)__usbh_class_info_end__;
+    #else
+
     usbh_class_info_table_begin = (struct usbh_class_info *)&__usbh_class_info_start__;
     usbh_class_info_table_end = (struct usbh_class_info *)&__usbh_class_info_end__;
+
+    #endif /* CONFIG_USB_SIM */
+
 #elif defined(__ICCARM__) || defined(__ICCRX__)
     usbh_class_info_table_begin = (struct usbh_class_info *)__section_begin("usbh_class_info");
     usbh_class_info_table_end = (struct usbh_class_info *)__section_end("usbh_class_info");
@@ -707,8 +720,23 @@ int usbh_initialize(void)
 
 int usbh_control_transfer(usbh_pipe_t pipe, struct usb_setup_packet *setup, uint8_t *buffer)
 {
-    struct usbh_urb *urb;
     int ret;
+
+#if defined(CONFIG_USB_SIM)
+    static struct usbh_urb  g_tmp_urb;
+    struct usbh_urb         *urb = &g_tmp_urb;
+
+    memset(urb, 0, sizeof(struct usbh_urb));
+
+    usbh_control_urb_fill(urb, pipe, setup, buffer, setup->wLength, CONFIG_USBHOST_CONTROL_TRANSFER_TIMEOUT, NULL, NULL);
+
+    ret = usbh_submit_urb(urb);
+    if (ret == 0) {
+        ret = urb->actual_length;
+    }
+#else   /* CONFIG_USB_SIM */
+
+    struct usbh_urb *urb;
 
     urb = usb_malloc(sizeof(struct usbh_urb));
     memset(urb, 0, sizeof(struct usbh_urb));
@@ -720,6 +748,8 @@ int usbh_control_transfer(usbh_pipe_t pipe, struct usb_setup_packet *setup, uint
         ret = urb->actual_length;
     }
     usb_free(urb);
+
+#endif  /* CONFIG_USB_SIM */
     return ret;
 }
 
