@@ -170,7 +170,7 @@
 #define AUDIO_CHANNEL_BOC  (1 << 24) /*  Bottom Center */
 #define AUDIO_CHANNEL_BLC  (1 << 25) /*  Back Left of Center */
 #define AUDIO_CHANNEL_BRC  (1 << 26) /*  Back Right of Center */
-                                     /* Bits 27-30: Reserved */
+/* Bits 27-30: Reserved */
 #define AUDIO_CHANNEL_RD (1 << 31)   /*  Raw Data */
 
 /* Audio Function Category Codes */
@@ -432,7 +432,7 @@
 #define AUDIO_ENCODER_ERROR_PARMS     11 /* Inconsistent Set of Parameters */
 #define AUDIO_ENCODER_ERROR_NOTREADY  12 /* Not Ready */
 #define AUDIO_ENCODER_ERROR_BUSY      13 /* Busy */
-                                         /* >13: Reserved */
+/* >13: Reserved */
 
 /* Format Type Codes */
 
@@ -595,7 +595,8 @@
 #define AUDIO_FORMAT_TYPE_II  0x02
 #define AUDIO_FORMAT_TYPE_III 0x03
 
-struct audio_cs_if_ac_header_descriptor {
+struct audio_cs_if_ac_header_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -607,7 +608,8 @@ struct audio_cs_if_ac_header_descriptor {
 
 #define AUDIO_SIZEOF_AC_HEADER_DESC(n) (8 + n)
 
-struct audio_cs_if_ac_input_terminal_descriptor {
+struct audio_cs_if_ac_input_terminal_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -622,7 +624,8 @@ struct audio_cs_if_ac_input_terminal_descriptor {
 
 #define AUDIO_SIZEOF_AC_INPUT_TERMINAL_DESC (12)
 
-struct audio_cs_if_ac_output_terminal_descriptor {
+struct audio_cs_if_ac_output_terminal_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -635,7 +638,8 @@ struct audio_cs_if_ac_output_terminal_descriptor {
 
 #define AUDIO_SIZEOF_AC_OUTPUT_TERMINAL_DESC (9)
 
-struct audio_cs_if_ac_feature_unit_descriptor {
+struct audio_cs_if_ac_feature_unit_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -648,7 +652,8 @@ struct audio_cs_if_ac_feature_unit_descriptor {
 
 #define AUDIO_SIZEOF_AC_FEATURE_UNIT_DESC(ch, n) (7 + (ch + 1) * n)
 
-struct audio_cs_if_as_general_descriptor {
+struct audio_cs_if_as_general_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -659,7 +664,8 @@ struct audio_cs_if_as_general_descriptor {
 
 #define AUDIO_SIZEOF_AS_GENERAL_DESC (7)
 
-struct audio_cs_if_as_format_type_descriptor {
+struct audio_cs_if_as_format_type_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -673,7 +679,8 @@ struct audio_cs_if_as_format_type_descriptor {
 
 #define AUDIO_SIZEOF_FORMAT_TYPE_DESC(n) (8 + 3 * n)
 
-struct audio_ep_descriptor {
+struct audio_ep_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bEndpointAddress;
@@ -686,7 +693,8 @@ struct audio_ep_descriptor {
 
 #define AUDIO_SIZEOF_EP_DESC (9)
 
-struct audio_cs_ep_ep_general_descriptor {
+struct audio_cs_ep_ep_general_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -812,7 +820,8 @@ struct audio_cs_ep_ep_general_descriptor {
 
 #define AUDIO_AS_DESCRIPTOR_INIT_LEN(n) (0x09 + 0x09 + 0x07 + 0x08 + 3 * n + 0x09 + 0x07)
 
-struct audio_v2_channel_cluster_descriptor {
+struct audio_v2_channel_cluster_descriptor
+{
     uint8_t bNrChannels;
     uint32_t bmChannelConfig;
     uint8_t iChannelNames;
@@ -820,7 +829,8 @@ struct audio_v2_channel_cluster_descriptor {
 
 #define AUDIO_V2_SIZEOF_CHANNEL_CLUSTER_DESC (6)
 
-struct audio_v2_cs_if_ac_header_descriptor {
+struct audio_v2_cs_if_ac_header_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -832,7 +842,8 @@ struct audio_v2_cs_if_ac_header_descriptor {
 
 #define AUDIO_V2_SIZEOF_AC_HEADER_DESC (9)
 
-struct audio_v2_cs_if_ac_clock_source_descriptor {
+struct audio_v2_cs_if_ac_clock_source_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -845,7 +856,8 @@ struct audio_v2_cs_if_ac_clock_source_descriptor {
 
 #define AUDIO_V2_SIZEOF_AC_CLOCK_SOURCE_DESC (8)
 
-struct audio_v2_cs_if_ac_clock_selector_descriptor {
+struct audio_v2_cs_if_ac_clock_selector_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -857,7 +869,8 @@ struct audio_v2_cs_if_ac_clock_selector_descriptor {
 
 #define AUDIO_SIZEOF_AC_CLOCK_SELECTOR_DESC(n) (7 + n)
 
-struct audio_v2_cs_if_ac_clock_multiplier_descriptor {
+struct audio_v2_cs_if_ac_clock_multiplier_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -869,7 +882,8 @@ struct audio_v2_cs_if_ac_clock_multiplier_descriptor {
 
 #define AUDIO_SIZEOF_AC_CLOCK_MULTIPLIER_DESC() (7)
 
-struct audio_v2_cs_if_ac_input_terminal_descriptor {
+struct audio_v2_cs_if_ac_input_terminal_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -886,7 +900,8 @@ struct audio_v2_cs_if_ac_input_terminal_descriptor {
 
 #define AUDIO_V2_SIZEOF_AC_INPUT_TERMINAL_DESC (17)
 
-struct audio_v2_cs_if_ac_output_terminal_descriptor {
+struct audio_v2_cs_if_ac_output_terminal_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -901,7 +916,8 @@ struct audio_v2_cs_if_ac_output_terminal_descriptor {
 
 #define AUDIO_V2_SIZEOF_AC_OUTPUT_TERMINAL_DESC (12)
 
-struct audio_v2_cs_if_ac_feature_unit_descriptor {
+struct audio_v2_cs_if_ac_feature_unit_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -913,7 +929,8 @@ struct audio_v2_cs_if_ac_feature_unit_descriptor {
 
 #define AUDIO_V2_SIZEOF_AC_FEATURE_UNIT_DESC(ch) (6 + (ch + 1) * 4)
 
-struct audio_v2_cs_if_as_general_descriptor {
+struct audio_v2_cs_if_as_general_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -928,34 +945,37 @@ struct audio_v2_cs_if_as_general_descriptor {
 
 #define AUDIO_V2_SIZEOF_AS_GENERAL_DESC (16)
 
-struct audio_v2_control_range1_param_block {
+struct audio_v2_control_range1_param_block
+{
     uint16_t wNumSubRanges;
     struct
     {
         uint8_t bMin;
         uint8_t bMax;
         uint8_t bRes;
-    }subrange[];
+    } subrange[];
 } __PACKED;
 
-struct audio_v2_control_range2_param_block {
+struct audio_v2_control_range2_param_block
+{
     uint16_t wNumSubRanges;
     struct
     {
         uint16_t wMin;
         uint16_t wMax;
         uint16_t wRes;
-    }subrange[];
+    } subrange[];
 } __PACKED;
 
-struct audio_v2_control_range3_param_block {
+struct audio_v2_control_range3_param_block
+{
     uint16_t wNumSubRanges;
     struct
     {
         uint32_t dMin;
         uint32_t dMax;
         uint32_t dRes;
-    }subrange[];
+    } subrange[];
 } __PACKED;
 
 #define AUDIO_V2_AC_DESCRIPTOR_INIT(bFirstInterface, bInterfaceCount, wTotalLength, bCategory, bmControls, stridx) \

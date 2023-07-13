@@ -11,9 +11,9 @@
 #define USBD_LANGID_STRING 1033
 
 #ifdef CONFIG_USB_HS
-#define EP_INTERVAL 0x04
+    #define EP_INTERVAL 0x04
 #else
-#define EP_INTERVAL 0x01
+    #define EP_INTERVAL 0x01
 #endif
 
 #define AUDIO_OUT_EP 0x02
@@ -26,58 +26,58 @@
 #define IN_CHANNEL_NUM 2
 
 #if IN_CHANNEL_NUM == 1
-#define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define INPUT_CH_ENABLE 0x00000000
+    #define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define INPUT_CH_ENABLE 0x00000000
 #elif IN_CHANNEL_NUM == 2
-#define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define INPUT_CH_ENABLE 0x00000003
+    #define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define INPUT_CH_ENABLE 0x00000003
 #elif IN_CHANNEL_NUM == 3
-#define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define INPUT_CH_ENABLE 0x00000007
+    #define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define INPUT_CH_ENABLE 0x00000007
 #elif IN_CHANNEL_NUM == 4
-#define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define INPUT_CH_ENABLE 0x0000000f
+    #define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define INPUT_CH_ENABLE 0x0000000f
 #elif IN_CHANNEL_NUM == 5
-#define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define INPUT_CH_ENABLE 0x0000001f
+    #define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define INPUT_CH_ENABLE 0x0000001f
 #elif IN_CHANNEL_NUM == 6
-#define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define INPUT_CH_ENABLE 0x0000003F
+    #define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define INPUT_CH_ENABLE 0x0000003F
 #elif IN_CHANNEL_NUM == 7
-#define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define INPUT_CH_ENABLE 0x0000007f
+    #define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define INPUT_CH_ENABLE 0x0000007f
 #elif IN_CHANNEL_NUM == 8
-#define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define INPUT_CH_ENABLE 0x000000ff
+    #define INPUT_CTRL      DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define INPUT_CH_ENABLE 0x000000ff
 #endif
 
 
 #define OUT_CHANNEL_NUM 2
 
 #if OUT_CHANNEL_NUM == 1
-#define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define OUTPUT_CH_ENABLE 0x00000000
+    #define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define OUTPUT_CH_ENABLE 0x00000000
 #elif OUT_CHANNEL_NUM == 2
-#define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define OUTPUT_CH_ENABLE 0x00000003
+    #define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define OUTPUT_CH_ENABLE 0x00000003
 #elif OUT_CHANNEL_NUM == 3
-#define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define OUTPUT_CH_ENABLE 0x00000007
+    #define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define OUTPUT_CH_ENABLE 0x00000007
 #elif OUT_CHANNEL_NUM == 4
-#define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define OUTPUT_CH_ENABLE 0x0000000f
+    #define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define OUTPUT_CH_ENABLE 0x0000000f
 #elif OUT_CHANNEL_NUM == 5
-#define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define OUTPUT_CH_ENABLE 0x0000001f
+    #define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define OUTPUT_CH_ENABLE 0x0000001f
 #elif OUT_CHANNEL_NUM == 6
-#define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define OUTPUT_CH_ENABLE 0x0000003F
+    #define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define OUTPUT_CH_ENABLE 0x0000003F
 #elif OUT_CHANNEL_NUM == 7
-#define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define OUTPUT_CH_ENABLE 0x0000007f
+    #define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define OUTPUT_CH_ENABLE 0x0000007f
 #elif OUT_CHANNEL_NUM == 8
-#define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
-#define OUTPUT_CH_ENABLE 0x000000ff
+    #define OUTPUT_CTRL     DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL), DBVAL(BMCONTROL)
+    #define OUTPUT_CH_ENABLE 0x000000ff
 #endif
 
 
@@ -110,7 +110,8 @@
                       AUDIO_V2_SIZEOF_AC_FEATURE_UNIT_DESC(IN_CHANNEL_NUM) +  \
                       AUDIO_V2_SIZEOF_AC_OUTPUT_TERMINAL_DESC)
 
-uint8_t audio_descriptor[] = {
+uint8_t audio_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0x00, 0x00, 0x00, USBD_VID, USBD_PID, 0x0001, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_AUDIO_CONFIG_DESC_SIZ, 0x03, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
     AUDIO_V2_AC_DESCRIPTOR_INIT(0x00, 0x03, AUDIO_AC_SIZ, AUDIO_CATEGORY_UNDEF, 0x00, 0x00),
@@ -198,7 +199,8 @@ uint8_t audio_descriptor[] = {
     0x00
 };
 
-static const uint8_t speaker_default_sampling_freq_table[] = {
+static const uint8_t speaker_default_sampling_freq_table[] =
+{
     AUDIO_SAMPLE_FREQ_NUM(5),
     AUDIO_SAMPLE_FREQ_4B(8000),
     AUDIO_SAMPLE_FREQ_4B(8000),
@@ -217,7 +219,8 @@ static const uint8_t speaker_default_sampling_freq_table[] = {
     AUDIO_SAMPLE_FREQ_4B(0x00)
 };
 
-static const uint8_t mic_default_sampling_freq_table[] = {
+static const uint8_t mic_default_sampling_freq_table[] =
+{
     AUDIO_SAMPLE_FREQ_NUM(1),
     AUDIO_SAMPLE_FREQ_4B(16000),
     AUDIO_SAMPLE_FREQ_4B(16000),
@@ -231,22 +234,28 @@ volatile bool rx_flag = 0;
 
 void usbd_audio_open(uint8_t intf)
 {
-    if (intf == 1) {
+    if (intf == 1)
+    {
         rx_flag = 1;
         /* setup first out ep read transfer */
         usbd_ep_start_read(AUDIO_OUT_EP, out_buffer, AUDIO_OUT_PACKET);
         USB_LOG_RAW("OPEN1\r\n");
-    } else {
+    }
+    else
+    {
         tx_flag = 1;
         USB_LOG_RAW("OPEN2\r\n");
     }
 }
 void usbd_audio_close(uint8_t intf)
 {
-    if (intf == 1) {
+    if (intf == 1)
+    {
         rx_flag = 1;
         USB_LOG_RAW("CLOSE1\r\n");
-    } else {
+    }
+    else
+    {
         tx_flag = 0;
         USB_LOG_RAW("CLOSE2\r\n");
     }
@@ -254,22 +263,30 @@ void usbd_audio_close(uint8_t intf)
 
 void usbd_audio_get_sampling_freq_table(uint8_t entity_id, uint8_t **sampling_freq_table)
 {
-    if (entity_id == 0x01) {
+    if (entity_id == 0x01)
+    {
         *sampling_freq_table = (uint8_t *)speaker_default_sampling_freq_table;
-    } else if (entity_id == 0x05) {
+    }
+    else if (entity_id == 0x05)
+    {
         *sampling_freq_table = (uint8_t *)mic_default_sampling_freq_table;
-    } else {
+    }
+    else
+    {
     }
 }
 
 void usbd_audio_set_sampling_freq(uint8_t entity_id, uint8_t ep_ch, uint32_t sampling_freq)
 {
     uint16_t packet_size = 0;
-    if (entity_id == 1) {
+    if (entity_id == 1)
+    {
         packet_size = ((sampling_freq * 2 * OUT_CHANNEL_NUM) / 1000);
         audio_descriptor[18 + USB_AUDIO_CONFIG_DESC_SIZ - AUDIO_V2_AS_DESCRIPTOR_INIT_LEN - 11] = packet_size;
         audio_descriptor[18 + USB_AUDIO_CONFIG_DESC_SIZ - AUDIO_V2_AS_DESCRIPTOR_INIT_LEN - 10] = packet_size >> 8;
-    } else if (entity_id == 5) {
+    }
+    else if (entity_id == 5)
+    {
         packet_size = ((sampling_freq * 2 * IN_CHANNEL_NUM) / 1000);
         audio_descriptor[18 + USB_AUDIO_CONFIG_DESC_SIZ - 11] = packet_size;
         audio_descriptor[18 + USB_AUDIO_CONFIG_DESC_SIZ - 10] = packet_size >> 8;
@@ -288,12 +305,14 @@ void usbd_audio_iso_in_callback(uint8_t ep, uint32_t nbytes)
 {
 }
 
-static struct usbd_endpoint audio_out_ep = {
+static struct usbd_endpoint audio_out_ep =
+{
     .ep_cb = usbd_audio_iso_out_callback,
     .ep_addr = AUDIO_OUT_EP
 };
 
-static struct usbd_endpoint audio_in_ep = {
+static struct usbd_endpoint audio_in_ep =
+{
     .ep_cb = usbd_audio_iso_in_callback,
     .ep_addr = AUDIO_IN_EP
 };
@@ -321,8 +340,10 @@ void audio_init()
 
 void audio_test()
 {
-    while (1) {
-        if (tx_flag) {
+    while (1)
+    {
+        if (tx_flag)
+        {
         }
     }
 }

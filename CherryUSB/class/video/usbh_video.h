@@ -11,24 +11,28 @@
 #define USBH_VIDEO_FORMAT_UNCOMPRESSED 0
 #define USBH_VIDEO_FORMAT_MJPEG        1
 
-struct usbh_video_resolution {
+struct usbh_video_resolution
+{
     uint16_t wWidth;
     uint16_t wHeight;
 };
 
-struct usbh_video_format {
+struct usbh_video_format
+{
     struct usbh_video_resolution frame[12];
     uint8_t format_type;
     uint8_t num_of_frames;
 };
 
-struct usbh_videostreaming {
+struct usbh_videostreaming
+{
     uint32_t bufoffset;
     uint32_t buflen;
     void (*video_one_frame_callback)(struct usbh_videostreaming *stream);
 };
 
-struct usbh_video {
+struct usbh_video
+{
     struct usbh_hubport *hport;
 
     uint8_t ctrl_intf; /* interface number */

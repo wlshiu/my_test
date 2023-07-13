@@ -4,10 +4,11 @@
 static int xxx_class_interface_request_handler(struct usb_setup_packet *setup, uint8_t **data, uint32_t *len)
 {
     USB_LOG_WRN("XXX Class request: "
-                 "bRequest 0x%02x\r\n",
-                 setup->bRequest);
+                "bRequest 0x%02x\r\n",
+                setup->bRequest);
 
-    switch (setup->bRequest) {
+    switch (setup->bRequest)
+    {
         default:
             USB_LOG_WRN("Unhandled XXX Class bRequest 0x%02x\r\n", setup->bRequest);
             return -1;
@@ -18,7 +19,8 @@ static int xxx_class_interface_request_handler(struct usb_setup_packet *setup, u
 
 static void xxx_notify_handler(uint8_t event, void *arg)
 {
-    switch (event) {
+    switch (event)
+    {
         case USBD_EVENT_RESET:
 
             break;

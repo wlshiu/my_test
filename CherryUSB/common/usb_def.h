@@ -309,7 +309,8 @@
 #define WEBUSB_FUNCTION_SUBSET_HEADER_SIZE      3
 
 /* Setup packet definition used to read raw data from USB line */
-struct usb_setup_packet {
+struct usb_setup_packet
+{
     /** Request type. Bits 0:4 determine recipient, see
      * \ref usb_request_recipient. Bits 5:6 determine type, see
      * \ref usb_request_type. Bit 7 determines data transfer direction, see
@@ -338,7 +339,8 @@ struct usb_setup_packet {
 #define USB_SIZEOF_SETUP_PACKET 8
 
 /** Standard Device Descriptor */
-struct usb_device_descriptor {
+struct usb_device_descriptor
+{
     uint8_t bLength;            /* Descriptor size in bytes = 18 */
     uint8_t bDescriptorType;    /* DEVICE descriptor type = 1 */
     uint16_t bcdUSB;            /* USB spec in BCD, e.g. 0x0200 */
@@ -358,7 +360,8 @@ struct usb_device_descriptor {
 #define USB_SIZEOF_DEVICE_DESC 18
 
 /** Standard Configuration Descriptor */
-struct usb_configuration_descriptor {
+struct usb_configuration_descriptor
+{
     uint8_t bLength;             /* Descriptor size in bytes = 9 */
     uint8_t bDescriptorType;     /* CONFIGURATION type = 2 or 7 */
     uint16_t wTotalLength;       /* Length of concatenated descriptors */
@@ -372,7 +375,8 @@ struct usb_configuration_descriptor {
 #define USB_SIZEOF_CONFIG_DESC 9
 
 /** Standard Interface Descriptor */
-struct usb_interface_descriptor {
+struct usb_interface_descriptor
+{
     uint8_t bLength;            /* Descriptor size in bytes = 9 */
     uint8_t bDescriptorType;    /* INTERFACE descriptor type = 4 */
     uint8_t bInterfaceNumber;   /* Interface no.*/
@@ -387,7 +391,8 @@ struct usb_interface_descriptor {
 #define USB_SIZEOF_INTERFACE_DESC 9
 
 /** Standard Endpoint Descriptor */
-struct usb_endpoint_descriptor {
+struct usb_endpoint_descriptor
+{
     uint8_t bLength;          /* Descriptor size in bytes = 7 */
     uint8_t bDescriptorType;  /* ENDPOINT descriptor type = 5 */
     uint8_t bEndpointAddress; /* Endpoint # 0 - 15 | IN/OUT */
@@ -399,7 +404,8 @@ struct usb_endpoint_descriptor {
 #define USB_SIZEOF_ENDPOINT_DESC 7
 
 /** Unicode (UTF16LE) String Descriptor */
-struct usb_string_descriptor {
+struct usb_string_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint16_t bString;
@@ -408,7 +414,8 @@ struct usb_string_descriptor {
 #define USB_SIZEOF_STRING_LANGID_DESC 4
 
 /* USB Interface Association Descriptor */
-struct usb_interface_association_descriptor {
+struct usb_interface_association_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bFirstInterface;
@@ -422,7 +429,8 @@ struct usb_interface_association_descriptor {
 #define USB_SIZEOF_IAD_DESC 8
 
 /** USB device_qualifier descriptor */
-struct usb_device_qualifier_descriptor {
+struct usb_device_qualifier_descriptor
+{
     uint8_t bLength;            /* Descriptor size in bytes = 10 */
     uint8_t bDescriptorType;    /* DEVICE QUALIFIER type = 6 */
     uint16_t bcdUSB;            /* USB spec in BCD, e.g. 0x0200 */
@@ -451,7 +459,8 @@ struct usb_device_qualifier_descriptor {
  */
 
 /* MS OS 1.0 string descriptor */
-struct usb_msosv1_string_descriptor {
+struct usb_msosv1_string_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bString[14];
@@ -460,7 +469,8 @@ struct usb_msosv1_string_descriptor {
 } __PACKED;
 
 /* MS OS 1.0 Header descriptor */
-struct usb_msosv1_compat_id_header_descriptor {
+struct usb_msosv1_compat_id_header_descriptor
+{
     uint32_t dwLength;
     uint16_t bcdVersion;
     uint16_t wIndex;
@@ -469,7 +479,8 @@ struct usb_msosv1_compat_id_header_descriptor {
 } __PACKED;
 
 /* MS OS 1.0 Function descriptor */
-struct usb_msosv1_comp_id_function_descriptor {
+struct usb_msosv1_comp_id_function_descriptor
+{
     uint8_t bFirstInterfaceNumber;
     uint8_t reserved1;
     uint8_t compatibleID[8];
@@ -483,7 +494,8 @@ struct usb_msosv1_comp_id_function_descriptor {
         struct usb_msosv1_comp_id_function_descriptor compat_id_function[x]; \
     };
 
-struct usb_msosv1_descriptor {
+struct usb_msosv1_descriptor
+{
     uint8_t *string;
     uint8_t string_len;
     uint8_t vendor_code;
@@ -494,7 +506,8 @@ struct usb_msosv1_descriptor {
 };
 
 /* MS OS 2.0 Header descriptor */
-struct usb_msosv2_header_descriptor {
+struct usb_msosv2_header_descriptor
+{
     uint32_t dwLength;
     uint16_t bcdVersion;
     uint16_t wIndex;
@@ -502,7 +515,8 @@ struct usb_msosv2_header_descriptor {
 } __PACKED;
 
 /*Microsoft OS 2.0 set header descriptor*/
-struct usb_msosv2_set_header_descriptor {
+struct usb_msosv2_set_header_descriptor
+{
     uint16_t wLength;
     uint16_t wDescriptorType;
     uint32_t dwWindowsVersion;
@@ -510,7 +524,8 @@ struct usb_msosv2_set_header_descriptor {
 } __PACKED;
 
 /* Microsoft OS 2.0 compatibleID descriptor*/
-struct usb_msosv2_comp_id_descriptor {
+struct usb_msosv2_comp_id_descriptor
+{
     uint16_t wLength;
     uint16_t wDescriptorType;
     uint8_t compatibleID[8];
@@ -518,7 +533,8 @@ struct usb_msosv2_comp_id_descriptor {
 } __PACKED;
 
 /* MS OS 2.0 property descriptor */
-struct usb_msosv2_property_descriptor {
+struct usb_msosv2_property_descriptor
+{
     uint16_t wLength;
     uint16_t wDescriptorType;
     uint32_t dwPropertyDataType;
@@ -529,7 +545,8 @@ struct usb_msosv2_property_descriptor {
 };
 
 /* Microsoft OS 2.0 subset function descriptor  */
-struct usb_msosv2_subset_function_descriptor {
+struct usb_msosv2_subset_function_descriptor
+{
     uint16_t wLength;
     uint16_t wDescriptorType;
     uint8_t bFirstInterface;
@@ -537,14 +554,16 @@ struct usb_msosv2_subset_function_descriptor {
     uint16_t wSubsetLength;
 } __PACKED;
 
-struct usb_msosv2_descriptor {
+struct usb_msosv2_descriptor
+{
     uint8_t *compat_id;
     uint16_t compat_id_len;
     uint8_t vendor_code;
 };
 
 /* BOS header Descriptor */
-struct usb_bos_header_descriptor {
+struct usb_bos_header_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint16_t wTotalLength;
@@ -552,7 +571,8 @@ struct usb_bos_header_descriptor {
 } __PACKED;
 
 /* BOS Capability platform Descriptor */
-struct usb_bos_capability_platform_descriptor {
+struct usb_bos_capability_platform_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDevCapabilityType;
@@ -561,7 +581,8 @@ struct usb_bos_capability_platform_descriptor {
 } __PACKED;
 
 /* BOS Capability MS OS Descriptors version 2 */
-struct usb_bos_capability_msosv2_descriptor {
+struct usb_bos_capability_msosv2_descriptor
+{
     uint32_t dwWindowsVersion;
     uint16_t wMSOSDescriptorSetTotalLength;
     uint8_t bVendorCode;
@@ -569,14 +590,16 @@ struct usb_bos_capability_msosv2_descriptor {
 } __PACKED;
 
 /* BOS Capability webusb */
-struct usb_bos_capability_webusb_descriptor {
+struct usb_bos_capability_webusb_descriptor
+{
     uint16_t bcdVersion;
     uint8_t bVendorCode;
     uint8_t iLandingPage;
 } __PACKED;
 
 /* BOS Capability extension Descriptor*/
-struct usb_bos_capability_extension_descriptor {
+struct usb_bos_capability_extension_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDevCapabilityType;
@@ -590,7 +613,8 @@ struct usb_bos_capability_extension_descriptor {
 * https://github.com/sowbug/weblight/blob/master/firmware/webusb.c
 * (BSD-2) Thanks http://janaxelson.com/files/ms_os_20_descriptors.c
 */
-struct usb_bos_capability_platform_msosv2_descriptor {
+struct usb_bos_capability_platform_msosv2_descriptor
+{
     struct usb_bos_capability_platform_descriptor platform_msos;
     struct usb_bos_capability_msosv2_descriptor data_msosv2;
 } __PACKED;
@@ -598,38 +622,44 @@ struct usb_bos_capability_platform_msosv2_descriptor {
 /* WebUSB Platform Capability Descriptor:
 * https://wicg.github.io/webusb/#webusb-platform-capability-descriptor
 */
-struct usb_bos_capability_platform_webusb_descriptor {
+struct usb_bos_capability_platform_webusb_descriptor
+{
     struct usb_bos_capability_platform_descriptor platform_webusb;
     struct usb_bos_capability_webusb_descriptor data_webusb;
 } __PACKED;
 
-struct usb_webusb_url_descriptor {
+struct usb_webusb_url_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bScheme;
     char URL[];
 } __PACKED;
 
-struct usb_webusb_url_ex_descriptor {
+struct usb_webusb_url_ex_descriptor
+{
     uint8_t vendor_code;
     uint8_t *string;
     uint32_t string_len;
 } __PACKED;
 
-struct usb_bos_descriptor {
+struct usb_bos_descriptor
+{
     uint8_t *string;
     uint32_t string_len;
 };
 
 /* USB Device Capability Descriptor */
-struct usb_device_capability_descriptor {
+struct usb_device_capability_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDevCapabilityType;
 } __PACKED;
 
 /** USB descriptor header */
-struct usb_desc_header {
+struct usb_desc_header
+{
     uint8_t bLength;         /**< descriptor length */
     uint8_t bDescriptorType; /**< descriptor type */
 };

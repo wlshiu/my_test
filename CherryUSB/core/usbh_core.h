@@ -45,13 +45,13 @@ extern "C" {
 #endif
 
 static inline void usbh_control_urb_fill(struct usbh_urb *urb,
-                                         usbh_pipe_t pipe,
-                                         struct usb_setup_packet *setup,
-                                         uint8_t *transfer_buffer,
-                                         uint32_t transfer_buffer_length,
-                                         uint32_t timeout,
-                                         usbh_complete_callback_t complete,
-                                         void *arg)
+        usbh_pipe_t pipe,
+        struct usb_setup_packet *setup,
+        uint8_t *transfer_buffer,
+        uint32_t transfer_buffer_length,
+        uint32_t timeout,
+        usbh_complete_callback_t complete,
+        void *arg)
 {
     urb->pipe = pipe;
     urb->setup = setup;
@@ -96,7 +96,8 @@ static inline void usbh_int_urb_fill(struct usbh_urb *urb,
     urb->arg = arg;
 }
 
-struct usbh_class_info {
+struct usbh_class_info
+{
     uint8_t match_flags; /* Used for product specific matches; range is inclusive */
     uint8_t class;       /* Base device class code */
     uint8_t subclass;    /* Sub-class, depends on base class. Eg. */
@@ -107,22 +108,26 @@ struct usbh_class_info {
 };
 
 struct usbh_hubport;
-struct usbh_class_driver {
+struct usbh_class_driver
+{
     const char *driver_name;
     int (*connect)(struct usbh_hubport *hport, uint8_t intf);
     int (*disconnect)(struct usbh_hubport *hport, uint8_t intf);
 };
 
-struct usbh_endpoint {
+struct usbh_endpoint
+{
     struct usb_endpoint_descriptor ep_desc;
 };
 
-struct usbh_interface_altsetting {
+struct usbh_interface_altsetting
+{
     struct usb_interface_descriptor intf_desc;
     struct usbh_endpoint ep[CONFIG_USBHOST_MAX_ENDPOINTS];
 };
 
-struct usbh_interface {
+struct usbh_interface
+{
     char devname[CONFIG_USBHOST_DEV_NAMELEN];
     struct usbh_class_driver *class_driver;
     void *priv;
@@ -130,12 +135,14 @@ struct usbh_interface {
     uint8_t altsetting_num;
 };
 
-struct usbh_configuration {
+struct usbh_configuration
+{
     struct usb_configuration_descriptor config_desc;
     struct usbh_interface intf[CONFIG_USBHOST_MAX_INTERFACES];
 };
 
-struct usbh_hubport {
+struct usbh_hubport
+{
     bool connected;   /* True: device connected; false: disconnected */
     uint8_t port;     /* Hub port index */
     uint8_t dev_addr; /* device address */
@@ -154,7 +161,8 @@ struct usbh_hubport {
 #endif
 };
 
-struct usbh_hub {
+struct usbh_hub
+{
     usb_slist_t list;
     bool connected;
     bool is_roothub;

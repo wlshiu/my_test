@@ -39,7 +39,8 @@ int usb_osal_sem_give(usb_osal_sem_t sem)
     int ret;
 
     ret = xSemaphoreGiveFromISR((SemaphoreHandle_t)sem, &xHigherPriorityTaskWoken);
-    if (ret == pdPASS) {
+    if (ret == pdPASS)
+    {
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
 
@@ -77,7 +78,8 @@ int usb_osal_mq_send(usb_osal_mq_t mq, uintptr_t addr)
     int ret;
 
     ret = xQueueSendFromISR((usb_osal_mq_t)mq, &addr, &xHigherPriorityTaskWoken);
-    if (ret == pdPASS) {
+    if (ret == pdPASS)
+    {
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
 

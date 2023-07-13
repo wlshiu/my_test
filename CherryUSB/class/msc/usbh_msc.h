@@ -9,7 +9,8 @@
 #include "usb_msc.h"
 #include "usb_scsi.h"
 
-struct usbh_msc {
+struct usbh_msc
+{
     struct usbh_hubport *hport;
 
     uint8_t intf; /* Data interface number */

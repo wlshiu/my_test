@@ -406,7 +406,8 @@
 #define MTP_SESSION_CLOSED 0x00
 #define MTP_SESSION_OPENED 0x01
 
-struct mtp_container_command {
+struct mtp_container_command
+{
     uint32_t conlen;
     uint16_t contype;
     uint16_t code;
@@ -418,7 +419,8 @@ struct mtp_container_command {
     uint32_t param5;
 } __PACKED;
 
-struct mtp_container_data {
+struct mtp_container_data
+{
     uint32_t conlen;
     uint16_t contype;
     uint16_t code;
@@ -426,7 +428,8 @@ struct mtp_container_data {
     uint8_t data[512];
 } __PACKED;
 
-struct mtp_container_response {
+struct mtp_container_response
+{
     uint32_t conlen;
     uint16_t contype;
     uint16_t code;

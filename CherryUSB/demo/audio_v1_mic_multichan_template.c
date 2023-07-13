@@ -11,9 +11,9 @@
 #define USBD_LANGID_STRING 1033
 
 #ifdef CONFIG_USB_HS
-#define EP_INTERVAL 0x04
+    #define EP_INTERVAL 0x04
 #else
-#define EP_INTERVAL 0x01
+    #define EP_INTERVAL 0x01
 #endif
 
 #define AUDIO_IN_EP 0x81
@@ -24,29 +24,29 @@
 #define IN_CHANNEL_NUM 1
 
 #if IN_CHANNEL_NUM == 1
-#define INPUT_CTRL      0x03, 0x03
-#define INPUT_CH_ENABLE 0x0000
+    #define INPUT_CTRL      0x03, 0x03
+    #define INPUT_CH_ENABLE 0x0000
 #elif IN_CHANNEL_NUM == 2
-#define INPUT_CTRL      0x03, 0x03, 0x03
-#define INPUT_CH_ENABLE 0x0003
+    #define INPUT_CTRL      0x03, 0x03, 0x03
+    #define INPUT_CH_ENABLE 0x0003
 #elif IN_CHANNEL_NUM == 3
-#define INPUT_CTRL      0x03, 0x03, 0x03, 0x03
-#define INPUT_CH_ENABLE 0x0007
+    #define INPUT_CTRL      0x03, 0x03, 0x03, 0x03
+    #define INPUT_CH_ENABLE 0x0007
 #elif IN_CHANNEL_NUM == 4
-#define INPUT_CTRL      0x03, 0x03, 0x03, 0x03, 0x03
-#define INPUT_CH_ENABLE 0x000f
+    #define INPUT_CTRL      0x03, 0x03, 0x03, 0x03, 0x03
+    #define INPUT_CH_ENABLE 0x000f
 #elif IN_CHANNEL_NUM == 5
-#define INPUT_CTRL      0x03, 0x03, 0x03, 0x03, 0x03, 0x03
-#define INPUT_CH_ENABLE 0x001f
+    #define INPUT_CTRL      0x03, 0x03, 0x03, 0x03, 0x03, 0x03
+    #define INPUT_CH_ENABLE 0x001f
 #elif IN_CHANNEL_NUM == 6
-#define INPUT_CTRL      0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03
-#define INPUT_CH_ENABLE 0x003F
+    #define INPUT_CTRL      0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03
+    #define INPUT_CH_ENABLE 0x003F
 #elif IN_CHANNEL_NUM == 7
-#define INPUT_CTRL      0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03
-#define INPUT_CH_ENABLE 0x007f
+    #define INPUT_CTRL      0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03
+    #define INPUT_CH_ENABLE 0x007f
 #elif IN_CHANNEL_NUM == 8
-#define INPUT_CTRL      0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03
-#define INPUT_CH_ENABLE 0x00ff
+    #define INPUT_CTRL      0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03
+    #define INPUT_CH_ENABLE 0x00ff
 #endif
 
 /* AudioFreq * DataSize (2 bytes) * NumChannels (Stereo: 1) */
@@ -65,7 +65,8 @@
                       AUDIO_SIZEOF_AC_FEATURE_UNIT_DESC(IN_CHANNEL_NUM, 1) + \
                       AUDIO_SIZEOF_AC_OUTPUT_TERMINAL_DESC)
 
-const uint8_t audio_descriptor[] = {
+const uint8_t audio_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0xef, 0x02, 0x01, USBD_VID, USBD_PID, 0x0001, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_AUDIO_CONFIG_DESC_SIZ, 0x02, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
     AUDIO_AC_DESCRIPTOR_INIT(0x00, 0x02, AUDIO_AC_SIZ, 0x00, 0x01),
@@ -172,7 +173,8 @@ void usbd_audio_iso_callback(uint8_t ep, uint32_t nbytes)
     ep_tx_busy_flag = false;
 }
 
-static struct usbd_endpoint audio_in_ep = {
+static struct usbd_endpoint audio_in_ep =
+{
     .ep_cb = usbd_audio_iso_callback,
     .ep_addr = AUDIO_IN_EP
 };
@@ -196,13 +198,17 @@ USB_NOCACHE_RAM_SECTION USB_MEM_ALIGNX uint8_t write_buffer[AUDIO_IN_PACKET];
 
 void audio_test()
 {
-    while (1) {
-        if (tx_flag) {
+    while (1)
+    {
+        if (tx_flag)
+        {
             memset(write_buffer, 'a', AUDIO_IN_PACKET);
             ep_tx_busy_flag = true;
             usbd_ep_start_write(AUDIO_IN_EP, write_buffer, AUDIO_IN_PACKET);
-            while (ep_tx_busy_flag) {
-                if (tx_flag == false) {
+            while (ep_tx_busy_flag)
+            {
+                if (tx_flag == false)
+                {
                     break;
                 }
             }

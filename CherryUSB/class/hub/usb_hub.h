@@ -93,7 +93,8 @@
 #define HUB_CHAR_PORTIND         (1 << 7) /* Bit 7: Port Indicators Supported */
 
 /* Hub descriptor */
-struct usb_hub_descriptor {
+struct usb_hub_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bNbrPorts;
@@ -107,13 +108,15 @@ struct usb_hub_descriptor {
 #define USB_SIZEOF_HUB_DESC 9
 
 /* Hub status */
-struct hub_status {
+struct hub_status
+{
     uint16_t wPortStatus;
     uint16_t wPortChange;
 };
 
 /* Hub port status */
-struct hub_port_status {
+struct hub_port_status
+{
     uint16_t wPortStatus;
     uint16_t wPortChange;
 };

@@ -20,7 +20,8 @@ typedef void *usbh_pipe_t;
  *
  * Structure containing the USB endpoint configuration.
  */
-struct usbh_endpoint_cfg {
+struct usbh_endpoint_cfg
+{
     struct usbh_hubport *hport;
     uint8_t ep_addr;     /* Endpoint addr with direction */
     uint8_t ep_type;     /* Endpoint type */
@@ -34,7 +35,8 @@ struct usbh_endpoint_cfg {
  *
  * Structure containing the USB Iso configuration.
  */
-struct usbh_iso_frame_packet {
+struct usbh_iso_frame_packet
+{
     uint8_t *transfer_buffer;
     uint32_t transfer_buffer_length;
     uint32_t actual_length;
@@ -46,7 +48,8 @@ struct usbh_iso_frame_packet {
  *
  * Structure containing the USB Urb configuration.
  */
-struct usbh_urb {
+struct usbh_urb
+{
     usbh_pipe_t pipe;
     struct usb_setup_packet *setup;
     uint8_t *transfer_buffer;

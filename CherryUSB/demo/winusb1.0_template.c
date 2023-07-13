@@ -3,7 +3,8 @@
 
 #define WCID_VENDOR_CODE 0x17
 
-__ALIGN_BEGIN const uint8_t WCID_StringDescriptor_MSOS[18] __ALIGN_END = {
+__ALIGN_BEGIN const uint8_t WCID_StringDescriptor_MSOS[18] __ALIGN_END =
+{
     ///////////////////////////////////////
     /// MS OS string descriptor
     ///////////////////////////////////////
@@ -16,7 +17,8 @@ __ALIGN_BEGIN const uint8_t WCID_StringDescriptor_MSOS[18] __ALIGN_END = {
     0x00,                                       /* bReserved */
 };
 
-__ALIGN_BEGIN const uint8_t WINUSB_WCIDDescriptor[40] __ALIGN_END = {
+__ALIGN_BEGIN const uint8_t WINUSB_WCIDDescriptor[40] __ALIGN_END =
+{
     ///////////////////////////////////////
     /// WCID descriptor
     ///////////////////////////////////////
@@ -38,7 +40,8 @@ __ALIGN_BEGIN const uint8_t WINUSB_WCIDDescriptor[40] __ALIGN_END = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,             /* bReserved_6 */
 };
 
-__ALIGN_BEGIN const uint8_t WINUSB_IF0_WCIDProperties[142] __ALIGN_END = {
+__ALIGN_BEGIN const uint8_t WINUSB_IF0_WCIDProperties[142] __ALIGN_END =
+{
     ///////////////////////////////////////
     /// WCID property descriptor
     ///////////////////////////////////////
@@ -73,7 +76,8 @@ __ALIGN_BEGIN const uint8_t WINUSB_IF0_WCIDProperties[142] __ALIGN_END = {
     '6', 0x00, '}', 0x00, 0x00, 0x00,           /* wcData_39 */
 };
 
-struct usb_msosv1_descriptor msosv1_desc = {
+struct usb_msosv1_descriptor msosv1_desc =
+{
     .string = (uint8_t *)WCID_StringDescriptor_MSOS,
     .string_len = 18,
     .vendor_code = WCID_VENDOR_CODE,
@@ -94,12 +98,13 @@ struct usb_msosv1_descriptor msosv1_desc = {
 #define USB_CONFIG_SIZE (9 + 9 + 7 + 7)
 
 #ifdef CONFIG_USB_HS
-#define WINUSB_EP_MPS 512
+    #define WINUSB_EP_MPS 512
 #else
-#define WINUSB_EP_MPS 64
+    #define WINUSB_EP_MPS 64
 #endif
 
-const uint8_t winusb_descriptor[] = {
+const uint8_t winusb_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0xff, 0xff, 0xff, USBD_VID, USBD_PID, 0x0001, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_CONFIG_SIZE, 0x01, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
     USB_INTERFACE_DESCRIPTOR_INIT(0x00, 0x00, 0x02, 0xff, 0x01, 0x00, 0x02),
@@ -208,20 +213,25 @@ void usbd_winusb_in(uint8_t ep, uint32_t nbytes)
 {
     USB_LOG_RAW("actual in len:%d\r\n", nbytes);
 
-    if ((nbytes % CDC_MAX_MPS) == 0 && nbytes) {
+    if ((nbytes % CDC_MAX_MPS) == 0 && nbytes)
+    {
         /* send zlp */
         usbd_ep_start_write(CDC_IN_EP, NULL, 0);
-    } else {
+    }
+    else
+    {
         ep_tx_busy_flag = false;
     }
 }
 
-struct usbd_endpoint winusb_out_ep = {
+struct usbd_endpoint winusb_out_ep =
+{
     .ep_addr = WINUSB_OUT_EP,
     .ep_cb = usbd_winusb_out
 };
 
-struct usbd_endpoint winusb_in_ep = {
+struct usbd_endpoint winusb_in_ep =
+{
     .ep_addr = WINUSB_IN_EP,
     .ep_cb = usbd_winusb_in
 };

@@ -15,7 +15,7 @@
 #define USB_DBG_LOG     3
 
 #ifndef USB_DBG_TAG
-#define USB_DBG_TAG "USB"
+    #define USB_DBG_TAG "USB"
 #endif
 /*
  * The color for terminal (foreground)
@@ -50,27 +50,27 @@
     } while (0)
 
 #if (CONFIG_USB_DBG_LEVEL >= USB_DBG_LOG)
-#define USB_LOG_DBG(fmt, ...) usb_dbg_log_line("Dbg", 0, fmt, ##__VA_ARGS__)
+    #define USB_LOG_DBG(fmt, ...) usb_dbg_log_line("Dbg", 0, fmt, ##__VA_ARGS__)
 #else
-#define USB_LOG_DBG(...)  {}
+    #define USB_LOG_DBG(...)  {}
 #endif
 
 #if (CONFIG_USB_DBG_LEVEL >= USB_DBG_INFO)
-#define USB_LOG_INFO(fmt, ...) usb_dbg_log_line("Info", 32, fmt, ##__VA_ARGS__)
+    #define USB_LOG_INFO(fmt, ...) usb_dbg_log_line("Info", 32, fmt, ##__VA_ARGS__)
 #else
-#define USB_LOG_INFO(...) {}
+    #define USB_LOG_INFO(...) {}
 #endif
 
 #if (CONFIG_USB_DBG_LEVEL >= USB_DBG_WARNING)
-#define USB_LOG_WRN(fmt, ...) usb_dbg_log_line("Warm", 33, fmt, ##__VA_ARGS__)
+    #define USB_LOG_WRN(fmt, ...) usb_dbg_log_line("Warm", 33, fmt, ##__VA_ARGS__)
 #else
-#define USB_LOG_WRN(...) {}
+    #define USB_LOG_WRN(...) {}
 #endif
 
 #if (CONFIG_USB_DBG_LEVEL >= USB_DBG_ERROR)
-#define USB_LOG_ERR(fmt, ...) usb_dbg_log_line("Err", 31, fmt, ##__VA_ARGS__)
+    #define USB_LOG_ERR(fmt, ...) usb_dbg_log_line("Err", 31, fmt, ##__VA_ARGS__)
 #else
-#define USB_LOG_ERR(...) {}
+    #define USB_LOG_ERR(...) {}
 #endif
 
 #define USB_LOG_RAW(...) CONFIG_USB_PRINTF(__VA_ARGS__)

@@ -11,9 +11,9 @@
 #define USBD_LANGID_STRING 1033
 
 #ifdef CONFIG_USB_HS
-#define EP_INTERVAL 0x04
+    #define EP_INTERVAL 0x04
 #else
-#define EP_INTERVAL 0x01
+    #define EP_INTERVAL 0x01
 #endif
 
 #define AUDIO_IN_EP  0x81
@@ -53,7 +53,8 @@
                       AUDIO_SIZEOF_AC_FEATURE_UNIT_DESC(2, 1) + \
                       AUDIO_SIZEOF_AC_OUTPUT_TERMINAL_DESC)
 
-const uint8_t audio_descriptor[] = {
+const uint8_t audio_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0xef, 0x02, 0x01, USBD_VID, USBD_PID, 0x0001, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_AUDIO_CONFIG_DESC_SIZ, 0x03, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
     AUDIO_AC_DESCRIPTOR_INIT(0x00, 0x03, AUDIO_AC_SIZ, 0x00, 0x01, 0x02),
@@ -149,22 +150,28 @@ volatile bool rx_flag = 0;
 
 void usbd_audio_open(uint8_t intf)
 {
-    if (intf == 1) {
+    if (intf == 1)
+    {
         rx_flag = 1;
         /* setup first out ep read transfer */
         usbd_ep_start_read(AUDIO_OUT_EP, out_buffer, AUDIO_OUT_PACKET);
         printf("OPEN1\r\n");
-    } else {
+    }
+    else
+    {
         tx_flag = 1;
         printf("OPEN2\r\n");
     }
 }
 void usbd_audio_close(uint8_t intf)
 {
-    if (intf == 1) {
+    if (intf == 1)
+    {
         rx_flag = 1;
         printf("CLOSE1\r\n");
-    } else {
+    }
+    else
+    {
         tx_flag = 0;
         printf("CLOSE2\r\n");
     }
@@ -188,12 +195,14 @@ void usbd_audio_in_callback(uint8_t ep, uint32_t nbytes)
     ep_tx_busy_flag = false;
 }
 
-static struct usbd_endpoint audio_in_ep = {
+static struct usbd_endpoint audio_in_ep =
+{
     .ep_cb = usbd_audio_in_callback,
     .ep_addr = AUDIO_IN_EP
 };
 
-static struct usbd_endpoint audio_out_ep = {
+static struct usbd_endpoint audio_out_ep =
+{
     .ep_cb = usbd_audio_out_callback,
     .ep_addr = AUDIO_OUT_EP
 };
@@ -219,13 +228,17 @@ void audio_init()
 
 void audio_test()
 {
-    while (1) {
-        if (tx_flag) {
+    while (1)
+    {
+        if (tx_flag)
+        {
             memset(write_buffer, 'a', AUDIO_IN_PACKET);
             ep_tx_busy_flag = true;
             usbd_ep_start_write(AUDIO_IN_EP, write_buffer, AUDIO_IN_PACKET);
-            while (ep_tx_busy_flag) {
-                if (tx_flag == false) {
+            while (ep_tx_busy_flag)
+            {
+                if (tx_flag == false)
+                {
                     break;
                 }
             }

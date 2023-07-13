@@ -8,7 +8,8 @@
 
 #include "usb_audio.h"
 
-struct usbh_audio_format_type {
+struct usbh_audio_format_type
+{
     uint8_t channels;
     uint8_t format_type;
     uint8_t bitresolution;
@@ -23,7 +24,8 @@ struct usbh_audio_format_type {
  *
  *
 */
-struct usbh_audio_module {
+struct usbh_audio_module
+{
     const char *name;
     uint8_t data_intf;
     uint8_t input_terminal_id;
@@ -38,7 +40,8 @@ struct usbh_audio_module {
     struct usbh_audio_format_type altsetting[CONFIG_USBHOST_MAX_INTF_ALTSETTINGS];
 };
 
-struct usbh_audio {
+struct usbh_audio
+{
     struct usbh_hubport *hport;
 
     uint8_t ctrl_intf; /* interface number */

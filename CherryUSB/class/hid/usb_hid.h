@@ -220,17 +220,17 @@
 #define HID_USAGE_PAGE_TELEPHONY       0x0b /* Telephony */
 #define HID_USAGE_PAGE_CONSUMER        0x0c /* Consumer */
 #define HID_USAGE_PAGE_DIGITIZER       0x0d /* Digitizer */
-                                            /* 0x0e Reserved */
+/* 0x0e Reserved */
 #define HID_USAGE_PAGE_PIDPAGE 0x0f         /* PID Page  Physical Interface Device */
 #define HID_USAGE_PAGE_UNICODE 0x10         /* Unicode */
-                                            /* 0x11-13 Reserved */
+/* 0x11-13 Reserved */
 #define HID_USAGE_PAGE_ALPHA_DISPLAY 0x14   /* Alphanumeric Display */
-                                            /* 0x15-3f Reserved */
+/* 0x15-3f Reserved */
 #define HID_USAGE_PAGE_MEDICAL 0x40         /* Medical Instruments */
-                                            /* 0x41-7f Reserved */
-                                            /* 0x80-83 Monitor Devices */
-                                            /* 0x84-87 Power Devices */
-                                            /* 0x88-8b Reserved */
+/* 0x41-7f Reserved */
+/* 0x80-83 Monitor Devices */
+/* 0x84-87 Power Devices */
+/* 0x88-8b Reserved */
 #define HID_USAGE_PAGE_BARCODE_SCANNER 0x8c /* Bar Code Scanner page */
 #define HID_USAGE_PAGE_SCALE           0x8d /* Scale page */
 #define HID_USAGE_PAGE_MSR             0x8e /* Magnetic Stripe Reading (MSR) Devices */
@@ -241,14 +241,14 @@
 #define HID_DESKTOP_USAGE_UNDEFINED 0x00        /* Undefined */
 #define HID_DESKTOP_USAGE_POINTER   0x01        /* Pointer */
 #define HID_DESKTOP_USAGE_MOUSE     0x02        /* Mouse */
-                                           /* 0x03 Reserved */
+/* 0x03 Reserved */
 #define HID_DESKTOP_USAGE_JOYSTICK  0x04        /* Joystick */
 #define HID_DESKTOP_USAGE_GAMEPAD   0x05        /* Game Pad */
 #define HID_DESKTOP_USAGE_KEYBOARD  0x06        /* Keyboard */
 #define HID_DESKTOP_USAGE_KEYPAD    0x07        /* Keypad */
 #define HID_DESKTOP_USAGE_MULTIAXIS 0x08        /* Multi-axis Controller */
 #define HID_DESKTOP_USAGE_TABLET    0x09        /* Tablet PC System Controls */
-                                           /* 0x0a-2f Reserved */
+/* 0x0a-2f Reserved */
 #define HID_DESKTOP_USAGE_X         0x30        /* X */
 #define HID_DESKTOP_USAGE_Y         0x31        /* Y */
 #define HID_DESKTOP_USAGE_Z         0x32        /* Z */
@@ -264,7 +264,7 @@
 #define HID_DESKTOP_USAGE_MOTION    0x3c        /* Motion Wakeup */
 #define HID_DESKTOP_USAGE_START     0x3d        /* Start */
 #define HID_DESKTOP_USAGE_SELECT    0x3e        /* Select */
-                                           /* 0x3f Reserved */
+/* 0x3f Reserved */
 #define HID_DESKTOP_USAGE_VX         0x40       /* Vx */
 #define HID_DESKTOP_USAGE_VY         0x41       /* Vy */
 #define HID_DESKTOP_USAGE_VZ         0x42       /* Vz */
@@ -274,7 +274,7 @@
 #define HID_DESKTOP_USAGE_VNO        0x46       /* Vno */
 #define HID_DESKTOP_USAGE_FEATURE    0x47       /* Feature Notification */
 #define HID_DESKTOP_USAGE_RESOLUTION 0x48       /* Resolution Multiplier */
-                                           /* 0x49-7f Reserved */
+/* 0x49-7f Reserved */
 #define HID_DESKTOP_USAGE_CONTROL      0x80     /* System Control */
 #define HID_DESKTOP_USAGE_POWERDOWN    0x81     /* System Power Down */
 #define HID_DESKTOP_USAGE_SLEEP        0x82     /* System Sleep */
@@ -295,7 +295,7 @@
 #define HID_DESKTOP_USAGE_DPAD_DOWN    0x91     /* D-pad Down */
 #define HID_DESKTOP_USAGE_DPAD_RIGHT   0x92     /* D-pad Right */
 #define HID_DESKTOP_USAGE_DPAD_LEFT    0x93     /* D-pad Left */
-                                           /* 0x94-9f Reserved */
+/* 0x94-9f Reserved */
 #define HID_DESKTOP_USAGE_DOCK            0xa0  /* System Dock */
 #define HID_DESKTOP_USAGE_UNDOCK          0xa1  /* System Undock */
 #define HID_DESKTOP_USAGE_SETUP           0xa2  /* System Setup */
@@ -305,7 +305,7 @@
 #define HID_DESKTOP_USAGE_APP_DEBUG_BREAK 0xa6  /* Application Debugger Break */
 #define HID_DESKTOP_USAGE_MUTE            0xa7  /* System Speaker Mute */
 #define HID_DESKTOP_USAGE_HIBERNATE       0xa8  /* System Hibernate */
-                                           /* 0xa9-af Reserved */
+/* 0xa9-af Reserved */
 #define HID_DESKTOP_USAGE_DISPLAY_INVERT   0xb0 /* System Display Invert */
 #define HID_DESKTOP_USAGE_DISPALY_INTERNAL 0xb1 /* System Display Internal */
 #define HID_DESKTOP_USAGE_DISPLAY_EXTERNAL 0xb2 /* System Display External */
@@ -314,7 +314,7 @@
 #define HID_DESKTOP_USAGE_DISPLAY_TOGGLE   0xb5 /* System Display Toggle Int/Ext */
 #define HID_DESKTOP_USAGE_DISPLAY_SWAP     0xb6 /* System Display Swap */
 #define HID_DESKTOP_USAGE_                 0xb7 /* System Display LCD Autoscale */
-                                           /* 0xb8-ffff Reserved */
+/* 0xb8-ffff Reserved */
 
 /* Keyboard usage IDs (HuT 10) */
 #define HID_KBD_USAGE_NONE            0x00 /* Reserved (no event indicated) */
@@ -528,12 +528,14 @@
 #define HID_KBD_USAGE_MAX 0xe7
 
 /* HID Report Definitions */
-struct usb_hid_class_subdescriptor {
+struct usb_hid_class_subdescriptor
+{
     uint8_t bDescriptorType;/* Class descriptor type (See 7.1) */
     uint16_t wDescriptorLength;/* Size of the report descriptor */
 } __PACKED;
 
-struct usb_hid_descriptor {
+struct usb_hid_descriptor
+{
     uint8_t bLength; /* Size of the HID descriptor */
     uint8_t bDescriptorType;/* HID descriptor type */
     uint16_t bcdHID;/* HID class specification release */
@@ -552,9 +554,9 @@ struct usb_hid_descriptor {
 /* Keyboard input report (8 bytes) (HID B.1) */
 struct usb_hid_kbd_report
 {
-  uint8_t modifier;  /* Modifier keys. See HID_MODIFER_* definitions */
-  uint8_t reserved;
-  uint8_t key[6];    /* Keycode 1-6 */
+    uint8_t modifier;  /* Modifier keys. See HID_MODIFER_* definitions */
+    uint8_t reserved;
+    uint8_t key[6];    /* Keycode 1-6 */
 };
 
 /* Keyboard output report (1 byte) (HID B.1),
@@ -564,22 +566,22 @@ struct usb_hid_kbd_report
 /* Mouse input report (HID B.2) */
 struct usb_hid_mouse_report
 {
-  uint8_t buttons;   /* See HID_MOUSE_INPUT_BUTTON_* definitions */
-  uint8_t xdisp;     /* X displacement */
-  uint8_t ydisp;     /* y displacement */
-                     /* Device specific additional bytes may follow */
+    uint8_t buttons;   /* See HID_MOUSE_INPUT_BUTTON_* definitions */
+    uint8_t xdisp;     /* X displacement */
+    uint8_t ydisp;     /* y displacement */
+    /* Device specific additional bytes may follow */
 #ifdef CONFIG_INPUT_MOUSE_WHEEL
-  uint8_t wdisp;     /* Wheel displacement */
+    uint8_t wdisp;     /* Wheel displacement */
 #endif
 };
 
 /* Joystick input report (1 bytes) (HID D.1) */
 struct usb_hid_js_report
 {
-  uint8_t xpos;      /* X position */
-  uint8_t ypos;      /* X position */
-  uint8_t buttons;   /* See USBHID_JSIN_* definitions */
-  uint8_t throttle;  /* Throttle */
+    uint8_t xpos;      /* X position */
+    uint8_t ypos;      /* X position */
+    uint8_t buttons;   /* See USBHID_JSIN_* definitions */
+    uint8_t throttle;  /* Throttle */
 };
 
 #endif /* USB_HID_H */

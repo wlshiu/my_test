@@ -8,7 +8,8 @@
 
 #include "usb_cdc.h"
 
-struct usbh_rndis {
+struct usbh_rndis
+{
     struct usbh_hubport *hport;
 
     uint8_t ctrl_intf; /* Control interface number */

@@ -8,7 +8,8 @@
 
 #include "usb_mtp.h"
 
-struct usbh_mtp {
+struct usbh_mtp
+{
     struct usbh_hubport *hport;
 
     uint8_t intf;          /* interface number */

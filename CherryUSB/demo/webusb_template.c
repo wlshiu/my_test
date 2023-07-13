@@ -11,7 +11,8 @@
 #define URL_DESCRIPTOR_LENGTH 0x2C
 
 // 描述符集信息
-const uint8_t MS_OS_20_DESCRIPTOR_SET[MS_OS_20_DESCRIPTOR_LENGTH] = {
+const uint8_t MS_OS_20_DESCRIPTOR_SET[MS_OS_20_DESCRIPTOR_LENGTH] =
+{
     // Microsoft OS 2.0 描述符集标头
     0x0A, 0x00,                       // Descriptor size (10 bytes)
     0x00, 0x00,                       // MS OS 2.0 descriptor set header
@@ -57,14 +58,16 @@ const uint8_t MS_OS_20_DESCRIPTOR_SET[MS_OS_20_DESCRIPTOR_LENGTH] = {
     '8', 0x00, 'c', 0x00, '3', 0x00, 'a', 0x00, '1', 0x00, '9', 0x00, 'a', 0x00, '}', 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-const uint8_t USBD_WebUSBURLDescriptor[URL_DESCRIPTOR_LENGTH] = {
+const uint8_t USBD_WebUSBURLDescriptor[URL_DESCRIPTOR_LENGTH] =
+{
     URL_DESCRIPTOR_LENGTH,
     WEBUSB_URL_TYPE,
     WEBUSB_URL_SCHEME_HTTPS,
     WEBUSB_URL_STRINGS
 };
 
-struct usb_webusb_url_ex_descriptor webusb_url_desc = {
+struct usb_webusb_url_ex_descriptor webusb_url_desc =
+{
     .vendor_code = WL_REQUEST_WEBUSB,
     .string = MS_OS_20_DESCRIPTOR_SET,
     .string_len = MS_OS_20_DESCRIPTOR_LENGTH

@@ -7,137 +7,137 @@
 #define USB_UTIL_H
 
 #if defined(__CC_ARM)
-#ifndef __USED
-#define __USED __attribute__((used))
-#endif
-#ifndef __WEAK
-#define __WEAK __attribute__((weak))
-#endif
-#ifndef __PACKED
-#define __PACKED __attribute__((packed))
-#endif
-#ifndef __PACKED_STRUCT
-#define __PACKED_STRUCT __packed struct
-#endif
-#ifndef __PACKED_UNION
-#define __PACKED_UNION __packed union
-#endif
-#ifndef __ALIGNED
-#define __ALIGNED(x) __attribute__((aligned(x)))
-#endif
+    #ifndef __USED
+        #define __USED __attribute__((used))
+    #endif
+    #ifndef __WEAK
+        #define __WEAK __attribute__((weak))
+    #endif
+    #ifndef __PACKED
+        #define __PACKED __attribute__((packed))
+    #endif
+    #ifndef __PACKED_STRUCT
+        #define __PACKED_STRUCT __packed struct
+    #endif
+    #ifndef __PACKED_UNION
+        #define __PACKED_UNION __packed union
+    #endif
+    #ifndef __ALIGNED
+        #define __ALIGNED(x) __attribute__((aligned(x)))
+    #endif
 #elif defined(__GNUC__)
-#ifndef __USED
-#define __USED __attribute__((used))
-#endif
-#ifndef __WEAK
-#define __WEAK __attribute__((weak))
-#endif
-#ifndef __PACKED
-#define __PACKED __attribute__((packed, aligned(1)))
-#endif
-#ifndef __PACKED_STRUCT
-#define __PACKED_STRUCT struct __attribute__((packed, aligned(1)))
-#endif
-#ifndef __PACKED_UNION
-#define __PACKED_UNION union __attribute__((packed, aligned(1)))
-#endif
-#ifndef __ALIGNED
-#define __ALIGNED(x) __attribute__((aligned(x)))
-#endif
+    #ifndef __USED
+        #define __USED __attribute__((used))
+    #endif
+    #ifndef __WEAK
+        #define __WEAK __attribute__((weak))
+    #endif
+    #ifndef __PACKED
+        #define __PACKED __attribute__((packed, aligned(1)))
+    #endif
+    #ifndef __PACKED_STRUCT
+        #define __PACKED_STRUCT struct __attribute__((packed, aligned(1)))
+    #endif
+    #ifndef __PACKED_UNION
+        #define __PACKED_UNION union __attribute__((packed, aligned(1)))
+    #endif
+    #ifndef __ALIGNED
+        #define __ALIGNED(x) __attribute__((aligned(x)))
+    #endif
 #elif defined(__ICCARM__) || defined(__ICCRX__)
-#ifndef __USED
-#if __ICCARM_V8
-#define __USED __attribute__((used))
-#else
-#define __USED __root
-#endif
-#endif
+    #ifndef __USED
+        #if __ICCARM_V8
+            #define __USED __attribute__((used))
+        #else
+            #define __USED __root
+        #endif
+    #endif
 
-#ifndef __WEAK
-#if __ICCARM_V8
-#define __WEAK __attribute__((weak))
-#else
-#define __WEAK _Pragma("__weak")
-#endif
-#endif
+    #ifndef __WEAK
+        #if __ICCARM_V8
+            #define __WEAK __attribute__((weak))
+        #else
+            #define __WEAK _Pragma("__weak")
+        #endif
+    #endif
 
-#ifndef __PACKED
-#if __ICCARM_V8
-#define __PACKED __attribute__((packed, aligned(1)))
-#else
-/* Needs IAR language extensions */
-#define __PACKED __packed
-#endif
-#endif
+    #ifndef __PACKED
+        #if __ICCARM_V8
+            #define __PACKED __attribute__((packed, aligned(1)))
+        #else
+            /* Needs IAR language extensions */
+            #define __PACKED __packed
+        #endif
+    #endif
 
-#ifndef __PACKED_STRUCT
-#if __ICCARM_V8
-#define __PACKED_STRUCT struct __attribute__((packed, aligned(1)))
-#else
-/* Needs IAR language extensions */
-#define __PACKED_STRUCT __packed struct
-#endif
-#endif
+    #ifndef __PACKED_STRUCT
+        #if __ICCARM_V8
+            #define __PACKED_STRUCT struct __attribute__((packed, aligned(1)))
+        #else
+            /* Needs IAR language extensions */
+            #define __PACKED_STRUCT __packed struct
+        #endif
+    #endif
 
-#ifndef __PACKED_UNION
-#if __ICCARM_V8
-#define __PACKED_UNION union __attribute__((packed, aligned(1)))
-#else
-/* Needs IAR language extensions */
-#define __PACKED_UNION __packed union
-#endif
-#endif
+    #ifndef __PACKED_UNION
+        #if __ICCARM_V8
+            #define __PACKED_UNION union __attribute__((packed, aligned(1)))
+        #else
+            /* Needs IAR language extensions */
+            #define __PACKED_UNION __packed union
+        #endif
+    #endif
 
-#ifndef __ALIGNED
-#if __ICCARM_V8
-#define __ALIGNED(x) __attribute__((aligned(x)))
-#elif (__VER__ >= 7080000)
-/* Needs IAR language extensions */
-#define __ALIGNED(x) __attribute__((aligned(x)))
-#else
-#warning No compiler specific solution for __ALIGNED.__ALIGNED is ignored.
-#define __ALIGNED(x)
-#endif
-#endif
+    #ifndef __ALIGNED
+        #if __ICCARM_V8
+            #define __ALIGNED(x) __attribute__((aligned(x)))
+        #elif (__VER__ >= 7080000)
+            /* Needs IAR language extensions */
+            #define __ALIGNED(x) __attribute__((aligned(x)))
+        #else
+            #warning No compiler specific solution for __ALIGNED.__ALIGNED is ignored.
+            #define __ALIGNED(x)
+        #endif
+    #endif
 
 #endif
 
 #ifndef __ALIGN_BEGIN
-#define __ALIGN_BEGIN
+    #define __ALIGN_BEGIN
 #endif
 #ifndef __ALIGN_END
-#define __ALIGN_END __attribute__((aligned(4)))
+    #define __ALIGN_END __attribute__((aligned(4)))
 #endif
 
 #ifndef ARG_UNUSED
-#define ARG_UNUSED(x) (void)(x)
+    #define ARG_UNUSED(x) (void)(x)
 #endif
 
 #ifndef LO_BYTE
-#define LO_BYTE(x) ((uint8_t)(x & 0x00FF))
+    #define LO_BYTE(x) ((uint8_t)(x & 0x00FF))
 #endif
 
 #ifndef HI_BYTE
-#define HI_BYTE(x) ((uint8_t)((x & 0xFF00) >> 8))
+    #define HI_BYTE(x) ((uint8_t)((x & 0xFF00) >> 8))
 #endif
 
 #ifndef MAX
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+    #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 
 #ifndef MIN
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+    #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
 #ifndef BCD
-#define BCD(x) ((((x) / 10) << 4) | ((x) % 10))
+    #define BCD(x) ((((x) / 10) << 4) | ((x) % 10))
 #endif
 
 #ifdef BIT
-#undef BIT
-#define BIT(n) (1UL << (n))
+    #undef BIT
+    #define BIT(n) (1UL << (n))
 #else
-#define BIT(n) (1UL << (n))
+    #define BIT(n) (1UL << (n))
 #endif
 
 #ifndef ARRAY_SIZE
@@ -146,10 +146,10 @@
 #endif
 
 #ifndef BSWAP16
-#define BSWAP16(u16) (__builtin_bswap16(u16))
+    #define BSWAP16(u16) (__builtin_bswap16(u16))
 #endif
 #ifndef BSWAP32
-#define BSWAP32(u32) (__builtin_bswap32(u32))
+    #define BSWAP32(u32) (__builtin_bswap32(u32))
 #endif
 
 #define GET_BE16(field) \
@@ -196,11 +196,11 @@
     _61, _62, _63, N, ...) N
 #define PP_RSEQ_N()                             \
     63, 62, 61, 60,                             \
-        59, 58, 57, 56, 55, 54, 53, 52, 51, 50, \
-        49, 48, 47, 46, 45, 44, 43, 42, 41, 40, \
-        39, 38, 37, 36, 35, 34, 33, 32, 31, 30, \
-        29, 28, 27, 26, 25, 24, 23, 22, 21, 20, \
-        19, 18, 17, 16, 15, 14, 13, 12, 11, 10, \
-        9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+    59, 58, 57, 56, 55, 54, 53, 52, 51, 50, \
+    49, 48, 47, 46, 45, 44, 43, 42, 41, 40, \
+    39, 38, 37, 36, 35, 34, 33, 32, 31, 30, \
+    29, 28, 27, 26, 25, 24, 23, 22, 21, 20, \
+    19, 18, 17, 16, 15, 14, 13, 12, 11, 10, \
+    9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 
 #endif /* USB_UTIL_H */

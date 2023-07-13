@@ -24,7 +24,8 @@
 #define MIDI_PITCHBEND_MAX 8191
 
 /*! Enumeration of MIDI types */
-enum MidiType {
+enum MidiType
+{
     InvalidType = 0x00,          ///< For notifying errors
     NoteOff = 0x80,              ///< Note Off
     NoteOn = 0x90,               ///< Note On
@@ -47,7 +48,8 @@ enum MidiType {
 };
 
 /*! Enumeration of Thru filter modes */
-enum MidiFilterMode {
+enum MidiFilterMode
+{
     Off = 0,              ///< Thru disabled (nothing passes through).
     Full = 1,             ///< Fully enabled Thru (every incoming message is sent back).
     SameChannel = 2,      ///< Only the messages on the Input Channel will be sent back.
@@ -58,7 +60,8 @@ enum MidiFilterMode {
  See the detailed controllers numbers & description here:
  http://www.somascape.org/midi/tech/spec.html#ctrlnums
  */
-enum MidiControlChangeNumber {
+enum MidiControlChangeNumber
+{
     // High resolution Continuous Controllers MSB (+32 for LSB) ----------------
     BankSelect = 0,
     ModulationWheel = 1,
@@ -123,7 +126,8 @@ enum MidiControlChangeNumber {
     PolyModeOn = 127
 };
 
-struct midi_cs_if_ac_header_descriptor {
+struct midi_cs_if_ac_header_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -135,7 +139,8 @@ struct midi_cs_if_ac_header_descriptor {
 
 #define MIDI_SIZEOF_AC_HEADER_DESC(n) (8 + n)
 
-struct midi_cs_if_ms_header_descriptor {
+struct midi_cs_if_ms_header_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -145,7 +150,8 @@ struct midi_cs_if_ms_header_descriptor {
 
 #define MIDI_SIZEOF_MS_HEADER_DESC (7)
 
-struct midi_cs_if_in_jack_descriptor {
+struct midi_cs_if_in_jack_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -156,7 +162,8 @@ struct midi_cs_if_in_jack_descriptor {
 
 #define MIDI_SIZEOF_IN_JACK_DESC (6)
 
-struct midi_cs_if_out_jack_descriptor {
+struct midi_cs_if_out_jack_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -170,7 +177,8 @@ struct midi_cs_if_out_jack_descriptor {
 
 #define MIDI_SIZEOF_OUT_JACK_DESC (9)
 
-struct midi_cs_ep_ms_general_descriptor {
+struct midi_cs_ep_ms_general_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;

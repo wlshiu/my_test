@@ -93,7 +93,8 @@
 #define DFU_MANIFEST_MASK (1U << 2)
 
 /** Run-Time Functional Descriptor */
-struct dfu_runtime_descriptor {
+struct dfu_runtime_descriptor
+{
     uint8_t bLength;         /**<\brief Descriptor length in bytes.*/
     uint8_t bDescriptorType; /**<\brief DFU functional descriptor type.*/
     uint8_t bmAttributes;    /**<\brief USB DFU capabilities \ref USB_DFU_CAPAB*/
@@ -103,7 +104,8 @@ struct dfu_runtime_descriptor {
 } __PACKED;
 
 /**\brief Payload packet to response in DFU_GETSTATUS request */
-struct dfu_info {
+struct dfu_info
+{
     uint8_t bStatus;       /**<\brief An indication of the status resulting from the
                                      * execution of the most recent request.*/
     uint8_t bPollTimeout;  /**<\brief Minimum time (LSB) in ms, that the host should wait

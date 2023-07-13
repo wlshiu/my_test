@@ -57,7 +57,8 @@ static int usbh_printer_connect(struct usbh_hubport *hport, uint8_t intf)
     int ret;
 
     struct usbh_printer *printer_class = usb_malloc(sizeof(struct usbh_printer));
-    if (printer_class == NULL) {
+    if (printer_class == NULL)
+    {
         USB_LOG_ERR("Fail to alloc printer_class\r\n");
         return -ENOMEM;
     }
@@ -69,12 +70,16 @@ static int usbh_printer_connect(struct usbh_hubport *hport, uint8_t intf)
 
     hport->config.intf[intf].priv = printer_class;
 
-    for (uint8_t i = 0; i < hport->config.intf[intf + 1].altsetting[0].intf_desc.bNumEndpoints; i++) {
+    for (uint8_t i = 0; i < hport->config.intf[intf + 1].altsetting[0].intf_desc.bNumEndpoints; i++)
+    {
         ep_desc = &hport->config.intf[intf + 1].altsetting[0].ep[i].ep_desc;
 
-        if (ep_desc->bEndpointAddress & 0x80) {
+        if (ep_desc->bEndpointAddress & 0x80)
+        {
             usbh_hport_activate_epx(&printer_class->bulkin, hport, ep_desc);
-        } else {
+        }
+        else
+        {
             usbh_hport_activate_epx(&printer_class->bulkout, hport, ep_desc);
         }
     }
@@ -94,16 +99,20 @@ static int usbh_printer_disconnect(struct usbh_hubport *hport, uint8_t intf)
 
     struct usbh_printer *printer_class = (struct usbh_printer *)hport->config.intf[intf].priv;
 
-    if (printer_class) {
-        if (printer_class->bulkin) {
+    if (printer_class)
+    {
+        if (printer_class->bulkin)
+        {
             usbh_pipe_free(printer_class->bulkin);
         }
 
-        if (printer_class->bulkout) {
+        if (printer_class->bulkout)
+        {
             usbh_pipe_free(printer_class->bulkout);
         }
 
-        if (hport->config.intf[intf].devname[0] != '\0') {
+        if (hport->config.intf[intf].devname[0] != '\0')
+        {
             USB_LOG_INFO("Unregister Printer Class:%s\r\n", hport->config.intf[intf].devname);
         }
 
@@ -114,13 +123,15 @@ static int usbh_printer_disconnect(struct usbh_hubport *hport, uint8_t intf)
     return ret;
 }
 
-static const struct usbh_class_driver printer_class_driver = {
+static const struct usbh_class_driver printer_class_driver =
+{
     .driver_name = "printer",
     .connect = usbh_printer_connect,
     .disconnect = usbh_printer_disconnect
 };
 
-CLASS_INFO_DEFINE const struct usbh_class_info printer_class_info = {
+CLASS_INFO_DEFINE const struct usbh_class_info printer_class_info =
+{
     .match_flags = USB_CLASS_MATCH_INTF_CLASS | USB_CLASS_MATCH_INTF_SUBCLASS | USB_CLASS_MATCH_INTF_PROTOCOL,
     .class = USB_DEVICE_CLASS_PRINTER,
     .subclass = PRINTER_SUBCLASS,

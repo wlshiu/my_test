@@ -36,7 +36,8 @@
 #define MSC_MAX_CDB_LEN (16) /* Max length of SCSI Command Data Block */
 
 /** MSC Bulk-Only Command Block Wrapper (CBW) */
-struct CBW {
+struct CBW
+{
     uint32_t dSignature;         /* 'USBC' = 0x43425355 */
     uint32_t dTag;               /* Depends on command id */
     uint32_t dDataLength;        /* Number of bytes that host expects to transfer */
@@ -49,7 +50,8 @@ struct CBW {
 #define USB_SIZEOF_MSC_CBW 31
 
 /** MSC Bulk-Only Command Status Wrapper (CSW) */
-struct CSW {
+struct CSW
+{
     uint32_t dSignature;   /* 'USBS' = 0x53425355 */
     uint32_t dTag;         /* Same tag as original command */
     uint32_t dDataResidue; /* Amount not transferred */

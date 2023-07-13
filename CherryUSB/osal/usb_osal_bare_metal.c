@@ -126,20 +126,20 @@ static void _usb_osal_mpool_init(uint32_t mpool_base, int mpool_len)
         total_size -= (addr - (uint32_t)mpool_base);
     }
 
-    pAlign_addr = (uint8_t*)addr;
+    pAlign_addr = (uint8_t *)addr;
 
-    g_blk_start.pNext_free_blk = (void*)pAlign_addr;
+    g_blk_start.pNext_free_blk = (void *)pAlign_addr;
     g_blk_start.blk_size       = 0ul;
 
     addr = ((uint32_t)pAlign_addr) + total_size;
     addr = (addr - g_link_hdr_size) & ~BYTE_ALIGN_MASK;
 
-    g_pBlk_end = (void*)addr;
+    g_pBlk_end = (void *)addr;
 
     g_pBlk_end->blk_size       = 0;
     g_pBlk_end->pNext_free_blk = 0;
 
-    pBlk_head = (blk_link_t*)pAlign_addr;
+    pBlk_head = (blk_link_t *)pAlign_addr;
 
     pBlk_head->blk_size       = addr - (uint32_t)pBlk_head;
     pBlk_head->pNext_free_blk = g_pBlk_end;
@@ -156,22 +156,22 @@ static void _usb_osal_add_blk_to_free_list(blk_link_t *pBlk)
     uint8_t     *pCur;
 
     for(pIterator = &g_blk_start;
-        pIterator->pNext_free_blk < pBlk;
-        pIterator = pIterator->pNext_free_blk)
+            pIterator->pNext_free_blk < pBlk;
+            pIterator = pIterator->pNext_free_blk)
     {
     }
 
-    pCur = (uint8_t*)pIterator;
+    pCur = (uint8_t *)pIterator;
 
-    if( (pCur + pIterator->blk_size) == (uint8_t*)pBlk )
+    if( (pCur + pIterator->blk_size) == (uint8_t *)pBlk )
     {
         pIterator->blk_size += pBlk->blk_size;
         pBlk                = pIterator;
     }
 
-    pCur = (uint8_t*)pBlk;
+    pCur = (uint8_t *)pBlk;
 
-    if( (pCur + pBlk->blk_size) == (uint8_t*)pIterator->pNext_free_blk )
+    if( (pCur + pBlk->blk_size) == (uint8_t *)pIterator->pNext_free_blk )
     {
         if( pIterator->pNext_free_blk == g_pBlk_end )
             pBlk->pNext_free_blk = g_pBlk_end;
@@ -257,7 +257,7 @@ usb_osal_sem_t usb_osal_sem_create(uint32_t initial_count)
 
 void usb_osal_sem_delete(usb_osal_sem_t sem)
 {
-    sys_vsem_t      *pSem = (sys_vsem_t*)sem;
+    sys_vsem_t      *pSem = (sys_vsem_t *)sem;
 
     pSem->used = 0;
     return;
@@ -265,7 +265,7 @@ void usb_osal_sem_delete(usb_osal_sem_t sem)
 
 int usb_osal_sem_take(usb_osal_sem_t sem, uint32_t timeout) // wait
 {
-    sys_vsem_t      *pSem = (sys_vsem_t*)sem;
+    sys_vsem_t      *pSem = (sys_vsem_t *)sem;
 #if 1
     while( pSem->cnt == 0 )
     {
@@ -281,7 +281,7 @@ int usb_osal_sem_take(usb_osal_sem_t sem, uint32_t timeout) // wait
 
 int usb_osal_sem_give(usb_osal_sem_t sem)   // post
 {
-    sys_vsem_t      *pSem = (sys_vsem_t*)sem;
+    sys_vsem_t      *pSem = (sys_vsem_t *)sem;
     pSem->cnt++;
     return (int)0;
 }
@@ -311,7 +311,8 @@ usb_osal_mq_t usb_osal_mq_create(uint32_t max_msgs)
 {
     rbuf_t      *pRBI = 0;
 
-    do {
+    do
+    {
         if( max_msgs > CONFIG_RBI_ELEM_MAX )
             break;
 
@@ -327,13 +328,14 @@ usb_osal_mq_t usb_osal_mq_create(uint32_t max_msgs)
             pRBI->tail     = 0;
             break;
         }
-    } while(0);
+    }
+    while(0);
     return (usb_osal_mq_t)pRBI;
 }
 
 int usb_osal_mq_send(usb_osal_mq_t mq, uintptr_t addr)
 {
-    rbuf_t          *pRBI = (rbuf_t*)mq;
+    rbuf_t          *pRBI = (rbuf_t *)mq;
     uint32_t        head = 0;
     uint32_t        tail = 0;
 
@@ -355,7 +357,7 @@ int usb_osal_mq_send(usb_osal_mq_t mq, uintptr_t addr)
 
 int usb_osal_mq_recv(usb_osal_mq_t mq, uintptr_t *addr, uint32_t timeout)
 {
-    rbuf_t          *pRBI = (rbuf_t*)mq;
+    rbuf_t          *pRBI = (rbuf_t *)mq;
     uint32_t        head = 0;
     uint32_t        tail = 0;
 
@@ -395,7 +397,7 @@ int usb_osal_mpool_init(uint32_t *pMPool, int pool_len)
     int     rval = 0;
 
     if( !pMPool || ((uint32_t)pMPool & BYTE_ALIGN_MASK) ||
-        !pool_len || (pool_len & BYTE_ALIGN_MASK) )
+            !pool_len || (pool_len & BYTE_ALIGN_MASK) )
         return -EINVAL;
 
     g_mempool_base = (uint32_t)pMPool;
@@ -452,13 +454,13 @@ void *usb_osal_malloc(int length)
 
         if( pBlk_cur != g_pBlk_end )
         {
-            pAddr = (void*)(((uint8_t*)pBlk_prev->pNext_free_blk) + g_link_hdr_size);
+            pAddr = (void *)(((uint8_t *)pBlk_prev->pNext_free_blk) + g_link_hdr_size);
 
             pBlk_prev->pNext_free_blk = pBlk_cur->pNext_free_blk;
 
             if( (pBlk_cur->blk_size - length) > MIN_BLOCK_SIZE )
             {
-                pBlk_next = (void*)(((uint8_t*)pBlk_cur) + length);
+                pBlk_next = (void *)(((uint8_t *)pBlk_cur) + length);
 
                 pBlk_next->blk_size = pBlk_cur->blk_size - length;
                 pBlk_cur->blk_size  = length;
@@ -489,16 +491,16 @@ void usb_osal_free(void *pPtr)
 
     if( pPtr == 0 )     return;
 
-    pBLink = (void*)((uint32_t)pPtr - g_link_hdr_size);
+    pBLink = (void *)((uint32_t)pPtr - g_link_hdr_size);
 
     if( (pBLink->blk_size & BLK_USED_FLAG) == 0 ||
-        pBLink->pNext_free_blk )
+            pBLink->pNext_free_blk )
         return;
 
     pBLink->blk_size &= ~BLK_USED_FLAG;
 
     g_free_bytes += pBLink->blk_size;
-    _usb_osal_add_blk_to_free_list(((blk_link_t*)pBLink));
+    _usb_osal_add_blk_to_free_list(((blk_link_t *)pBLink));
     g_free_cnt++;
 
     return;

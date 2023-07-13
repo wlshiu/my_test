@@ -24,7 +24,8 @@ extern "C" {
 #include "usb_log.h"
 #include "usb_dc.h"
 
-enum usbd_event_type {
+enum usbd_event_type
+{
     /* USB DCD IRQ */
     USBD_EVENT_ERROR,        /** USB error reported by the controller */
     USBD_EVENT_RESET,        /** USB reset */
@@ -48,12 +49,14 @@ typedef void (*usbd_notify_handler)(uint8_t event, void *arg);
 
 extern usb_slist_t usbd_intf_head;
 
-struct usbd_endpoint {
+struct usbd_endpoint
+{
     uint8_t ep_addr;
     usbd_endpoint_callback ep_cb;
 };
 
-struct usbd_interface {
+struct usbd_interface
+{
     usb_slist_t list;
     usbd_request_handler class_interface_handler;
     usbd_request_handler class_endpoint_handler;
@@ -64,7 +67,8 @@ struct usbd_interface {
     uint8_t intf_num;
 };
 
-struct usb_descriptor {
+struct usb_descriptor
+{
     const uint8_t *device_descriptor;
     const uint8_t *fs_config_descriptor;
     const uint8_t *hs_config_descriptor;

@@ -28,10 +28,10 @@
 #define CDC_SUBCLASS_CAPI       0x05 /* CAPI Control Model */
 #define CDC_SUBCLASS_ECM        0x06 /* Ethernet Networking Control Model */
 #define CDC_SUBCLASS_ATM        0x07 /* ATM Networking Control Model */
-                                     /* 0x08-0x0d Reserved (future use) */
+/* 0x08-0x0d Reserved (future use) */
 #define CDC_SUBCLASS_MBIM       0x0e /* MBIM Control Model */
-                                     /* 0x0f-0x7f Reserved (future use) */
-                                     /* 0x80-0xfe Reserved (vendor specific) */
+/* 0x0f-0x7f Reserved (future use) */
+/* 0x80-0xfe Reserved (vendor specific) */
 
 #define CDC_DIRECT_LINE_CONTROL_MODEL         0x01U
 #define CDC_ABSTRACT_CONTROL_MODEL            0x02U
@@ -219,7 +219,8 @@
 /* Header functional descriptor */
 /* (usbcdc11.pdf, 5.2.3.1) */
 /* This header must precede any list of class-specific descriptors. */
-struct cdc_header_descriptor {
+struct cdc_header_descriptor
+{
     uint8_t bFunctionLength;    /* size of this descriptor in bytes */
     uint8_t bDescriptorType;    /* CS_INTERFACE descriptor type */
     uint8_t bDescriptorSubtype; /* Header functional descriptor subtype */
@@ -229,7 +230,8 @@ struct cdc_header_descriptor {
 /* Call management functional descriptor */
 /* (usbcdc11.pdf, 5.2.3.2) */
 /* Describes the processing of calls for the communication class interface. */
-struct cdc_call_management_descriptor {
+struct cdc_call_management_descriptor
+{
     uint8_t bFunctionLength;    /* size of this descriptor in bytes */
     uint8_t bDescriptorType;    /* CS_INTERFACE descriptor type */
     uint8_t bDescriptorSubtype; /* call management functional descriptor subtype */
@@ -240,7 +242,8 @@ struct cdc_call_management_descriptor {
 /* Abstract control management functional descriptor */
 /* (usbcdc11.pdf, 5.2.3.3) */
 /* Describes the command supported by the communication interface class with the Abstract Control Model subclass code. */
-struct cdc_abstract_control_management_descriptor {
+struct cdc_abstract_control_management_descriptor
+{
     uint8_t bFunctionLength;    /* size of this descriptor in bytes */
     uint8_t bDescriptorType;    /* CS_INTERFACE descriptor type */
     uint8_t bDescriptorSubtype; /* abstract control management functional descriptor subtype */
@@ -250,7 +253,8 @@ struct cdc_abstract_control_management_descriptor {
 /* Union functional descriptors */
 /* (usbcdc11.pdf, 5.2.3.8) */
 /* Describes the relationship between a group of interfaces that can be considered to form a functional unit. */
-struct cdc_union_descriptor {
+struct cdc_union_descriptor
+{
     uint8_t bFunctionLength;    /* size of this descriptor in bytes */
     uint8_t bDescriptorType;    /* CS_INTERFACE descriptor type */
     uint8_t bDescriptorSubtype; /* union functional descriptor subtype */
@@ -259,7 +263,8 @@ struct cdc_union_descriptor {
 
 /* Union functional descriptors with one slave interface */
 /* (usbcdc11.pdf, 5.2.3.8) */
-struct cdc_union_1slave_descriptor {
+struct cdc_union_1slave_descriptor
+{
     uint8_t bFunctionLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -270,7 +275,8 @@ struct cdc_union_1slave_descriptor {
 /* Line coding structure for GET_LINE_CODING / SET_LINE_CODING class requests*/
 /* Format of the data returned when a GetLineCoding request is received */
 /* (usbcdc11.pdf, 6.2.13) */
-struct cdc_line_coding {
+struct cdc_line_coding
+{
     uint32_t dwDTERate;  /* Data terminal rate in bits per second */
     uint8_t bCharFormat; /* Number of stop bits */
     uint8_t bParityType; /* Parity bit type */
@@ -278,7 +284,8 @@ struct cdc_line_coding {
 } __PACKED;
 
 /** Data structure for the notification about SerialState */
-struct cdc_acm_notification {
+struct cdc_acm_notification
+{
     uint8_t bmRequestType;
     uint8_t bNotificationType;
     uint16_t wValue;
@@ -288,7 +295,8 @@ struct cdc_acm_notification {
 } __PACKED;
 
 /** Ethernet Networking Functional Descriptor */
-struct cdc_ecm_descriptor {
+struct cdc_ecm_descriptor
+{
     uint8_t bFunctionLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;

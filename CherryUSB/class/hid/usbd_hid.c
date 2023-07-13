@@ -17,7 +17,8 @@ static int hid_class_interface_request_handler(struct usb_setup_packet *setup, u
 
     uint8_t intf_num = LO_BYTE(setup->wIndex);
 
-    switch (setup->bRequest) {
+    switch (setup->bRequest)
+    {
         case HID_REQUEST_GET_REPORT:
             /* report id ,report type */
             usbh_hid_get_report(intf_num, LO_BYTE(setup->wValue), HI_BYTE(setup->wValue), data, len);
@@ -90,6 +91,4 @@ __WEAK void usbh_hid_set_idle(uint8_t intf, uint8_t report_id, uint8_t duration)
 __WEAK void usbh_hid_set_protocol(uint8_t intf, uint8_t protocol)
 {
 }
-
-#endif /* CONFIG_ENABLE_USBD_HID */
-
+#endif  /* CONFIG_ENABLE_USBD_HID */

@@ -16,9 +16,11 @@ static int usbh_hid_devno_alloc(struct usbh_hid *hid_class)
 {
     int devno;
 
-    for (devno = 0; devno < 32; devno++) {
+    for (devno = 0; devno < 32; devno++)
+    {
         uint32_t bitno = 1 << devno;
-        if ((g_devinuse & bitno) == 0) {
+        if ((g_devinuse & bitno) == 0)
+        {
             g_devinuse |= bitno;
             hid_class->minor = devno;
             return 0;
@@ -32,7 +34,8 @@ static void usbh_hid_devno_free(struct usbh_hid *hid_class)
 {
     int devno = hid_class->minor;
 
-    if (devno >= 0 && devno < 32) {
+    if (devno >= 0 && devno < 32)
+    {
         g_devinuse &= ~(1 << devno);
     }
 }
@@ -49,7 +52,8 @@ static int usbh_hid_get_report_descriptor(struct usbh_hid *hid_class, uint8_t *b
     setup->wLength = 128;
 
     ret = usbh_control_transfer(hid_class->hport->ep0, setup, g_hid_buf);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         return ret;
     }
     memcpy(buffer, g_hid_buf, ret - 8);
@@ -81,7 +85,8 @@ int usbh_hid_get_idle(struct usbh_hid *hid_class, uint8_t *buffer)
     setup->wLength = 1;
 
     ret = usbh_control_transfer(hid_class->hport->ep0, setup, g_hid_buf);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         return ret;
     }
     memcpy(buffer, g_hid_buf, 1);
@@ -107,7 +112,8 @@ int usbh_hid_connect(struct usbh_hubport *hport, uint8_t intf)
     int ret;
 
     struct usbh_hid *hid_class = usb_malloc(sizeof(struct usbh_hid));
-    if (hid_class == NULL) {
+    if (hid_class == NULL)
+    {
         USB_LOG_ERR("Fail to alloc hid_class\r\n");
         return -ENOMEM;
     }
@@ -126,20 +132,26 @@ int usbh_hid_connect(struct usbh_hubport *hport, uint8_t intf)
     // }
 
     ret = usbh_hid_set_idle(hid_class, 0, 0);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         USB_LOG_WRN("Do not support set idle\r\n");
     }
 
     ret = usbh_hid_get_report_descriptor(hid_class, hid_class->report_desc);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         return ret;
     }
 
-    for (uint8_t i = 0; i < hport->config.intf[intf].altsetting[0].intf_desc.bNumEndpoints; i++) {
+    for (uint8_t i = 0; i < hport->config.intf[intf].altsetting[0].intf_desc.bNumEndpoints; i++)
+    {
         ep_desc = &hport->config.intf[intf].altsetting[0].ep[i].ep_desc;
-        if (ep_desc->bEndpointAddress & 0x80) {
+        if (ep_desc->bEndpointAddress & 0x80)
+        {
             usbh_hport_activate_epx(&hid_class->intin, hport, ep_desc);
-        } else {
+        }
+        else
+        {
             usbh_hport_activate_epx(&hid_class->intout, hport, ep_desc);
         }
     }
@@ -158,18 +170,22 @@ int usbh_hid_disconnect(struct usbh_hubport *hport, uint8_t intf)
 
     struct usbh_hid *hid_class = (struct usbh_hid *)hport->config.intf[intf].priv;
 
-    if (hid_class) {
+    if (hid_class)
+    {
         usbh_hid_devno_free(hid_class);
 
-        if (hid_class->intin) {
+        if (hid_class->intin)
+        {
             usbh_pipe_free(hid_class->intin);
         }
 
-        if (hid_class->intout) {
+        if (hid_class->intout)
+        {
             usbh_pipe_free(hid_class->intout);
         }
 
-        if (hport->config.intf[intf].devname[0] != '\0') {
+        if (hport->config.intf[intf].devname[0] != '\0')
+        {
             USB_LOG_INFO("Unregister HID Class:%s\r\n", hport->config.intf[intf].devname);
             usbh_hid_stop(hid_class);
         }
@@ -189,13 +205,15 @@ __WEAK void usbh_hid_stop(struct usbh_hid *hid_class)
 {
 }
 
-const struct usbh_class_driver hid_class_driver = {
+const struct usbh_class_driver hid_class_driver =
+{
     .driver_name = "hid",
     .connect = usbh_hid_connect,
     .disconnect = usbh_hid_disconnect
 };
 
-CLASS_INFO_DEFINE const struct usbh_class_info hid_custom_class_info = {
+CLASS_INFO_DEFINE const struct usbh_class_info hid_custom_class_info =
+{
     .match_flags = USB_CLASS_MATCH_INTF_CLASS,
     .class = USB_DEVICE_CLASS_HID,
     .subclass = 0x00,

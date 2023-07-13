@@ -254,7 +254,7 @@
 #define VIDEO_GET_CUR_PU_ANALOG_VIDEO_STANDARD_CONTROL          0x8131U
 #define VIDEO_GET_CUR_PU_ANALOG_LOCK_STATUS_CONTROL             0x8132U
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_CUR_PU_CONTRAST_AUTO_CONTROL 0x8133U
+    #define VIDEO_GET_CUR_PU_CONTRAST_AUTO_CONTROL 0x8133U
 #endif
 
 #define VIDEO_GET_CUR_CT_SCANNING_MODE_CONTROL          0x8141U
@@ -275,9 +275,9 @@
 #define VIDEO_GET_CUR_CT_ROLL_RELATIVE_CONTROL          0x8150U
 #define VIDEO_GET_CUR_CT_PRIVACY_CONTROL                0x8151U
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_CUR_CT_FOCUS_SIMPLE_CONTROL       0x8152U
-#define VIDEO_GET_CUR_CT_DIGITAL_WINDOW_CONTROL     0x8153U
-#define VIDEO_GET_CUR_CT_REGION_OF_INTEREST_CONTROL 0x8154U
+    #define VIDEO_GET_CUR_CT_FOCUS_SIMPLE_CONTROL       0x8152U
+    #define VIDEO_GET_CUR_CT_DIGITAL_WINDOW_CONTROL     0x8153U
+    #define VIDEO_GET_CUR_CT_REGION_OF_INTEREST_CONTROL 0x8154U
 #endif
 
 #define VIDEO_GET_CUR_VS_PROBE_CONTROL                0x8161U
@@ -291,26 +291,26 @@
 #define VIDEO_GET_CUR_VS_SYNCH_DELAY_CONTROL          0x8169U
 
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_CUR_EU_SELECT_LAYER_CONTROL        0x8181U
-#define VIDEO_GET_CUR_EU_PROFILE_TOOLSET_CONTROL     0x8182U
-#define VIDEO_GET_CUR_EU_VIDEO_RESOLUTION_CONTROL    0x8183U
-#define VIDEO_GET_CUR_EU_MIN_FRAME_INTERVAL_CONTROL  0x8184U
-#define VIDEO_GET_CUR_EU_SLICE_MODE_CONTROL          0x8185U
-#define VIDEO_GET_CUR_EU_RATE_CONTROL_MODE_CONTROL   0x8186U
-#define VIDEO_GET_CUR_EU_AVERAGE_BITRATE_CONTROL     0x8187U
-#define VIDEO_GET_CUR_EU_CPB_SIZE_CONTROL            0x8188U
-#define VIDEO_GET_CUR_EU_PEAK_BIT_RATE_CONTROL       0x8189U
-#define VIDEO_GET_CUR_EU_QUANTIZATION_PARAMS_CONTROL 0x818AU
-#define VIDEO_GET_CUR_EU_SYNC_REF_FRAME_CONTROL      0x818BU
-#define VIDEO_GET_CUR_EU_LTR_BUFFER_CONTROL          0x818CU
-#define VIDEO_GET_CUR_EU_LTR_PICTURE_CONTROL         0x818DU
-#define VIDEO_GET_CUR_EU_LTR_VALIDATION_CONTROL      0x818EU
-#define VIDEO_GET_CUR_EU_LEVEL_IDC_LIMIT_CONTROL     0x818FU
-#define VIDEO_GET_CUR_EU_SEI_PAYLOADTYPE_CONTROL     0x8190U
-#define VIDEO_GET_CUR_EU_QP_RANGE_CONTROL            0x8191U
-#define VIDEO_GET_CUR_EU_PRIORITY_CONTROL            0x8192U
-#define VIDEO_GET_CUR_EU_START_OR_STOP_LAYER_CONTROL 0x8193U
-#define VIDEO_GET_CUR_EU_ERROR_RESILIENCY_CONTROL    0x8194U
+    #define VIDEO_GET_CUR_EU_SELECT_LAYER_CONTROL        0x8181U
+    #define VIDEO_GET_CUR_EU_PROFILE_TOOLSET_CONTROL     0x8182U
+    #define VIDEO_GET_CUR_EU_VIDEO_RESOLUTION_CONTROL    0x8183U
+    #define VIDEO_GET_CUR_EU_MIN_FRAME_INTERVAL_CONTROL  0x8184U
+    #define VIDEO_GET_CUR_EU_SLICE_MODE_CONTROL          0x8185U
+    #define VIDEO_GET_CUR_EU_RATE_CONTROL_MODE_CONTROL   0x8186U
+    #define VIDEO_GET_CUR_EU_AVERAGE_BITRATE_CONTROL     0x8187U
+    #define VIDEO_GET_CUR_EU_CPB_SIZE_CONTROL            0x8188U
+    #define VIDEO_GET_CUR_EU_PEAK_BIT_RATE_CONTROL       0x8189U
+    #define VIDEO_GET_CUR_EU_QUANTIZATION_PARAMS_CONTROL 0x818AU
+    #define VIDEO_GET_CUR_EU_SYNC_REF_FRAME_CONTROL      0x818BU
+    #define VIDEO_GET_CUR_EU_LTR_BUFFER_CONTROL          0x818CU
+    #define VIDEO_GET_CUR_EU_LTR_PICTURE_CONTROL         0x818DU
+    #define VIDEO_GET_CUR_EU_LTR_VALIDATION_CONTROL      0x818EU
+    #define VIDEO_GET_CUR_EU_LEVEL_IDC_LIMIT_CONTROL     0x818FU
+    #define VIDEO_GET_CUR_EU_SEI_PAYLOADTYPE_CONTROL     0x8190U
+    #define VIDEO_GET_CUR_EU_QP_RANGE_CONTROL            0x8191U
+    #define VIDEO_GET_CUR_EU_PRIORITY_CONTROL            0x8192U
+    #define VIDEO_GET_CUR_EU_START_OR_STOP_LAYER_CONTROL 0x8193U
+    #define VIDEO_GET_CUR_EU_ERROR_RESILIENCY_CONTROL    0x8194U
 #endif
 
 /*! @brief Video device class-specific request GET MIN COMMAND */
@@ -338,8 +338,8 @@
 #define VIDEO_GET_MIN_CT_ROLL_ABSOLUTE_CONTROL          0x824FU
 #define VIDEO_GET_MIN_CT_ROLL_RELATIVE_CONTROL          0x8250U
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_MIN_CT_DIGITAL_WINDOW_CONTROL     0x8251U
-#define VIDEO_GET_MIN_CT_REGION_OF_INTEREST_CONTROL 0x8252U
+    #define VIDEO_GET_MIN_CT_DIGITAL_WINDOW_CONTROL     0x8251U
+    #define VIDEO_GET_MIN_CT_REGION_OF_INTEREST_CONTROL 0x8252U
 #endif
 
 #define VIDEO_GET_MIN_VS_PROBE_CONTROL                0x8261U
@@ -348,17 +348,17 @@
 #define VIDEO_GET_MIN_VS_SYNCH_DELAY_CONTROL          0x8269U
 
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_MIN_EU_VIDEO_RESOLUTION_CONTROL    0x8283U
-#define VIDEO_GET_MIN_EU_MIN_FRAME_INTERVAL_CONTROL  0x8284U
-#define VIDEO_GET_MIN_EU_SLICE_MODE_CONTROL          0x8285U
-#define VIDEO_GET_MIN_EU_AVERAGE_BITRATE_CONTROL     0x8287U
-#define VIDEO_GET_MIN_EU_CPB_SIZE_CONTROL            0x8288U
-#define VIDEO_GET_MIN_EU_PEAK_BIT_RATE_CONTROL       0x8289U
-#define VIDEO_GET_MIN_EU_QUANTIZATION_PARAMS_CONTROL 0x828AU
-#define VIDEO_GET_MIN_EU_SYNC_REF_FRAME_CONTROL      0x828BU
-#define VIDEO_GET_MIN_EU_LEVEL_IDC_LIMIT_CONTROL     0x828FU
-#define VIDEO_GET_MIN_EU_SEI_PAYLOADTYPE_CONTROL     0x8290U
-#define VIDEO_GET_MIN_EU_QP_RANGE_CONTROL            0x8291U
+    #define VIDEO_GET_MIN_EU_VIDEO_RESOLUTION_CONTROL    0x8283U
+    #define VIDEO_GET_MIN_EU_MIN_FRAME_INTERVAL_CONTROL  0x8284U
+    #define VIDEO_GET_MIN_EU_SLICE_MODE_CONTROL          0x8285U
+    #define VIDEO_GET_MIN_EU_AVERAGE_BITRATE_CONTROL     0x8287U
+    #define VIDEO_GET_MIN_EU_CPB_SIZE_CONTROL            0x8288U
+    #define VIDEO_GET_MIN_EU_PEAK_BIT_RATE_CONTROL       0x8289U
+    #define VIDEO_GET_MIN_EU_QUANTIZATION_PARAMS_CONTROL 0x828AU
+    #define VIDEO_GET_MIN_EU_SYNC_REF_FRAME_CONTROL      0x828BU
+    #define VIDEO_GET_MIN_EU_LEVEL_IDC_LIMIT_CONTROL     0x828FU
+    #define VIDEO_GET_MIN_EU_SEI_PAYLOADTYPE_CONTROL     0x8290U
+    #define VIDEO_GET_MIN_EU_QP_RANGE_CONTROL            0x8291U
 #endif
 
 /*! @brief Video device class-specific request GET MAX COMMAND */
@@ -386,8 +386,8 @@
 #define VIDEO_GET_MAX_CT_ROLL_ABSOLUTE_CONTROL          0x834FU
 #define VIDEO_GET_MAX_CT_ROLL_RELATIVE_CONTROL          0x8350U
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_MAX_CT_DIGITAL_WINDOW_CONTROL     0x8351U
-#define VIDEO_GET_MAX_CT_REGION_OF_INTEREST_CONTROL 0x8352U
+    #define VIDEO_GET_MAX_CT_DIGITAL_WINDOW_CONTROL     0x8351U
+    #define VIDEO_GET_MAX_CT_REGION_OF_INTEREST_CONTROL 0x8352U
 #endif
 
 #define VIDEO_GET_MAX_VS_PROBE_CONTROL                0x8361U
@@ -396,18 +396,18 @@
 #define VIDEO_GET_MAX_VS_SYNCH_DELAY_CONTROL          0x8369U
 
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_MAX_EU_VIDEO_RESOLUTION_CONTROL    0x8383U
-#define VIDEO_GET_MAX_EU_MIN_FRAME_INTERVAL_CONTROL  0x8384U
-#define VIDEO_GET_MAX_EU_SLICE_MODE_CONTROL          0x8385U
-#define VIDEO_GET_MAX_EU_AVERAGE_BITRATE_CONTROL     0x8387U
-#define VIDEO_GET_MAX_EU_CPB_SIZE_CONTROL            0x8388U
-#define VIDEO_GET_MAX_EU_PEAK_BIT_RATE_CONTROL       0x8389U
-#define VIDEO_GET_MAX_EU_QUANTIZATION_PARAMS_CONTROL 0x838AU
-#define VIDEO_GET_MAX_EU_SYNC_REF_FRAME_CONTROL      0x838BU
-#define VIDEO_GET_MAX_EU_LTR_BUFFER_CONTROL          0x838CU
-#define VIDEO_GET_MAX_EU_LEVEL_IDC_LIMIT_CONTROL     0x838FU
-#define VIDEO_GET_MAX_EU_SEI_PAYLOADTYPE_CONTROL     0x8390U
-#define VIDEO_GET_MAX_EU_QP_RANGE_CONTROL            0x8391U
+    #define VIDEO_GET_MAX_EU_VIDEO_RESOLUTION_CONTROL    0x8383U
+    #define VIDEO_GET_MAX_EU_MIN_FRAME_INTERVAL_CONTROL  0x8384U
+    #define VIDEO_GET_MAX_EU_SLICE_MODE_CONTROL          0x8385U
+    #define VIDEO_GET_MAX_EU_AVERAGE_BITRATE_CONTROL     0x8387U
+    #define VIDEO_GET_MAX_EU_CPB_SIZE_CONTROL            0x8388U
+    #define VIDEO_GET_MAX_EU_PEAK_BIT_RATE_CONTROL       0x8389U
+    #define VIDEO_GET_MAX_EU_QUANTIZATION_PARAMS_CONTROL 0x838AU
+    #define VIDEO_GET_MAX_EU_SYNC_REF_FRAME_CONTROL      0x838BU
+    #define VIDEO_GET_MAX_EU_LTR_BUFFER_CONTROL          0x838CU
+    #define VIDEO_GET_MAX_EU_LEVEL_IDC_LIMIT_CONTROL     0x838FU
+    #define VIDEO_GET_MAX_EU_SEI_PAYLOADTYPE_CONTROL     0x8390U
+    #define VIDEO_GET_MAX_EU_QP_RANGE_CONTROL            0x8391U
 #endif
 
 /*! @brief Video device class-specific request GET RES COMMAND */
@@ -442,11 +442,11 @@
 #define VIDEO_GET_RES_VS_SYNCH_DELAY_CONTROL          0x8469U
 
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_RES_EU_AVERAGE_BITRATE_CONTROL     0x8487U
-#define VIDEO_GET_RES_EU_CPB_SIZE_CONTROL            0x8488U
-#define VIDEO_GET_RES_EU_PEAK_BIT_RATE_CONTROL       0x8489U
-#define VIDEO_GET_RES_EU_QUANTIZATION_PARAMS_CONTROL 0x848AU
-#define VIDEO_GET_RES_EU_ERROR_RESILIENCY_CONTROL    0x8494U
+    #define VIDEO_GET_RES_EU_AVERAGE_BITRATE_CONTROL     0x8487U
+    #define VIDEO_GET_RES_EU_CPB_SIZE_CONTROL            0x8488U
+    #define VIDEO_GET_RES_EU_PEAK_BIT_RATE_CONTROL       0x8489U
+    #define VIDEO_GET_RES_EU_QUANTIZATION_PARAMS_CONTROL 0x848AU
+    #define VIDEO_GET_RES_EU_ERROR_RESILIENCY_CONTROL    0x8494U
 #endif
 
 /*! @brief Video device class-specific request GET LEN COMMAND */
@@ -457,23 +457,23 @@
 #define VIDEO_GET_LEN_VS_STILL_COMMIT_CONTROL 0x8564U
 
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_LEN_EU_SELECT_LAYER_CONTROL        0x8581U
-#define VIDEO_GET_LEN_EU_PROFILE_TOOLSET_CONTROL     0x8582U
-#define VIDEO_GET_LEN_EU_VIDEO_RESOLUTION_CONTROL    0x8583U
-#define VIDEO_GET_LEN_EU_MIN_FRAME_INTERVAL_CONTROL  0x8584U
-#define VIDEO_GET_LEN_EU_SLICE_MODE_CONTROL          0x8585U
-#define VIDEO_GET_LEN_EU_RATE_CONTROL_MODE_CONTROL   0x8586U
-#define VIDEO_GET_LEN_EU_AVERAGE_BITRATE_CONTROL     0x8587U
-#define VIDEO_GET_LEN_EU_CPB_SIZE_CONTROL            0x8588U
-#define VIDEO_GET_LEN_EU_PEAK_BIT_RATE_CONTROL       0x8589U
-#define VIDEO_GET_LEN_EU_QUANTIZATION_PARAMS_CONTROL 0x858AU
-#define VIDEO_GET_LEN_EU_SYNC_REF_FRAME_CONTROL      0x858BU
-#define VIDEO_GET_LEN_EU_LTR_BUFFER_CONTROL          0x858CU
-#define VIDEO_GET_LEN_EU_LTR_PICTURE_CONTROL         0x858DU
-#define VIDEO_GET_LEN_EU_LTR_VALIDATION_CONTROL      0x858EU
-#define VIDEO_GET_LEN_EU_QP_RANGE_CONTROL            0x8591U
-#define VIDEO_GET_LEN_EU_PRIORITY_CONTROL            0x8592U
-#define VIDEO_GET_LEN_EU_START_OR_STOP_LAYER_CONTROL 0x8593U
+    #define VIDEO_GET_LEN_EU_SELECT_LAYER_CONTROL        0x8581U
+    #define VIDEO_GET_LEN_EU_PROFILE_TOOLSET_CONTROL     0x8582U
+    #define VIDEO_GET_LEN_EU_VIDEO_RESOLUTION_CONTROL    0x8583U
+    #define VIDEO_GET_LEN_EU_MIN_FRAME_INTERVAL_CONTROL  0x8584U
+    #define VIDEO_GET_LEN_EU_SLICE_MODE_CONTROL          0x8585U
+    #define VIDEO_GET_LEN_EU_RATE_CONTROL_MODE_CONTROL   0x8586U
+    #define VIDEO_GET_LEN_EU_AVERAGE_BITRATE_CONTROL     0x8587U
+    #define VIDEO_GET_LEN_EU_CPB_SIZE_CONTROL            0x8588U
+    #define VIDEO_GET_LEN_EU_PEAK_BIT_RATE_CONTROL       0x8589U
+    #define VIDEO_GET_LEN_EU_QUANTIZATION_PARAMS_CONTROL 0x858AU
+    #define VIDEO_GET_LEN_EU_SYNC_REF_FRAME_CONTROL      0x858BU
+    #define VIDEO_GET_LEN_EU_LTR_BUFFER_CONTROL          0x858CU
+    #define VIDEO_GET_LEN_EU_LTR_PICTURE_CONTROL         0x858DU
+    #define VIDEO_GET_LEN_EU_LTR_VALIDATION_CONTROL      0x858EU
+    #define VIDEO_GET_LEN_EU_QP_RANGE_CONTROL            0x8591U
+    #define VIDEO_GET_LEN_EU_PRIORITY_CONTROL            0x8592U
+    #define VIDEO_GET_LEN_EU_START_OR_STOP_LAYER_CONTROL 0x8593U
 #endif
 
 /*! @brief Video device class-specific request GET INFO COMMAND */
@@ -499,7 +499,7 @@
 #define VIDEO_GET_INFO_PU_ANALOG_VIDEO_STANDARD_CONTROL          0x8631U
 #define VIDEO_GET_INFO_PU_ANALOG_LOCK_STATUS_CONTROL             0x8632U
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_INFO_PU_CONTRAST_AUTO_CONTROL 0x8633U
+    #define VIDEO_GET_INFO_PU_CONTRAST_AUTO_CONTROL 0x8633U
 #endif
 
 #define VIDEO_GET_INFO_CT_SCANNING_MODE_CONTROL          0x8641U
@@ -520,7 +520,7 @@
 #define VIDEO_GET_INFO_CT_ROLL_RELATIVE_CONTROL          0x8650U
 #define VIDEO_GET_INFO_CT_PRIVACY_CONTROL                0x8651U
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_INFO_CT_FOCUS_SIMPLE_CONTROL 0x8652U
+    #define VIDEO_GET_INFO_CT_FOCUS_SIMPLE_CONTROL 0x8652U
 #endif
 
 #define VIDEO_GET_INFO_VS_PROBE_CONTROL                0x8661U
@@ -534,24 +534,24 @@
 #define VIDEO_GET_INFO_VS_SYNCH_DELAY_CONTROL          0x8669U
 
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_INFO_EU_SELECT_LAYER_CONTROL        0x8681U
-#define VIDEO_GET_INFO_EU_PROFILE_TOOLSET_CONTROL     0x8682U
-#define VIDEO_GET_INFO_EU_VIDEO_RESOLUTION_CONTROL    0x8683U
-#define VIDEO_GET_INFO_EU_MIN_FRAME_INTERVAL_CONTROL  0x8684U
-#define VIDEO_GET_INFO_EU_SLICE_MODE_CONTROL          0x8685U
-#define VIDEO_GET_INFO_EU_RATE_CONTROL_MODE_CONTROL   0x8686U
-#define VIDEO_GET_INFO_EU_AVERAGE_BITRATE_CONTROL     0x8687U
-#define VIDEO_GET_INFO_EU_CPB_SIZE_CONTROL            0x8688U
-#define VIDEO_GET_INFO_EU_PEAK_BIT_RATE_CONTROL       0x8689U
-#define VIDEO_GET_INFO_EU_QUANTIZATION_PARAMS_CONTROL 0x868AU
-#define VIDEO_GET_INFO_EU_SYNC_REF_FRAME_CONTROL      0x868BU
-#define VIDEO_GET_INFO_EU_LTR_BUFFER_CONTROL          0x868CU
-#define VIDEO_GET_INFO_EU_LTR_PICTURE_CONTROL         0x868DU
-#define VIDEO_GET_INFO_EU_LTR_VALIDATION_CONTROL      0x868EU
-#define VIDEO_GET_INFO_EU_SEI_PAYLOADTYPE_CONTROL     0x8690U
-#define VIDEO_GET_INFO_EU_QP_RANGE_CONTROL            0x8691U
-#define VIDEO_GET_INFO_EU_PRIORITY_CONTROL            0x8692U
-#define VIDEO_GET_INFO_EU_START_OR_STOP_LAYER_CONTROL 0x8693U
+    #define VIDEO_GET_INFO_EU_SELECT_LAYER_CONTROL        0x8681U
+    #define VIDEO_GET_INFO_EU_PROFILE_TOOLSET_CONTROL     0x8682U
+    #define VIDEO_GET_INFO_EU_VIDEO_RESOLUTION_CONTROL    0x8683U
+    #define VIDEO_GET_INFO_EU_MIN_FRAME_INTERVAL_CONTROL  0x8684U
+    #define VIDEO_GET_INFO_EU_SLICE_MODE_CONTROL          0x8685U
+    #define VIDEO_GET_INFO_EU_RATE_CONTROL_MODE_CONTROL   0x8686U
+    #define VIDEO_GET_INFO_EU_AVERAGE_BITRATE_CONTROL     0x8687U
+    #define VIDEO_GET_INFO_EU_CPB_SIZE_CONTROL            0x8688U
+    #define VIDEO_GET_INFO_EU_PEAK_BIT_RATE_CONTROL       0x8689U
+    #define VIDEO_GET_INFO_EU_QUANTIZATION_PARAMS_CONTROL 0x868AU
+    #define VIDEO_GET_INFO_EU_SYNC_REF_FRAME_CONTROL      0x868BU
+    #define VIDEO_GET_INFO_EU_LTR_BUFFER_CONTROL          0x868CU
+    #define VIDEO_GET_INFO_EU_LTR_PICTURE_CONTROL         0x868DU
+    #define VIDEO_GET_INFO_EU_LTR_VALIDATION_CONTROL      0x868EU
+    #define VIDEO_GET_INFO_EU_SEI_PAYLOADTYPE_CONTROL     0x8690U
+    #define VIDEO_GET_INFO_EU_QP_RANGE_CONTROL            0x8691U
+    #define VIDEO_GET_INFO_EU_PRIORITY_CONTROL            0x8692U
+    #define VIDEO_GET_INFO_EU_START_OR_STOP_LAYER_CONTROL 0x8693U
 #endif
 
 /*! @brief Video device class-specific request GET DEF COMMAND */
@@ -572,7 +572,7 @@
 #define VIDEO_GET_DEF_PU_DIGITAL_MULTIPLIER_LIMIT_CONTROL       0x872FU
 #define VIDEO_GET_DEF_PU_HUE_AUTO_CONTROL                       0x8730U
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_DEF_PU_CONTRAST_AUTO_CONTROL 0x8731U
+    #define VIDEO_GET_DEF_PU_CONTRAST_AUTO_CONTROL 0x8731U
 #endif
 
 #define VIDEO_GET_DEF_CT_AE_MODE_CONTROL                0x8742U
@@ -588,9 +588,9 @@
 #define VIDEO_GET_DEF_CT_ROLL_ABSOLUTE_CONTROL          0x874FU
 #define VIDEO_GET_DEF_CT_ROLL_RELATIVE_CONTROL          0x8750U
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_DEF_CT_FOCUS_SIMPLE_CONTROL       0x8751U
-#define VIDEO_GET_DEF_CT_DIGITAL_WINDOW_CONTROL     0x8752U
-#define VIDEO_GET_DEF_CT_REGION_OF_INTEREST_CONTROL 0x8753U
+    #define VIDEO_GET_DEF_CT_FOCUS_SIMPLE_CONTROL       0x8751U
+    #define VIDEO_GET_DEF_CT_DIGITAL_WINDOW_CONTROL     0x8752U
+    #define VIDEO_GET_DEF_CT_REGION_OF_INTEREST_CONTROL 0x8753U
 #endif
 
 #define VIDEO_GET_DEF_VS_PROBE_CONTROL                0x8761U
@@ -599,22 +599,22 @@
 #define VIDEO_GET_DEF_VS_SYNCH_DELAY_CONTROL          0x8769U
 
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_GET_DEF_EU_PROFILE_TOOLSET_CONTROL     0x8782U
-#define VIDEO_GET_DEF_EU_VIDEO_RESOLUTION_CONTROL    0x8783U
-#define VIDEO_GET_DEF_EU_MIN_FRAME_INTERVAL_CONTROL  0x8784U
-#define VIDEO_GET_DEF_EU_SLICE_MODE_CONTROL          0x8785U
-#define VIDEO_GET_DEF_EU_RATE_CONTROL_MODE_CONTROL   0x8786U
-#define VIDEO_GET_DEF_EU_AVERAGE_BITRATE_CONTROL     0x8787U
-#define VIDEO_GET_DEF_EU_CPB_SIZE_CONTROL            0x8788U
-#define VIDEO_GET_DEF_EU_PEAK_BIT_RATE_CONTROL       0x8789U
-#define VIDEO_GET_DEF_EU_QUANTIZATION_PARAMS_CONTROL 0x878AU
-#define VIDEO_GET_DEF_EU_LTR_BUFFER_CONTROL          0x878CU
-#define VIDEO_GET_DEF_EU_LTR_PICTURE_CONTROL         0x878DU
-#define VIDEO_GET_DEF_EU_LTR_VALIDATION_CONTROL      0x878EU
-#define VIDEO_GET_DEF_EU_LEVEL_IDC_LIMIT_CONTROL     0x878FU
-#define VIDEO_GET_DEF_EU_SEI_PAYLOADTYPE_CONTROL     0x8790U
-#define VIDEO_GET_DEF_EU_QP_RANGE_CONTROL            0x8791U
-#define VIDEO_GET_DEF_EU_ERROR_RESILIENCY_CONTROL    0x8794U
+    #define VIDEO_GET_DEF_EU_PROFILE_TOOLSET_CONTROL     0x8782U
+    #define VIDEO_GET_DEF_EU_VIDEO_RESOLUTION_CONTROL    0x8783U
+    #define VIDEO_GET_DEF_EU_MIN_FRAME_INTERVAL_CONTROL  0x8784U
+    #define VIDEO_GET_DEF_EU_SLICE_MODE_CONTROL          0x8785U
+    #define VIDEO_GET_DEF_EU_RATE_CONTROL_MODE_CONTROL   0x8786U
+    #define VIDEO_GET_DEF_EU_AVERAGE_BITRATE_CONTROL     0x8787U
+    #define VIDEO_GET_DEF_EU_CPB_SIZE_CONTROL            0x8788U
+    #define VIDEO_GET_DEF_EU_PEAK_BIT_RATE_CONTROL       0x8789U
+    #define VIDEO_GET_DEF_EU_QUANTIZATION_PARAMS_CONTROL 0x878AU
+    #define VIDEO_GET_DEF_EU_LTR_BUFFER_CONTROL          0x878CU
+    #define VIDEO_GET_DEF_EU_LTR_PICTURE_CONTROL         0x878DU
+    #define VIDEO_GET_DEF_EU_LTR_VALIDATION_CONTROL      0x878EU
+    #define VIDEO_GET_DEF_EU_LEVEL_IDC_LIMIT_CONTROL     0x878FU
+    #define VIDEO_GET_DEF_EU_SEI_PAYLOADTYPE_CONTROL     0x8790U
+    #define VIDEO_GET_DEF_EU_QP_RANGE_CONTROL            0x8791U
+    #define VIDEO_GET_DEF_EU_ERROR_RESILIENCY_CONTROL    0x8794U
 #endif
 
 /*! @brief Video device class-specific request SET CUR COMMAND */
@@ -637,7 +637,7 @@
 #define VIDEO_SET_CUR_PU_DIGITAL_MULTIPLIER_LIMIT_CONTROL       0x012FU
 #define VIDEO_SET_CUR_PU_HUE_AUTO_CONTROL                       0x0130U
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_SET_CUR_PU_CONTRAST_AUTO_CONTROL 0x0131U
+    #define VIDEO_SET_CUR_PU_CONTRAST_AUTO_CONTROL 0x0131U
 #endif
 
 #define VIDEO_SET_CUR_CT_SCANNING_MODE_CONTROL          0x0141U
@@ -658,9 +658,9 @@
 #define VIDEO_SET_CUR_CT_ROLL_RELATIVE_CONTROL          0x0150U
 #define VIDEO_SET_CUR_CT_PRIVACY_CONTROL                0x0151U
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_SET_CUR_CT_FOCUS_SIMPLE_CONTROL       0x0152U
-#define VIDEO_SET_CUR_CT_DIGITAL_WINDOW_CONTROL     0x0153U
-#define VIDEO_SET_CUR_CT_REGION_OF_INTEREST_CONTROL 0x0154U
+    #define VIDEO_SET_CUR_CT_FOCUS_SIMPLE_CONTROL       0x0152U
+    #define VIDEO_SET_CUR_CT_DIGITAL_WINDOW_CONTROL     0x0153U
+    #define VIDEO_SET_CUR_CT_REGION_OF_INTEREST_CONTROL 0x0154U
 #endif
 
 #define VIDEO_SET_CUR_VS_PROBE_CONTROL                0x0161U
@@ -674,32 +674,34 @@
 #define VIDEO_SET_CUR_VS_SYNCH_DELAY_CONTROL          0x0169U
 
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
-#define VIDEO_SET_CUR_EU_SELECT_LAYER_CONTROL        0x0181U
-#define VIDEO_SET_CUR_EU_PROFILE_TOOLSET_CONTROL     0x0182U
-#define VIDEO_SET_CUR_EU_VIDEO_RESOLUTION_CONTROL    0x0183U
-#define VIDEO_SET_CUR_EU_MIN_FRAME_INTERVAL_CONTROL  0x0184U
-#define VIDEO_SET_CUR_EU_SLICE_MODE_CONTROL          0x0185U
-#define VIDEO_SET_CUR_EU_RATE_CONTROL_MODE_CONTROL   0x0186U
-#define VIDEO_SET_CUR_EU_AVERAGE_BITRATE_CONTROL     0x0187U
-#define VIDEO_SET_CUR_EU_CPB_SIZE_CONTROL            0x0188U
-#define VIDEO_SET_CUR_EU_PEAK_BIT_RATE_CONTROL       0x0189U
-#define VIDEO_SET_CUR_EU_QUANTIZATION_PARAMS_CONTROL 0x018AU
-#define VIDEO_SET_CUR_EU_SYNC_REF_FRAME_CONTROL      0x018BU
-#define VIDEO_SET_CUR_EU_LTR_BUFFER_CONTROL          0x018CU
-#define VIDEO_SET_CUR_EU_LTR_PICTURE_CONTROL         0x018DU
-#define VIDEO_SET_CUR_EU_LTR_VALIDATION_CONTROL      0x018EU
-#define VIDEO_SET_CUR_EU_LEVEL_IDC_LIMIT_CONTROL     0x018FU
-#define VIDEO_SET_CUR_EU_SEI_PAYLOADTYPE_CONTROL     0x0190U
-#define VIDEO_SET_CUR_EU_QP_RANGE_CONTROL            0x0191U
-#define VIDEO_SET_CUR_EU_PRIORITY_CONTROL            0x0192U
-#define VIDEO_SET_CUR_EU_START_OR_STOP_LAYER_CONTROL 0x0193U
-#define VIDEO_SET_CUR_EU_ERROR_RESILIENCY_CONTROL    0x0194U
+    #define VIDEO_SET_CUR_EU_SELECT_LAYER_CONTROL        0x0181U
+    #define VIDEO_SET_CUR_EU_PROFILE_TOOLSET_CONTROL     0x0182U
+    #define VIDEO_SET_CUR_EU_VIDEO_RESOLUTION_CONTROL    0x0183U
+    #define VIDEO_SET_CUR_EU_MIN_FRAME_INTERVAL_CONTROL  0x0184U
+    #define VIDEO_SET_CUR_EU_SLICE_MODE_CONTROL          0x0185U
+    #define VIDEO_SET_CUR_EU_RATE_CONTROL_MODE_CONTROL   0x0186U
+    #define VIDEO_SET_CUR_EU_AVERAGE_BITRATE_CONTROL     0x0187U
+    #define VIDEO_SET_CUR_EU_CPB_SIZE_CONTROL            0x0188U
+    #define VIDEO_SET_CUR_EU_PEAK_BIT_RATE_CONTROL       0x0189U
+    #define VIDEO_SET_CUR_EU_QUANTIZATION_PARAMS_CONTROL 0x018AU
+    #define VIDEO_SET_CUR_EU_SYNC_REF_FRAME_CONTROL      0x018BU
+    #define VIDEO_SET_CUR_EU_LTR_BUFFER_CONTROL          0x018CU
+    #define VIDEO_SET_CUR_EU_LTR_PICTURE_CONTROL         0x018DU
+    #define VIDEO_SET_CUR_EU_LTR_VALIDATION_CONTROL      0x018EU
+    #define VIDEO_SET_CUR_EU_LEVEL_IDC_LIMIT_CONTROL     0x018FU
+    #define VIDEO_SET_CUR_EU_SEI_PAYLOADTYPE_CONTROL     0x0190U
+    #define VIDEO_SET_CUR_EU_QP_RANGE_CONTROL            0x0191U
+    #define VIDEO_SET_CUR_EU_PRIORITY_CONTROL            0x0192U
+    #define VIDEO_SET_CUR_EU_START_OR_STOP_LAYER_CONTROL 0x0193U
+    #define VIDEO_SET_CUR_EU_ERROR_RESILIENCY_CONTROL    0x0194U
 #endif
 
 /*! @brief The payload header structure. */
-struct video_payload_header {
+struct video_payload_header
+{
     uint8_t bHeaderLength; /*!< The payload header length. */
-    union {
+    union
+    {
         uint8_t bmheaderInfo; /*!< The payload header bitmap field. */
         struct
         {
@@ -708,7 +710,7 @@ struct video_payload_header {
             uint8_t endOfFrame      : 1U; /*!< End of Frame. This bit indicates the end of a video frame and is set in the
                                         last video sample that belongs to a frame.*/
             uint8_t
-                presentationTimeStamp    : 1U; /*!< Presentation Time Stamp. This bit, when set, indicates the presence of
+            presentationTimeStamp    : 1U; /*!< Presentation Time Stamp. This bit, when set, indicates the presence of
                                                a PTS field.*/
             uint8_t sourceClockReference : 1U; /*!< Source Clock Reference. This bit, when set, indicates the presence
                                                   of a SCR field.*/
@@ -738,8 +740,10 @@ struct video_payload_header {
 } __PACKED;
 
 /*! @brief The Video probe and commit controls structure.*/
-struct video_probe_and_commit_controls {
-    union {
+struct video_probe_and_commit_controls
+{
+    union
+    {
         uint8_t bmHint; /*!< Bit-field control indicating to the function what fields shall be kept fixed. */
         struct
         {
@@ -751,7 +755,8 @@ struct video_probe_and_commit_controls {
             uint8_t reserved        : 3U; /*!< Reserved field.*/
         } hintBitmap;
     } hintUnion;
-    union {
+    union
+    {
         uint8_t bmHint; /*!< Bit-field control indicating to the function what fields shall be kept fixed. */
         struct
         {
@@ -783,7 +788,7 @@ struct video_probe_and_commit_controls {
 #if defined(USB_DEVICE_VIDEO_CLASS_VERSION_1_5) && USB_DEVICE_VIDEO_CLASS_VERSION_1_5
     uint8_t bUsage; /*!< This bitmap enables features reported by the bmUsages field of the Video Frame Descriptor.*/
     uint8_t
-        bBitDepthLuma;                  /*!< Represents bit_depth_luma_minus8 + 8U, which must be the same as bit_depth_chroma_minus8 +
+    bBitDepthLuma;                  /*!< Represents bit_depth_luma_minus8 + 8U, which must be the same as bit_depth_chroma_minus8 +
                            8.*/
     uint8_t bmSettings;                 /*!< A bitmap of flags that is used to discover and control specific features of a temporally
                            encoded video stream.*/
@@ -794,7 +799,8 @@ struct video_probe_and_commit_controls {
 } __PACKED;
 
 /*! @brief The Video still probe and still commit controls structure.*/
-struct video_still_probe_and_commit_controls {
+struct video_still_probe_and_commit_controls
+{
     uint8_t bFormatIndex;              /*!< Video format index from a format descriptor.*/
     uint8_t bFrameIndex;               /*!< Video frame index from a frame descriptor.*/
     uint8_t bCompressionIndex;         /*!< Compression index from a frame descriptor.*/
@@ -803,7 +809,8 @@ struct video_still_probe_and_commit_controls {
                                           receive in a single payload transfer.*/
 } __PACKED;
 
-struct video_cs_if_vc_header_descriptor {
+struct video_cs_if_vc_header_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint16_t bcdVDC;
@@ -815,7 +822,8 @@ struct video_cs_if_vc_header_descriptor {
 
 #define VIDEO_SIZEOF_VC_HEADER_DESC(n) (11 + n)
 
-struct video_cs_if_vc_input_terminal_descriptor {
+struct video_cs_if_vc_input_terminal_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -832,7 +840,8 @@ struct video_cs_if_vc_input_terminal_descriptor {
 
 #define VIDEO_SIZEOF_VC_INPUT_TERMINAL_DESC(n) (15 + n)
 
-struct video_cs_if_vc_processing_unit_descriptor {
+struct video_cs_if_vc_processing_unit_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -847,7 +856,8 @@ struct video_cs_if_vc_processing_unit_descriptor {
 
 #define VIDEO_SIZEOF_VC_PROCESSING_UNIT_DESC(n) (10 + n)
 
-struct video_cs_if_vc_output_terminal_descriptor {
+struct video_cs_if_vc_output_terminal_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -860,7 +870,8 @@ struct video_cs_if_vc_output_terminal_descriptor {
 
 #define VIDEO_SIZEOF_VC_OUTPUT_TERMINAL_DESC 9
 
-struct video_cs_ep_vc_ep_descriptor {
+struct video_cs_ep_vc_ep_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -869,7 +880,8 @@ struct video_cs_ep_vc_ep_descriptor {
 
 #define VIDEO_SIZEOF_VC_EP_DESC 5
 
-struct video_cs_if_vs_input_header_descriptor {
+struct video_cs_if_vs_input_header_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -887,7 +899,8 @@ struct video_cs_if_vs_input_header_descriptor {
 
 #define VIDEO_SIZEOF_VS_INPUT_HEADER_DESC(p, n) (13 + p * n)
 
-struct video_cs_if_vs_output_header_descriptor {
+struct video_cs_if_vs_output_header_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -901,7 +914,8 @@ struct video_cs_if_vs_output_header_descriptor {
 
 #define VIDEO_SIZEOF_VS_OUTPUT_TERMINAL_DESC(p, n) (9 + p * n)
 
-struct video_cs_if_vs_format_uncompressed_descriptor {
+struct video_cs_if_vs_format_uncompressed_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -918,7 +932,8 @@ struct video_cs_if_vs_format_uncompressed_descriptor {
 
 #define VIDEO_SIZEOF_VS_FORMAT_UNCOMPRESSED_DESC (27)
 
-struct video_cs_if_vs_frame_uncompressed_descriptor {
+struct video_cs_if_vs_frame_uncompressed_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -936,7 +951,8 @@ struct video_cs_if_vs_frame_uncompressed_descriptor {
 
 #define VIDEO_SIZEOF_VS_FRAME_UNCOMPRESSED_DESC 30
 
-struct video_cs_if_vs_format_mjpeg_descriptor {
+struct video_cs_if_vs_format_mjpeg_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -952,7 +968,8 @@ struct video_cs_if_vs_format_mjpeg_descriptor {
 
 #define VIDEO_SIZEOF_VS_FORMAT_MJPEG_DESC 11
 
-struct video_cs_if_vs_frame_mjpeg_descriptor {
+struct video_cs_if_vs_frame_mjpeg_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -971,7 +988,8 @@ struct video_cs_if_vs_frame_mjpeg_descriptor {
 
 #define VIDEO_SIZEOF_VS_FRAME_MJPEG_DESC(n) (26 + n)
 
-struct video_cs_if_vs_colorformat_descriptor {
+struct video_cs_if_vs_colorformat_descriptor
+{
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -982,7 +1000,8 @@ struct video_cs_if_vs_colorformat_descriptor {
 
 #define VIDEO_SIZEOF_VS_COLORFORMAT_DESC 6
 
-struct video_vc_input_terminal_bmcontrol_bitmap {
+struct video_vc_input_terminal_bmcontrol_bitmap
+{
     uint32_t scanning_mode          : 1;
     uint32_t auto_exposure_mode     : 1;
     uint32_t auto_exposure_priority : 1;
@@ -1003,7 +1022,8 @@ struct video_vc_input_terminal_bmcontrol_bitmap {
     uint32_t pricvcy                : 1;
 };
 
-struct video_vc_processing_unit_bmcontrol_bitmap {
+struct video_vc_processing_unit_bmcontrol_bitmap
+{
     uint16_t brightness          : 1;
     uint16_t contrast            : 1;
     uint16_t hue                 : 1;
@@ -1022,7 +1042,8 @@ struct video_vc_processing_unit_bmcontrol_bitmap {
     uint16_t digital_mult_limit  : 1;
 };
 
-struct video_camera_capabilities {
+struct video_camera_capabilities
+{
     uint8_t support_get_request        : 1;
     uint8_t support_set_request        : 1;
     uint8_t disabled_by_automatic_mode : 1;
@@ -1031,7 +1052,8 @@ struct video_camera_capabilities {
     uint8_t reserved                   : 3;
 };
 
-struct video_autoexposure_mode {
+struct video_autoexposure_mode
+{
     uint8_t manual_mode            : 1;
     uint8_t auto_mode              : 1;
     uint8_t shutter_priority_mode  : 1;

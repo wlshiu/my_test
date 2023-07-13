@@ -8,7 +8,8 @@
 
 #include "usb_printer.h"
 
-struct usbh_printer {
+struct usbh_printer
+{
     struct usbh_hubport *hport;
 
     uint8_t intf;          /* interface number */

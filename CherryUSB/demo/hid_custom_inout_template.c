@@ -27,7 +27,8 @@
 #define HID_CUSTOM_REPORT_DESC_SIZE 34
 
 /*!< global descriptor */
-static const uint8_t hid_descriptor[] = {
+static const uint8_t hid_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0x00, 0x00, 0x00, USBD_VID, USBD_PID, 0x0002, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_HID_CONFIG_DESC_SIZ, 0x01, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
     /************** Descriptor of Custom interface *****************/
@@ -140,7 +141,8 @@ static const uint8_t hid_descriptor[] = {
 };
 
 /*!< custom hid report descriptor */
-static const uint8_t hid_custom_report_desc[HID_CUSTOM_REPORT_DESC_SIZE] = {
+static const uint8_t hid_custom_report_desc[HID_CUSTOM_REPORT_DESC_SIZE] =
+{
     /* USER CODE BEGIN 0 */
     0x06, 0x00, 0xff, // USAGE_PAGE (Vendor Defined Page 1)
     0x09, 0x01,       // USAGE (Vendor Usage 1)
@@ -159,7 +161,7 @@ static const uint8_t hid_custom_report_desc[HID_CUSTOM_REPORT_DESC_SIZE] = {
     0x75, 0x08,       //   REPORT_SIZE (8)
     0x91, 0x02,       //   OUTPUT (Data,Var,Abs)
     /* USER CODE END 0 */
-    0xC0 /*     END_COLLECTION	             */
+    0xC0 /*     END_COLLECTION               */
 };
 
 USB_NOCACHE_RAM_SECTION USB_MEM_ALIGNX uint8_t read_buffer[2048];
@@ -188,12 +190,14 @@ static void usbd_hid_custom_out_callback(uint8_t ep, uint32_t nbytes)
     usbd_ep_start_read(HIDRAW_OUT_EP, read_buffer, 64);
 }
 
-static struct usbd_endpoint custom_in_ep = {
+static struct usbd_endpoint custom_in_ep =
+{
     .ep_cb = usbd_hid_custom_in_callback,
     .ep_addr = HIDRAW_IN_EP
 };
 
-static struct usbd_endpoint custom_out_ep = {
+static struct usbd_endpoint custom_out_ep =
+{
     .ep_cb = usbd_hid_custom_out_callback,
     .ep_addr = HIDRAW_OUT_EP
 };
@@ -215,11 +219,13 @@ void hid_custom_test(void)
     uint8_t sendbuffer[64] = { 0x00, 0x00, HID_KBD_USAGE_A, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
     int ret = usbd_ep_start_write(HIDRAW_IN_EP, sendbuffer, 8);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         return;
     }
     custom_state = HID_STATE_BUSY;
-    while (custom_state == HID_STATE_BUSY) {
+    while (custom_state == HID_STATE_BUSY)
+    {
     }
 }
 

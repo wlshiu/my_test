@@ -3,7 +3,8 @@
 
 #include "usb_xxx.h"
 
-struct usbh_xxx {
+struct usbh_xxx
+{
     struct usbh_hubport *hport;
 
     uint8_t intf; /* interface number */

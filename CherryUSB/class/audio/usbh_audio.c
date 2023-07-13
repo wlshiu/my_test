@@ -25,9 +25,11 @@ static int usbh_audio_devno_alloc(struct usbh_audio *audio_class)
 {
     int devno;
 
-    for (devno = 0; devno < 32; devno++) {
+    for (devno = 0; devno < 32; devno++)
+    {
         uint32_t bitno = 1 << devno;
-        if ((g_devinuse & bitno) == 0) {
+        if ((g_devinuse & bitno) == 0)
+        {
             g_devinuse |= bitno;
             audio_class->minor = devno;
             return 0;
@@ -41,7 +43,8 @@ static void usbh_audio_devno_free(struct usbh_audio *audio_class)
 {
     int devno = audio_class->minor;
 
-    if (devno >= 0 && devno < 32) {
+    if (devno >= 0 && devno < 32)
+    {
         g_devinuse &= ~(1 << devno);
     }
 }
@@ -56,15 +59,21 @@ int usbh_audio_open(struct usbh_audio *audio_class, const char *name, uint32_t s
     uint8_t intf = 0xff;
     uint8_t altsetting = 1;
 
-    if (audio_class->is_opened) {
+    if (audio_class->is_opened)
+    {
         return -EMFILE;
     }
 
-    for (uint8_t i = 0; i < audio_class->module_num; i++) {
-        if (strcmp(name, audio_class->module[i].name) == 0) {
-            for (uint8_t j = 0; j < audio_class->num_of_intf_altsettings; j++) {
-                for (uint8_t k = 0; k < audio_class->module[i].altsetting[j].sampfreq_num; k++) {
-                    if (audio_class->module[i].altsetting[j].sampfreq[k] == samp_freq) {
+    for (uint8_t i = 0; i < audio_class->module_num; i++)
+    {
+        if (strcmp(name, audio_class->module[i].name) == 0)
+        {
+            for (uint8_t j = 0; j < audio_class->num_of_intf_altsettings; j++)
+            {
+                for (uint8_t k = 0; k < audio_class->module[i].altsetting[j].sampfreq_num; k++)
+                {
+                    if (audio_class->module[i].altsetting[j].sampfreq[k] == samp_freq)
+                    {
                         intf = audio_class->module[i].data_intf;
                         altsetting = j;
                         goto freq_found;
@@ -85,7 +94,8 @@ freq_found:
     setup->wLength = 0;
 
     ret = usbh_control_transfer(audio_class->hport->ep0, setup, NULL);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         return ret;
     }
 
@@ -99,16 +109,20 @@ freq_found:
 
     memcpy(g_audio_buf, &samp_freq, 3);
     ret = usbh_control_transfer(audio_class->hport->ep0, setup, g_audio_buf);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         return ret;
     }
 
     mult = (ep_desc->wMaxPacketSize & USB_MAXPACKETSIZE_ADDITIONAL_TRANSCATION_MASK) >> USB_MAXPACKETSIZE_ADDITIONAL_TRANSCATION_SHIFT;
     mps = ep_desc->wMaxPacketSize & USB_MAXPACKETSIZE_MASK;
-    if (ep_desc->bEndpointAddress & 0x80) {
+    if (ep_desc->bEndpointAddress & 0x80)
+    {
         audio_class->isoin_mps = mps * (mult + 1);
         usbh_hport_activate_epx(&audio_class->isoin, audio_class->hport, ep_desc);
-    } else {
+    }
+    else
+    {
         audio_class->isoout_mps = mps * (mult + 1);
         usbh_hport_activate_epx(&audio_class->isoout, audio_class->hport, ep_desc);
     }
@@ -126,13 +140,16 @@ int usbh_audio_close(struct usbh_audio *audio_class, const char *name)
     uint8_t intf = 0xff;
     uint8_t altsetting = 1;
 
-    for (size_t i = 0; i < audio_class->module_num; i++) {
-        if (strcmp(name, audio_class->module[i].name) == 0) {
+    for (size_t i = 0; i < audio_class->module_num; i++)
+    {
+        if (strcmp(name, audio_class->module[i].name) == 0)
+        {
             intf = audio_class->module[i].data_intf;
         }
     }
 
-    if (intf == 0xff) {
+    if (intf == 0xff)
+    {
         return -ENODEV;
     }
 
@@ -140,13 +157,18 @@ int usbh_audio_close(struct usbh_audio *audio_class, const char *name)
     audio_class->is_opened = false;
 
     ep_desc = &audio_class->hport->config.intf[intf].altsetting[altsetting].ep[0].ep_desc;
-    if (ep_desc->bEndpointAddress & 0x80) {
-        if (audio_class->isoin) {
+    if (ep_desc->bEndpointAddress & 0x80)
+    {
+        if (audio_class->isoin)
+        {
             usbh_pipe_free(audio_class->isoin);
             audio_class->isoin = NULL;
         }
-    } else {
-        if (audio_class->isoout) {
+    }
+    else
+    {
+        if (audio_class->isoout)
+        {
             usbh_pipe_free(audio_class->isoout);
             audio_class->isoout = NULL;
         }
@@ -171,14 +193,17 @@ int usbh_audio_set_volume(struct usbh_audio *audio_class, const char *name, uint
     uint8_t feature_id = 0xff;
     uint16_t volume_hex;
 
-    for (size_t i = 0; i < audio_class->module_num; i++) {
-        if (strcmp(name, audio_class->module[i].name) == 0) {
+    for (size_t i = 0; i < audio_class->module_num; i++)
+    {
+        if (strcmp(name, audio_class->module[i].name) == 0)
+        {
             intf = audio_class->ctrl_intf;
             feature_id = audio_class->module[i].feature_unit_id;
         }
     }
 
-    if (intf == 0xff) {
+    if (intf == 0xff)
+    {
         return -ENODEV;
     }
 
@@ -203,14 +228,17 @@ int usbh_audio_set_mute(struct usbh_audio *audio_class, const char *name, uint8_
     uint8_t intf = 0xff;
     uint8_t feature_id = 0xff;
 
-    for (size_t i = 0; i < audio_class->module_num; i++) {
-        if (strcmp(name, audio_class->module[i].name) == 0) {
+    for (size_t i = 0; i < audio_class->module_num; i++)
+    {
+        if (strcmp(name, audio_class->module[i].name) == 0)
+        {
             intf = audio_class->ctrl_intf;
             feature_id = audio_class->module[i].feature_unit_id;
         }
     }
 
-    if (intf == 0xff) {
+    if (intf == 0xff)
+    {
         return -ENODEV;
     }
 
@@ -233,12 +261,15 @@ void usbh_audio_list_module(struct usbh_audio *audio_class)
     USB_LOG_INFO("Num of modules :%u\r\n", audio_class->module_num);
     USB_LOG_INFO("Num of altsettings:%u\r\n", audio_class->num_of_intf_altsettings);
 
-    for (uint8_t i = 0; i < audio_class->module_num; i++) {
+    for (uint8_t i = 0; i < audio_class->module_num; i++)
+    {
         USB_LOG_INFO("  module name :%s\r\n", audio_class->module[i].name);
         USB_LOG_INFO("  module feature unit id :%d\r\n", audio_class->module[i].feature_unit_id);
 
-        for (uint8_t j = 0; j < audio_class->num_of_intf_altsettings; j++) {
-            if (j == 0) {
+        for (uint8_t j = 0; j < audio_class->num_of_intf_altsettings; j++)
+        {
+            if (j == 0)
+            {
                 USB_LOG_INFO("      Ingore altsetting 0\r\n");
                 continue;
             }
@@ -248,7 +279,8 @@ void usbh_audio_list_module(struct usbh_audio *audio_class)
             USB_LOG_INFO("          module bitresolution :%u\r\n", audio_class->module[i].altsetting[j].bitresolution);
             USB_LOG_INFO("          module sampfreq num :%u\r\n", audio_class->module[i].altsetting[j].sampfreq_num);
 
-            for (uint8_t k = 0; k < audio_class->module[i].altsetting[j].sampfreq_num; k++) {
+            for (uint8_t k = 0; k < audio_class->module[i].altsetting[j].sampfreq_num; k++)
+            {
                 USB_LOG_INFO("              module sampfreq :%d hz\r\n", audio_class->module[i].altsetting[j].sampfreq[k]);
             }
         }
@@ -270,7 +302,8 @@ static int usbh_audio_ctrl_connect(struct usbh_hubport *hport, uint8_t intf)
     uint8_t *p;
 
     struct usbh_audio *audio_class = usb_malloc(sizeof(struct usbh_audio));
-    if (audio_class == NULL) {
+    if (audio_class == NULL)
+    {
         USB_LOG_ERR("Fail to alloc audio_class\r\n");
         return -ENOMEM;
     }
@@ -284,8 +317,10 @@ static int usbh_audio_ctrl_connect(struct usbh_hubport *hport, uint8_t intf)
     hport->config.intf[intf].priv = audio_class;
 
     p = hport->raw_config_desc;
-    while (p[DESC_bLength]) {
-        switch (p[DESC_bDescriptorType]) {
+    while (p[DESC_bLength])
+    {
+        switch (p[DESC_bDescriptorType])
+        {
             case USB_DESCRIPTOR_TYPE_INTERFACE_ASSOCIATION:
                 cur_iface_count = p[3];
                 break;
@@ -296,80 +331,102 @@ static int usbh_audio_ctrl_connect(struct usbh_hubport *hport, uint8_t intf)
             case USB_DESCRIPTOR_TYPE_ENDPOINT:
                 break;
             case AUDIO_INTERFACE_DESCRIPTOR_TYPE:
-                if (cur_iface == audio_class->ctrl_intf) {
-                    switch (p[DESC_bDescriptorSubType]) {
-                        case AUDIO_CONTROL_HEADER: {
-                            struct audio_cs_if_ac_header_descriptor *desc = (struct audio_cs_if_ac_header_descriptor *)p;
-                            audio_class->bcdADC = desc->bcdADC;
-                            audio_class->bInCollection = desc->bInCollection;
-                        } break;
-                        case AUDIO_CONTROL_INPUT_TERMINAL: {
-                            struct audio_cs_if_ac_input_terminal_descriptor *desc = (struct audio_cs_if_ac_input_terminal_descriptor *)p;
-
-                            audio_class->module[input_offset].input_terminal_id = desc->bTerminalID;
-                            audio_class->module[input_offset].input_terminal_type = desc->wTerminalType;
-                            audio_class->module[input_offset].input_channel_config = desc->wChannelConfig;
-
-                            if (desc->wTerminalType == AUDIO_TERMINAL_STREAMING) {
-                                audio_class->module[input_offset].terminal_link_id = desc->bTerminalID;
+                if (cur_iface == audio_class->ctrl_intf)
+                {
+                    switch (p[DESC_bDescriptorSubType])
+                    {
+                        case AUDIO_CONTROL_HEADER:
+                            {
+                                struct audio_cs_if_ac_header_descriptor *desc = (struct audio_cs_if_ac_header_descriptor *)p;
+                                audio_class->bcdADC = desc->bcdADC;
+                                audio_class->bInCollection = desc->bInCollection;
                             }
-                            if (desc->wTerminalType == AUDIO_INTERM_MIC) {
-                                audio_class->module[input_offset].name = "mic";
-                            }
-                            input_offset++;
-                        } break;
                             break;
-                        case AUDIO_CONTROL_OUTPUT_TERMINAL: {
-                            struct audio_cs_if_ac_output_terminal_descriptor *desc = (struct audio_cs_if_ac_output_terminal_descriptor *)p;
-                            audio_class->module[output_offset].output_terminal_id = desc->bTerminalID;
-                            audio_class->module[output_offset].output_terminal_type = desc->wTerminalType;
-                            if (desc->wTerminalType == AUDIO_TERMINAL_STREAMING) {
-                                audio_class->module[output_offset].terminal_link_id = desc->bTerminalID;
-                            }
-                            if (desc->wTerminalType == AUDIO_OUTTERM_SPEAKER) {
-                                audio_class->module[output_offset].name = "speaker";
-                            }
-                            output_offset++;
-                        } break;
-                        case AUDIO_CONTROL_FEATURE_UNIT: {
-                            struct audio_cs_if_ac_feature_unit_descriptor *desc = (struct audio_cs_if_ac_feature_unit_descriptor *)p;
-                            audio_class->module[feature_unit_offset].feature_unit_id = desc->bUnitID;
-                            audio_class->module[feature_unit_offset].feature_unit_controlsize = desc->bControlSize;
+                        case AUDIO_CONTROL_INPUT_TERMINAL:
+                            {
+                                struct audio_cs_if_ac_input_terminal_descriptor *desc = (struct audio_cs_if_ac_input_terminal_descriptor *)p;
 
-                            for (uint8_t j = 0; j < desc->bControlSize; j++) {
-                                audio_class->module[feature_unit_offset].feature_unit_controls[j] = p[6 + j];
+                                audio_class->module[input_offset].input_terminal_id = desc->bTerminalID;
+                                audio_class->module[input_offset].input_terminal_type = desc->wTerminalType;
+                                audio_class->module[input_offset].input_channel_config = desc->wChannelConfig;
+
+                                if (desc->wTerminalType == AUDIO_TERMINAL_STREAMING)
+                                {
+                                    audio_class->module[input_offset].terminal_link_id = desc->bTerminalID;
+                                }
+                                if (desc->wTerminalType == AUDIO_INTERM_MIC)
+                                {
+                                    audio_class->module[input_offset].name = "mic";
+                                }
+                                input_offset++;
                             }
-                            feature_unit_offset++;
-                        } break;
+                            break;
+                            break;
+                        case AUDIO_CONTROL_OUTPUT_TERMINAL:
+                            {
+                                struct audio_cs_if_ac_output_terminal_descriptor *desc = (struct audio_cs_if_ac_output_terminal_descriptor *)p;
+                                audio_class->module[output_offset].output_terminal_id = desc->bTerminalID;
+                                audio_class->module[output_offset].output_terminal_type = desc->wTerminalType;
+                                if (desc->wTerminalType == AUDIO_TERMINAL_STREAMING)
+                                {
+                                    audio_class->module[output_offset].terminal_link_id = desc->bTerminalID;
+                                }
+                                if (desc->wTerminalType == AUDIO_OUTTERM_SPEAKER)
+                                {
+                                    audio_class->module[output_offset].name = "speaker";
+                                }
+                                output_offset++;
+                            }
+                            break;
+                        case AUDIO_CONTROL_FEATURE_UNIT:
+                            {
+                                struct audio_cs_if_ac_feature_unit_descriptor *desc = (struct audio_cs_if_ac_feature_unit_descriptor *)p;
+                                audio_class->module[feature_unit_offset].feature_unit_id = desc->bUnitID;
+                                audio_class->module[feature_unit_offset].feature_unit_controlsize = desc->bControlSize;
+
+                                for (uint8_t j = 0; j < desc->bControlSize; j++)
+                                {
+                                    audio_class->module[feature_unit_offset].feature_unit_controls[j] = p[6 + j];
+                                }
+                                feature_unit_offset++;
+                            }
+                            break;
                         case AUDIO_CONTROL_PROCESSING_UNIT:
 
                             break;
                         default:
                             break;
                     }
-                } else if ((cur_iface < (audio_class->ctrl_intf + cur_iface_count)) && (cur_iface > audio_class->ctrl_intf)) {
-                    switch (p[DESC_bDescriptorSubType]) {
+                }
+                else if ((cur_iface < (audio_class->ctrl_intf + cur_iface_count)) && (cur_iface > audio_class->ctrl_intf))
+                {
+                    switch (p[DESC_bDescriptorSubType])
+                    {
                         case AUDIO_STREAMING_GENERAL:
 
                             break;
-                        case AUDIO_STREAMING_FORMAT_TYPE: {
-                            struct audio_cs_if_as_format_type_descriptor *desc = (struct audio_cs_if_as_format_type_descriptor *)p;
+                        case AUDIO_STREAMING_FORMAT_TYPE:
+                            {
+                                struct audio_cs_if_as_format_type_descriptor *desc = (struct audio_cs_if_as_format_type_descriptor *)p;
 
-                            audio_class->module[format_offset].data_intf = cur_iface;
-                            audio_class->module[format_offset].altsetting[cur_alt_setting].channels = desc->bNrChannels;
-                            audio_class->module[format_offset].altsetting[cur_alt_setting].format_type = desc->bFormatType;
-                            audio_class->module[format_offset].altsetting[cur_alt_setting].bitresolution = desc->bBitResolution;
-                            audio_class->module[format_offset].altsetting[cur_alt_setting].sampfreq_num = desc->bSamFreqType;
+                                audio_class->module[format_offset].data_intf = cur_iface;
+                                audio_class->module[format_offset].altsetting[cur_alt_setting].channels = desc->bNrChannels;
+                                audio_class->module[format_offset].altsetting[cur_alt_setting].format_type = desc->bFormatType;
+                                audio_class->module[format_offset].altsetting[cur_alt_setting].bitresolution = desc->bBitResolution;
+                                audio_class->module[format_offset].altsetting[cur_alt_setting].sampfreq_num = desc->bSamFreqType;
 
-                            for (uint8_t j = 0; j < desc->bSamFreqType; j++) {
-                                audio_class->module[format_offset].altsetting[cur_alt_setting].sampfreq[j] = (uint32_t)(p[10 + j] << 16) |
-                                                                                                             (uint32_t)(p[9 + j] << 8) |
-                                                                                                             (uint32_t)(p[8 + j] << 0);
+                                for (uint8_t j = 0; j < desc->bSamFreqType; j++)
+                                {
+                                    audio_class->module[format_offset].altsetting[cur_alt_setting].sampfreq[j] = (uint32_t)(p[10 + j] << 16) |
+                                            (uint32_t)(p[9 + j] << 8) |
+                                            (uint32_t)(p[8 + j] << 0);
+                                }
+                                if (cur_alt_setting == (hport->config.intf[intf + 1].altsetting_num - 1))
+                                {
+                                    format_offset++;
+                                }
                             }
-                            if (cur_alt_setting == (hport->config.intf[intf + 1].altsetting_num - 1)) {
-                                format_offset++;
-                            }
-                        } break;
+                            break;
                         default:
                             break;
                     }
@@ -382,15 +439,18 @@ static int usbh_audio_ctrl_connect(struct usbh_hubport *hport, uint8_t intf)
         p += p[DESC_bLength];
     }
 
-    if ((input_offset != output_offset) && (input_offset != feature_unit_offset) && (input_offset != format_offset)) {
+    if ((input_offset != output_offset) && (input_offset != feature_unit_offset) && (input_offset != format_offset))
+    {
         return -EINVAL;
     }
 
     audio_class->module_num = input_offset;
 
-    for (size_t i = 0; i < audio_class->module_num; i++) {
+    for (size_t i = 0; i < audio_class->module_num; i++)
+    {
         ret = usbh_audio_close(audio_class, audio_class->module[i].name);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             USB_LOG_ERR("Fail to close audio module :%s\r\n", audio_class->module[i].name);
             return ret;
         }
@@ -411,18 +471,22 @@ static int usbh_audio_ctrl_disconnect(struct usbh_hubport *hport, uint8_t intf)
 
     struct usbh_audio *audio_class = (struct usbh_audio *)hport->config.intf[intf].priv;
 
-    if (audio_class) {
+    if (audio_class)
+    {
         usbh_audio_devno_free(audio_class);
 
-        if (audio_class->isoin) {
+        if (audio_class->isoin)
+        {
             usbh_pipe_free(audio_class->isoin);
         }
 
-        if (audio_class->isoout) {
+        if (audio_class->isoout)
+        {
             usbh_pipe_free(audio_class->isoout);
         }
 
-        if (hport->config.intf[intf].devname[0] != '\0') {
+        if (hport->config.intf[intf].devname[0] != '\0')
+        {
             USB_LOG_INFO("Unregister Audio Class:%s\r\n", hport->config.intf[intf].devname);
             usbh_audio_stop(audio_class);
         }
@@ -452,19 +516,22 @@ __WEAK void usbh_audio_stop(struct usbh_audio *audio_class)
 {
 }
 
-const struct usbh_class_driver audio_ctrl_class_driver = {
+const struct usbh_class_driver audio_ctrl_class_driver =
+{
     .driver_name = "audio_ctrl",
     .connect = usbh_audio_ctrl_connect,
     .disconnect = usbh_audio_ctrl_disconnect
 };
 
-const struct usbh_class_driver audio_streaming_class_driver = {
+const struct usbh_class_driver audio_streaming_class_driver =
+{
     .driver_name = "audio_streaming",
     .connect = usbh_audio_data_connect,
     .disconnect = usbh_audio_data_disconnect
 };
 
-CLASS_INFO_DEFINE const struct usbh_class_info audio_ctrl_intf_class_info = {
+CLASS_INFO_DEFINE const struct usbh_class_info audio_ctrl_intf_class_info =
+{
     .match_flags = USB_CLASS_MATCH_INTF_CLASS | USB_CLASS_MATCH_INTF_SUBCLASS,
     .class = USB_DEVICE_CLASS_AUDIO,
     .subclass = AUDIO_SUBCLASS_AUDIOCONTROL,
@@ -474,7 +541,8 @@ CLASS_INFO_DEFINE const struct usbh_class_info audio_ctrl_intf_class_info = {
     .class_driver = &audio_ctrl_class_driver
 };
 
-CLASS_INFO_DEFINE const struct usbh_class_info audio_streaming_intf_class_info = {
+CLASS_INFO_DEFINE const struct usbh_class_info audio_streaming_intf_class_info =
+{
     .match_flags = USB_CLASS_MATCH_INTF_CLASS | USB_CLASS_MATCH_INTF_SUBCLASS,
     .class = USB_DEVICE_CLASS_AUDIO,
     .subclass = AUDIO_SUBCLASS_AUDIOSTREAMING,

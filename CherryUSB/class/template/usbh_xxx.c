@@ -10,7 +10,8 @@ static int usbh_xxx_connect(struct usbh_hubport *hport, uint8_t intf)
     int ret;
 
     struct usbh_xxx *xxx_class = usb_malloc(sizeof(struct usbh_xxx));
-    if (xxx_class == NULL) {
+    if (xxx_class == NULL)
+    {
         USB_LOG_ERR("Fail to alloc xxx_class\r\n");
         return -ENOMEM;
     }
@@ -23,7 +24,8 @@ static int usbh_xxx_connect(struct usbh_hubport *hport, uint8_t intf)
     hport->config.intf[intf].priv = xxx_class;
     strncpy(hport->config.intf[intf].devname, DEV_FORMAT, CONFIG_USBHOST_DEV_NAMELEN);
 
-    for (uint8_t i = 0; i < hport->config.intf[intf + 1].intf_desc.bNumEndpoints; i++) {
+    for (uint8_t i = 0; i < hport->config.intf[intf + 1].intf_desc.bNumEndpoints; i++)
+    {
         ep_desc = &hport->config.intf[intf + 1].ep[i].ep_desc;
 
         ep_cfg.ep_addr = ep_desc->bEndpointAddress;
@@ -31,9 +33,12 @@ static int usbh_xxx_connect(struct usbh_hubport *hport, uint8_t intf)
         ep_cfg.ep_mps = ep_desc->wMaxPacketSize;
         ep_cfg.ep_interval = ep_desc->bInterval;
         ep_cfg.hport = hport;
-        if (ep_desc->bEndpointAddress & 0x80) {
+        if (ep_desc->bEndpointAddress & 0x80)
+        {
             usbh_pipe_alloc(&rndis_class->bulkin, &ep_cfg);
-        } else {
+        }
+        else
+        {
             usbh_pipe_alloc(&rndis_class->bulkout, &ep_cfg);
         }
     }
@@ -49,12 +54,15 @@ static int usbh_xxx_disconnect(struct usbh_hubport *hport, uint8_t intf)
 
     struct usbh_xxx *xxx_class = (struct usbh_xxx *)hport->config.intf[intf].priv;
 
-    if (xxx_class) {
-        if (xxx_class->bulkin) {
+    if (xxx_class)
+    {
+        if (xxx_class->bulkin)
+        {
             usbh_pipe_free(xxx_class->bulkin);
         }
 
-        if (xxx_class->bulkout) {
+        if (xxx_class->bulkout)
+        {
             usbh_pipe_free(xxx_class->bulkout);
         }
 
@@ -70,13 +78,15 @@ static int usbh_xxx_disconnect(struct usbh_hubport *hport, uint8_t intf)
 }
 
 
-static const struct usbh_class_driver xxx_class_driver = {
+static const struct usbh_class_driver xxx_class_driver =
+{
     .driver_name = "xxx",
     .connect = usbh_xxx_connect,
     .disconnect = usbh_xxx_disconnect
 };
 
-CLASS_INFO_DEFINE const struct usbh_class_info xxx_class_info = {
+CLASS_INFO_DEFINE const struct usbh_class_info xxx_class_info =
+{
     .match_flags = USB_CLASS_MATCH_INTF_CLASS | USB_CLASS_MATCH_INTF_SUBCLASS | USB_CLASS_MATCH_INTF_PROTOCOL,
     .class = 0,
     .subclass = 0,

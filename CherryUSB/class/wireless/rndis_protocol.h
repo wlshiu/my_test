@@ -94,13 +94,15 @@ typedef uint32_t rndis_AfListOffset_t;
 typedef uint32_t rndis_AfListSize_t;
 
 /*** Remote NDIS Generic Message type ***/
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
 } rndis_generic_msg_t;
 
 /*** Remote NDIS Initialize Message ***/
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
     rndis_RequestId_t RequestId;
@@ -110,7 +112,8 @@ typedef struct {
 } rndis_initialize_msg_t;
 
 /* Response: */
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
     rndis_RequestId_t RequestId;
@@ -127,7 +130,8 @@ typedef struct {
 } rndis_initialize_cmplt_t;
 
 /*** Remote NDIS Halt Message ***/
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
     rndis_RequestId_t RequestId;
@@ -139,7 +143,8 @@ typedef uint32_t rndis_InformationBufferOffset_t;
 typedef uint32_t rndis_DeviceVcHandle_t;
 
 /*** Remote NDIS Query Message ***/
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
     rndis_RequestId_t RequestId;
@@ -151,7 +156,8 @@ typedef struct {
 
 /* Response: */
 
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
     rndis_RequestId_t RequestId;
@@ -161,7 +167,8 @@ typedef struct {
 } rndis_query_cmplt_t;
 
 /*** Remote NDIS Set Message ***/
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
     rndis_RequestId_t RequestId;
@@ -172,7 +179,8 @@ typedef struct {
 } rndis_set_msg_t;
 
 /* Response */
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
     rndis_RequestId_t RequestId;
@@ -189,7 +197,8 @@ typedef uint32_t rndis_ParameterValueLength_t;
 #define PARAMETER_TYPE_STRING    2
 #define PARAMETER_TYPE_NUMERICAL 0
 
-typedef struct {
+typedef struct
+{
     rndis_ParameterNameOffset_t ParameterNameOffset;
     rndis_ParameterNameLength_t ParameterNameLength;
     rndis_ParameterType_t ParameterType;
@@ -200,7 +209,8 @@ typedef struct {
 typedef uint32_t rndis_Reserved_t;
 
 /*** Remote NDIS Soft Reset Message ***/
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
     rndis_Reserved_t Reserved;
@@ -209,7 +219,8 @@ typedef struct {
 typedef uint32_t rndis_AddressingReset_t;
 
 /* Response: */
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
     rndis_Status_t Status;
@@ -217,7 +228,8 @@ typedef struct {
 } rndis_reset_cmplt_t;
 
 /*** Remote NDIS Indicate Status Message ***/
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
     rndis_Status_t Status;
@@ -228,20 +240,23 @@ typedef struct {
 typedef uint32_t rndis_DiagStatus_t;
 typedef uint32_t rndis_ErrorOffset_t;
 
-typedef struct {
+typedef struct
+{
     rndis_DiagStatus_t DiagStatus;
     rndis_ErrorOffset_t ErrorOffset;
 } rndis_diagnostic_info_t;
 
 /*** Remote NDIS Keepalive Message */
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
     rndis_RequestId_t RequestId;
 } rndis_keepalive_msg_t;
 
 /* Response: */
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
     rndis_RequestId_t RequestId;
@@ -258,7 +273,8 @@ typedef uint32_t rndis_NumOOBDataElements_t;
 typedef uint32_t rndis_PerPacketInfoOffset_t;
 typedef uint32_t rndis_PerPacketInfoLength_t;
 
-typedef struct {
+typedef struct
+{
     rndis_MessageType_t MessageType;
     rndis_MessageLength_t MessageLength;
     rndis_DataOffset_t DataOffset;
@@ -276,7 +292,8 @@ typedef uint32_t rndis_ClassInformationOffset_t;
 typedef uint32_t rndis_Size_t;
 typedef uint32_t rndis_Type_t;
 
-typedef struct {
+typedef struct
+{
     rndis_Size_t Size;
     rndis_Type_t Type;
     rndis_ClassInformationOffset_t ClassInformationType;
@@ -284,13 +301,15 @@ typedef struct {
 
 #include "ndis.h"
 
-typedef enum rnids_state_e {
+typedef enum rnids_state_e
+{
     rndis_uninitialized,
     rndis_initialized,
     rndis_data_initialized
 } rndis_state_t;
 
-typedef struct {
+typedef struct
+{
     uint32_t txok;
     uint32_t rxok;
     uint32_t txbad;

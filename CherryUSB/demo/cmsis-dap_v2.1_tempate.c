@@ -19,14 +19,15 @@
 #define USB_CONFIG_SIZE          (9 + CMSIS_DAP_INTERFACE_SIZE + CDC_ACM_DESCRIPTOR_LEN)
 
 #ifdef CONFIG_USB_HS
-#define CDC_MAX_MPS 512
+    #define CDC_MAX_MPS 512
 #else
-#define CDC_MAX_MPS 64
+    #define CDC_MAX_MPS 64
 #endif
 
 #define WCID_VENDOR_CODE 0x01
 
-__ALIGN_BEGIN const uint8_t WCID_StringDescriptor_MSOS[18] __ALIGN_END = {
+__ALIGN_BEGIN const uint8_t WCID_StringDescriptor_MSOS[18] __ALIGN_END =
+{
     ///////////////////////////////////////
     /// MS OS string descriptor
     ///////////////////////////////////////
@@ -39,7 +40,8 @@ __ALIGN_BEGIN const uint8_t WCID_StringDescriptor_MSOS[18] __ALIGN_END = {
     0x00,                                       /* bReserved */
 };
 
-__ALIGN_BEGIN const uint8_t WINUSB_WCIDDescriptor[40] __ALIGN_END = {
+__ALIGN_BEGIN const uint8_t WINUSB_WCIDDescriptor[40] __ALIGN_END =
+{
     ///////////////////////////////////////
     /// WCID descriptor
     ///////////////////////////////////////
@@ -61,7 +63,8 @@ __ALIGN_BEGIN const uint8_t WINUSB_WCIDDescriptor[40] __ALIGN_END = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,             /* bReserved_6 */
 };
 
-__ALIGN_BEGIN const uint8_t WINUSB_IF0_WCIDProperties[142] __ALIGN_END = {
+__ALIGN_BEGIN const uint8_t WINUSB_IF0_WCIDProperties[142] __ALIGN_END =
+{
     ///////////////////////////////////////
     /// WCID property descriptor
     ///////////////////////////////////////
@@ -96,7 +99,8 @@ __ALIGN_BEGIN const uint8_t WINUSB_IF0_WCIDProperties[142] __ALIGN_END = {
     '6', 0x00, '}', 0x00, 0x00, 0x00,           /* wcData_39 */
 };
 
-struct usb_msosv1_descriptor msosv1_desc = {
+struct usb_msosv1_descriptor msosv1_desc =
+{
     .string = (uint8_t *)WCID_StringDescriptor_MSOS,
     .string_len = 18,
     .vendor_code = WCID_VENDOR_CODE,
@@ -106,7 +110,8 @@ struct usb_msosv1_descriptor msosv1_desc = {
     .comp_id_property_len = sizeof(WINUSB_IF0_WCIDProperties),
 };
 
-const uint8_t daplink_descriptor[] = {
+const uint8_t daplink_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0xEF, 0x02, 0x01, USBD_VID, USBD_PID, 0x0100, 0x01),
     /* Configuration 0 */
     USB_CONFIG_DESCRIPTOR_INIT(USB_CONFIG_SIZE, 0x03, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
@@ -202,17 +207,21 @@ void usbd_configure_done_callback(void)
 void usbd_cdc_acm_bulk_out(uint8_t ep, uint32_t nbytes)
 {
     /* setup next out ep read transfer */
-    if (1) {
+    if (1)
+    {
         usbd_ep_start_read(CDC_OUT_EP, cdc_read_buffer, CDC_MAX_MPS);
     }
 }
 
 void usbd_cdc_acm_bulk_in(uint8_t ep, uint32_t nbytes)
 {
-    if ((nbytes % CDC_MAX_MPS) == 0 && nbytes) {
+    if ((nbytes % CDC_MAX_MPS) == 0 && nbytes)
+    {
         /* send zlp */
         usbd_ep_start_write(CDC_IN_EP, NULL, 0);
-    } else {
+    }
+    else
+    {
         ep_tx_busy_flag = false;
     }
 }
@@ -220,7 +229,8 @@ void usbd_cdc_acm_bulk_in(uint8_t ep, uint32_t nbytes)
 void usb_dap_recv_callback(uint8_t ep, uint32_t nbytes)
 {
     uint32_t actual_len;
-    if (USB_Request[0] == ID_DAP_TransferAbort) {
+    if (USB_Request[0] == ID_DAP_TransferAbort)
+    {
         usbd_ep_start_read(ep, USB_Request, DAP_PACKET_SIZE);
         DAP_TransferAbort = 1;
         return;
@@ -233,29 +243,36 @@ void usb_dap_recv_callback(uint8_t ep, uint32_t nbytes)
 
 void usb_dap_send_callback(uint8_t ep, uint32_t nbytes)
 {
-    if ((nbytes % CDC_MAX_MPS) == 0 && nbytes) {
+    if ((nbytes % CDC_MAX_MPS) == 0 && nbytes)
+    {
         /* send zlp */
         usbd_ep_start_write(DAP_IN_EP, NULL, 0);
-    } else {
+    }
+    else
+    {
         ep_tx_busy_flag = false;
     }
 }
 
-static struct usbd_endpoint cdc_out_ep = {
+static struct usbd_endpoint cdc_out_ep =
+{
     .ep_addr = CDC_OUT_EP,
     .ep_cb = usbd_cdc_acm_bulk_out
 };
 
-static struct usbd_endpoint cdc_in_ep = {
+static struct usbd_endpoint cdc_in_ep =
+{
     .ep_addr = CDC_IN_EP,
     .ep_cb = usbd_cdc_acm_bulk_in
 };
 
-static struct usbd_endpoint dap_out_ep = {
+static struct usbd_endpoint dap_out_ep =
+{
     .ep_addr = DAP_OUT_EP,
     .ep_cb = usb_dap_recv_callback
 };
-static struct usbd_endpoint dap_in_ep = {
+static struct usbd_endpoint dap_in_ep =
+{
     .ep_addr = DAP_IN_EP,
     .ep_cb = usb_dap_send_callback
 };

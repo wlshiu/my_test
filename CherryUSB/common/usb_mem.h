@@ -28,11 +28,15 @@ static inline void *usb_iomalloc(size_t size)
     align_size = ((size + uintptr_size) & ~uintptr_size) + align;
     /* allocate memory block from heap */
     ptr = usb_malloc(align_size);
-    if (ptr != NULL) {
+    if (ptr != NULL)
+    {
         /* the allocated memory block is aligned */
-        if (((unsigned long)ptr & (align - 1)) == 0) {
+        if (((unsigned long)ptr & (align - 1)) == 0)
+        {
             align_ptr = (void *)((unsigned long)ptr + align);
-        } else {
+        }
+        else
+        {
             align_ptr = (void *)(((unsigned long)ptr + (align - 1)) & ~(align - 1));
         }
 
@@ -49,7 +53,7 @@ static inline void usb_iofree(void *ptr)
 {
     void *real_ptr;
 
-    real_ptr = (void *)*(unsigned long *)((unsigned long)ptr - sizeof(void *));
+    real_ptr = (void *) * (unsigned long *)((unsigned long)ptr - sizeof(void *));
     usb_free(real_ptr);
 }
 #else

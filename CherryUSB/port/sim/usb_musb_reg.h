@@ -8,360 +8,374 @@
 /**
   * @brief Register map for USB0 peripheral (USB0)
   */
-typedef struct {                                    /*!< USB0 Structure                                                        */
-  __IO uint8_t   FADDR;                             /*!< (@ 0x00000000) USB Device Functional Address                                         */
-  __IO uint8_t   POWER;                             /*!< (@ 0x00000001) USB Power                                                             */
-  __IO uint16_t  TXIS;                              /*!< (@ 0x00000002) USB Transmit Interrupt Status                                         */
-  __IO uint16_t  RXIS;                              /*!< (@ 0x00000004) USB Receive Interrupt Status                                          */
-  __IO uint16_t  TXIE;                              /*!< (@ 0x00000006) USB Transmit Interrupt Enable                                         */
-  __IO uint16_t  RXIE;                              /*!< (@ 0x00000008) USB Receive Interrupt Enable                                          */
-  __IO uint8_t   IS;                                /*!< (@ 0x0000000A) USB General Interrupt Status                                          */
-  __IO uint8_t   IE;                                /*!< (@ 0x0000000B) USB Interrupt Enable                                                  */
-  __IO uint16_t  FRAME;                             /*!< (@ 0x0000000C) USB Frame Value                                                       */
-  __IO uint8_t   EPIDX;                             /*!< (@ 0x0000000E) USB Endpoint Index                                                    */
-  __IO uint8_t   TEST;                              /*!< (@ 0x0000000F) USB Test Mode                                                         */
-  __IO uint16_t  TXMAXP;                            /*!< (@ 0x00000010) Maximum packet size for peripheral TX endpoint.                       */
+typedef struct                                      /*!< USB0 Structure                                                        */
+{
+    __IO uint8_t   FADDR;                             /*!< (@ 0x00000000) USB Device Functional Address                                         */
+    __IO uint8_t   POWER;                             /*!< (@ 0x00000001) USB Power                                                             */
+    __IO uint16_t  TXIS;                              /*!< (@ 0x00000002) USB Transmit Interrupt Status                                         */
+    __IO uint16_t  RXIS;                              /*!< (@ 0x00000004) USB Receive Interrupt Status                                          */
+    __IO uint16_t  TXIE;                              /*!< (@ 0x00000006) USB Transmit Interrupt Enable                                         */
+    __IO uint16_t  RXIE;                              /*!< (@ 0x00000008) USB Receive Interrupt Enable                                          */
+    __IO uint8_t   IS;                                /*!< (@ 0x0000000A) USB General Interrupt Status                                          */
+    __IO uint8_t   IE;                                /*!< (@ 0x0000000B) USB Interrupt Enable                                                  */
+    __IO uint16_t  FRAME;                             /*!< (@ 0x0000000C) USB Frame Value                                                       */
+    __IO uint8_t   EPIDX;                             /*!< (@ 0x0000000E) USB Endpoint Index                                                    */
+    __IO uint8_t   TEST;                              /*!< (@ 0x0000000F) USB Test Mode                                                         */
+    __IO uint16_t  TXMAXP;                            /*!< (@ 0x00000010) Maximum packet size for peripheral TX endpoint.                       */
 
-  union {
-    __IO uint16_t CSR;                              /*!< (@ 0x00000012) Control Status register for Endpoint 0.                             */
-    __IO uint16_t TXCSR;                            /*!< (@ 0x00000012) Control Status register for peripheral TX endpoint.                 */
-  };
+    union
+    {
+        __IO uint16_t CSR;                              /*!< (@ 0x00000012) Control Status register for Endpoint 0.                             */
+        __IO uint16_t TXCSR;                            /*!< (@ 0x00000012) Control Status register for peripheral TX endpoint.                 */
+    };
 
-  __IO uint16_t  RXMAXP;                            /*!< (@ 0x00000014) Maximum packet size for host Rx endpoint.                           */
-  __IO uint16_t  RXCSR;                             /*!< (@ 0x00000016) Control Status register for peripheral Rx endpoint.                 */
+    __IO uint16_t  RXMAXP;                            /*!< (@ 0x00000014) Maximum packet size for host Rx endpoint.                           */
+    __IO uint16_t  RXCSR;                             /*!< (@ 0x00000016) Control Status register for peripheral Rx endpoint.                 */
 
-  union {
-    __IO uint16_t COUNT;                            /*!< (@ 0x00000018) Number of received bytes in Endpoint 0 FIFO.                        */
-    __IO uint16_t RXCOUNT;                          /*!< (@ 0x00000018) Number of bytes to be read from peripheral Rx endpoint FIFO.        */
-  };
+    union
+    {
+        __IO uint16_t COUNT;                            /*!< (@ 0x00000018) Number of received bytes in Endpoint 0 FIFO.                        */
+        __IO uint16_t RXCOUNT;                          /*!< (@ 0x00000018) Number of bytes to be read from peripheral Rx endpoint FIFO.        */
+    };
 
-  union {
-    __IO uint8_t TYPE0;                             /*!< (@ 0x0000001A) Defines the speed of Endpoint 0                                     */
-    __IO uint8_t TXTYPE;                            /*!< (@ 0x0000001A) Sets the transaction protocol, speed and peripheral
+    union
+    {
+        __IO uint8_t TYPE0;                             /*!< (@ 0x0000001A) Defines the speed of Endpoint 0                                     */
+        __IO uint8_t TXTYPE;                            /*!< (@ 0x0000001A) Sets the transaction protocol, speed and peripheral
                                                                     endpoint number for the host TX endpoint                                */
-  };
+    };
 
-  union {
-    __IO uint8_t NAKLIMIT0;                         /*!< (@ 0x0000001B) Sets the NAK response timeout on Endpoint 0                     */
-    __IO uint8_t TXINTERVAL;                        /*!< (@ 0x0000001B) Sets the polling interval for Interrupt/ISOC
+    union
+    {
+        __IO uint8_t NAKLIMIT0;                         /*!< (@ 0x0000001B) Sets the NAK response timeout on Endpoint 0                     */
+        __IO uint8_t TXINTERVAL;                        /*!< (@ 0x0000001B) Sets the polling interval for Interrupt/ISOC
                                                                     transactions or the NAK response timeout
                                                                     on Bulk transactions for host TX endpoint                           */
-  };
-  __IO uint8_t   RXTYPE;                            /*!< (@ 0x0000001C) Sets the transaction protocol, speed and peripheral
+    };
+    __IO uint8_t   RXTYPE;                            /*!< (@ 0x0000001C) Sets the transaction protocol, speed and peripheral
                                                                     endpoint number for the host Rx endpoint                            */
-  __IO uint8_t   RXINTERVAL;                        /*!< (@ 0x0000001D) Sets the polling interval for Interrupt/ISOC
+    __IO uint8_t   RXINTERVAL;                        /*!< (@ 0x0000001D) Sets the polling interval for Interrupt/ISOC
                                                                     transactions or the NAK response timeout
                                                                     on Bulk transactions for host RX endpoint                           */
-  __I  uint8_t   RESERVED;
+    __I  uint8_t   RESERVED;
 
-  union {
-    __IO uint8_t CONFIGDATA;                        /*!< (@ 0x0000001F) Returns details of core configuration. (Index
+    union
+    {
+        __IO uint8_t CONFIGDATA;                        /*!< (@ 0x0000001F) Returns details of core configuration. (Index
                                                                     register set to select Endpoint 0.)                             */
-    __IO uint8_t FIFOSIZE;                          /*!< (@ 0x0000001F) Returns the configured size of the selected Rx
+        __IO uint8_t FIFOSIZE;                          /*!< (@ 0x0000001F) Returns the configured size of the selected Rx
                                                                     FIFO and TX FIFOs (Endpoints 1 – 15 only).                      */
-  };
- union {
-    __IO uint8_t   FIFO0_BYTE;                      /*!< (@ 0x00000020) USB FIFO Endpoint 0                                                   */
-    __IO uint16_t  FIFO0_HALF;                      /*!< USB FIFO Endpoint 0                                                   */
-    __IO uint32_t  FIFO0_WORD;                      /*!< USB FIFO Endpoint 0                                                   */
-  } FIFO0;
-  union {
-    __IO uint8_t   FIFO1_BYTE;                      /*!< (@ 0x00000024) USB FIFO Endpoint 1                                                   */
-    __IO uint16_t  FIFO1_HALF;                      /*!< USB FIFO Endpoint 1                                                   */
-    __IO uint32_t  FIFO1_WORD;                      /*!< USB FIFO Endpoint 1                                                   */
-  } FIFO1;
-  union {
-    __IO uint8_t   FIFO2_BYTE;                      /*!< (@ 0x00000028) USB FIFO Endpoint 2                                                   */
-    __IO uint16_t  FIFO2_HALF;                      /*!< USB FIFO Endpoint 2                                                   */
-    __IO uint32_t  FIFO2_WORD;                      /*!< USB FIFO Endpoint 2                                                   */
-  } FIFO2;
-  union {
-    __IO uint8_t   FIFO3_BYTE;                      /*!< (@ 0x0000002C) USB FIFO Endpoint 3                                                   */
-    __IO uint16_t  FIFO3_HALF;                      /*!< USB FIFO Endpoint 3                                                   */
-    __IO uint32_t  FIFO3_WORD;                      /*!< USB FIFO Endpoint 3                                                   */
-  } FIFO3;
-  union {
-    __IO uint8_t   FIFO4_BYTE;                      /*!< (@ 0x00000030) USB FIFO Endpoint 4                                                   */
-    __IO uint16_t  FIFO4_HALF;                      /*!< USB FIFO Endpoint 4                                                   */
-    __IO uint32_t  FIFO4_WORD;                      /*!< USB FIFO Endpoint 4                                                   */
-  } FIFO4;
-  union {
-    __IO uint8_t   FIFO5_BYTE;                      /*!< (@ 0x00000034) USB FIFO Endpoint 5                                                   */
-    __IO uint16_t  FIFO5_HALF;                      /*!< USB FIFO Endpoint 5                                                   */
-    __IO uint32_t  FIFO5_WORD;                      /*!< USB FIFO Endpoint 5                                                   */
-  } FIFO5;
-  union {
-    __IO uint8_t   FIFO6_BYTE;                      /*!< @ 0x00000038) USB FIFO Endpoint 6                                                   */
-    __IO uint16_t  FIFO6_HALF;                      /*!< USB FIFO Endpoint 6                                                   */
-    __IO uint32_t  FIFO6_WORD;                      /*!< USB FIFO Endpoint 6                                                   */
-  } FIFO6;
-  union {
-    __IO uint8_t   FIFO7_BYTE;                      /*!< (@ 0x0000003C) USB FIFO Endpoint 7                                                   */
-    __IO uint16_t  FIFO7_HALF;                      /*!< USB FIFO Endpoint 7                                                   */
-    __IO uint32_t  FIFO7_WORD;                      /*!< USB FIFO Endpoint 7                                                   */
-  } FIFO7;
-  __I  uint32_t  RESERVED1[8];
-  __IO uint8_t   DEVCTL;                            /*!< (@ 0x00000060) USB Device Control                                                    */
-  __IO uint8_t   CCONF;                             /*!< (@ 0x00000061) USB Common Configuration                                              */
-  __IO uint8_t   TXFIFOSZ;                          /*!< (@ 0x00000062) USB Transmit Dynamic FIFO Sizing                                      */
-  __IO uint8_t   RXFIFOSZ;                          /*!< (@ 0x00000063) USB Receive Dynamic FIFO Sizing                                       */
-  __IO uint16_t  TXFIFOADD;                         /*!< (@ 0x00000064) USB Transmit FIFO Start Address                                       */
-  __IO uint16_t  RXFIFOADD;                         /*!< (@ 0x00000066) USB Receive FIFO Start Address                                        */
-  __I  uint32_t  RESERVED2[2];
-  __IO uint8_t   ULPIVBUSCTL;                       /*!< USB ULPI VBUS Control                                                 */
-  __I  uint8_t   RESERVED3[3];
-  __IO uint8_t   ULPIREGDATA;                       /*!< USB ULPI Register Data                                                */
-  __IO uint8_t   ULPIREGADDR;                       /*!< USB ULPI Register Address                                             */
-  __IO uint8_t   ULPIREGCTL;                        /*!< USB ULPI Register Control                                             */
-  __I  uint8_t   RESERVED4;
-  __IO uint8_t   EPINFO;                            /*!< (@ 0x00000078) USB Endpoint Information                                              */
-  __IO uint8_t   RAMINFO;                           /*!< (@ 0x00000079) USB RAM Information                                                   */
-  __IO uint8_t   CONTIM;                            /*!< (@ 0x0000007A) USB Connect Timing                                                    */
-  __IO uint8_t   VPLEN;                             /*!< (@ 0x0000007B) USB OTG VBUS Pulse Timing                                             */
-  __IO uint8_t   HSEOF;                             /*!< (@ 0x0000007C) USB High-Speed Last Transaction to End of Frame Timing                */
-  __IO uint8_t   FSEOF;                             /*!< (@ 0x0000007D) USB Full-Speed Last Transaction to End of Frame Timing                */
-  __IO uint8_t   LSEOF;                             /*!< (@ 0x0000007E) USB Low-Speed Last Transaction to End of Frame Timing                 */
-  __I  uint8_t   RESERVED5;
-  __IO uint8_t   TXFUNCADDR0;                       /*!< (@ 0x00000080) USB Transmit Functional Address Endpoint 0                            */
-  __I  uint8_t   RESERVED6;
-  __IO uint8_t   TXHUBADDR0;                        /*!< (@ 0x00000082) USB Transmit Hub Address Endpoint 0                                   */
-  __IO uint8_t   TXHUBPORT0;                        /*!< (@ 0x00000083) USB Transmit Hub Port Endpoint 0                                      */
-  __I  uint32_t  RESERVED7;
-  __IO uint8_t   TXFUNCADDR1;                       /*!< USB Transmit Functional Address Endpoint 1                            */
-  __I  uint8_t   RESERVED8;
-  __IO uint8_t   TXHUBADDR1;                        /*!< USB Transmit Hub Address Endpoint 1                                   */
-  __IO uint8_t   TXHUBPORT1;                        /*!< USB Transmit Hub Port Endpoint 1                                      */
-  __IO uint8_t   RXFUNCADDR1;                       /*!< USB Receive Functional Address Endpoint 1                             */
-  __I  uint8_t   RESERVED9;
-  __IO uint8_t   RXHUBADDR1;                        /*!< USB Receive Hub Address Endpoint 1                                    */
-  __IO uint8_t   RXHUBPORT1;                        /*!< USB Receive Hub Port Endpoint 1                                       */
-  __IO uint8_t   TXFUNCADDR2;                       /*!< USB Transmit Functional Address Endpoint 2                            */
-  __I  uint8_t   RESERVED10;
-  __IO uint8_t   TXHUBADDR2;                        /*!< USB Transmit Hub Address Endpoint 2                                   */
-  __IO uint8_t   TXHUBPORT2;                        /*!< USB Transmit Hub Port Endpoint 2                                      */
-  __IO uint8_t   RXFUNCADDR2;                       /*!< USB Receive Functional Address Endpoint 2                             */
-  __I  uint8_t   RESERVED11;
-  __IO uint8_t   RXHUBADDR2;                        /*!< USB Receive Hub Address Endpoint 2                                    */
-  __IO uint8_t   RXHUBPORT2;                        /*!< USB Receive Hub Port Endpoint 2                                       */
-  __IO uint8_t   TXFUNCADDR3;                       /*!< USB Transmit Functional Address Endpoint 3                            */
-  __I  uint8_t   RESERVED12;
-  __IO uint8_t   TXHUBADDR3;                        /*!< USB Transmit Hub Address Endpoint 3                                   */
-  __IO uint8_t   TXHUBPORT3;                        /*!< USB Transmit Hub Port Endpoint 3                                      */
-  __IO uint8_t   RXFUNCADDR3;                       /*!< USB Receive Functional Address Endpoint 3                             */
-  __I  uint8_t   RESERVED13;
-  __IO uint8_t   RXHUBADDR3;                        /*!< USB Receive Hub Address Endpoint 3                                    */
-  __IO uint8_t   RXHUBPORT3;                        /*!< USB Receive Hub Port Endpoint 3                                       */
-  __IO uint8_t   TXFUNCADDR4;                       /*!< USB Transmit Functional Address Endpoint 4                            */
-  __I  uint8_t   RESERVED14;
-  __IO uint8_t   TXHUBADDR4;                        /*!< USB Transmit Hub Address Endpoint 4                                   */
-  __IO uint8_t   TXHUBPORT4;                        /*!< USB Transmit Hub Port Endpoint 4                                      */
-  __IO uint8_t   RXFUNCADDR4;                       /*!< USB Receive Functional Address Endpoint 4                             */
-  __I  uint8_t   RESERVED15;
-  __IO uint8_t   RXHUBADDR4;                        /*!< USB Receive Hub Address Endpoint 4                                    */
-  __IO uint8_t   RXHUBPORT4;                        /*!< USB Receive Hub Port Endpoint 4                                       */
-  __IO uint8_t   TXFUNCADDR5;                       /*!< USB Transmit Functional Address Endpoint 5                            */
-  __I  uint8_t   RESERVED16;
-  __IO uint8_t   TXHUBADDR5;                        /*!< USB Transmit Hub Address Endpoint 5                                   */
-  __IO uint8_t   TXHUBPORT5;                        /*!< USB Transmit Hub Port Endpoint 5                                      */
-  __IO uint8_t   RXFUNCADDR5;                       /*!< USB Receive Functional Address Endpoint 5                             */
-  __I  uint8_t   RESERVED17;
-  __IO uint8_t   RXHUBADDR5;                        /*!< USB Receive Hub Address Endpoint 5                                    */
-  __IO uint8_t   RXHUBPORT5;                        /*!< USB Receive Hub Port Endpoint 5                                       */
-  __IO uint8_t   TXFUNCADDR6;                       /*!< USB Transmit Functional Address Endpoint 6                            */
-  __I  uint8_t   RESERVED18;
-  __IO uint8_t   TXHUBADDR6;                        /*!< USB Transmit Hub Address Endpoint 6                                   */
-  __IO uint8_t   TXHUBPORT6;                        /*!< USB Transmit Hub Port Endpoint 6                                      */
-  __IO uint8_t   RXFUNCADDR6;                       /*!< USB Receive Functional Address Endpoint 6                             */
-  __I  uint8_t   RESERVED19;
-  __IO uint8_t   RXHUBADDR6;                        /*!< USB Receive Hub Address Endpoint 6                                    */
-  __IO uint8_t   RXHUBPORT6;                        /*!< USB Receive Hub Port Endpoint 6                                       */
-  __IO uint8_t   TXFUNCADDR7;                       /*!< USB Transmit Functional Address Endpoint 7                            */
-  __I  uint8_t   RESERVED20;
-  __IO uint8_t   TXHUBADDR7;                        /*!< USB Transmit Hub Address Endpoint 7                                   */
-  __IO uint8_t   TXHUBPORT7;                        /*!< USB Transmit Hub Port Endpoint 7                                      */
-  __IO uint8_t   RXFUNCADDR7;                       /*!< USB Receive Functional Address Endpoint 7                             */
-  __I  uint8_t   RESERVED21;
-  __IO uint8_t   RXHUBADDR7;                        /*!< USB Receive Hub Address Endpoint 7                                    */
-  __IO uint8_t   RXHUBPORT7;                        /*!< USB Receive Hub Port Endpoint 7                                       */
-  __I  uint32_t  RESERVED22[16];
-  __I  uint16_t  RESERVED23;
-  __O  uint8_t   CSRL0;                             /*!< (@ 0x00000102) USB Control and Status Endpoint 0 Low                                 */
-  __O  uint8_t   CSRH0;                             /*!< USB Control and Status Endpoint 0 High                                */
-  __I  uint16_t  RESERVED24[2];
-  __IO uint8_t   COUNT0;                            /*!< (@ 0x00000108) USB Receive Byte Count Endpoint 0                                     */
-  __I  uint8_t   RESERVED25;
-  __IO uint8_t   TYPE0_EP0;                         /*!< USB Type Endpoint 0                                                   */
-  __IO uint8_t   NAKLMT;                            /*!< USB NAK Limit                                                         */
-  __I  uint32_t  RESERVED26;
-  __IO uint16_t  TXMAXP1;                           /*!< (@ 0x00000110) USB Maximum Transmit Data Endpoint 1                                  */
-  __IO uint8_t   TXCSRL1;                           /*!< (@ 0x00000112) USB Transmit Control and Status Endpoint 1 Low                        */
-  __IO uint8_t   TXCSRH1;                           /*!< (@ 0x00000113) USB Transmit Control and Status Endpoint 1 High                       */
-  __IO uint16_t  RXMAXP1;                           /*!< (@ 0x00000114) USB Maximum Receive Data Endpoint 1                                   */
-  __IO uint8_t   RXCSRL1;                           /*!< (@ 0x00000116) USB Receive Control and Status Endpoint 1 Low                         */
-  __IO uint8_t   RXCSRH1;                           /*!< (@ 0x00000117) USB Receive Control and Status Endpoint 1 High                        */
-  __IO uint16_t  RXCOUNT1;                          /*!< (@ 0x00000118) USB Receive Byte Count Endpoint 1                                     */
-  __IO uint8_t   TXTYPE1;                           /*!< (@ 0x0000011A) USB Host Transmit Configure Type Endpoint 1                           */
-  __IO uint8_t   TXINTERVAL1;                       /*!< (@ 0x0000011B) USB Host Transmit Interval Endpoint 1                                 */
-  __IO uint8_t   RXTYPE1;                           /*!< (@ 0x0000011C) USB Host Configure Receive Type Endpoint 1                            */
-  __IO uint8_t   RXINTERVAL1;                       /*!< (@ 0x0000011D) USB Host Receive Polling Interval Endpoint 1                          */
-  __I  uint16_t  RESERVED27;
-  __IO uint16_t  TXMAXP2;                           /*!< (@ 0x00000120) USB Maximum Transmit Data Endpoint 2                                  */
-  __IO uint8_t   TXCSRL2;                           /*!< USB Transmit Control and Status Endpoint 2 Low                        */
-  __IO uint8_t   TXCSRH2;                           /*!< USB Transmit Control and Status Endpoint 2 High                       */
-  __IO uint16_t  RXMAXP2;                           /*!< USB Maximum Receive Data Endpoint 2                                   */
-  __IO uint8_t   RXCSRL2;                           /*!< USB Receive Control and Status Endpoint 2 Low                         */
-  __IO uint8_t   RXCSRH2;                           /*!< USB Receive Control and Status Endpoint 2 High                        */
-  __IO uint16_t  RXCOUNT2;                          /*!< USB Receive Byte Count Endpoint 2                                     */
-  __IO uint8_t   TXTYPE2;                           /*!< USB Host Transmit Configure Type Endpoint 2                           */
-  __IO uint8_t   TXINTERVAL2;                       /*!< USB Host Transmit Interval Endpoint 2                                 */
-  __IO uint8_t   RXTYPE2;                           /*!< USB Host Configure Receive Type Endpoint 2                            */
-  __IO uint8_t   RXINTERVAL2;                       /*!< USB Host Receive Polling Interval Endpoint 2                          */
-  __I  uint16_t  RESERVED28;
-  __IO uint16_t  TXMAXP3;                           /*!< (@ 0x00000130) USB Maximum Transmit Data Endpoint 3                                  */
-  __IO uint8_t   TXCSRL3;                           /*!< USB Transmit Control and Status Endpoint 3 Low                        */
-  __IO uint8_t   TXCSRH3;                           /*!< USB Transmit Control and Status Endpoint 3 High                       */
-  __IO uint16_t  RXMAXP3;                           /*!< USB Maximum Receive Data Endpoint 3                                   */
-  __IO uint8_t   RXCSRL3;                           /*!< USB Receive Control and Status Endpoint 3 Low                         */
-  __IO uint8_t   RXCSRH3;                           /*!< USB Receive Control and Status Endpoint 3 High                        */
-  __IO uint16_t  RXCOUNT3;                          /*!< USB Receive Byte Count Endpoint 3                                     */
-  __IO uint8_t   TXTYPE3;                           /*!< USB Host Transmit Configure Type Endpoint 3                           */
-  __IO uint8_t   TXINTERVAL3;                       /*!< USB Host Transmit Interval Endpoint 3                                 */
-  __IO uint8_t   RXTYPE3;                           /*!< USB Host Configure Receive Type Endpoint 3                            */
-  __IO uint8_t   RXINTERVAL3;                       /*!< USB Host Receive Polling Interval Endpoint 3                          */
-  __I  uint16_t  RESERVED29;
-  __IO uint16_t  TXMAXP4;                           /*!< (@ 0x00000140) USB Maximum Transmit Data Endpoint 4                                  */
-  __IO uint8_t   TXCSRL4;                           /*!< USB Transmit Control and Status Endpoint 4 Low                        */
-  __IO uint8_t   TXCSRH4;                           /*!< USB Transmit Control and Status Endpoint 4 High                       */
-  __IO uint16_t  RXMAXP4;                           /*!< USB Maximum Receive Data Endpoint 4                                   */
-  __IO uint8_t   RXCSRL4;                           /*!< USB Receive Control and Status Endpoint 4 Low                         */
-  __IO uint8_t   RXCSRH4;                           /*!< USB Receive Control and Status Endpoint 4 High                        */
-  __IO uint16_t  RXCOUNT4;                          /*!< USB Receive Byte Count Endpoint 4                                     */
-  __IO uint8_t   TXTYPE4;                           /*!< USB Host Transmit Configure Type Endpoint 4                           */
-  __IO uint8_t   TXINTERVAL4;                       /*!< USB Host Transmit Interval Endpoint 4                                 */
-  __IO uint8_t   RXTYPE4;                           /*!< USB Host Configure Receive Type Endpoint 4                            */
-  __IO uint8_t   RXINTERVAL4;                       /*!< USB Host Receive Polling Interval Endpoint 4                          */
-  __I  uint16_t  RESERVED30;
-  __IO uint16_t  TXMAXP5;                           /*!< (@ 0x00000150) USB Maximum Transmit Data Endpoint 5                                  */
-  __IO uint8_t   TXCSRL5;                           /*!< USB Transmit Control and Status Endpoint 5 Low                        */
-  __IO uint8_t   TXCSRH5;                           /*!< USB Transmit Control and Status Endpoint 5 High                       */
-  __IO uint16_t  RXMAXP5;                           /*!< USB Maximum Receive Data Endpoint 5                                   */
-  __IO uint8_t   RXCSRL5;                           /*!< USB Receive Control and Status Endpoint 5 Low                         */
-  __IO uint8_t   RXCSRH5;                           /*!< USB Receive Control and Status Endpoint 5 High                        */
-  __IO uint16_t  RXCOUNT5;                          /*!< USB Receive Byte Count Endpoint 5                                     */
-  __IO uint8_t   TXTYPE5;                           /*!< USB Host Transmit Configure Type Endpoint 5                           */
-  __IO uint8_t   TXINTERVAL5;                       /*!< USB Host Transmit Interval Endpoint 5                                 */
-  __IO uint8_t   RXTYPE5;                           /*!< USB Host Configure Receive Type Endpoint 5                            */
-  __IO uint8_t   RXINTERVAL5;                       /*!< USB Host Receive Polling Interval Endpoint 5                          */
-  __I  uint16_t  RESERVED31;
-  __IO uint16_t  TXMAXP6;                           /*!< (@ 0x00000160) USB Maximum Transmit Data Endpoint 6                                  */
-  __IO uint8_t   TXCSRL6;                           /*!< USB Transmit Control and Status Endpoint 6 Low                        */
-  __IO uint8_t   TXCSRH6;                           /*!< USB Transmit Control and Status Endpoint 6 High                       */
-  __IO uint16_t  RXMAXP6;                           /*!< USB Maximum Receive Data Endpoint 6                                   */
-  __IO uint8_t   RXCSRL6;                           /*!< USB Receive Control and Status Endpoint 6 Low                         */
-  __IO uint8_t   RXCSRH6;                           /*!< USB Receive Control and Status Endpoint 6 High                        */
-  __IO uint16_t  RXCOUNT6;                          /*!< USB Receive Byte Count Endpoint 6                                     */
-  __IO uint8_t   TXTYPE6;                           /*!< USB Host Transmit Configure Type Endpoint 6                           */
-  __IO uint8_t   TXINTERVAL6;                       /*!< USB Host Transmit Interval Endpoint 6                                 */
-  __IO uint8_t   RXTYPE6;                           /*!< USB Host Configure Receive Type Endpoint 6                            */
-  __IO uint8_t   RXINTERVAL6;                       /*!< USB Host Receive Polling Interval Endpoint 6                          */
-  __I  uint16_t  RESERVED32;
-  __IO uint16_t  TXMAXP7;                           /*!< (@ 0x00000170) USB Maximum Transmit Data Endpoint 7                                  */
-  __IO uint8_t   TXCSRL7;                           /*!< USB Transmit Control and Status Endpoint 7 Low                        */
-  __IO uint8_t   TXCSRH7;                           /*!< USB Transmit Control and Status Endpoint 7 High                       */
-  __IO uint16_t  RXMAXP7;                           /*!< USB Maximum Receive Data Endpoint 7                                   */
-  __IO uint8_t   RXCSRL7;                           /*!< USB Receive Control and Status Endpoint 7 Low                         */
-  __IO uint8_t   RXCSRH7;                           /*!< USB Receive Control and Status Endpoint 7 High                        */
-  __IO uint16_t  RXCOUNT7;                          /*!< USB Receive Byte Count Endpoint 7                                     */
-  __IO uint8_t   TXTYPE7;                           /*!< USB Host Transmit Configure Type Endpoint 7                           */
-  __IO uint8_t   TXINTERVAL7;                       /*!< USB Host Transmit Interval Endpoint 7                                 */
-  __IO uint8_t   RXTYPE7;                           /*!< USB Host Configure Receive Type Endpoint 7                            */
-  __IO uint8_t   RXINTERVAL7;                       /*!< USB Host Receive Polling Interval Endpoint 7                          */
-  __I  uint16_t  RESERVED33[65];
-  __IO uint8_t   DMAINTR;                           /*!< (@ 0x00000200) USB DMA Interrupt                                                     */
-  __I  uint8_t   RESERVED34[3];
-  __IO uint16_t  DMACTL0;                           /*!< (@ 0x00000204) USB DMA Control 0                                                     */
-  __I  uint16_t  RESERVED35;
-  __IO uint32_t  DMAADDR0;                          /*!< (@ 0x00000208) USB DMA Address 0                                                     */
-  __IO uint32_t  DMACOUNT0;                         /*!< (@ 0x0000020C) USB DMA Count 0                                                       */
-  __I  uint32_t  RESERVED36;
-  __IO uint16_t  DMACTL1;                           /*!< USB DMA Control 1                                                     */
-  __I  uint16_t  RESERVED37;
-  __IO uint32_t  DMAADDR1;                          /*!< USB DMA Address 1                                                     */
-  __IO uint32_t  DMACOUNT1;                         /*!< USB DMA Count 1                                                       */
-  __I  uint32_t  RESERVED38;
-  __IO uint16_t  DMACTL2;                           /*!< USB DMA Control 2                                                     */
-  __I  uint16_t  RESERVED39;
-  __IO uint32_t  DMAADDR2;                          /*!< USB DMA Address 2                                                     */
-  __IO uint32_t  DMACOUNT2;                         /*!< USB DMA Count 2                                                       */
-  __I  uint32_t  RESERVED40;
-  __IO uint16_t  DMACTL3;                           /*!< USB DMA Control 3                                                     */
-  __I  uint16_t  RESERVED41;
-  __IO uint32_t  DMAADDR3;                          /*!< USB DMA Address 3                                                     */
-  __IO uint32_t  DMACOUNT3;                         /*!< USB DMA Count 3                                                       */
-  __I  uint32_t  RESERVED42;
-  __IO uint16_t  DMACTL4;                           /*!< USB DMA Control 4                                                     */
-  __I  uint16_t  RESERVED43;
-  __IO uint32_t  DMAADDR4;                          /*!< USB DMA Address 4                                                     */
-  __IO uint32_t  DMACOUNT4;                         /*!< USB DMA Count 4                                                       */
-  __I  uint32_t  RESERVED44;
-  __IO uint16_t  DMACTL5;                           /*!< USB DMA Control 5                                                     */
-  __I  uint16_t  RESERVED45;
-  __IO uint32_t  DMAADDR5;                          /*!< USB DMA Address 5                                                     */
-  __IO uint32_t  DMACOUNT5;                         /*!< USB DMA Count 5                                                       */
-  __I  uint32_t  RESERVED46;
-  __IO uint16_t  DMACTL6;                           /*!< USB DMA Control 6                                                     */
-  __I  uint16_t  RESERVED47;
-  __IO uint32_t  DMAADDR6;                          /*!< USB DMA Address 6                                                     */
-  __IO uint32_t  DMACOUNT6;                         /*!< USB DMA Count 6                                                       */
-  __I  uint32_t  RESERVED48;
-  __IO uint16_t  DMACTL7;                           /*!< USB DMA Control 7                                                     */
-  __I  uint16_t  RESERVED49;
-  __IO uint32_t  DMAADDR7;                          /*!< USB DMA Address 7                                                     */
-  __IO uint32_t  DMACOUNT7;                         /*!< USB DMA Count 7                                                       */
-  __I  uint32_t  RESERVED50[33];
-  __IO uint16_t  RQPKTCOUNT1;                       /*!< USB Request Packet Count in Block Transfer Endpoint 1                 */
-  __I  uint16_t  RESERVED51;
-  __IO uint16_t  RQPKTCOUNT2;                       /*!< USB Request Packet Count in Block Transfer Endpoint 2                 */
-  __I  uint16_t  RESERVED52;
-  __IO uint16_t  RQPKTCOUNT3;                       /*!< USB Request Packet Count in Block Transfer Endpoint 3                 */
-  __I  uint16_t  RESERVED53;
-  __IO uint16_t  RQPKTCOUNT4;                       /*!< USB Request Packet Count in Block Transfer Endpoint 4                 */
-  __I  uint16_t  RESERVED54;
-  __IO uint16_t  RQPKTCOUNT5;                       /*!< USB Request Packet Count in Block Transfer Endpoint 5                 */
-  __I  uint16_t  RESERVED55;
-  __IO uint16_t  RQPKTCOUNT6;                       /*!< USB Request Packet Count in Block Transfer Endpoint 6                 */
-  __I  uint16_t  RESERVED56;
-  __IO uint16_t  RQPKTCOUNT7;                       /*!< USB Request Packet Count in Block Transfer Endpoint 7                 */
-  __I  uint16_t  RESERVED57[17];
-  __IO uint16_t  RXDPKTBUFDIS;                      /*!< USB Receive Double Packet Buffer Disable                              */
-  __IO uint16_t  TXDPKTBUFDIS;                      /*!< USB Transmit Double Packet Buffer Disable                             */
-  __IO uint16_t  CTO;                               /*!< (@ 0x00000344) USB Chirp Timeout                                                     */
-  __IO uint16_t  HHSRTN;                            /*!< (@ 0x00000346) USB High Speed to UTM Operating Delay                                 */
-  __IO uint16_t  HSBT;                              /*!< USB High Speed Time-out Adder                                         */
-  __I  uint16_t  RESERVED58[11];
-  __IO uint16_t  LPMATTR;                           /*!< (@ 0x00000360) USB LPM Attributes                                                    */
-  __IO uint8_t   LPMCNTRL;                          /*!< (@ 0x00000362) USB LPM Control                                                       */
-  __IO uint8_t   LPMIM;                             /*!< (@ 0x00000363) USB LPM Interrupt Mask                                                */
-  __IO uint8_t   LPMRIS;                            /*!< (@ 0x00000364) USB LPM Raw Interrupt Status                                          */
-  __IO uint8_t   LPMFADDR;                          /*!< (@ 0x00000365) USB LPM Function Address                                              */
-  __I  uint16_t  RESERVED59[77];
-  __IO uint32_t  EPC;                               /*!< USB External Power Control                                            */
-  __IO uint32_t  EPCRIS;                            /*!< USB External Power Control Raw Interrupt Status                       */
-  __IO uint32_t  EPCIM;                             /*!< USB External Power Control Interrupt Mask                             */
-  __IO uint32_t  EPCISC;                            /*!< USB External Power Control Interrupt Status and Clear                 */
-  __IO uint32_t  DRRIS;                             /*!< USB Device RESUME Raw Interrupt Status                                */
-  __IO uint32_t  DRIM;                              /*!< USB Device RESUME Interrupt Mask                                      */
-  __O  uint32_t  DRISC;                             /*!< USB Device RESUME Interrupt Status and Clear                          */
-  __IO uint32_t  GPCS;                              /*!< USB General-Purpose Control and Status                                */
-  __I  uint32_t  RESERVED60[4];
-  __IO uint32_t  VDC;                               /*!< USB VBUS Droop Control                                                */
-  __IO uint32_t  VDCRIS;                            /*!< USB VBUS Droop Control Raw Interrupt Status                           */
-  __IO uint32_t  VDCIM;                             /*!< USB VBUS Droop Control Interrupt Mask                                 */
-  __IO uint32_t  VDCISC;                            /*!< USB VBUS Droop Control Interrupt Status and Clear                     */
-  __I  uint32_t  RESERVED61[736];
-  __IO uint32_t  PP;                                /*!< USB Peripheral Properties                                             */
-  __IO uint32_t  PC;                                /*!< USB Peripheral Configuration                                          */
-  __IO uint32_t  CC;                                /*!< USB Clock Configuration                                               */
+    };
+    union
+    {
+        __IO uint8_t   FIFO0_BYTE;                      /*!< (@ 0x00000020) USB FIFO Endpoint 0                                                   */
+        __IO uint16_t  FIFO0_HALF;                      /*!< USB FIFO Endpoint 0                                                   */
+        __IO uint32_t  FIFO0_WORD;                      /*!< USB FIFO Endpoint 0                                                   */
+    } FIFO0;
+    union
+    {
+        __IO uint8_t   FIFO1_BYTE;                      /*!< (@ 0x00000024) USB FIFO Endpoint 1                                                   */
+        __IO uint16_t  FIFO1_HALF;                      /*!< USB FIFO Endpoint 1                                                   */
+        __IO uint32_t  FIFO1_WORD;                      /*!< USB FIFO Endpoint 1                                                   */
+    } FIFO1;
+    union
+    {
+        __IO uint8_t   FIFO2_BYTE;                      /*!< (@ 0x00000028) USB FIFO Endpoint 2                                                   */
+        __IO uint16_t  FIFO2_HALF;                      /*!< USB FIFO Endpoint 2                                                   */
+        __IO uint32_t  FIFO2_WORD;                      /*!< USB FIFO Endpoint 2                                                   */
+    } FIFO2;
+    union
+    {
+        __IO uint8_t   FIFO3_BYTE;                      /*!< (@ 0x0000002C) USB FIFO Endpoint 3                                                   */
+        __IO uint16_t  FIFO3_HALF;                      /*!< USB FIFO Endpoint 3                                                   */
+        __IO uint32_t  FIFO3_WORD;                      /*!< USB FIFO Endpoint 3                                                   */
+    } FIFO3;
+    union
+    {
+        __IO uint8_t   FIFO4_BYTE;                      /*!< (@ 0x00000030) USB FIFO Endpoint 4                                                   */
+        __IO uint16_t  FIFO4_HALF;                      /*!< USB FIFO Endpoint 4                                                   */
+        __IO uint32_t  FIFO4_WORD;                      /*!< USB FIFO Endpoint 4                                                   */
+    } FIFO4;
+    union
+    {
+        __IO uint8_t   FIFO5_BYTE;                      /*!< (@ 0x00000034) USB FIFO Endpoint 5                                                   */
+        __IO uint16_t  FIFO5_HALF;                      /*!< USB FIFO Endpoint 5                                                   */
+        __IO uint32_t  FIFO5_WORD;                      /*!< USB FIFO Endpoint 5                                                   */
+    } FIFO5;
+    union
+    {
+        __IO uint8_t   FIFO6_BYTE;                      /*!< @ 0x00000038) USB FIFO Endpoint 6                                                   */
+        __IO uint16_t  FIFO6_HALF;                      /*!< USB FIFO Endpoint 6                                                   */
+        __IO uint32_t  FIFO6_WORD;                      /*!< USB FIFO Endpoint 6                                                   */
+    } FIFO6;
+    union
+    {
+        __IO uint8_t   FIFO7_BYTE;                      /*!< (@ 0x0000003C) USB FIFO Endpoint 7                                                   */
+        __IO uint16_t  FIFO7_HALF;                      /*!< USB FIFO Endpoint 7                                                   */
+        __IO uint32_t  FIFO7_WORD;                      /*!< USB FIFO Endpoint 7                                                   */
+    } FIFO7;
+    __I  uint32_t  RESERVED1[8];
+    __IO uint8_t   DEVCTL;                            /*!< (@ 0x00000060) USB Device Control                                                    */
+    __IO uint8_t   CCONF;                             /*!< (@ 0x00000061) USB Common Configuration                                              */
+    __IO uint8_t   TXFIFOSZ;                          /*!< (@ 0x00000062) USB Transmit Dynamic FIFO Sizing                                      */
+    __IO uint8_t   RXFIFOSZ;                          /*!< (@ 0x00000063) USB Receive Dynamic FIFO Sizing                                       */
+    __IO uint16_t  TXFIFOADD;                         /*!< (@ 0x00000064) USB Transmit FIFO Start Address                                       */
+    __IO uint16_t  RXFIFOADD;                         /*!< (@ 0x00000066) USB Receive FIFO Start Address                                        */
+    __I  uint32_t  RESERVED2[2];
+    __IO uint8_t   ULPIVBUSCTL;                       /*!< USB ULPI VBUS Control                                                 */
+    __I  uint8_t   RESERVED3[3];
+    __IO uint8_t   ULPIREGDATA;                       /*!< USB ULPI Register Data                                                */
+    __IO uint8_t   ULPIREGADDR;                       /*!< USB ULPI Register Address                                             */
+    __IO uint8_t   ULPIREGCTL;                        /*!< USB ULPI Register Control                                             */
+    __I  uint8_t   RESERVED4;
+    __IO uint8_t   EPINFO;                            /*!< (@ 0x00000078) USB Endpoint Information                                              */
+    __IO uint8_t   RAMINFO;                           /*!< (@ 0x00000079) USB RAM Information                                                   */
+    __IO uint8_t   CONTIM;                            /*!< (@ 0x0000007A) USB Connect Timing                                                    */
+    __IO uint8_t   VPLEN;                             /*!< (@ 0x0000007B) USB OTG VBUS Pulse Timing                                             */
+    __IO uint8_t   HSEOF;                             /*!< (@ 0x0000007C) USB High-Speed Last Transaction to End of Frame Timing                */
+    __IO uint8_t   FSEOF;                             /*!< (@ 0x0000007D) USB Full-Speed Last Transaction to End of Frame Timing                */
+    __IO uint8_t   LSEOF;                             /*!< (@ 0x0000007E) USB Low-Speed Last Transaction to End of Frame Timing                 */
+    __I  uint8_t   RESERVED5;
+    __IO uint8_t   TXFUNCADDR0;                       /*!< (@ 0x00000080) USB Transmit Functional Address Endpoint 0                            */
+    __I  uint8_t   RESERVED6;
+    __IO uint8_t   TXHUBADDR0;                        /*!< (@ 0x00000082) USB Transmit Hub Address Endpoint 0                                   */
+    __IO uint8_t   TXHUBPORT0;                        /*!< (@ 0x00000083) USB Transmit Hub Port Endpoint 0                                      */
+    __I  uint32_t  RESERVED7;
+    __IO uint8_t   TXFUNCADDR1;                       /*!< USB Transmit Functional Address Endpoint 1                            */
+    __I  uint8_t   RESERVED8;
+    __IO uint8_t   TXHUBADDR1;                        /*!< USB Transmit Hub Address Endpoint 1                                   */
+    __IO uint8_t   TXHUBPORT1;                        /*!< USB Transmit Hub Port Endpoint 1                                      */
+    __IO uint8_t   RXFUNCADDR1;                       /*!< USB Receive Functional Address Endpoint 1                             */
+    __I  uint8_t   RESERVED9;
+    __IO uint8_t   RXHUBADDR1;                        /*!< USB Receive Hub Address Endpoint 1                                    */
+    __IO uint8_t   RXHUBPORT1;                        /*!< USB Receive Hub Port Endpoint 1                                       */
+    __IO uint8_t   TXFUNCADDR2;                       /*!< USB Transmit Functional Address Endpoint 2                            */
+    __I  uint8_t   RESERVED10;
+    __IO uint8_t   TXHUBADDR2;                        /*!< USB Transmit Hub Address Endpoint 2                                   */
+    __IO uint8_t   TXHUBPORT2;                        /*!< USB Transmit Hub Port Endpoint 2                                      */
+    __IO uint8_t   RXFUNCADDR2;                       /*!< USB Receive Functional Address Endpoint 2                             */
+    __I  uint8_t   RESERVED11;
+    __IO uint8_t   RXHUBADDR2;                        /*!< USB Receive Hub Address Endpoint 2                                    */
+    __IO uint8_t   RXHUBPORT2;                        /*!< USB Receive Hub Port Endpoint 2                                       */
+    __IO uint8_t   TXFUNCADDR3;                       /*!< USB Transmit Functional Address Endpoint 3                            */
+    __I  uint8_t   RESERVED12;
+    __IO uint8_t   TXHUBADDR3;                        /*!< USB Transmit Hub Address Endpoint 3                                   */
+    __IO uint8_t   TXHUBPORT3;                        /*!< USB Transmit Hub Port Endpoint 3                                      */
+    __IO uint8_t   RXFUNCADDR3;                       /*!< USB Receive Functional Address Endpoint 3                             */
+    __I  uint8_t   RESERVED13;
+    __IO uint8_t   RXHUBADDR3;                        /*!< USB Receive Hub Address Endpoint 3                                    */
+    __IO uint8_t   RXHUBPORT3;                        /*!< USB Receive Hub Port Endpoint 3                                       */
+    __IO uint8_t   TXFUNCADDR4;                       /*!< USB Transmit Functional Address Endpoint 4                            */
+    __I  uint8_t   RESERVED14;
+    __IO uint8_t   TXHUBADDR4;                        /*!< USB Transmit Hub Address Endpoint 4                                   */
+    __IO uint8_t   TXHUBPORT4;                        /*!< USB Transmit Hub Port Endpoint 4                                      */
+    __IO uint8_t   RXFUNCADDR4;                       /*!< USB Receive Functional Address Endpoint 4                             */
+    __I  uint8_t   RESERVED15;
+    __IO uint8_t   RXHUBADDR4;                        /*!< USB Receive Hub Address Endpoint 4                                    */
+    __IO uint8_t   RXHUBPORT4;                        /*!< USB Receive Hub Port Endpoint 4                                       */
+    __IO uint8_t   TXFUNCADDR5;                       /*!< USB Transmit Functional Address Endpoint 5                            */
+    __I  uint8_t   RESERVED16;
+    __IO uint8_t   TXHUBADDR5;                        /*!< USB Transmit Hub Address Endpoint 5                                   */
+    __IO uint8_t   TXHUBPORT5;                        /*!< USB Transmit Hub Port Endpoint 5                                      */
+    __IO uint8_t   RXFUNCADDR5;                       /*!< USB Receive Functional Address Endpoint 5                             */
+    __I  uint8_t   RESERVED17;
+    __IO uint8_t   RXHUBADDR5;                        /*!< USB Receive Hub Address Endpoint 5                                    */
+    __IO uint8_t   RXHUBPORT5;                        /*!< USB Receive Hub Port Endpoint 5                                       */
+    __IO uint8_t   TXFUNCADDR6;                       /*!< USB Transmit Functional Address Endpoint 6                            */
+    __I  uint8_t   RESERVED18;
+    __IO uint8_t   TXHUBADDR6;                        /*!< USB Transmit Hub Address Endpoint 6                                   */
+    __IO uint8_t   TXHUBPORT6;                        /*!< USB Transmit Hub Port Endpoint 6                                      */
+    __IO uint8_t   RXFUNCADDR6;                       /*!< USB Receive Functional Address Endpoint 6                             */
+    __I  uint8_t   RESERVED19;
+    __IO uint8_t   RXHUBADDR6;                        /*!< USB Receive Hub Address Endpoint 6                                    */
+    __IO uint8_t   RXHUBPORT6;                        /*!< USB Receive Hub Port Endpoint 6                                       */
+    __IO uint8_t   TXFUNCADDR7;                       /*!< USB Transmit Functional Address Endpoint 7                            */
+    __I  uint8_t   RESERVED20;
+    __IO uint8_t   TXHUBADDR7;                        /*!< USB Transmit Hub Address Endpoint 7                                   */
+    __IO uint8_t   TXHUBPORT7;                        /*!< USB Transmit Hub Port Endpoint 7                                      */
+    __IO uint8_t   RXFUNCADDR7;                       /*!< USB Receive Functional Address Endpoint 7                             */
+    __I  uint8_t   RESERVED21;
+    __IO uint8_t   RXHUBADDR7;                        /*!< USB Receive Hub Address Endpoint 7                                    */
+    __IO uint8_t   RXHUBPORT7;                        /*!< USB Receive Hub Port Endpoint 7                                       */
+    __I  uint32_t  RESERVED22[16];
+    __I  uint16_t  RESERVED23;
+    __O  uint8_t   CSRL0;                             /*!< (@ 0x00000102) USB Control and Status Endpoint 0 Low                                 */
+    __O  uint8_t   CSRH0;                             /*!< USB Control and Status Endpoint 0 High                                */
+    __I  uint16_t  RESERVED24[2];
+    __IO uint8_t   COUNT0;                            /*!< (@ 0x00000108) USB Receive Byte Count Endpoint 0                                     */
+    __I  uint8_t   RESERVED25;
+    __IO uint8_t   TYPE0_EP0;                         /*!< USB Type Endpoint 0                                                   */
+    __IO uint8_t   NAKLMT;                            /*!< USB NAK Limit                                                         */
+    __I  uint32_t  RESERVED26;
+    __IO uint16_t  TXMAXP1;                           /*!< (@ 0x00000110) USB Maximum Transmit Data Endpoint 1                                  */
+    __IO uint8_t   TXCSRL1;                           /*!< (@ 0x00000112) USB Transmit Control and Status Endpoint 1 Low                        */
+    __IO uint8_t   TXCSRH1;                           /*!< (@ 0x00000113) USB Transmit Control and Status Endpoint 1 High                       */
+    __IO uint16_t  RXMAXP1;                           /*!< (@ 0x00000114) USB Maximum Receive Data Endpoint 1                                   */
+    __IO uint8_t   RXCSRL1;                           /*!< (@ 0x00000116) USB Receive Control and Status Endpoint 1 Low                         */
+    __IO uint8_t   RXCSRH1;                           /*!< (@ 0x00000117) USB Receive Control and Status Endpoint 1 High                        */
+    __IO uint16_t  RXCOUNT1;                          /*!< (@ 0x00000118) USB Receive Byte Count Endpoint 1                                     */
+    __IO uint8_t   TXTYPE1;                           /*!< (@ 0x0000011A) USB Host Transmit Configure Type Endpoint 1                           */
+    __IO uint8_t   TXINTERVAL1;                       /*!< (@ 0x0000011B) USB Host Transmit Interval Endpoint 1                                 */
+    __IO uint8_t   RXTYPE1;                           /*!< (@ 0x0000011C) USB Host Configure Receive Type Endpoint 1                            */
+    __IO uint8_t   RXINTERVAL1;                       /*!< (@ 0x0000011D) USB Host Receive Polling Interval Endpoint 1                          */
+    __I  uint16_t  RESERVED27;
+    __IO uint16_t  TXMAXP2;                           /*!< (@ 0x00000120) USB Maximum Transmit Data Endpoint 2                                  */
+    __IO uint8_t   TXCSRL2;                           /*!< USB Transmit Control and Status Endpoint 2 Low                        */
+    __IO uint8_t   TXCSRH2;                           /*!< USB Transmit Control and Status Endpoint 2 High                       */
+    __IO uint16_t  RXMAXP2;                           /*!< USB Maximum Receive Data Endpoint 2                                   */
+    __IO uint8_t   RXCSRL2;                           /*!< USB Receive Control and Status Endpoint 2 Low                         */
+    __IO uint8_t   RXCSRH2;                           /*!< USB Receive Control and Status Endpoint 2 High                        */
+    __IO uint16_t  RXCOUNT2;                          /*!< USB Receive Byte Count Endpoint 2                                     */
+    __IO uint8_t   TXTYPE2;                           /*!< USB Host Transmit Configure Type Endpoint 2                           */
+    __IO uint8_t   TXINTERVAL2;                       /*!< USB Host Transmit Interval Endpoint 2                                 */
+    __IO uint8_t   RXTYPE2;                           /*!< USB Host Configure Receive Type Endpoint 2                            */
+    __IO uint8_t   RXINTERVAL2;                       /*!< USB Host Receive Polling Interval Endpoint 2                          */
+    __I  uint16_t  RESERVED28;
+    __IO uint16_t  TXMAXP3;                           /*!< (@ 0x00000130) USB Maximum Transmit Data Endpoint 3                                  */
+    __IO uint8_t   TXCSRL3;                           /*!< USB Transmit Control and Status Endpoint 3 Low                        */
+    __IO uint8_t   TXCSRH3;                           /*!< USB Transmit Control and Status Endpoint 3 High                       */
+    __IO uint16_t  RXMAXP3;                           /*!< USB Maximum Receive Data Endpoint 3                                   */
+    __IO uint8_t   RXCSRL3;                           /*!< USB Receive Control and Status Endpoint 3 Low                         */
+    __IO uint8_t   RXCSRH3;                           /*!< USB Receive Control and Status Endpoint 3 High                        */
+    __IO uint16_t  RXCOUNT3;                          /*!< USB Receive Byte Count Endpoint 3                                     */
+    __IO uint8_t   TXTYPE3;                           /*!< USB Host Transmit Configure Type Endpoint 3                           */
+    __IO uint8_t   TXINTERVAL3;                       /*!< USB Host Transmit Interval Endpoint 3                                 */
+    __IO uint8_t   RXTYPE3;                           /*!< USB Host Configure Receive Type Endpoint 3                            */
+    __IO uint8_t   RXINTERVAL3;                       /*!< USB Host Receive Polling Interval Endpoint 3                          */
+    __I  uint16_t  RESERVED29;
+    __IO uint16_t  TXMAXP4;                           /*!< (@ 0x00000140) USB Maximum Transmit Data Endpoint 4                                  */
+    __IO uint8_t   TXCSRL4;                           /*!< USB Transmit Control and Status Endpoint 4 Low                        */
+    __IO uint8_t   TXCSRH4;                           /*!< USB Transmit Control and Status Endpoint 4 High                       */
+    __IO uint16_t  RXMAXP4;                           /*!< USB Maximum Receive Data Endpoint 4                                   */
+    __IO uint8_t   RXCSRL4;                           /*!< USB Receive Control and Status Endpoint 4 Low                         */
+    __IO uint8_t   RXCSRH4;                           /*!< USB Receive Control and Status Endpoint 4 High                        */
+    __IO uint16_t  RXCOUNT4;                          /*!< USB Receive Byte Count Endpoint 4                                     */
+    __IO uint8_t   TXTYPE4;                           /*!< USB Host Transmit Configure Type Endpoint 4                           */
+    __IO uint8_t   TXINTERVAL4;                       /*!< USB Host Transmit Interval Endpoint 4                                 */
+    __IO uint8_t   RXTYPE4;                           /*!< USB Host Configure Receive Type Endpoint 4                            */
+    __IO uint8_t   RXINTERVAL4;                       /*!< USB Host Receive Polling Interval Endpoint 4                          */
+    __I  uint16_t  RESERVED30;
+    __IO uint16_t  TXMAXP5;                           /*!< (@ 0x00000150) USB Maximum Transmit Data Endpoint 5                                  */
+    __IO uint8_t   TXCSRL5;                           /*!< USB Transmit Control and Status Endpoint 5 Low                        */
+    __IO uint8_t   TXCSRH5;                           /*!< USB Transmit Control and Status Endpoint 5 High                       */
+    __IO uint16_t  RXMAXP5;                           /*!< USB Maximum Receive Data Endpoint 5                                   */
+    __IO uint8_t   RXCSRL5;                           /*!< USB Receive Control and Status Endpoint 5 Low                         */
+    __IO uint8_t   RXCSRH5;                           /*!< USB Receive Control and Status Endpoint 5 High                        */
+    __IO uint16_t  RXCOUNT5;                          /*!< USB Receive Byte Count Endpoint 5                                     */
+    __IO uint8_t   TXTYPE5;                           /*!< USB Host Transmit Configure Type Endpoint 5                           */
+    __IO uint8_t   TXINTERVAL5;                       /*!< USB Host Transmit Interval Endpoint 5                                 */
+    __IO uint8_t   RXTYPE5;                           /*!< USB Host Configure Receive Type Endpoint 5                            */
+    __IO uint8_t   RXINTERVAL5;                       /*!< USB Host Receive Polling Interval Endpoint 5                          */
+    __I  uint16_t  RESERVED31;
+    __IO uint16_t  TXMAXP6;                           /*!< (@ 0x00000160) USB Maximum Transmit Data Endpoint 6                                  */
+    __IO uint8_t   TXCSRL6;                           /*!< USB Transmit Control and Status Endpoint 6 Low                        */
+    __IO uint8_t   TXCSRH6;                           /*!< USB Transmit Control and Status Endpoint 6 High                       */
+    __IO uint16_t  RXMAXP6;                           /*!< USB Maximum Receive Data Endpoint 6                                   */
+    __IO uint8_t   RXCSRL6;                           /*!< USB Receive Control and Status Endpoint 6 Low                         */
+    __IO uint8_t   RXCSRH6;                           /*!< USB Receive Control and Status Endpoint 6 High                        */
+    __IO uint16_t  RXCOUNT6;                          /*!< USB Receive Byte Count Endpoint 6                                     */
+    __IO uint8_t   TXTYPE6;                           /*!< USB Host Transmit Configure Type Endpoint 6                           */
+    __IO uint8_t   TXINTERVAL6;                       /*!< USB Host Transmit Interval Endpoint 6                                 */
+    __IO uint8_t   RXTYPE6;                           /*!< USB Host Configure Receive Type Endpoint 6                            */
+    __IO uint8_t   RXINTERVAL6;                       /*!< USB Host Receive Polling Interval Endpoint 6                          */
+    __I  uint16_t  RESERVED32;
+    __IO uint16_t  TXMAXP7;                           /*!< (@ 0x00000170) USB Maximum Transmit Data Endpoint 7                                  */
+    __IO uint8_t   TXCSRL7;                           /*!< USB Transmit Control and Status Endpoint 7 Low                        */
+    __IO uint8_t   TXCSRH7;                           /*!< USB Transmit Control and Status Endpoint 7 High                       */
+    __IO uint16_t  RXMAXP7;                           /*!< USB Maximum Receive Data Endpoint 7                                   */
+    __IO uint8_t   RXCSRL7;                           /*!< USB Receive Control and Status Endpoint 7 Low                         */
+    __IO uint8_t   RXCSRH7;                           /*!< USB Receive Control and Status Endpoint 7 High                        */
+    __IO uint16_t  RXCOUNT7;                          /*!< USB Receive Byte Count Endpoint 7                                     */
+    __IO uint8_t   TXTYPE7;                           /*!< USB Host Transmit Configure Type Endpoint 7                           */
+    __IO uint8_t   TXINTERVAL7;                       /*!< USB Host Transmit Interval Endpoint 7                                 */
+    __IO uint8_t   RXTYPE7;                           /*!< USB Host Configure Receive Type Endpoint 7                            */
+    __IO uint8_t   RXINTERVAL7;                       /*!< USB Host Receive Polling Interval Endpoint 7                          */
+    __I  uint16_t  RESERVED33[65];
+    __IO uint8_t   DMAINTR;                           /*!< (@ 0x00000200) USB DMA Interrupt                                                     */
+    __I  uint8_t   RESERVED34[3];
+    __IO uint16_t  DMACTL0;                           /*!< (@ 0x00000204) USB DMA Control 0                                                     */
+    __I  uint16_t  RESERVED35;
+    __IO uint32_t  DMAADDR0;                          /*!< (@ 0x00000208) USB DMA Address 0                                                     */
+    __IO uint32_t  DMACOUNT0;                         /*!< (@ 0x0000020C) USB DMA Count 0                                                       */
+    __I  uint32_t  RESERVED36;
+    __IO uint16_t  DMACTL1;                           /*!< USB DMA Control 1                                                     */
+    __I  uint16_t  RESERVED37;
+    __IO uint32_t  DMAADDR1;                          /*!< USB DMA Address 1                                                     */
+    __IO uint32_t  DMACOUNT1;                         /*!< USB DMA Count 1                                                       */
+    __I  uint32_t  RESERVED38;
+    __IO uint16_t  DMACTL2;                           /*!< USB DMA Control 2                                                     */
+    __I  uint16_t  RESERVED39;
+    __IO uint32_t  DMAADDR2;                          /*!< USB DMA Address 2                                                     */
+    __IO uint32_t  DMACOUNT2;                         /*!< USB DMA Count 2                                                       */
+    __I  uint32_t  RESERVED40;
+    __IO uint16_t  DMACTL3;                           /*!< USB DMA Control 3                                                     */
+    __I  uint16_t  RESERVED41;
+    __IO uint32_t  DMAADDR3;                          /*!< USB DMA Address 3                                                     */
+    __IO uint32_t  DMACOUNT3;                         /*!< USB DMA Count 3                                                       */
+    __I  uint32_t  RESERVED42;
+    __IO uint16_t  DMACTL4;                           /*!< USB DMA Control 4                                                     */
+    __I  uint16_t  RESERVED43;
+    __IO uint32_t  DMAADDR4;                          /*!< USB DMA Address 4                                                     */
+    __IO uint32_t  DMACOUNT4;                         /*!< USB DMA Count 4                                                       */
+    __I  uint32_t  RESERVED44;
+    __IO uint16_t  DMACTL5;                           /*!< USB DMA Control 5                                                     */
+    __I  uint16_t  RESERVED45;
+    __IO uint32_t  DMAADDR5;                          /*!< USB DMA Address 5                                                     */
+    __IO uint32_t  DMACOUNT5;                         /*!< USB DMA Count 5                                                       */
+    __I  uint32_t  RESERVED46;
+    __IO uint16_t  DMACTL6;                           /*!< USB DMA Control 6                                                     */
+    __I  uint16_t  RESERVED47;
+    __IO uint32_t  DMAADDR6;                          /*!< USB DMA Address 6                                                     */
+    __IO uint32_t  DMACOUNT6;                         /*!< USB DMA Count 6                                                       */
+    __I  uint32_t  RESERVED48;
+    __IO uint16_t  DMACTL7;                           /*!< USB DMA Control 7                                                     */
+    __I  uint16_t  RESERVED49;
+    __IO uint32_t  DMAADDR7;                          /*!< USB DMA Address 7                                                     */
+    __IO uint32_t  DMACOUNT7;                         /*!< USB DMA Count 7                                                       */
+    __I  uint32_t  RESERVED50[33];
+    __IO uint16_t  RQPKTCOUNT1;                       /*!< USB Request Packet Count in Block Transfer Endpoint 1                 */
+    __I  uint16_t  RESERVED51;
+    __IO uint16_t  RQPKTCOUNT2;                       /*!< USB Request Packet Count in Block Transfer Endpoint 2                 */
+    __I  uint16_t  RESERVED52;
+    __IO uint16_t  RQPKTCOUNT3;                       /*!< USB Request Packet Count in Block Transfer Endpoint 3                 */
+    __I  uint16_t  RESERVED53;
+    __IO uint16_t  RQPKTCOUNT4;                       /*!< USB Request Packet Count in Block Transfer Endpoint 4                 */
+    __I  uint16_t  RESERVED54;
+    __IO uint16_t  RQPKTCOUNT5;                       /*!< USB Request Packet Count in Block Transfer Endpoint 5                 */
+    __I  uint16_t  RESERVED55;
+    __IO uint16_t  RQPKTCOUNT6;                       /*!< USB Request Packet Count in Block Transfer Endpoint 6                 */
+    __I  uint16_t  RESERVED56;
+    __IO uint16_t  RQPKTCOUNT7;                       /*!< USB Request Packet Count in Block Transfer Endpoint 7                 */
+    __I  uint16_t  RESERVED57[17];
+    __IO uint16_t  RXDPKTBUFDIS;                      /*!< USB Receive Double Packet Buffer Disable                              */
+    __IO uint16_t  TXDPKTBUFDIS;                      /*!< USB Transmit Double Packet Buffer Disable                             */
+    __IO uint16_t  CTO;                               /*!< (@ 0x00000344) USB Chirp Timeout                                                     */
+    __IO uint16_t  HHSRTN;                            /*!< (@ 0x00000346) USB High Speed to UTM Operating Delay                                 */
+    __IO uint16_t  HSBT;                              /*!< USB High Speed Time-out Adder                                         */
+    __I  uint16_t  RESERVED58[11];
+    __IO uint16_t  LPMATTR;                           /*!< (@ 0x00000360) USB LPM Attributes                                                    */
+    __IO uint8_t   LPMCNTRL;                          /*!< (@ 0x00000362) USB LPM Control                                                       */
+    __IO uint8_t   LPMIM;                             /*!< (@ 0x00000363) USB LPM Interrupt Mask                                                */
+    __IO uint8_t   LPMRIS;                            /*!< (@ 0x00000364) USB LPM Raw Interrupt Status                                          */
+    __IO uint8_t   LPMFADDR;                          /*!< (@ 0x00000365) USB LPM Function Address                                              */
+    __I  uint16_t  RESERVED59[77];
+    __IO uint32_t  EPC;                               /*!< USB External Power Control                                            */
+    __IO uint32_t  EPCRIS;                            /*!< USB External Power Control Raw Interrupt Status                       */
+    __IO uint32_t  EPCIM;                             /*!< USB External Power Control Interrupt Mask                             */
+    __IO uint32_t  EPCISC;                            /*!< USB External Power Control Interrupt Status and Clear                 */
+    __IO uint32_t  DRRIS;                             /*!< USB Device RESUME Raw Interrupt Status                                */
+    __IO uint32_t  DRIM;                              /*!< USB Device RESUME Interrupt Mask                                      */
+    __O  uint32_t  DRISC;                             /*!< USB Device RESUME Interrupt Status and Clear                          */
+    __IO uint32_t  GPCS;                              /*!< USB General-Purpose Control and Status                                */
+    __I  uint32_t  RESERVED60[4];
+    __IO uint32_t  VDC;                               /*!< USB VBUS Droop Control                                                */
+    __IO uint32_t  VDCRIS;                            /*!< USB VBUS Droop Control Raw Interrupt Status                           */
+    __IO uint32_t  VDCIM;                             /*!< USB VBUS Droop Control Interrupt Mask                                 */
+    __IO uint32_t  VDCISC;                            /*!< USB VBUS Droop Control Interrupt Status and Clear                     */
+    __I  uint32_t  RESERVED61[736];
+    __IO uint32_t  PP;                                /*!< USB Peripheral Properties                                             */
+    __IO uint32_t  PC;                                /*!< USB Peripheral Configuration                                          */
+    __IO uint32_t  CC;                                /*!< USB Clock Configuration                                               */
 } USB0_Type;
 
 //*****************************************************************************
@@ -403,248 +417,248 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_O_CONTIM            0x0000007A  // USB Connect Timing
 #define USB_O_VPLEN             0x0000007B  // USB OTG VBUS Pulse Timing
 #define USB_O_HSEOF             0x0000007C  // USB High-Speed Last Transaction
-                                            // to End of Frame Timing
+// to End of Frame Timing
 #define USB_O_FSEOF             0x0000007D  // USB Full-Speed Last Transaction
-                                            // to End of Frame Timing
+// to End of Frame Timing
 #define USB_O_LSEOF             0x0000007E  // USB Low-Speed Last Transaction
-                                            // to End of Frame Timing
+// to End of Frame Timing
 #define USB_O_TXFUNCADDR0       0x00000080  // USB Transmit Functional Address
-                                            // Endpoint 0
+// Endpoint 0
 #define USB_O_TXHUBADDR0        0x00000082  // USB Transmit Hub Address
-                                            // Endpoint 0
+// Endpoint 0
 #define USB_O_TXHUBPORT0        0x00000083  // USB Transmit Hub Port Endpoint 0
 #define USB_O_TXFUNCADDR1       0x00000088  // USB Transmit Functional Address
-                                            // Endpoint 1
+// Endpoint 1
 #define USB_O_TXHUBADDR1        0x0000008A  // USB Transmit Hub Address
-                                            // Endpoint 1
+// Endpoint 1
 #define USB_O_TXHUBPORT1        0x0000008B  // USB Transmit Hub Port Endpoint 1
 #define USB_O_RXFUNCADDR1       0x0000008C  // USB Receive Functional Address
-                                            // Endpoint 1
+// Endpoint 1
 #define USB_O_RXHUBADDR1        0x0000008E  // USB Receive Hub Address Endpoint
-                                            // 1
+// 1
 #define USB_O_RXHUBPORT1        0x0000008F  // USB Receive Hub Port Endpoint 1
 #define USB_O_TXFUNCADDR2       0x00000090  // USB Transmit Functional Address
-                                            // Endpoint 2
+// Endpoint 2
 #define USB_O_TXHUBADDR2        0x00000092  // USB Transmit Hub Address
-                                            // Endpoint 2
+// Endpoint 2
 #define USB_O_TXHUBPORT2        0x00000093  // USB Transmit Hub Port Endpoint 2
 #define USB_O_RXFUNCADDR2       0x00000094  // USB Receive Functional Address
-                                            // Endpoint 2
+// Endpoint 2
 #define USB_O_RXHUBADDR2        0x00000096  // USB Receive Hub Address Endpoint
-                                            // 2
+// 2
 #define USB_O_RXHUBPORT2        0x00000097  // USB Receive Hub Port Endpoint 2
 #define USB_O_TXFUNCADDR3       0x00000098  // USB Transmit Functional Address
-                                            // Endpoint 3
+// Endpoint 3
 #define USB_O_TXHUBADDR3        0x0000009A  // USB Transmit Hub Address
-                                            // Endpoint 3
+// Endpoint 3
 #define USB_O_TXHUBPORT3        0x0000009B  // USB Transmit Hub Port Endpoint 3
 #define USB_O_RXFUNCADDR3       0x0000009C  // USB Receive Functional Address
-                                            // Endpoint 3
+// Endpoint 3
 #define USB_O_RXHUBADDR3        0x0000009E  // USB Receive Hub Address Endpoint
-                                            // 3
+// 3
 #define USB_O_RXHUBPORT3        0x0000009F  // USB Receive Hub Port Endpoint 3
 #define USB_O_TXFUNCADDR4       0x000000A0  // USB Transmit Functional Address
-                                            // Endpoint 4
+// Endpoint 4
 #define USB_O_TXHUBADDR4        0x000000A2  // USB Transmit Hub Address
-                                            // Endpoint 4
+// Endpoint 4
 #define USB_O_TXHUBPORT4        0x000000A3  // USB Transmit Hub Port Endpoint 4
 #define USB_O_RXFUNCADDR4       0x000000A4  // USB Receive Functional Address
-                                            // Endpoint 4
+// Endpoint 4
 #define USB_O_RXHUBADDR4        0x000000A6  // USB Receive Hub Address Endpoint
-                                            // 4
+// 4
 #define USB_O_RXHUBPORT4        0x000000A7  // USB Receive Hub Port Endpoint 4
 #define USB_O_TXFUNCADDR5       0x000000A8  // USB Transmit Functional Address
-                                            // Endpoint 5
+// Endpoint 5
 #define USB_O_TXHUBADDR5        0x000000AA  // USB Transmit Hub Address
-                                            // Endpoint 5
+// Endpoint 5
 #define USB_O_TXHUBPORT5        0x000000AB  // USB Transmit Hub Port Endpoint 5
 #define USB_O_RXFUNCADDR5       0x000000AC  // USB Receive Functional Address
-                                            // Endpoint 5
+// Endpoint 5
 #define USB_O_RXHUBADDR5        0x000000AE  // USB Receive Hub Address Endpoint
-                                            // 5
+// 5
 #define USB_O_RXHUBPORT5        0x000000AF  // USB Receive Hub Port Endpoint 5
 #define USB_O_TXFUNCADDR6       0x000000B0  // USB Transmit Functional Address
-                                            // Endpoint 6
+// Endpoint 6
 #define USB_O_TXHUBADDR6        0x000000B2  // USB Transmit Hub Address
-                                            // Endpoint 6
+// Endpoint 6
 #define USB_O_TXHUBPORT6        0x000000B3  // USB Transmit Hub Port Endpoint 6
 #define USB_O_RXFUNCADDR6       0x000000B4  // USB Receive Functional Address
-                                            // Endpoint 6
+// Endpoint 6
 #define USB_O_RXHUBADDR6        0x000000B6  // USB Receive Hub Address Endpoint
-                                            // 6
+// 6
 #define USB_O_RXHUBPORT6        0x000000B7  // USB Receive Hub Port Endpoint 6
 #define USB_O_TXFUNCADDR7       0x000000B8  // USB Transmit Functional Address
-                                            // Endpoint 7
+// Endpoint 7
 #define USB_O_TXHUBADDR7        0x000000BA  // USB Transmit Hub Address
-                                            // Endpoint 7
+// Endpoint 7
 #define USB_O_TXHUBPORT7        0x000000BB  // USB Transmit Hub Port Endpoint 7
 #define USB_O_RXFUNCADDR7       0x000000BC  // USB Receive Functional Address
-                                            // Endpoint 7
+// Endpoint 7
 #define USB_O_RXHUBADDR7        0x000000BE  // USB Receive Hub Address Endpoint
-                                            // 7
+// 7
 #define USB_O_RXHUBPORT7        0x000000BF  // USB Receive Hub Port Endpoint 7
 #define USB_O_CSRL0             0x00000102  // USB Control and Status Endpoint
-                                            // 0 Low
+// 0 Low
 #define USB_O_CSRH0             0x00000103  // USB Control and Status Endpoint
-                                            // 0 High
+// 0 High
 #define USB_O_COUNT0            0x00000108  // USB Receive Byte Count Endpoint
-                                            // 0
+// 0
 #define USB_O_TYPE0             0x0000010A  // USB Type Endpoint 0
 #define USB_O_NAKLMT            0x0000010B  // USB NAK Limit
 #define USB_O_TXMAXP1           0x00000110  // USB Maximum Transmit Data
-                                            // Endpoint 1
+// Endpoint 1
 #define USB_O_TXCSRL1           0x00000112  // USB Transmit Control and Status
-                                            // Endpoint 1 Low
+// Endpoint 1 Low
 #define USB_O_TXCSRH1           0x00000113  // USB Transmit Control and Status
-                                            // Endpoint 1 High
+// Endpoint 1 High
 #define USB_O_RXMAXP1           0x00000114  // USB Maximum Receive Data
-                                            // Endpoint 1
+// Endpoint 1
 #define USB_O_RXCSRL1           0x00000116  // USB Receive Control and Status
-                                            // Endpoint 1 Low
+// Endpoint 1 Low
 #define USB_O_RXCSRH1           0x00000117  // USB Receive Control and Status
-                                            // Endpoint 1 High
+// Endpoint 1 High
 #define USB_O_RXCOUNT1          0x00000118  // USB Receive Byte Count Endpoint
-                                            // 1
+// 1
 #define USB_O_TXTYPE1           0x0000011A  // USB Host Transmit Configure Type
-                                            // Endpoint 1
+// Endpoint 1
 #define USB_O_TXINTERVAL1       0x0000011B  // USB Host Transmit Interval
-                                            // Endpoint 1
+// Endpoint 1
 #define USB_O_RXTYPE1           0x0000011C  // USB Host Configure Receive Type
-                                            // Endpoint 1
+// Endpoint 1
 #define USB_O_RXINTERVAL1       0x0000011D  // USB Host Receive Polling
-                                            // Interval Endpoint 1
+// Interval Endpoint 1
 #define USB_O_TXMAXP2           0x00000120  // USB Maximum Transmit Data
-                                            // Endpoint 2
+// Endpoint 2
 #define USB_O_TXCSRL2           0x00000122  // USB Transmit Control and Status
-                                            // Endpoint 2 Low
+// Endpoint 2 Low
 #define USB_O_TXCSRH2           0x00000123  // USB Transmit Control and Status
-                                            // Endpoint 2 High
+// Endpoint 2 High
 #define USB_O_RXMAXP2           0x00000124  // USB Maximum Receive Data
-                                            // Endpoint 2
+// Endpoint 2
 #define USB_O_RXCSRL2           0x00000126  // USB Receive Control and Status
-                                            // Endpoint 2 Low
+// Endpoint 2 Low
 #define USB_O_RXCSRH2           0x00000127  // USB Receive Control and Status
-                                            // Endpoint 2 High
+// Endpoint 2 High
 #define USB_O_RXCOUNT2          0x00000128  // USB Receive Byte Count Endpoint
-                                            // 2
+// 2
 #define USB_O_TXTYPE2           0x0000012A  // USB Host Transmit Configure Type
-                                            // Endpoint 2
+// Endpoint 2
 #define USB_O_TXINTERVAL2       0x0000012B  // USB Host Transmit Interval
-                                            // Endpoint 2
+// Endpoint 2
 #define USB_O_RXTYPE2           0x0000012C  // USB Host Configure Receive Type
-                                            // Endpoint 2
+// Endpoint 2
 #define USB_O_RXINTERVAL2       0x0000012D  // USB Host Receive Polling
-                                            // Interval Endpoint 2
+// Interval Endpoint 2
 #define USB_O_TXMAXP3           0x00000130  // USB Maximum Transmit Data
-                                            // Endpoint 3
+// Endpoint 3
 #define USB_O_TXCSRL3           0x00000132  // USB Transmit Control and Status
-                                            // Endpoint 3 Low
+// Endpoint 3 Low
 #define USB_O_TXCSRH3           0x00000133  // USB Transmit Control and Status
-                                            // Endpoint 3 High
+// Endpoint 3 High
 #define USB_O_RXMAXP3           0x00000134  // USB Maximum Receive Data
-                                            // Endpoint 3
+// Endpoint 3
 #define USB_O_RXCSRL3           0x00000136  // USB Receive Control and Status
-                                            // Endpoint 3 Low
+// Endpoint 3 Low
 #define USB_O_RXCSRH3           0x00000137  // USB Receive Control and Status
-                                            // Endpoint 3 High
+// Endpoint 3 High
 #define USB_O_RXCOUNT3          0x00000138  // USB Receive Byte Count Endpoint
-                                            // 3
+// 3
 #define USB_O_TXTYPE3           0x0000013A  // USB Host Transmit Configure Type
-                                            // Endpoint 3
+// Endpoint 3
 #define USB_O_TXINTERVAL3       0x0000013B  // USB Host Transmit Interval
-                                            // Endpoint 3
+// Endpoint 3
 #define USB_O_RXTYPE3           0x0000013C  // USB Host Configure Receive Type
-                                            // Endpoint 3
+// Endpoint 3
 #define USB_O_RXINTERVAL3       0x0000013D  // USB Host Receive Polling
-                                            // Interval Endpoint 3
+// Interval Endpoint 3
 #define USB_O_TXMAXP4           0x00000140  // USB Maximum Transmit Data
-                                            // Endpoint 4
+// Endpoint 4
 #define USB_O_TXCSRL4           0x00000142  // USB Transmit Control and Status
-                                            // Endpoint 4 Low
+// Endpoint 4 Low
 #define USB_O_TXCSRH4           0x00000143  // USB Transmit Control and Status
-                                            // Endpoint 4 High
+// Endpoint 4 High
 #define USB_O_RXMAXP4           0x00000144  // USB Maximum Receive Data
-                                            // Endpoint 4
+// Endpoint 4
 #define USB_O_RXCSRL4           0x00000146  // USB Receive Control and Status
-                                            // Endpoint 4 Low
+// Endpoint 4 Low
 #define USB_O_RXCSRH4           0x00000147  // USB Receive Control and Status
-                                            // Endpoint 4 High
+// Endpoint 4 High
 #define USB_O_RXCOUNT4          0x00000148  // USB Receive Byte Count Endpoint
-                                            // 4
+// 4
 #define USB_O_TXTYPE4           0x0000014A  // USB Host Transmit Configure Type
-                                            // Endpoint 4
+// Endpoint 4
 #define USB_O_TXINTERVAL4       0x0000014B  // USB Host Transmit Interval
-                                            // Endpoint 4
+// Endpoint 4
 #define USB_O_RXTYPE4           0x0000014C  // USB Host Configure Receive Type
-                                            // Endpoint 4
+// Endpoint 4
 #define USB_O_RXINTERVAL4       0x0000014D  // USB Host Receive Polling
-                                            // Interval Endpoint 4
+// Interval Endpoint 4
 #define USB_O_TXMAXP5           0x00000150  // USB Maximum Transmit Data
-                                            // Endpoint 5
+// Endpoint 5
 #define USB_O_TXCSRL5           0x00000152  // USB Transmit Control and Status
-                                            // Endpoint 5 Low
+// Endpoint 5 Low
 #define USB_O_TXCSRH5           0x00000153  // USB Transmit Control and Status
-                                            // Endpoint 5 High
+// Endpoint 5 High
 #define USB_O_RXMAXP5           0x00000154  // USB Maximum Receive Data
-                                            // Endpoint 5
+// Endpoint 5
 #define USB_O_RXCSRL5           0x00000156  // USB Receive Control and Status
-                                            // Endpoint 5 Low
+// Endpoint 5 Low
 #define USB_O_RXCSRH5           0x00000157  // USB Receive Control and Status
-                                            // Endpoint 5 High
+// Endpoint 5 High
 #define USB_O_RXCOUNT5          0x00000158  // USB Receive Byte Count Endpoint
-                                            // 5
+// 5
 #define USB_O_TXTYPE5           0x0000015A  // USB Host Transmit Configure Type
-                                            // Endpoint 5
+// Endpoint 5
 #define USB_O_TXINTERVAL5       0x0000015B  // USB Host Transmit Interval
-                                            // Endpoint 5
+// Endpoint 5
 #define USB_O_RXTYPE5           0x0000015C  // USB Host Configure Receive Type
-                                            // Endpoint 5
+// Endpoint 5
 #define USB_O_RXINTERVAL5       0x0000015D  // USB Host Receive Polling
-                                            // Interval Endpoint 5
+// Interval Endpoint 5
 #define USB_O_TXMAXP6           0x00000160  // USB Maximum Transmit Data
-                                            // Endpoint 6
+// Endpoint 6
 #define USB_O_TXCSRL6           0x00000162  // USB Transmit Control and Status
-                                            // Endpoint 6 Low
+// Endpoint 6 Low
 #define USB_O_TXCSRH6           0x00000163  // USB Transmit Control and Status
-                                            // Endpoint 6 High
+// Endpoint 6 High
 #define USB_O_RXMAXP6           0x00000164  // USB Maximum Receive Data
-                                            // Endpoint 6
+// Endpoint 6
 #define USB_O_RXCSRL6           0x00000166  // USB Receive Control and Status
-                                            // Endpoint 6 Low
+// Endpoint 6 Low
 #define USB_O_RXCSRH6           0x00000167  // USB Receive Control and Status
-                                            // Endpoint 6 High
+// Endpoint 6 High
 #define USB_O_RXCOUNT6          0x00000168  // USB Receive Byte Count Endpoint
-                                            // 6
+// 6
 #define USB_O_TXTYPE6           0x0000016A  // USB Host Transmit Configure Type
-                                            // Endpoint 6
+// Endpoint 6
 #define USB_O_TXINTERVAL6       0x0000016B  // USB Host Transmit Interval
-                                            // Endpoint 6
+// Endpoint 6
 #define USB_O_RXTYPE6           0x0000016C  // USB Host Configure Receive Type
-                                            // Endpoint 6
+// Endpoint 6
 #define USB_O_RXINTERVAL6       0x0000016D  // USB Host Receive Polling
-                                            // Interval Endpoint 6
+// Interval Endpoint 6
 #define USB_O_TXMAXP7           0x00000170  // USB Maximum Transmit Data
-                                            // Endpoint 7
+// Endpoint 7
 #define USB_O_TXCSRL7           0x00000172  // USB Transmit Control and Status
-                                            // Endpoint 7 Low
+// Endpoint 7 Low
 #define USB_O_TXCSRH7           0x00000173  // USB Transmit Control and Status
-                                            // Endpoint 7 High
+// Endpoint 7 High
 #define USB_O_RXMAXP7           0x00000174  // USB Maximum Receive Data
-                                            // Endpoint 7
+// Endpoint 7
 #define USB_O_RXCSRL7           0x00000176  // USB Receive Control and Status
-                                            // Endpoint 7 Low
+// Endpoint 7 Low
 #define USB_O_RXCSRH7           0x00000177  // USB Receive Control and Status
-                                            // Endpoint 7 High
+// Endpoint 7 High
 #define USB_O_RXCOUNT7          0x00000178  // USB Receive Byte Count Endpoint
-                                            // 7
+// 7
 #define USB_O_TXTYPE7           0x0000017A  // USB Host Transmit Configure Type
-                                            // Endpoint 7
+// Endpoint 7
 #define USB_O_TXINTERVAL7       0x0000017B  // USB Host Transmit Interval
-                                            // Endpoint 7
+// Endpoint 7
 #define USB_O_RXTYPE7           0x0000017C  // USB Host Configure Receive Type
-                                            // Endpoint 7
+// Endpoint 7
 #define USB_O_RXINTERVAL7       0x0000017D  // USB Host Receive Polling
-                                            // Interval Endpoint 7
+// Interval Endpoint 7
 #define USB_O_DMAINTR           0x00000200  // USB DMA Interrupt
 #define USB_O_DMACTL0           0x00000204  // USB DMA Control 0
 #define USB_O_DMAADDR0          0x00000208  // USB DMA Address 0
@@ -671,26 +685,26 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_O_DMAADDR7          0x00000278  // USB DMA Address 7
 #define USB_O_DMACOUNT7         0x0000027C  // USB DMA Count 7
 #define USB_O_RQPKTCOUNT1       0x00000304  // USB Request Packet Count in
-                                            // Block Transfer Endpoint 1
+// Block Transfer Endpoint 1
 #define USB_O_RQPKTCOUNT2       0x00000308  // USB Request Packet Count in
-                                            // Block Transfer Endpoint 2
+// Block Transfer Endpoint 2
 #define USB_O_RQPKTCOUNT3       0x0000030C  // USB Request Packet Count in
-                                            // Block Transfer Endpoint 3
+// Block Transfer Endpoint 3
 #define USB_O_RQPKTCOUNT4       0x00000310  // USB Request Packet Count in
-                                            // Block Transfer Endpoint 4
+// Block Transfer Endpoint 4
 #define USB_O_RQPKTCOUNT5       0x00000314  // USB Request Packet Count in
-                                            // Block Transfer Endpoint 5
+// Block Transfer Endpoint 5
 #define USB_O_RQPKTCOUNT6       0x00000318  // USB Request Packet Count in
-                                            // Block Transfer Endpoint 6
+// Block Transfer Endpoint 6
 #define USB_O_RQPKTCOUNT7       0x0000031C  // USB Request Packet Count in
-                                            // Block Transfer Endpoint 7
+// Block Transfer Endpoint 7
 #define USB_O_RXDPKTBUFDIS      0x00000340  // USB Receive Double Packet Buffer
-                                            // Disable
+// Disable
 #define USB_O_TXDPKTBUFDIS      0x00000342  // USB Transmit Double Packet
-                                            // Buffer Disable
+// Buffer Disable
 #define USB_O_CTO               0x00000344  // USB Chirp Timeout
 #define USB_O_HHSRTN            0x00000346  // USB High Speed to UTM Operating
-                                            // Delay
+// Delay
 #define USB_O_HSBT              0x00000348  // USB High Speed Time-out Adder
 #define USB_O_LPMATTR           0x00000360  // USB LPM Attributes
 #define USB_O_LPMCNTRL          0x00000362  // USB LPM Control
@@ -699,31 +713,31 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_O_LPMFADDR          0x00000365  // USB LPM Function Address
 #define USB_O_EPC               0x00000400  // USB External Power Control
 #define USB_O_EPCRIS            0x00000404  // USB External Power Control Raw
-                                            // Interrupt Status
+// Interrupt Status
 #define USB_O_EPCIM             0x00000408  // USB External Power Control
-                                            // Interrupt Mask
+// Interrupt Mask
 #define USB_O_EPCISC            0x0000040C  // USB External Power Control
-                                            // Interrupt Status and Clear
+// Interrupt Status and Clear
 #define USB_O_DRRIS             0x00000410  // USB Device RESUME Raw Interrupt
-                                            // Status
+// Status
 #define USB_O_DRIM              0x00000414  // USB Device RESUME Interrupt Mask
 #define USB_O_DRISC             0x00000418  // USB Device RESUME Interrupt
-                                            // Status and Clear
+// Status and Clear
 #define USB_O_GPCS              0x0000041C  // USB General-Purpose Control and
-                                            // Status
+// Status
 #define USB_O_VDC               0x00000430  // USB VBUS Droop Control
 #define USB_O_VDCRIS            0x00000434  // USB VBUS Droop Control Raw
-                                            // Interrupt Status
+// Interrupt Status
 #define USB_O_VDCIM             0x00000438  // USB VBUS Droop Control Interrupt
-                                            // Mask
+// Mask
 #define USB_O_VDCISC            0x0000043C  // USB VBUS Droop Control Interrupt
-                                            // Status and Clear
+// Status and Clear
 #define USB_O_IDVRIS            0x00000444  // USB ID Valid Detect Raw
-                                            // Interrupt Status
+// Interrupt Status
 #define USB_O_IDVIM             0x00000448  // USB ID Valid Detect Interrupt
-                                            // Mask
+// Mask
 #define USB_O_IDVISC            0x0000044C  // USB ID Valid Detect Interrupt
-                                            // Status and Clear
+// Status and Clear
 #define USB_O_PP                0x00000FC0  // USB Peripheral Properties
 #define USB_O_PC                0x00000FC4  // USB Peripheral Configuration
 #define USB_O_CC                0x00000FC8  // USB Clock Configuration
@@ -790,7 +804,7 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_TXIE_EP2            0x00000004  // TX Endpoint 2 Interrupt Enable
 #define USB_TXIE_EP1            0x00000002  // TX Endpoint 1 Interrupt Enable
 #define USB_TXIE_EP0            0x00000001  // TX and RX Endpoint 0 Interrupt
-                                            // Enable
+// Enable
 
 //*****************************************************************************
 //
@@ -826,9 +840,9 @@ typedef struct {                                    /*!< USB0 Structure         
 //
 //*****************************************************************************
 #define USB_IE_VBUSERR          0x00000080  // Enable VBUS Error Interrupt (OTG
-                                            // only)
+// only)
 #define USB_IE_SESREQ           0x00000040  // Enable Session Request (OTG
-                                            // only)
+// only)
 #define USB_IE_DISCON           0x00000020  // Enable Disconnect Interrupt
 #define USB_IE_CONN             0x00000010  // Enable Connect Interrupt
 #define USB_IE_SOF              0x00000008  // Enable Start-of-Frame Interrupt
@@ -1649,7 +1663,7 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_RXCSRH1_DTWE        0x00000004  // Data Toggle Write Enable
 #define USB_RXCSRH1_DT          0x00000002  // Data Toggle
 #define USB_RXCSRH1_INCOMPRX    0x00000001  // Incomplete RX Transmission
-                                            // Status
+// Status
 
 //*****************************************************************************
 //
@@ -1803,7 +1817,7 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_RXCSRH2_DTWE        0x00000004  // Data Toggle Write Enable
 #define USB_RXCSRH2_DT          0x00000002  // Data Toggle
 #define USB_RXCSRH2_INCOMPRX    0x00000001  // Incomplete RX Transmission
-                                            // Status
+// Status
 
 //*****************************************************************************
 //
@@ -1957,7 +1971,7 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_RXCSRH3_DTWE        0x00000004  // Data Toggle Write Enable
 #define USB_RXCSRH3_DT          0x00000002  // Data Toggle
 #define USB_RXCSRH3_INCOMPRX    0x00000001  // Incomplete RX Transmission
-                                            // Status
+// Status
 
 //*****************************************************************************
 //
@@ -2111,7 +2125,7 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_RXCSRH4_DTWE        0x00000004  // Data Toggle Write Enable
 #define USB_RXCSRH4_DT          0x00000002  // Data Toggle
 #define USB_RXCSRH4_INCOMPRX    0x00000001  // Incomplete RX Transmission
-                                            // Status
+// Status
 
 //*****************************************************************************
 //
@@ -2265,7 +2279,7 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_RXCSRH5_DTWE        0x00000004  // Data Toggle Write Enable
 #define USB_RXCSRH5_DT          0x00000002  // Data Toggle
 #define USB_RXCSRH5_INCOMPRX    0x00000001  // Incomplete RX Transmission
-                                            // Status
+// Status
 
 //*****************************************************************************
 //
@@ -2419,7 +2433,7 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_RXCSRH6_DTWE        0x00000004  // Data Toggle Write Enable
 #define USB_RXCSRH6_DT          0x00000002  // Data Toggle
 #define USB_RXCSRH6_INCOMPRX    0x00000001  // Incomplete RX Transmission
-                                            // Status
+// Status
 
 //*****************************************************************************
 //
@@ -2573,7 +2587,7 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_RXCSRH7_DTWE        0x00000004  // Data Toggle Write Enable
 #define USB_RXCSRH7_DT          0x00000002  // Data Toggle
 #define USB_RXCSRH7_INCOMPRX    0x00000001  // Incomplete RX Transmission
-                                            // Status
+// Status
 
 //*****************************************************************************
 //
@@ -2672,9 +2686,9 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_DMACTL0_BRSTM_ANY   0x00000000  // Bursts of unspecified length
 #define USB_DMACTL0_BRSTM_INC4  0x00000200  // INCR4 or unspecified length
 #define USB_DMACTL0_BRSTM_INC8  0x00000400  // INCR8, INCR4 or unspecified
-                                            // length
+// length
 #define USB_DMACTL0_BRSTM_INC16 0x00000600  // INCR16, INCR8, INCR4 or
-                                            // unspecified length
+// unspecified length
 #define USB_DMACTL0_ERR         0x00000100  // Bus Error Bit
 #define USB_DMACTL0_EP_M        0x000000F0  // Endpoint number
 #define USB_DMACTL0_IE          0x00000008  // DMA Interrupt Enable
@@ -2709,9 +2723,9 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_DMACTL1_BRSTM_ANY   0x00000000  // Bursts of unspecified length
 #define USB_DMACTL1_BRSTM_INC4  0x00000200  // INCR4 or unspecified length
 #define USB_DMACTL1_BRSTM_INC8  0x00000400  // INCR8, INCR4 or unspecified
-                                            // length
+// length
 #define USB_DMACTL1_BRSTM_INC16 0x00000600  // INCR16, INCR8, INCR4 or
-                                            // unspecified length
+// unspecified length
 #define USB_DMACTL1_ERR         0x00000100  // Bus Error Bit
 #define USB_DMACTL1_EP_M        0x000000F0  // Endpoint number
 #define USB_DMACTL1_IE          0x00000008  // DMA Interrupt Enable
@@ -2746,9 +2760,9 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_DMACTL2_BRSTM_ANY   0x00000000  // Bursts of unspecified length
 #define USB_DMACTL2_BRSTM_INC4  0x00000200  // INCR4 or unspecified length
 #define USB_DMACTL2_BRSTM_INC8  0x00000400  // INCR8, INCR4 or unspecified
-                                            // length
+// length
 #define USB_DMACTL2_BRSTM_INC16 0x00000600  // INCR16, INCR8, INCR4 or
-                                            // unspecified length
+// unspecified length
 #define USB_DMACTL2_ERR         0x00000100  // Bus Error Bit
 #define USB_DMACTL2_EP_M        0x000000F0  // Endpoint number
 #define USB_DMACTL2_IE          0x00000008  // DMA Interrupt Enable
@@ -2783,9 +2797,9 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_DMACTL3_BRSTM_ANY   0x00000000  // Bursts of unspecified length
 #define USB_DMACTL3_BRSTM_INC4  0x00000200  // INCR4 or unspecified length
 #define USB_DMACTL3_BRSTM_INC8  0x00000400  // INCR8, INCR4 or unspecified
-                                            // length
+// length
 #define USB_DMACTL3_BRSTM_INC16 0x00000600  // INCR16, INCR8, INCR4 or
-                                            // unspecified length
+// unspecified length
 #define USB_DMACTL3_ERR         0x00000100  // Bus Error Bit
 #define USB_DMACTL3_EP_M        0x000000F0  // Endpoint number
 #define USB_DMACTL3_IE          0x00000008  // DMA Interrupt Enable
@@ -2820,9 +2834,9 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_DMACTL4_BRSTM_ANY   0x00000000  // Bursts of unspecified length
 #define USB_DMACTL4_BRSTM_INC4  0x00000200  // INCR4 or unspecified length
 #define USB_DMACTL4_BRSTM_INC8  0x00000400  // INCR8, INCR4 or unspecified
-                                            // length
+// length
 #define USB_DMACTL4_BRSTM_INC16 0x00000600  // INCR16, INCR8, INCR4 or
-                                            // unspecified length
+// unspecified length
 #define USB_DMACTL4_ERR         0x00000100  // Bus Error Bit
 #define USB_DMACTL4_EP_M        0x000000F0  // Endpoint number
 #define USB_DMACTL4_IE          0x00000008  // DMA Interrupt Enable
@@ -2857,9 +2871,9 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_DMACTL5_BRSTM_ANY   0x00000000  // Bursts of unspecified length
 #define USB_DMACTL5_BRSTM_INC4  0x00000200  // INCR4 or unspecified length
 #define USB_DMACTL5_BRSTM_INC8  0x00000400  // INCR8, INCR4 or unspecified
-                                            // length
+// length
 #define USB_DMACTL5_BRSTM_INC16 0x00000600  // INCR16, INCR8, INCR4 or
-                                            // unspecified length
+// unspecified length
 #define USB_DMACTL5_ERR         0x00000100  // Bus Error Bit
 #define USB_DMACTL5_EP_M        0x000000F0  // Endpoint number
 #define USB_DMACTL5_IE          0x00000008  // DMA Interrupt Enable
@@ -2894,9 +2908,9 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_DMACTL6_BRSTM_ANY   0x00000000  // Bursts of unspecified length
 #define USB_DMACTL6_BRSTM_INC4  0x00000200  // INCR4 or unspecified length
 #define USB_DMACTL6_BRSTM_INC8  0x00000400  // INCR8, INCR4 or unspecified
-                                            // length
+// length
 #define USB_DMACTL6_BRSTM_INC16 0x00000600  // INCR16, INCR8, INCR4 or
-                                            // unspecified length
+// unspecified length
 #define USB_DMACTL6_ERR         0x00000100  // Bus Error Bit
 #define USB_DMACTL6_EP_M        0x000000F0  // Endpoint number
 #define USB_DMACTL6_IE          0x00000008  // DMA Interrupt Enable
@@ -2931,9 +2945,9 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_DMACTL7_BRSTM_ANY   0x00000000  // Bursts of unspecified length
 #define USB_DMACTL7_BRSTM_INC4  0x00000200  // INCR4 or unspecified length
 #define USB_DMACTL7_BRSTM_INC8  0x00000400  // INCR8, INCR4 or unspecified
-                                            // length
+// length
 #define USB_DMACTL7_BRSTM_INC16 0x00000600  // INCR16, INCR8, INCR4 or
-                                            // unspecified length
+// unspecified length
 #define USB_DMACTL7_ERR         0x00000100  // Bus Error Bit
 #define USB_DMACTL7_EP_M        0x000000F0  // Endpoint number
 #define USB_DMACTL7_IE          0x00000008  // DMA Interrupt Enable
@@ -3029,19 +3043,19 @@ typedef struct {                                    /*!< USB0 Structure         
 //
 //*****************************************************************************
 #define USB_RXDPKTBUFDIS_EP7    0x00000080  // EP7 RX Double-Packet Buffer
-                                            // Disable
+// Disable
 #define USB_RXDPKTBUFDIS_EP6    0x00000040  // EP6 RX Double-Packet Buffer
-                                            // Disable
+// Disable
 #define USB_RXDPKTBUFDIS_EP5    0x00000020  // EP5 RX Double-Packet Buffer
-                                            // Disable
+// Disable
 #define USB_RXDPKTBUFDIS_EP4    0x00000010  // EP4 RX Double-Packet Buffer
-                                            // Disable
+// Disable
 #define USB_RXDPKTBUFDIS_EP3    0x00000008  // EP3 RX Double-Packet Buffer
-                                            // Disable
+// Disable
 #define USB_RXDPKTBUFDIS_EP2    0x00000004  // EP2 RX Double-Packet Buffer
-                                            // Disable
+// Disable
 #define USB_RXDPKTBUFDIS_EP1    0x00000002  // EP1 RX Double-Packet Buffer
-                                            // Disable
+// Disable
 
 //*****************************************************************************
 //
@@ -3050,19 +3064,19 @@ typedef struct {                                    /*!< USB0 Structure         
 //
 //*****************************************************************************
 #define USB_TXDPKTBUFDIS_EP7    0x00000080  // EP7 TX Double-Packet Buffer
-                                            // Disable
+// Disable
 #define USB_TXDPKTBUFDIS_EP6    0x00000040  // EP6 TX Double-Packet Buffer
-                                            // Disable
+// Disable
 #define USB_TXDPKTBUFDIS_EP5    0x00000020  // EP5 TX Double-Packet Buffer
-                                            // Disable
+// Disable
 #define USB_TXDPKTBUFDIS_EP4    0x00000010  // EP4 TX Double-Packet Buffer
-                                            // Disable
+// Disable
 #define USB_TXDPKTBUFDIS_EP3    0x00000008  // EP3 TX Double-Packet Buffer
-                                            // Disable
+// Disable
 #define USB_TXDPKTBUFDIS_EP2    0x00000004  // EP2 TX Double-Packet Buffer
-                                            // Disable
+// Disable
 #define USB_TXDPKTBUFDIS_EP1    0x00000002  // EP1 TX Double-Packet Buffer
-                                            // Disable
+// Disable
 
 //*****************************************************************************
 //
@@ -3078,7 +3092,7 @@ typedef struct {                                    /*!< USB0 Structure         
 //
 //*****************************************************************************
 #define USB_HHSRTN_HHSRTN_M     0x0000FFFF  // HIgh Speed to UTM Operating
-                                            // Delay
+// Delay
 #define USB_HHSRTN_HHSRTN_S     0
 
 //*****************************************************************************
@@ -3110,20 +3124,20 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_LPMCNTRL_NAK        0x00000010  // LPM NAK
 #define USB_LPMCNTRL_EN_M       0x0000000C  // LPM Enable
 #define USB_LPMCNTRL_EN_NONE    0x00000000  // LPM and Extended transactions
-                                            // are not supported. In this case,
-                                            // the USB does not respond to LPM
-                                            // transactions and LPM
-                                            // transactions cause a timeout
+// are not supported. In this case,
+// the USB does not respond to LPM
+// transactions and LPM
+// transactions cause a timeout
 #define USB_LPMCNTRL_EN_EXT     0x00000004  // LPM is not supported but
-                                            // extended transactions are
-                                            // supported. In this case, the USB
-                                            // does respond to an LPM
-                                            // transaction with a STALL
+// extended transactions are
+// supported. In this case, the USB
+// does respond to an LPM
+// transaction with a STALL
 #define USB_LPMCNTRL_EN_LPMEXT  0x0000000C  // The USB supports LPM extended
-                                            // transactions. In this case, the
-                                            // USB responds with a NYET or an
-                                            // ACK as determined by the value
-                                            // of TXLPM and other conditions
+// transactions. In this case, the
+// USB responds with a NYET or an
+// ACK as determined by the value
+// of TXLPM and other conditions
 #define USB_LPMCNTRL_RES        0x00000002  // LPM Resume
 #define USB_LPMCNTRL_TXLPM      0x00000001  // Transmit LPM Transaction Enable
 
@@ -3174,13 +3188,13 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_EPC_PFLTEN          0x00000010  // Power Fault Input Enable
 #define USB_EPC_EPENDE          0x00000004  // EPEN Drive Enable
 #define USB_EPC_EPEN_M          0x00000003  // External Power Supply Enable
-                                            // Configuration
+// Configuration
 #define USB_EPC_EPEN_LOW        0x00000000  // Power Enable Active Low
 #define USB_EPC_EPEN_HIGH       0x00000001  // Power Enable Active High
 #define USB_EPC_EPEN_VBLOW      0x00000002  // Power Enable High if VBUS Low
-                                            // (OTG only)
+// (OTG only)
 #define USB_EPC_EPEN_VBHIGH     0x00000003  // Power Enable High if VBUS High
-                                            // (OTG only)
+// (OTG only)
 
 //*****************************************************************************
 //
@@ -3202,7 +3216,7 @@ typedef struct {                                    /*!< USB0 Structure         
 //
 //*****************************************************************************
 #define USB_EPCISC_PF           0x00000001  // USB Power Fault Interrupt Status
-                                            // and Clear
+// and Clear
 
 //*****************************************************************************
 //
@@ -3224,7 +3238,7 @@ typedef struct {                                    /*!< USB0 Structure         
 //
 //*****************************************************************************
 #define USB_DRISC_RESUME        0x00000001  // RESUME Interrupt Status and
-                                            // Clear
+// Clear
 
 //*****************************************************************************
 //
@@ -3237,9 +3251,9 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_GPCS_DEVMOD_DEV     0x00000003  // Force USB0VBUS and USB0ID high
 #define USB_GPCS_DEVMOD_HOSTVBUS                                              \
                                 0x00000004  // Use USB0VBUS and force USB0ID
-                                            // low
+// low
 #define USB_GPCS_DEVMOD_DEVVBUS 0x00000005  // Use USB0VBUS and force USB0ID
-                                            // high
+// high
 #define USB_GPCS_DEVMODOTG      0x00000002  // Enable Device Mode
 #define USB_GPCS_DEVMOD         0x00000001  // Device Mode
 
@@ -3270,7 +3284,7 @@ typedef struct {                                    /*!< USB0 Structure         
 //
 //*****************************************************************************
 #define USB_VDCISC_VD           0x00000001  // VBUS Droop Interrupt Status and
-                                            // Clear
+// Clear
 
 //*****************************************************************************
 //
@@ -3278,7 +3292,7 @@ typedef struct {                                    /*!< USB0 Structure         
 //
 //*****************************************************************************
 #define USB_IDVRIS_ID           0x00000001  // ID Valid Detect Raw Interrupt
-                                            // Status
+// Status
 
 //*****************************************************************************
 //
@@ -3293,7 +3307,7 @@ typedef struct {                                    /*!< USB0 Structure         
 //
 //*****************************************************************************
 #define USB_IDVISC_ID           0x00000001  // ID Valid Detect Interrupt Status
-                                            // and Clear
+// and Clear
 
 //*****************************************************************************
 //
@@ -3450,46 +3464,46 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_HOST_IN_NOT_COMP    0x01000000  // Device failed to respond
 #define USB_HOST_IN_STALL       0x00400000  // Stall on this endpoint received
 #define USB_HOST_IN_DATA_ERROR  0x00080000  // CRC or bit-stuff error
-                                            // (ISOC Mode)
+// (ISOC Mode)
 #define USB_HOST_IN_NAK_TO      0x00080000  // NAK received for more than the
-                                            // specified timeout period
+// specified timeout period
 #define USB_HOST_IN_ERROR       0x00040000  // Failed to communicate with a
-                                            // device
+// device
 #define USB_HOST_IN_FIFO_FULL   0x00020000  // RX FIFO full
 #define USB_HOST_IN_PKTRDY      0x00010000  // Data packet ready
 #define USB_HOST_OUT_STATUS     0x000000A7  // Mask of all host OUT interrupts
 #define USB_HOST_OUT_NAK_TO     0x00000080  // NAK received for more than the
-                                            // specified timeout period
+// specified timeout period
 #define USB_HOST_OUT_NOT_COMP   0x00000080  // No response from device
-                                            // (ISOC mode)
+// (ISOC mode)
 #define USB_HOST_OUT_STALL      0x00000020  // Stall on this endpoint received
 #define USB_HOST_OUT_ERROR      0x00000004  // Failed to communicate with a
-                                            // device
+// device
 #define USB_HOST_OUT_FIFO_NE    0x00000002  // TX FIFO is not empty
 #define USB_HOST_OUT_PKTPEND    0x00000001  // Transmit still being transmitted
 #define USB_HOST_EP0_NAK_TO     0x00000080  // NAK received for more than the
-                                            // specified timeout period
+// specified timeout period
 #define USB_HOST_EP0_STATUS     0x00000040  // This was a status packet
 #define USB_HOST_EP0_ERROR      0x00000010  // Failed to communicate with a
-                                            // device
+// device
 #define USB_HOST_EP0_RX_STALL   0x00000004  // Stall on this endpoint received
 #define USB_HOST_EP0_RXPKTRDY   0x00000001  // Receive data packet ready
 #define USB_DEV_RX_PID_ERROR    0x01000000  // PID error in isochronous
-                                            // transfer
+// transfer
 #define USB_DEV_RX_SENT_STALL   0x00400000  // Stall was sent on this endpoint
 #define USB_DEV_RX_DATA_ERROR   0x00080000  // CRC error on the data
 #define USB_DEV_RX_OVERRUN      0x00040000  // OUT packet was not loaded due to
-                                            // a full FIFO
+// a full FIFO
 #define USB_DEV_RX_FIFO_FULL    0x00020000  // RX FIFO full
 #define USB_DEV_RX_PKT_RDY      0x00010000  // Data packet ready
 #define USB_DEV_TX_NOT_COMP     0x00000080  // Large packet split up, more data
-                                            // to come
+// to come
 #define USB_DEV_TX_SENT_STALL   0x00000020  // Stall was sent on this endpoint
 #define USB_DEV_TX_UNDERRUN     0x00000004  // IN received with no data ready
 #define USB_DEV_TX_FIFO_NE      0x00000002  // The TX FIFO is not empty
 #define USB_DEV_TX_TXPKTRDY     0x00000001  // Transmit still being transmitted
 #define USB_DEV_EP0_SETUP_END   0x00000010  // Control transaction ended before
-                                            // Data End seen
+// Data End seen
 #define USB_DEV_EP0_SENT_STALL  0x00000004  // Stall was sent on this endpoint
 #define USB_DEV_EP0_IN_PKTPEND  0x00000002  // Transmit data packet pending
 #define USB_DEV_EP0_OUT_PKTRDY  0x00000001  // Receive data packet ready
@@ -3506,8 +3520,8 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_EP_DMA_MODE_0       0x00000008  // Enable DMA access using mode 0
 #define USB_EP_DMA_MODE_1       0x00000010  // Enable DMA access using mode 1
 #define USB_EP_DIS_NYET         0x00000020  // Disable NYET response for
-                                            // high-speed Bulk and Interrupt
-                                            // endpoints in device mode.
+// high-speed Bulk and Interrupt
+// endpoints in device mode.
 #define USB_EP_MODE_ISOC        0x00000000  // Isochronous endpoint
 #define USB_EP_MODE_BULK        0x00000100  // Bulk endpoint
 #define USB_EP_MODE_INT         0x00000200  // Interrupt endpoint
@@ -3673,11 +3687,11 @@ typedef struct {                                    /*!< USB0 Structure         
 #define USB_TRANS_OUT           0x00000102  // Normal OUT transaction
 #define USB_TRANS_IN            0x00000102  // Normal IN transaction
 #define USB_TRANS_IN_LAST       0x0000010a  // Final IN transaction (for
-                                            // endpoint 0 in device mode)
+// endpoint 0 in device mode)
 #define USB_TRANS_SETUP         0x0000110a  // Setup transaction (for endpoint
-                                            // 0)
+// 0)
 #define USB_TRANS_STATUS        0x00000142  // Status transaction (for endpoint
-                                            // 0)
+// 0)
 
 //*****************************************************************************
 //
@@ -3685,27 +3699,27 @@ typedef struct {                                    /*!< USB0 Structure         
 //
 //*****************************************************************************
 #define USB_DUAL_MODE_HOST      0x00000001  // Dual mode controller is in Host
-                                            // mode.
+// mode.
 #define USB_DUAL_MODE_DEVICE    0x00000081  // Dual mode controller is in
-                                            // Device mode.
+// Device mode.
 #define USB_DUAL_MODE_NONE      0x00000080  // Dual mode controller mode is not
-                                            // set.
+// set.
 #define USB_OTG_MODE_ASIDE_HOST 0x0000001d  // OTG controller on the A side of
-                                            // the cable.
+// the cable.
 #define USB_OTG_MODE_ASIDE_NPWR 0x00000001  // OTG controller on the A side of
-                                            // the cable.
+// the cable.
 #define USB_OTG_MODE_ASIDE_SESS 0x00000009  // OTG controller on the A side of
-                                            // the cable Session Valid.
+// the cable Session Valid.
 #define USB_OTG_MODE_ASIDE_AVAL 0x00000011  // OTG controller on the A side of
-                                            // the cable A valid.
+// the cable A valid.
 #define USB_OTG_MODE_ASIDE_DEV  0x00000019  // OTG controller on the A side of
-                                            // the cable.
+// the cable.
 #define USB_OTG_MODE_BSIDE_HOST 0x0000009d  // OTG controller on the B side of
-                                            // the cable.
+// the cable.
 #define USB_OTG_MODE_BSIDE_DEV  0x00000099  // OTG controller on the B side of
-                                            // the cable.
+// the cable.
 #define USB_OTG_MODE_BSIDE_NPWR 0x00000081  // OTG controller on the B side of
-                                            // the cable.
+// the cable.
 #define USB_OTG_MODE_NONE       0x00000080  // OTG controller mode is not set.
 
 //*****************************************************************************

@@ -8,7 +8,8 @@
 
 #include "usb_hid.h"
 
-struct usbh_hid {
+struct usbh_hid
+{
     struct usbh_hubport *hport;
 
     uint8_t report_desc[128];

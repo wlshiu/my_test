@@ -31,7 +31,8 @@
 #define USB_CONFIG_SIZE (9 + CDC_ACM_DESCRIPTOR_LEN * 4)
 
 /*!< global descriptor */
-static const uint8_t cdc_descriptor[] = {
+static const uint8_t cdc_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0xEF, 0x02, 0x01, USBD_VID, USBD_PID, 0x0100, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_CONFIG_SIZE, 0x08, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
     CDC_ACM_DESCRIPTOR_INIT(0x00, CDC_INT_EP, CDC_OUT_EP, CDC_IN_EP, 0x02),
@@ -118,9 +119,9 @@ USB_NOCACHE_RAM_SECTION USB_MEM_ALIGNX uint8_t write_buffer[4][2048] = { 0x31, 0
 volatile bool ep_tx_busy_flag = false;
 
 #ifdef CONFIG_USB_HS
-#define CDC_MAX_MPS 512
+    #define CDC_MAX_MPS 512
 #else
-#define CDC_MAX_MPS 64
+    #define CDC_MAX_MPS 64
 #endif
 
 void usbd_configure_done_callback(void)
@@ -143,50 +144,61 @@ void usbd_cdc_acm_bulk_in(uint8_t ep, uint32_t nbytes)
 {
     USB_LOG_RAW("actual in len:%d\r\n", nbytes);
 
-    if ((nbytes % CDC_MAX_MPS) == 0 && nbytes) {
+    if ((nbytes % CDC_MAX_MPS) == 0 && nbytes)
+    {
         /* send zlp */
         usbd_ep_start_write(CDC_IN_EP, NULL, 0);
-    } else {
+    }
+    else
+    {
         ep_tx_busy_flag = false;
     }
 }
 
-struct usbd_endpoint cdc_out_ep1 = {
+struct usbd_endpoint cdc_out_ep1 =
+{
     .ep_addr = CDC_OUT_EP,
     .ep_cb = usbd_cdc_acm_bulk_out
 };
 
-struct usbd_endpoint cdc_in_ep1 = {
+struct usbd_endpoint cdc_in_ep1 =
+{
     .ep_addr = CDC_IN_EP,
     .ep_cb = usbd_cdc_acm_bulk_in
 };
 
-struct usbd_endpoint cdc_out_ep2 = {
+struct usbd_endpoint cdc_out_ep2 =
+{
     .ep_addr = CDC_OUT_EP2,
     .ep_cb = usbd_cdc_acm_bulk_out
 };
 
-struct usbd_endpoint cdc_in_ep2 = {
+struct usbd_endpoint cdc_in_ep2 =
+{
     .ep_addr = CDC_IN_EP2,
     .ep_cb = usbd_cdc_acm_bulk_in
 };
 
-struct usbd_endpoint cdc_out_ep3 = {
+struct usbd_endpoint cdc_out_ep3 =
+{
     .ep_addr = CDC_OUT_EP3,
     .ep_cb = usbd_cdc_acm_bulk_out
 };
 
-struct usbd_endpoint cdc_in_ep3 = {
+struct usbd_endpoint cdc_in_ep3 =
+{
     .ep_addr = CDC_IN_EP3,
     .ep_cb = usbd_cdc_acm_bulk_in
 };
 
-struct usbd_endpoint cdc_out_ep4 = {
+struct usbd_endpoint cdc_out_ep4 =
+{
     .ep_addr = CDC_OUT_EP4,
     .ep_cb = usbd_cdc_acm_bulk_out
 };
 
-struct usbd_endpoint cdc_in_ep4 = {
+struct usbd_endpoint cdc_in_ep4 =
+{
     .ep_addr = CDC_IN_EP4,
     .ep_cb = usbd_cdc_acm_bulk_in
 };

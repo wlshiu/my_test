@@ -14,9 +14,9 @@ extern "C" {
 
 /* Init rndis interface driver */
 struct usbd_interface *usbd_rndis_init_intf(struct usbd_interface *intf,
-                                             const uint8_t out_ep,
-                                             const uint8_t in_ep,
-                                             const uint8_t int_ep, uint8_t mac[6]);
+        const uint8_t out_ep,
+        const uint8_t in_ep,
+        const uint8_t int_ep, uint8_t mac[6]);
 
 #ifdef CONFIG_USBDEV_RNDIS_USING_LWIP
 struct pbuf *usbd_rndis_eth_rx(void);

@@ -9,18 +9,18 @@
 #define VIDEO_IN_EP 0x81
 
 #ifdef CONFIG_USB_HS
-#define MAX_PAYLOAD_SIZE  1024 // for high speed with one transcations every one micro frame
-#define VIDEO_PACKET_SIZE (unsigned int)(((MAX_PAYLOAD_SIZE / 1)) | (0x00 << 11))
+    #define MAX_PAYLOAD_SIZE  1024 // for high speed with one transcations every one micro frame
+    #define VIDEO_PACKET_SIZE (unsigned int)(((MAX_PAYLOAD_SIZE / 1)) | (0x00 << 11))
 
-// #define MAX_PAYLOAD_SIZE  2048 // for high speed with two transcations every one micro frame
-// #define VIDEO_PACKET_SIZE (unsigned int)(((MAX_PAYLOAD_SIZE / 2)) | (0x01 << 11))
+    // #define MAX_PAYLOAD_SIZE  2048 // for high speed with two transcations every one micro frame
+    // #define VIDEO_PACKET_SIZE (unsigned int)(((MAX_PAYLOAD_SIZE / 2)) | (0x01 << 11))
 
-// #define MAX_PAYLOAD_SIZE  3072 // for high speed with three transcations every one micro frame
-// #define VIDEO_PACKET_SIZE (unsigned int)(((MAX_PAYLOAD_SIZE / 3)) | (0x02 << 11))
+    // #define MAX_PAYLOAD_SIZE  3072 // for high speed with three transcations every one micro frame
+    // #define VIDEO_PACKET_SIZE (unsigned int)(((MAX_PAYLOAD_SIZE / 3)) | (0x02 << 11))
 
 #else
-#define MAX_PAYLOAD_SIZE  1020
-#define VIDEO_PACKET_SIZE (unsigned int)(((MAX_PAYLOAD_SIZE / 1)) | (0x00 << 11))
+    #define MAX_PAYLOAD_SIZE  1020
+    #define VIDEO_PACKET_SIZE (unsigned int)(((MAX_PAYLOAD_SIZE / 1)) | (0x00 << 11))
 #endif
 
 #define WIDTH  (unsigned int)(640)
@@ -54,7 +54,8 @@
 #define USBD_MAX_POWER     100
 #define USBD_LANGID_STRING 1033
 
-const uint8_t video_descriptor[] = {
+const uint8_t video_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0xef, 0x02, 0x01, USBD_VID, USBD_PID, 0x0001, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_VIDEO_DESC_SIZ, 0x02, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
     VIDEO_VC_DESCRIPTOR_INIT(0x00, 0, 0x0100, VC_TERMINAL_SIZ, 48000000, 0x02),
@@ -172,7 +173,8 @@ void usbd_video_iso_callback(uint8_t ep, uint32_t nbytes)
     iso_tx_busy = false;
 }
 
-static struct usbd_endpoint video_in_ep = {
+static struct usbd_endpoint video_in_ep =
+{
     .ep_cb = usbd_video_iso_callback,
     .ep_addr = VIDEO_IN_EP
 };
@@ -197,33 +199,45 @@ void video_test()
     uint32_t out_len;
     uint32_t packets;
     memset(packet_buffer, 0, 10 * 1024);
-    while (1) {
-        if (tx_flag) {
+    while (1)
+    {
+        if (tx_flag)
+        {
             packets = usbd_video_mjpeg_payload_fill((uint8_t *)jpeg_data, sizeof(jpeg_data), packet_buffer, &out_len);
 #if 0
             iso_tx_busy = true;
             usbd_ep_start_write(VIDEO_IN_EP, packet_buffer, out_len);
-            while (iso_tx_busy) {
-                if (tx_flag == 0) {
+            while (iso_tx_busy)
+            {
+                if (tx_flag == 0)
+                {
                     break;
                 }
             }
 #else
             /* dwc2 must use this method */
-            for (uint32_t i = 0; i < packets; i++) {
-                if (i == (packets - 1)) {
+            for (uint32_t i = 0; i < packets; i++)
+            {
+                if (i == (packets - 1))
+                {
                     iso_tx_busy = true;
                     usbd_ep_start_write(VIDEO_IN_EP, &packet_buffer[i * MAX_PAYLOAD_SIZE], out_len - (packets - 1) * MAX_PAYLOAD_SIZE);
-                    while (iso_tx_busy) {
-                        if (tx_flag == 0) {
+                    while (iso_tx_busy)
+                    {
+                        if (tx_flag == 0)
+                        {
                             break;
                         }
                     }
-                } else {
+                }
+                else
+                {
                     iso_tx_busy = true;
                     usbd_ep_start_write(VIDEO_IN_EP, &packet_buffer[i * MAX_PAYLOAD_SIZE], MAX_PAYLOAD_SIZE);
-                    while (iso_tx_busy) {
-                        if (tx_flag == 0) {
+                    while (iso_tx_busy)
+                    {
+                        if (tx_flag == 0)
+                        {
                             break;
                         }
                     }

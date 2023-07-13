@@ -15,7 +15,8 @@
 #include "usbh_core.h"
 #include "asix.h"
 
-struct usbh_axusbnet {
+struct usbh_axusbnet
+{
     struct usbh_hubport *hport;
 
     uint8_t intf; /* interface number */
@@ -24,7 +25,7 @@ struct usbh_axusbnet {
     usbh_pipe_t bulkin;  /* Bulk IN endpoint */
     usbh_pipe_t bulkout; /* Bulk OUT endpoint */
 
-    uint32_t bulkin_buf[2048/sizeof(uint32_t)];
+    uint32_t bulkin_buf[2048 / sizeof(uint32_t)];
 };
 
 #endif /* __USB_CLASHH_AXUSBNET_H__ */

@@ -378,11 +378,11 @@
 /* Inquiry */
 
 #define SCSICMD_INQUIRYFLAGS_EVPD                0x01  /* Bit 0: EVPD */
-                                                       /* Bits 5-7: Peripheral Qualifier */
+/* Bits 5-7: Peripheral Qualifier */
 #define SCSIRESP_INQUIRYPQ_CONNECTED             0x00  /*   000: Device is connected */
 #define SCSIRESP_INQUIRYPQ_NOTCONNECTED          0x20  /*   001: Device is NOT connected */
 #define SCSIRESP_INQUIRYPQ_NOTCAPABLE            0x60  /*   011: LUN not supported */
-                                                       /* Bits 0-4: Peripheral Device */
+/* Bits 0-4: Peripheral Device */
 #define SCSIRESP_INQUIRYPD_DIRECTACCESS          0x00  /*   Direct-access block device */
 #define SCSIRESP_INQUIRYPD_SEQUENTIALACCESS      0x01  /*   Sequential-access block device */
 #define SCSIRESP_INQUIRYPD_PRINTER               0x02  /*   Printer device */
@@ -479,7 +479,7 @@
 #define SCSICMD_MODESENSE_PGCODEMASK             0x3f /* Bits 0-5: Page code */
 
 #define SCSICMD_MODESENSE6_PCDEFAULT             0x80 /*   Default values */
-                                                      /* Direct-access device page codes */
+/* Direct-access device page codes */
 #define SCSIRESP_MODESENSE_PGCCODE_VENDOR        0x00 /*   Vendor-specific */
 #define SCSIRESP_MODESENSE_PGCCODE_RWERROR       0x01 /*   Read/Write error recovery mode page */
 #define SCSIRESP_MODESENSE_PGCCODE_RECONNECT     0x02 /*   Disconnect-reconnect mode page */
@@ -500,7 +500,7 @@
 #define SCSIRESP_MODESENSE_PGCCODE_IE            0x1c /*   Informational exceptions control mode page (0x1c/0x00) */
 #define SCSIRESP_MODESENSE_PGCCODE_BC            0x1c /*   Background control mode page (0x1c/0x01) */
 #define SCSIRESP_MODESENSE_PGCCODE_RETURNALL     0x3f /*   Return all mode pages */
-                                                      /* Direct-access caching mode page */
+/* Direct-access caching mode page */
 #define SCSIRESP_CACHINGMODEPG_PS                0x80 /*   Byte 0, Bit 7: PS */
 #define SCSIRESP_CACHINGMODEPG_SPF               0x60 /*   Byte 0, Bit 6: SPF */
 #define SCSIRESP_CACHINGMODEPG_IC                0x80 /*   Byte 2, Bit 7: IC */
@@ -598,356 +598,356 @@
 
 struct scsicmd_requestsense_s
 {
-  uint8_t opcode;        /* 0: 0x03 */
-  uint8_t flags;         /* 1: See SCSICMD_REQUESTSENSE_FLAGS_* */
-  uint8_t reserved[2];   /* 2-3: Reserved */
-  uint8_t alloclen;      /* 4: Allocation length */
-  uint8_t control;       /* 5: Control */
+    uint8_t opcode;        /* 0: 0x03 */
+    uint8_t flags;         /* 1: See SCSICMD_REQUESTSENSE_FLAGS_* */
+    uint8_t reserved[2];   /* 2-3: Reserved */
+    uint8_t alloclen;      /* 4: Allocation length */
+    uint8_t control;       /* 5: Control */
 };
 #define SCSICMD_REQUESTSENSE_SIZEOF 6
 #define SCSICMD_REQUESTSENSE_MSSIZEOF 12 /* MS-Windows REQUEST SENSE with cbw->cdblen == 12 */
 
 struct scsiresp_fixedsensedata_s
 {
-  uint8_t code;          /* 0: Response code See  SCSIRESP_SENSEDATA_*FIXED defns */
-  uint8_t obsolete;      /* 1: */
-  uint8_t flags;         /* 2: See SCSIRESP_SENSEDATA_* definitions */
-  uint8_t info[4];       /* 3-6: Information */
-  uint8_t len;           /* 7: Additional length */
-  uint8_t cmdinfo[4];    /* 8-11: Command-specific information */
-  uint8_t code2;         /* 12: Additional sense code */
-  uint8_t qual2;         /* 13: Additional sense code qualifier */
-  uint8_t fru;           /* 14: Field replacement unit code */
-  uint8_t key[3];        /* 15-17: Sense key specific */
-                         /* 18-: Additional bytes may follow */
+    uint8_t code;          /* 0: Response code See  SCSIRESP_SENSEDATA_*FIXED defns */
+    uint8_t obsolete;      /* 1: */
+    uint8_t flags;         /* 2: See SCSIRESP_SENSEDATA_* definitions */
+    uint8_t info[4];       /* 3-6: Information */
+    uint8_t len;           /* 7: Additional length */
+    uint8_t cmdinfo[4];    /* 8-11: Command-specific information */
+    uint8_t code2;         /* 12: Additional sense code */
+    uint8_t qual2;         /* 13: Additional sense code qualifier */
+    uint8_t fru;           /* 14: Field replacement unit code */
+    uint8_t key[3];        /* 15-17: Sense key specific */
+    /* 18-: Additional bytes may follow */
 };
 #define SCSIRESP_FIXEDSENSEDATA_SIZEOF 18 /* Minimum size */
 
 struct scscicmd_inquiry_s
 {
-  uint8_t opcode;        /* 0: 0x12 */
-  uint8_t flags;         /* 1: See SCSICMD_INQUIRY_FLAGS_* */
-  uint8_t pagecode;      /* 2: Page code */
-  uint8_t alloclen[2];   /* 3-4: Allocation length */
-  uint8_t control;       /* 5: Control */
+    uint8_t opcode;        /* 0: 0x12 */
+    uint8_t flags;         /* 1: See SCSICMD_INQUIRY_FLAGS_* */
+    uint8_t pagecode;      /* 2: Page code */
+    uint8_t alloclen[2];   /* 3-4: Allocation length */
+    uint8_t control;       /* 5: Control */
 };
 #define SCSICMD_INQUIRY_SIZEOF 6
 
 struct scsiresp_inquiry_s
 {
-  /* Mandatory */
+    /* Mandatory */
 
-  uint8_t qualtype;      /* 0: Bits 5-7: Peripheral qualifier; Bits 0-4: Peripheral device type */
-  uint8_t flags1;        /* 1: See SCSIRESP_INQUIRY_FLAGS1_* */
-  uint8_t version;       /* 2: Version */
-  uint8_t flags2;        /* 3: See SCSIRESP_INQUIRY_FLAGS2_* */
-  uint8_t len;           /* 4: Additional length */
-  uint8_t flags3;        /* 5: See SCSIRESP_INQUIRY_FLAGS3_* */
-  uint8_t flags4;        /* 6: See SCSIRESP_INQUIRY_FLAGS4_* */
-  uint8_t flags5;        /* 7: See SCSIRESP_INQUIRY_FLAGS5_* */
-  uint8_t vendorid[8];   /* 8-15: T10 Vendor Identification */
-  uint8_t productid[16]; /* 16-31: Product Identification */
-  uint8_t revision[4];   /* 32-35: Product Revision Level */
+    uint8_t qualtype;      /* 0: Bits 5-7: Peripheral qualifier; Bits 0-4: Peripheral device type */
+    uint8_t flags1;        /* 1: See SCSIRESP_INQUIRY_FLAGS1_* */
+    uint8_t version;       /* 2: Version */
+    uint8_t flags2;        /* 3: See SCSIRESP_INQUIRY_FLAGS2_* */
+    uint8_t len;           /* 4: Additional length */
+    uint8_t flags3;        /* 5: See SCSIRESP_INQUIRY_FLAGS3_* */
+    uint8_t flags4;        /* 6: See SCSIRESP_INQUIRY_FLAGS4_* */
+    uint8_t flags5;        /* 7: See SCSIRESP_INQUIRY_FLAGS5_* */
+    uint8_t vendorid[8];   /* 8-15: T10 Vendor Identification */
+    uint8_t productid[16]; /* 16-31: Product Identification */
+    uint8_t revision[4];   /* 32-35: Product Revision Level */
 
-  /* Optional */
+    /* Optional */
 
-  uint8_t vendor[20];    /* 36-55: Vendor specific */
-  uint8_t flags6;        /* 56: See SCSIRESP_INQUIRY_FLAGS6_* */
-  uint8_t reserved1;     /* 57: Reserved */
-  uint8_t version1[2];   /* 58-59: Version Descriptor 1 */
-  uint8_t version2[2];   /* 60-61: Version Descriptor 2 */
-  uint8_t version3[2];   /* 62-63: Version Descriptor 3 */
-  uint8_t version4[2];   /* 64-65: Version Descriptor 4 */
-  uint8_t version5[2];   /* 66-67: Version Descriptor 5 */
-  uint8_t version6[2];   /* 68-69: Version Descriptor 6 */
-  uint8_t version7[2];   /* 70-71: Version Descriptor 7 */
-  uint8_t version8[2];   /* 72-73: Version Descriptor 8 */
-  uint8_t reserved2[22]; /* 74-95: Reserved */
-                         /* 96-: Vendor-specific parameters may follow */
+    uint8_t vendor[20];    /* 36-55: Vendor specific */
+    uint8_t flags6;        /* 56: See SCSIRESP_INQUIRY_FLAGS6_* */
+    uint8_t reserved1;     /* 57: Reserved */
+    uint8_t version1[2];   /* 58-59: Version Descriptor 1 */
+    uint8_t version2[2];   /* 60-61: Version Descriptor 2 */
+    uint8_t version3[2];   /* 62-63: Version Descriptor 3 */
+    uint8_t version4[2];   /* 64-65: Version Descriptor 4 */
+    uint8_t version5[2];   /* 66-67: Version Descriptor 5 */
+    uint8_t version6[2];   /* 68-69: Version Descriptor 6 */
+    uint8_t version7[2];   /* 70-71: Version Descriptor 7 */
+    uint8_t version8[2];   /* 72-73: Version Descriptor 8 */
+    uint8_t reserved2[22]; /* 74-95: Reserved */
+    /* 96-: Vendor-specific parameters may follow */
 };
 #define SCSIRESP_INQUIRY_SIZEOF 36 /* Minimum size */
 
 struct scsicmd_modeselect6_s
 {
-  uint8_t opcode;        /* 0x15 */
-  uint8_t flags;         /* 1: See SCSICMD_MODESELECT6_FLAGS_* */
-  uint8_t reserved[2];   /* 2-3: Reserved */
-  uint8_t plen;          /* 4: Parameter list length */
-  uint8_t control;       /* 5: Control */
+    uint8_t opcode;        /* 0x15 */
+    uint8_t flags;         /* 1: See SCSICMD_MODESELECT6_FLAGS_* */
+    uint8_t reserved[2];   /* 2-3: Reserved */
+    uint8_t plen;          /* 4: Parameter list length */
+    uint8_t control;       /* 5: Control */
 };
 #define SCSICMD_MODESELECT6_SIZEOF 6
 
 struct scsicmd_modesense6_s
 {
-  uint8_t opcode;        /* 0x1a */
-  uint8_t flags;         /* 1: See SCSICMD_MODESENSE6_FLAGS_* */
-  uint8_t pcpgcode;      /* 2: Bits 6-7: PC, bits 0-5: page code */
-  uint8_t subpgcode;     /* 3: subpage code */
-  uint8_t alloclen;      /* 4: Allocation length */
-  uint8_t control;       /* 5: Control */
+    uint8_t opcode;        /* 0x1a */
+    uint8_t flags;         /* 1: See SCSICMD_MODESENSE6_FLAGS_* */
+    uint8_t pcpgcode;      /* 2: Bits 6-7: PC, bits 0-5: page code */
+    uint8_t subpgcode;     /* 3: subpage code */
+    uint8_t alloclen;      /* 4: Allocation length */
+    uint8_t control;       /* 5: Control */
 };
 #define SCSICMD_MODESENSE6_SIZEOF 6
 
 struct scsiresp_modeparameterhdr6_s
 {
-  uint8_t mdlen;         /* 0: Mode data length */
-  uint8_t type;          /* 1: Medium type */
-  uint8_t param;         /* 2: Device-specific parameter */
-  uint8_t bdlen;         /* 3: Block descriptor length */
+    uint8_t mdlen;         /* 0: Mode data length */
+    uint8_t type;          /* 1: Medium type */
+    uint8_t param;         /* 2: Device-specific parameter */
+    uint8_t bdlen;         /* 3: Block descriptor length */
 };
 #define SCSIRESP_MODEPARAMETERHDR6_SIZEOF 4
 
 struct scsiresp_blockdesc_s
 {
-  uint8_t density;       /* 0: density code */
-  uint8_t nblocks[3];    /* 1-3: Number of blocks */
-  uint8_t reserved;      /* 4: reserved */
-  uint8_t blklen[3];     /* 5-7: Block len */
+    uint8_t density;       /* 0: density code */
+    uint8_t nblocks[3];    /* 1-3: Number of blocks */
+    uint8_t reserved;      /* 4: reserved */
+    uint8_t blklen[3];     /* 5-7: Block len */
 };
 #define SCSIRESP_BLOCKDESC_SIZEOF 8
 
 struct scsiresp_pageformat_s
 {
-  uint8_t pgcode;       /* 0: See SCSIRESP_PAGEFMT_* definitions */
-  uint8_t pglen;        /* 1: Page length (n-1) */
-  uint8_t parms[1];     /* 2-n: Mode parameters */
+    uint8_t pgcode;       /* 0: See SCSIRESP_PAGEFMT_* definitions */
+    uint8_t pglen;        /* 1: Page length (n-1) */
+    uint8_t parms[1];     /* 2-n: Mode parameters */
 };
 
 struct scsiresp_subpageformat_s
 {
-  uint8_t pgcode;       /* 0: See SCSIRESP_PAGEFMT_* definitions */
-  uint8_t subpgcode;    /* 1: sub-page code */
-  uint8_t pglen[2];     /* 2-3: Page length (n-3) */
-  uint8_t parms[1];     /* 4-n: Mode parameters */
+    uint8_t pgcode;       /* 0: See SCSIRESP_PAGEFMT_* definitions */
+    uint8_t subpgcode;    /* 1: sub-page code */
+    uint8_t pglen[2];     /* 2-3: Page length (n-3) */
+    uint8_t parms[1];     /* 4-n: Mode parameters */
 };
 
 struct scsiresp_cachingmodepage_s
 {
-  uint8_t pgcode;      /* 0: Bit 7: PS; Bit 6: SPF, Bits 0-5: page code == 8 */
-  uint8_t len;         /* 1: Page length (18) */
-  uint8_t flags1;      /* 2: See SCSIRESP_CACHINGMODEPG_* definitions */
-  uint8_t priority;    /* 3: Bits 4-7: Demand read retention priority; Bits 0-3: Write retention priority */
-  uint8_t dpflen[2];   /* 4-5: Disable prefetch transfer length */
-  uint8_t minpf[2];    /* 6-7: Minimum pre-fetch */
-  uint8_t maxpf[2];    /* 8-9: Maximum pre-fetch */
-  uint8_t maxpfc[2];   /* 10-11: Maximum pref-fetch ceiling */
-  uint8_t flags2;      /* 12: See SCSIRESP_CACHINGMODEPG_* definitions */
-  uint8_t nsegments;   /* 13: Number of cache segments */
-  uint8_t segsize[2];  /* 14-15: Cache segment size */
-  uint8_t reserved;    /* 16: Reserved */
-  uint8_t obsolete[3]; /* 17-19: Obsolete */
+    uint8_t pgcode;      /* 0: Bit 7: PS; Bit 6: SPF, Bits 0-5: page code == 8 */
+    uint8_t len;         /* 1: Page length (18) */
+    uint8_t flags1;      /* 2: See SCSIRESP_CACHINGMODEPG_* definitions */
+    uint8_t priority;    /* 3: Bits 4-7: Demand read retention priority; Bits 0-3: Write retention priority */
+    uint8_t dpflen[2];   /* 4-5: Disable prefetch transfer length */
+    uint8_t minpf[2];    /* 6-7: Minimum pre-fetch */
+    uint8_t maxpf[2];    /* 8-9: Maximum pre-fetch */
+    uint8_t maxpfc[2];   /* 10-11: Maximum pref-fetch ceiling */
+    uint8_t flags2;      /* 12: See SCSIRESP_CACHINGMODEPG_* definitions */
+    uint8_t nsegments;   /* 13: Number of cache segments */
+    uint8_t segsize[2];  /* 14-15: Cache segment size */
+    uint8_t reserved;    /* 16: Reserved */
+    uint8_t obsolete[3]; /* 17-19: Obsolete */
 };
 
 /* Format structures for selected SCSI block commands */
 
 struct scsicmd_read6_s
 {
-  uint8_t opcode;        /* 0: 0x08 */
-  uint8_t mslba;         /* 1: Bits 5-7: reserved; Bits 0-6: MS Logical Block Address (LBA) */
-  uint8_t lslba[2];      /* 2-3: LS Logical Block Address (LBA) */
-  uint8_t xfrlen;        /* 4: Transfer length (in contiguous logical blocks) */
-  uint8_t control;       /* 5: Control */
+    uint8_t opcode;        /* 0: 0x08 */
+    uint8_t mslba;         /* 1: Bits 5-7: reserved; Bits 0-6: MS Logical Block Address (LBA) */
+    uint8_t lslba[2];      /* 2-3: LS Logical Block Address (LBA) */
+    uint8_t xfrlen;        /* 4: Transfer length (in contiguous logical blocks) */
+    uint8_t control;       /* 5: Control */
 };
 #define SCSICMD_READ6_SIZEOF 6
 
 struct scsicmd_write6_s
 {
-  uint8_t opcode;        /* 0: 0x0a */
-  uint8_t mslba;         /* 1: Bits 5-7: reserved; Bits 0-6: MS Logical Block Address (LBA) */
-  uint8_t lslba[2];      /* 2-3: LS Logical Block Address (LBA) */
-  uint8_t xfrlen;        /* 4: Transfer length (in contiguous logical blocks) */
-  uint8_t control;       /* 5: Control */
+    uint8_t opcode;        /* 0: 0x0a */
+    uint8_t mslba;         /* 1: Bits 5-7: reserved; Bits 0-6: MS Logical Block Address (LBA) */
+    uint8_t lslba[2];      /* 2-3: LS Logical Block Address (LBA) */
+    uint8_t xfrlen;        /* 4: Transfer length (in contiguous logical blocks) */
+    uint8_t control;       /* 5: Control */
 };
 #define SCSICMD_WRITE6_SIZEOF 6
 
 struct scsicmd_startstopunit_s
 {
-  uint8_t opcode;        /* 0: 0x1b */
-  uint8_t immed;         /* 1: Bits 2-7: Reserved, Bit 0: Immed */
-  uint8_t reserved;      /* 2: reserved */
-  uint8_t pcm;           /* 3: Bits 4-7: Reserved, Bits 0-3: Power condition modifier */
-  uint8_t pc;            /* 4: Bits 4-7: Power condition, Bit 2: NO_FLUSH, Bit 1: LOEJ, Bit 0: START */
-  uint8_t control;       /* 5: Control */
+    uint8_t opcode;        /* 0: 0x1b */
+    uint8_t immed;         /* 1: Bits 2-7: Reserved, Bit 0: Immed */
+    uint8_t reserved;      /* 2: reserved */
+    uint8_t pcm;           /* 3: Bits 4-7: Reserved, Bits 0-3: Power condition modifier */
+    uint8_t pc;            /* 4: Bits 4-7: Power condition, Bit 2: NO_FLUSH, Bit 1: LOEJ, Bit 0: START */
+    uint8_t control;       /* 5: Control */
 };
 #define SCSICMD_STARTSTOPUNIT_SIZEOF 6
 
 struct scsicmd_preventmediumremoval_s
 {
-  uint8_t opcode;        /* 0: 0x1e */
-  uint8_t reserved[3];   /* 1-3: Reserved */
-  uint8_t prevent;       /* 4: Bits 2-7: Reserved, Bits 0:1: prevent */
-  uint8_t control;       /* 5: Control */
+    uint8_t opcode;        /* 0: 0x1e */
+    uint8_t reserved[3];   /* 1-3: Reserved */
+    uint8_t prevent;       /* 4: Bits 2-7: Reserved, Bits 0:1: prevent */
+    uint8_t control;       /* 5: Control */
 };
 #define SCSICMD_PREVENTMEDIUMREMOVAL_SIZEOF 6
 
 struct scsicmd_readformatcapcacities_s
 {
-  uint8_t opcode;        /* 0: 0x23 */
-  uint8_t reserved[6];   /* 1-6: Reserved */
-  uint8_t alloclen[2];   /* 7-8: Allocation length */
-  uint8_t control;       /* 9: Control */
+    uint8_t opcode;        /* 0: 0x23 */
+    uint8_t reserved[6];   /* 1-6: Reserved */
+    uint8_t alloclen[2];   /* 7-8: Allocation length */
+    uint8_t control;       /* 9: Control */
 };
 #define SCSICMD_READFORMATCAPACITIES_SIZEOF 10
 
 struct scsiresp_readformatcapacities_s
 {
-  /* Current capacity header */
+    /* Current capacity header */
 
-  uint8_t reserved[3];  /* 0-2: Reserved */
-  uint8_t listlen;      /* 3: Capacity list length */
+    uint8_t reserved[3];  /* 0-2: Reserved */
+    uint8_t listlen;      /* 3: Capacity list length */
 
-  /* Current/Maximum Capacity Descriptor (actually a separate structure) */
+    /* Current/Maximum Capacity Descriptor (actually a separate structure) */
 
-  uint8_t nblocks[4];   /* 4-7: Number of blocks */
-  uint8_t type;         /* 8: Bits 2-7: Reserved, Bits 0-1: Descriptor type */
-  uint8_t blocklen[3];  /* 9-11: Block length */
+    uint8_t nblocks[4];   /* 4-7: Number of blocks */
+    uint8_t type;         /* 8: Bits 2-7: Reserved, Bits 0-1: Descriptor type */
+    uint8_t blocklen[3];  /* 9-11: Block length */
 };
 #define SCSIRESP_READFORMATCAPACITIES_SIZEOF 12
 #define SCSIRESP_CURRCAPACITYDESC_SIZEOF 8
 
 struct scsiresp_formattedcapacitydesc_s
 {
-  uint8_t nblocks[4];   /* 0-3: Number of blocks */
-  uint8_t type;         /* 4: Bits 2-7: Type, bits 0-1, reserved */
-  uint8_t param[3];     /* 5-7: Type dependent parameter */
+    uint8_t nblocks[4];   /* 0-3: Number of blocks */
+    uint8_t type;         /* 4: Bits 2-7: Type, bits 0-1, reserved */
+    uint8_t param[3];     /* 5-7: Type dependent parameter */
 };
 #define SCSIRESP_FORMATTEDCAPACITYDESC_SIZEOF 8
 
 struct scsicmd_readcapacity10_s
 {
-  uint8_t opcode;        /* 0: 0x25 */
-  uint8_t reserved1;     /* 1: Bits 1-7: Reserved, Bit 0: Obsolete */
-  uint8_t lba[4];        /* 2-5: Logical block address (LBA) */
-  uint8_t reserved2[2];  /* 6-7: Reserved */
-  uint8_t pmi;           /* 8: Bits 1-7 Reserved; Bit 0: PMI */
-  uint8_t control;       /* 9: Control */
+    uint8_t opcode;        /* 0: 0x25 */
+    uint8_t reserved1;     /* 1: Bits 1-7: Reserved, Bit 0: Obsolete */
+    uint8_t lba[4];        /* 2-5: Logical block address (LBA) */
+    uint8_t reserved2[2];  /* 6-7: Reserved */
+    uint8_t pmi;           /* 8: Bits 1-7 Reserved; Bit 0: PMI */
+    uint8_t control;       /* 9: Control */
 };
 #define SCSICMD_READCAPACITY10_SIZEOF 10
 
 struct scsiresp_readcapacity10_s
 {
-  uint8_t lba[4];        /* 0-3: Returned logical block address (LBA) */
-  uint8_t blklen[4];     /* 4-7: Logical block length (in bytes) */
+    uint8_t lba[4];        /* 0-3: Returned logical block address (LBA) */
+    uint8_t blklen[4];     /* 4-7: Logical block length (in bytes) */
 };
 #define SCSIRESP_READCAPACITY10_SIZEOF 8
 
 struct scsicmd_read10_s
 {
-  uint8_t opcode;        /* 0: 0x28 */
-  uint8_t flags;         /* 1: See SCSICMD_READ10FLAGS_* */
-  uint8_t lba[4];        /* 2-5: Logical Block Address (LBA) */
-  uint8_t groupno;       /* 6: Bits 5-7: reserved; Bits 0-6: group number */
-  uint8_t xfrlen[2];     /* 7-8: Transfer length (in contiguous logical blocks) */
-  uint8_t control;       /* 9: Control */
+    uint8_t opcode;        /* 0: 0x28 */
+    uint8_t flags;         /* 1: See SCSICMD_READ10FLAGS_* */
+    uint8_t lba[4];        /* 2-5: Logical Block Address (LBA) */
+    uint8_t groupno;       /* 6: Bits 5-7: reserved; Bits 0-6: group number */
+    uint8_t xfrlen[2];     /* 7-8: Transfer length (in contiguous logical blocks) */
+    uint8_t control;       /* 9: Control */
 };
 #define SCSICMD_READ10_SIZEOF 10
 
 struct scsicmd_write10_s
 {
-  uint8_t opcode;        /* 0: 0x2a */
-  uint8_t flags;         /* 1: See SCSICMD_WRITE10FLAGS_* */
-  uint8_t lba[4];        /* 2-5: Logical Block Address (LBA) */
-  uint8_t groupno;       /* 6: Bits 5-7: reserved; Bits 0-6: group number */
-  uint8_t xfrlen[2];     /* 7-8: Transfer length (in contiguous logical blocks) */
-  uint8_t control;       /* 9: Control */
+    uint8_t opcode;        /* 0: 0x2a */
+    uint8_t flags;         /* 1: See SCSICMD_WRITE10FLAGS_* */
+    uint8_t lba[4];        /* 2-5: Logical Block Address (LBA) */
+    uint8_t groupno;       /* 6: Bits 5-7: reserved; Bits 0-6: group number */
+    uint8_t xfrlen[2];     /* 7-8: Transfer length (in contiguous logical blocks) */
+    uint8_t control;       /* 9: Control */
 };
 #define SCSICMD_WRITE10_SIZEOF 10
 
 struct scsicmd_verify10_s
 {
-  uint8_t opcode;        /* 0: 0x2f */
-  uint8_t flags;         /* 1: See SCSICMD_VERIFY10_* definitions */
-  uint8_t lba[4];        /* 2-5: Logical block address (LBA) */
-  uint8_t groupno;       /* 6: Bit 7: restricted; Bits 5-6: Reserved, Bits 0-4: Group number */
-  uint8_t len[2];        /* 7-8: Verification length (in blocks) */
-  uint8_t control;       /* 9: Control */
+    uint8_t opcode;        /* 0: 0x2f */
+    uint8_t flags;         /* 1: See SCSICMD_VERIFY10_* definitions */
+    uint8_t lba[4];        /* 2-5: Logical block address (LBA) */
+    uint8_t groupno;       /* 6: Bit 7: restricted; Bits 5-6: Reserved, Bits 0-4: Group number */
+    uint8_t len[2];        /* 7-8: Verification length (in blocks) */
+    uint8_t control;       /* 9: Control */
 };
 #define SCSICMD_VERIFY10_SIZEOF 10
 
 struct scsicmd_synchronizecache10_s
 {
-  uint8_t opcode;        /* 0: 0x35 */
-  uint8_t flags;         /* 1: See SCSICMD_SYNCHRONIZECACHE10_* definitions */
-  uint8_t lba[4];        /* 2-5: Logical block address (LBA) */
-  uint8_t groupno;       /* 6: Bit 7: restricted; Bits 5-6: Reserved, Bits 0-4: Group number */
-  uint8_t len[2];        /* 7-8: Number of logical blocks */
-  uint8_t control;       /* 9: Control */
+    uint8_t opcode;        /* 0: 0x35 */
+    uint8_t flags;         /* 1: See SCSICMD_SYNCHRONIZECACHE10_* definitions */
+    uint8_t lba[4];        /* 2-5: Logical block address (LBA) */
+    uint8_t groupno;       /* 6: Bit 7: restricted; Bits 5-6: Reserved, Bits 0-4: Group number */
+    uint8_t len[2];        /* 7-8: Number of logical blocks */
+    uint8_t control;       /* 9: Control */
 };
 #define SCSICMD_SYNCHRONIZECACHE10_SIZEOF 10
 
 struct scsicmd_modeselect10_s
 {
-  uint8_t opcode;        /* 0: 0x55 */
-  uint8_t flags;         /* 1: See SCSICMD_MODESELECT10_FLAGS_* */
-  uint8_t reserved[5];   /* 2-6: Reserved */
-  uint8_t parmlen[2];    /* 7-8: Parameter list length */
-  uint8_t control;       /* 9: Control */
+    uint8_t opcode;        /* 0: 0x55 */
+    uint8_t flags;         /* 1: See SCSICMD_MODESELECT10_FLAGS_* */
+    uint8_t reserved[5];   /* 2-6: Reserved */
+    uint8_t parmlen[2];    /* 7-8: Parameter list length */
+    uint8_t control;       /* 9: Control */
 };
 #define SCSICMD_MODESELECT10_SIZEOF 10
 
 struct scsiresp_modeparameterhdr10_s
 {
-  uint8_t mdlen[2];      /* 0-1: Mode data length */
-  uint8_t type;          /* 2: Medium type */
-  uint8_t param;         /* 3: Device-specific parameter */
-  uint8_t reserved[2];   /* 4-5: reserved */
-  uint8_t bdlen[2];      /* 6-7: Block descriptor length */
+    uint8_t mdlen[2];      /* 0-1: Mode data length */
+    uint8_t type;          /* 2: Medium type */
+    uint8_t param;         /* 3: Device-specific parameter */
+    uint8_t reserved[2];   /* 4-5: reserved */
+    uint8_t bdlen[2];      /* 6-7: Block descriptor length */
 };
 #define SCSIRESP_MODEPARAMETERHDR10_SIZEOF 8
 
 struct scsicmd_modesense10_s
 {
-  uint8_t opcode;        /* O: 0x5a */
-  uint8_t flags;         /* 1: See SCSICMD_MODESENSE10_FLAGS_* */
-  uint8_t pcpgcode;      /* 2: Bits 6-7: PC, bits 0-5: page code */
-  uint8_t subpgcode;     /* 3: subpage code */
-  uint8_t reserved[3];   /* 4-6: reserved */
-  uint8_t alloclen[2];   /* 7-8: Allocation length */
-  uint8_t control;       /* 9: Control */
+    uint8_t opcode;        /* O: 0x5a */
+    uint8_t flags;         /* 1: See SCSICMD_MODESENSE10_FLAGS_* */
+    uint8_t pcpgcode;      /* 2: Bits 6-7: PC, bits 0-5: page code */
+    uint8_t subpgcode;     /* 3: subpage code */
+    uint8_t reserved[3];   /* 4-6: reserved */
+    uint8_t alloclen[2];   /* 7-8: Allocation length */
+    uint8_t control;       /* 9: Control */
 };
 #define SCSICMD_MODESENSE10_SIZEOF 10
 
 struct scsicmd_readcapacity16_s
 {
-  uint8_t opcode;        /* 0: 0x9e */
-  uint8_t action;        /* 1: Bits 5-7: Reserved, Bits 0-4: Service action */
-  uint8_t lba[8];        /* 2-9: Logical block address (LBA) */
-  uint8_t len[4];        /* 10-13: Allocation length */
-  uint8_t reserved;      /* 14: Reserved */
-  uint8_t control;       /* 15: Control */
+    uint8_t opcode;        /* 0: 0x9e */
+    uint8_t action;        /* 1: Bits 5-7: Reserved, Bits 0-4: Service action */
+    uint8_t lba[8];        /* 2-9: Logical block address (LBA) */
+    uint8_t len[4];        /* 10-13: Allocation length */
+    uint8_t reserved;      /* 14: Reserved */
+    uint8_t control;       /* 15: Control */
 };
 #define SCSICMD_READCAPACITY16_SIZEOF 16
 
 struct scsicmd_read12_s
 {
-  uint8_t opcode;        /* 0: 0xa8 */
-  uint8_t flags;         /* 1: See SCSICMD_READ12FLAGS_* */
-  uint8_t lba[4];        /* 2-5: Logical Block Address (LBA) */
-  uint8_t xfrlen[4];     /* 6-9: Transfer length (in contiguous logical blocks) */
-  uint8_t groupno;       /* 10: Bit 7: restricted; Bits 5-6: reserved; Bits 0-6: group number */
-  uint8_t control;       /* 11: Control */
+    uint8_t opcode;        /* 0: 0xa8 */
+    uint8_t flags;         /* 1: See SCSICMD_READ12FLAGS_* */
+    uint8_t lba[4];        /* 2-5: Logical Block Address (LBA) */
+    uint8_t xfrlen[4];     /* 6-9: Transfer length (in contiguous logical blocks) */
+    uint8_t groupno;       /* 10: Bit 7: restricted; Bits 5-6: reserved; Bits 0-6: group number */
+    uint8_t control;       /* 11: Control */
 };
 #define SCSICMD_READ12_SIZEOF 12
 
 struct scsicmd_write12_s
 {
-  uint8_t opcode;        /* 0: 0xaa */
-  uint8_t flags;         /* 1: See SCSICMD_WRITE12FLAGS_* */
-  uint8_t lba[4];        /* 2-5: Logical Block Address (LBA) */
-  uint8_t xfrlen[4];     /* 6-9: Transfer length (in contiguous logical blocks) */
-  uint8_t groupno;       /* 10: Bit 7: restricted; Bits 5-6: reserved; Bits 0-6: group number */
-  uint8_t control;       /* 11: Control */
+    uint8_t opcode;        /* 0: 0xaa */
+    uint8_t flags;         /* 1: See SCSICMD_WRITE12FLAGS_* */
+    uint8_t lba[4];        /* 2-5: Logical Block Address (LBA) */
+    uint8_t xfrlen[4];     /* 6-9: Transfer length (in contiguous logical blocks) */
+    uint8_t groupno;       /* 10: Bit 7: restricted; Bits 5-6: reserved; Bits 0-6: group number */
+    uint8_t control;       /* 11: Control */
 };
 #define SCSICMD_WRITE12_SIZEOF 12
 
 struct scsicmd_verify12_s
 {
-  uint8_t opcode;        /* 0: 0xaf */
-  uint8_t flags;         /* 1: See SCSICMD_VERIFY12_* definitions */
-  uint8_t lba[4];        /* 2-5: Logical block address (LBA) */
-  uint8_t len[4];        /* 6-9: Verification length */
-  uint8_t groupno;       /* 10: Bit 7: restricted; Bits 5-6: Reserved, Bits 0-4: Group number */
-  uint8_t control;       /* 11: Control */
+    uint8_t opcode;        /* 0: 0xaf */
+    uint8_t flags;         /* 1: See SCSICMD_VERIFY12_* definitions */
+    uint8_t lba[4];        /* 2-5: Logical block address (LBA) */
+    uint8_t len[4];        /* 6-9: Verification length */
+    uint8_t groupno;       /* 10: Bit 7: restricted; Bits 5-6: Reserved, Bits 0-4: Group number */
+    uint8_t control;       /* 11: Control */
 };
 #define SCSICMD_VERIFY12_SIZEOF 12
 

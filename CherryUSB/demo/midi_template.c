@@ -1,7 +1,8 @@
 #include "usbd_core.h"
 #include "usb_midi.h"
 
-const uint8_t midi_descriptor[] = {
+const uint8_t midi_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0x00, 0x00, 0x00, USBD_VID, USBD_PID, 0x0100, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_CONFIG_SIZE, 0x02, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
     // Standard AC Interface Descriptor
@@ -141,12 +142,14 @@ void usbd_midi_bulk_in(uint8_t ep, uint32_t nbytes)
 struct usbd_interface intf0;
 struct usbd_interface intf1;
 
-struct usbd_endpoint midi_out_ep = {
+struct usbd_endpoint midi_out_ep =
+{
     .ep_addr = MIDI_OUT_EP,
     .ep_cb = usbd_midi_bulk_out
 };
 
-struct usbd_endpoint midi_in_ep = {
+struct usbd_endpoint midi_in_ep =
+{
     .ep_addr = MIDI_IN_EP,
     .ep_cb = usbd_midi_bulk_in
 };

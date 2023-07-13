@@ -8,7 +8,8 @@
 
 #include "usb_cdc.h"
 
-struct usbh_cdc_acm {
+struct usbh_cdc_acm
+{
     struct usbh_hubport *hport;
 
     struct cdc_line_coding linecoding;

@@ -23,7 +23,8 @@ extern "C" {
 /**
  * Single List structure
  */
-struct usb_slist_node {
+struct usb_slist_node
+{
     struct usb_slist_node *next; /**< point to next node. */
 };
 typedef struct usb_slist_node usb_slist_t; /**< Type for single list. */
@@ -48,7 +49,8 @@ static inline void usb_slist_add_tail(usb_slist_t *l, usb_slist_t *n)
 {
     usb_slist_t *tmp = l;
 
-    while (tmp->next) {
+    while (tmp->next)
+    {
         tmp = tmp->next;
     }
 
@@ -59,13 +61,16 @@ static inline void usb_slist_add_tail(usb_slist_t *l, usb_slist_t *n)
 
 static inline void usb_slist_insert(usb_slist_t *l, usb_slist_t *next, usb_slist_t *n)
 {
-    if (!next) {
+    if (!next)
+    {
         usb_slist_add_tail(next, l);
         return;
     }
 
-    while (l->next) {
-        if (l->next == next) {
+    while (l->next)
+    {
+        if (l->next == next)
+        {
             l->next = n;
             n->next = next;
         }
@@ -78,12 +83,14 @@ static inline usb_slist_t *usb_slist_remove(usb_slist_t *l, usb_slist_t *n)
 {
     usb_slist_t *tmp = l;
     /* remove slist head */
-    while (tmp->next && tmp->next != n) {
+    while (tmp->next && tmp->next != n)
+    {
         tmp = tmp->next;
     }
 
     /* remove node */
-    if (tmp->next != (usb_slist_t *)0) {
+    if (tmp->next != (usb_slist_t *)0)
+    {
         tmp->next = tmp->next->next;
     }
 
@@ -95,7 +102,8 @@ static inline unsigned int usb_slist_len(const usb_slist_t *l)
     unsigned int len = 0;
     const usb_slist_t *list = l->next;
 
-    while (list != NULL) {
+    while (list != NULL)
+    {
         list = list->next;
         len++;
     }
@@ -105,8 +113,10 @@ static inline unsigned int usb_slist_len(const usb_slist_t *l)
 
 static inline unsigned int usb_slist_contains(usb_slist_t *l, usb_slist_t *n)
 {
-    while (l->next) {
-        if (l->next == n) {
+    while (l->next)
+    {
+        if (l->next == n)
+        {
             return 0;
         }
 
@@ -123,7 +133,8 @@ static inline usb_slist_t *usb_slist_head(usb_slist_t *l)
 
 static inline usb_slist_t *usb_slist_tail(usb_slist_t *l)
 {
-    while (l->next) {
+    while (l->next)
+    {
         l = l->next;
     }
 
@@ -228,7 +239,8 @@ static inline int usb_slist_isempty(usb_slist_t *l)
 /**
  * Double List structure
  */
-struct usb_dlist_node {
+struct usb_dlist_node
+{
     struct usb_dlist_node *next; /**< point to next node. */
     struct usb_dlist_node *prev; /**< point to prev node. */
 };
@@ -324,7 +336,8 @@ static inline unsigned int usb_dlist_len(const usb_dlist_t *l)
     unsigned int len = 0;
     const usb_dlist_t *p = l;
 
-    while (p->next != l) {
+    while (p->next != l)
+    {
         p = p->next;
         len++;
     }

@@ -7,29 +7,30 @@
 
 #if defined(CONFIG_ENABLE_USBD_DFU) && (CONFIG_ENABLE_USBD_DFU)
 
-
 #include "usbd_dfu.h"
 
 /** Modify the following three parameters according to different platforms */
 #ifndef USBD_DFU_XFER_SIZE
-#define USBD_DFU_XFER_SIZE 1024
+    #define USBD_DFU_XFER_SIZE 1024
 #endif
 
 #ifndef USBD_DFU_APP_DEFAULT_ADD
-#define USBD_DFU_APP_DEFAULT_ADD 0x8004000
+    #define USBD_DFU_APP_DEFAULT_ADD 0x8004000
 #endif
 
 #ifndef FLASH_PROGRAM_TIME
-#define FLASH_PROGRAM_TIME 50
+    #define FLASH_PROGRAM_TIME 50
 #endif
 
 #ifndef FLASH_ERASE_TIME
-#define FLASH_ERASE_TIME 50
+    #define FLASH_ERASE_TIME 50
 #endif
 
-struct dfu_cfg_priv {
+struct dfu_cfg_priv
+{
     struct dfu_info info;
-    union {
+    union
+    {
         uint32_t d32[USBD_DFU_XFER_SIZE / 4U];
         uint8_t d8[USBD_DFU_XFER_SIZE];
     } buffer;
@@ -68,7 +69,8 @@ static void dfu_reset(void)
 
 static uint16_t dfu_getstatus(uint32_t add, uint8_t cmd, uint8_t *buffer)
 {
-    switch (cmd) {
+    switch (cmd)
+    {
         case DFU_MEDIA_PROGRAM:
             buffer[1] = (uint8_t)FLASH_PROGRAM_TIME;
             buffer[2] = (uint8_t)(FLASH_PROGRAM_TIME << 8);
@@ -89,10 +91,11 @@ static uint16_t dfu_getstatus(uint32_t add, uint8_t cmd, uint8_t *buffer)
 static void dfu_request_detach(void)
 {
     if ((usbd_dfu_cfg.dev_state == DFU_STATE_DFU_IDLE) ||
-        (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_SYNC) ||
-        (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_IDLE) ||
-        (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_MANIFEST_SYNC) ||
-        (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_UPLOAD_IDLE)) {
+            (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_SYNC) ||
+            (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_IDLE) ||
+            (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_MANIFEST_SYNC) ||
+            (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_UPLOAD_IDLE))
+    {
         /* Update the state machine */
         usbd_dfu_cfg.dev_state = DFU_STATE_DFU_IDLE;
         usbd_dfu_cfg.dev_status[0] = DFU_STATUS_OK;
@@ -112,14 +115,17 @@ static void dfu_request_upload(struct usb_setup_packet *setup, uint8_t **data, u
     uint32_t addr;
     uint8_t *phaddr;
     /* Data setup request */
-    if (req->wLength > 0U) {
-        if ((usbd_dfu_cfg.dev_state == DFU_STATE_DFU_IDLE) || (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_UPLOAD_IDLE)) {
+    if (req->wLength > 0U)
+    {
+        if ((usbd_dfu_cfg.dev_state == DFU_STATE_DFU_IDLE) || (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_UPLOAD_IDLE))
+        {
             /* Update the global length and block number */
             usbd_dfu_cfg.wblock_num = req->wValue;
             usbd_dfu_cfg.wlength = MIN(req->wLength, USBD_DFU_XFER_SIZE);
 
             /* DFU Get Command */
-            if (usbd_dfu_cfg.wblock_num == 0U) {
+            if (usbd_dfu_cfg.wblock_num == 0U)
+            {
                 /* Update the state machine */
                 usbd_dfu_cfg.dev_state = (usbd_dfu_cfg.wlength > 3U) ? DFU_STATE_DFU_IDLE : DFU_STATE_DFU_UPLOAD_IDLE;
 
@@ -136,7 +142,9 @@ static void dfu_request_upload(struct usb_setup_packet *setup, uint8_t **data, u
                 /* Send the status data over EP0 */
                 memcpy(*data, usbd_dfu_cfg.buffer.d8, 3);
                 *len = 3;
-            } else if (usbd_dfu_cfg.wblock_num > 1U) {
+            }
+            else if (usbd_dfu_cfg.wblock_num > 1U)
+            {
                 usbd_dfu_cfg.dev_state = DFU_STATE_DFU_UPLOAD_IDLE;
 
                 usbd_dfu_cfg.dev_status[1] = 0U;
@@ -152,7 +160,8 @@ static void dfu_request_upload(struct usb_setup_packet *setup, uint8_t **data, u
                 /* Send the status data over EP0 */
                 memcpy(*data, usbd_dfu_cfg.buffer.d8, usbd_dfu_cfg.wlength);
                 *len = usbd_dfu_cfg.wlength;
-            } else /* unsupported usbd_dfu_cfg.wblock_num */
+            }
+            else   /* unsupported usbd_dfu_cfg.wblock_num */
             {
                 usbd_dfu_cfg.dev_state = DFU_STATUS_ERR_STALLEDPKT;
 
@@ -166,7 +175,8 @@ static void dfu_request_upload(struct usb_setup_packet *setup, uint8_t **data, u
             }
         }
         /* Unsupported state */
-        else {
+        else
+        {
             usbd_dfu_cfg.wlength = 0U;
             usbd_dfu_cfg.wblock_num = 0U;
 
@@ -175,7 +185,8 @@ static void dfu_request_upload(struct usb_setup_packet *setup, uint8_t **data, u
         }
     }
     /* No Data setup request */
-    else {
+    else
+    {
         usbd_dfu_cfg.dev_state = DFU_STATE_DFU_IDLE;
 
         usbd_dfu_cfg.dev_status[1] = 0U;
@@ -189,8 +200,10 @@ static void dfu_request_dnload(struct usb_setup_packet *setup, uint8_t **data, u
 {
     /* Data setup request */
     struct usb_setup_packet *req = setup;
-    if (req->wLength > 0U) {
-        if ((usbd_dfu_cfg.dev_state == DFU_STATE_DFU_IDLE) || (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_IDLE)) {
+    if (req->wLength > 0U)
+    {
+        if ((usbd_dfu_cfg.dev_state == DFU_STATE_DFU_IDLE) || (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_IDLE))
+        {
             /* Update the global length and block number */
             usbd_dfu_cfg.wblock_num = req->wValue;
             usbd_dfu_cfg.wlength = MIN(req->wLength, USBD_DFU_XFER_SIZE);
@@ -205,21 +218,26 @@ static void dfu_request_dnload(struct usb_setup_packet *setup, uint8_t **data, u
             usbd_dfu_cfg.firmwar_flag = 1;
         }
         /* Unsupported state */
-        else {
+        else
+        {
             USB_LOG_ERR("Dfu_request_dnload unsupported state\r\n");
         }
     }
     /* 0 Data DNLOAD request */
-    else {
+    else
+    {
         /* End of DNLOAD operation*/
-        if ((usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_IDLE) || (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_IDLE)) {
+        if ((usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_IDLE) || (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_IDLE))
+        {
             usbd_dfu_cfg.manif_state = DFU_MANIFEST_IN_PROGRESS;
             usbd_dfu_cfg.dev_state = DFU_STATE_DFU_MANIFEST_SYNC;
             usbd_dfu_cfg.dev_status[1] = 0U;
             usbd_dfu_cfg.dev_status[2] = 0U;
             usbd_dfu_cfg.dev_status[3] = 0U;
             usbd_dfu_cfg.dev_status[4] = usbd_dfu_cfg.dev_state;
-        } else {
+        }
+        else
+        {
             /* Call the error management function (command will be NAKed */
             USB_LOG_ERR("Dfu_request_dnload End of DNLOAD operation but dev_state %02x \r\n", usbd_dfu_cfg.dev_state);
         }
@@ -229,20 +247,29 @@ static void dfu_request_dnload(struct usb_setup_packet *setup, uint8_t **data, u
 static int8_t dfu_getstatus_special_handler(void)
 {
     uint32_t addr;
-    if (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_BUSY) {
+    if (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_BUSY)
+    {
         /* Decode the Special Command */
-        if (usbd_dfu_cfg.wblock_num == 0U) {
-            if (usbd_dfu_cfg.wlength == 1U) {
-                if (usbd_dfu_cfg.buffer.d8[0] == DFU_CMD_GETCOMMANDS) {
+        if (usbd_dfu_cfg.wblock_num == 0U)
+        {
+            if (usbd_dfu_cfg.wlength == 1U)
+            {
+                if (usbd_dfu_cfg.buffer.d8[0] == DFU_CMD_GETCOMMANDS)
+                {
                     /* Nothing to do */
                 }
-            } else if (usbd_dfu_cfg.wlength == 5U) {
-                if (usbd_dfu_cfg.buffer.d8[0] == DFU_CMD_SETADDRESSPOINTER) {
+            }
+            else if (usbd_dfu_cfg.wlength == 5U)
+            {
+                if (usbd_dfu_cfg.buffer.d8[0] == DFU_CMD_SETADDRESSPOINTER)
+                {
                     usbd_dfu_cfg.data_ptr = usbd_dfu_cfg.buffer.d8[1];
                     usbd_dfu_cfg.data_ptr += (uint32_t)usbd_dfu_cfg.buffer.d8[2] << 8;
                     usbd_dfu_cfg.data_ptr += (uint32_t)usbd_dfu_cfg.buffer.d8[3] << 16;
                     usbd_dfu_cfg.data_ptr += (uint32_t)usbd_dfu_cfg.buffer.d8[4] << 24;
-                } else if (usbd_dfu_cfg.buffer.d8[0] == DFU_CMD_ERASE) {
+                }
+                else if (usbd_dfu_cfg.buffer.d8[0] == DFU_CMD_ERASE)
+                {
                     usbd_dfu_cfg.data_ptr = usbd_dfu_cfg.buffer.d8[1];
                     usbd_dfu_cfg.data_ptr += (uint32_t)usbd_dfu_cfg.buffer.d8[2] << 8;
                     usbd_dfu_cfg.data_ptr += (uint32_t)usbd_dfu_cfg.buffer.d8[3] << 16;
@@ -251,10 +278,14 @@ static int8_t dfu_getstatus_special_handler(void)
                     USB_LOG_DBG("Erase start add %08x \r\n", usbd_dfu_cfg.data_ptr);
                     /*!< Erase */
                     dfu_erase_flash(usbd_dfu_cfg.data_ptr);
-                } else {
+                }
+                else
+                {
                     return -1;
                 }
-            } else {
+            }
+            else
+            {
                 /* Reset the global length and block number */
                 usbd_dfu_cfg.wlength = 0U;
                 usbd_dfu_cfg.wblock_num = 0U;
@@ -263,8 +294,10 @@ static int8_t dfu_getstatus_special_handler(void)
             }
         }
         /* Regular Download Command */
-        else {
-            if (usbd_dfu_cfg.wblock_num > 1U) {
+        else
+        {
+            if (usbd_dfu_cfg.wblock_num > 1U)
+            {
                 /* Decode the required address */
                 addr = ((usbd_dfu_cfg.wblock_num - 2U) * USBD_DFU_XFER_SIZE) + usbd_dfu_cfg.data_ptr;
 
@@ -294,14 +327,16 @@ static void dfu_request_getstatus(struct usb_setup_packet *setup, uint8_t **data
 {
     /*!< Determine whether to leave DFU mode */
     if (usbd_dfu_cfg.manif_state == DFU_MANIFEST_IN_PROGRESS &&
-        usbd_dfu_cfg.dev_state == DFU_STATE_DFU_MANIFEST_SYNC &&
-        usbd_dfu_cfg.dev_status[1] == 0U &&
-        usbd_dfu_cfg.dev_status[2] == 0U &&
-        usbd_dfu_cfg.dev_status[3] == 0U &&
-        usbd_dfu_cfg.dev_status[4] == usbd_dfu_cfg.dev_state) {
+            usbd_dfu_cfg.dev_state == DFU_STATE_DFU_MANIFEST_SYNC &&
+            usbd_dfu_cfg.dev_status[1] == 0U &&
+            usbd_dfu_cfg.dev_status[2] == 0U &&
+            usbd_dfu_cfg.dev_status[3] == 0U &&
+            usbd_dfu_cfg.dev_status[4] == usbd_dfu_cfg.dev_state)
+    {
         usbd_dfu_cfg.manif_state = DFU_MANIFEST_COMPLETE;
 
-        if ((0x0B & DFU_MANIFEST_MASK) != 0U) {
+        if ((0x0B & DFU_MANIFEST_MASK) != 0U)
+        {
             usbd_dfu_cfg.dev_state = DFU_STATE_DFU_MANIFEST_SYNC;
 
             usbd_dfu_cfg.dev_status[1] = 0U;
@@ -309,7 +344,9 @@ static void dfu_request_getstatus(struct usb_setup_packet *setup, uint8_t **data
             usbd_dfu_cfg.dev_status[3] = 0U;
             usbd_dfu_cfg.dev_status[4] = usbd_dfu_cfg.dev_state;
             return;
-        } else {
+        }
+        else
+        {
             usbd_dfu_cfg.dev_state = DFU_STATE_DFU_MANIFEST_WAIT_RESET;
 
             usbd_dfu_cfg.dev_status[1] = 0U;
@@ -321,9 +358,11 @@ static void dfu_request_getstatus(struct usb_setup_packet *setup, uint8_t **data
         }
     }
 
-    switch (usbd_dfu_cfg.dev_state) {
+    switch (usbd_dfu_cfg.dev_state)
+    {
         case DFU_STATE_DFU_DNLOAD_SYNC:
-            if (usbd_dfu_cfg.wlength != 0U) {
+            if (usbd_dfu_cfg.wlength != 0U)
+            {
                 usbd_dfu_cfg.dev_state = DFU_STATE_DFU_DNLOAD_BUSY;
 
                 usbd_dfu_cfg.dev_status[1] = 0U;
@@ -331,12 +370,16 @@ static void dfu_request_getstatus(struct usb_setup_packet *setup, uint8_t **data
                 usbd_dfu_cfg.dev_status[3] = 0U;
                 usbd_dfu_cfg.dev_status[4] = usbd_dfu_cfg.dev_state;
 
-                if ((usbd_dfu_cfg.wblock_num == 0U) && (usbd_dfu_cfg.buffer.d8[0] == DFU_CMD_ERASE)) {
+                if ((usbd_dfu_cfg.wblock_num == 0U) && (usbd_dfu_cfg.buffer.d8[0] == DFU_CMD_ERASE))
+                {
                     dfu_getstatus(usbd_dfu_cfg.data_ptr, DFU_MEDIA_ERASE, usbd_dfu_cfg.dev_status);
-                } else {
+                }
+                else
+                {
                     dfu_getstatus(usbd_dfu_cfg.data_ptr, DFU_MEDIA_PROGRAM, usbd_dfu_cfg.dev_status);
                 }
-            } else /* (usbd_dfu_cfg.wlength==0)*/
+            }
+            else   /* (usbd_dfu_cfg.wlength==0)*/
             {
                 usbd_dfu_cfg.dev_state = DFU_STATE_DFU_DNLOAD_IDLE;
 
@@ -348,16 +391,20 @@ static void dfu_request_getstatus(struct usb_setup_packet *setup, uint8_t **data
             break;
 
         case DFU_STATE_DFU_MANIFEST_SYNC:
-            if (usbd_dfu_cfg.manif_state == DFU_MANIFEST_IN_PROGRESS) {
+            if (usbd_dfu_cfg.manif_state == DFU_MANIFEST_IN_PROGRESS)
+            {
                 usbd_dfu_cfg.dev_state = DFU_STATE_DFU_MANIFEST;
 
                 usbd_dfu_cfg.dev_status[1] = 1U; /*bwPollTimeout = 1ms*/
                 usbd_dfu_cfg.dev_status[2] = 0U;
                 usbd_dfu_cfg.dev_status[3] = 0U;
                 usbd_dfu_cfg.dev_status[4] = usbd_dfu_cfg.dev_state;
-            } else {
+            }
+            else
+            {
                 if ((usbd_dfu_cfg.manif_state == DFU_MANIFEST_COMPLETE) &&
-                    ((0x0B & DFU_MANIFEST_MASK) != 0U)) {
+                        ((0x0B & DFU_MANIFEST_MASK) != 0U))
+                {
                     usbd_dfu_cfg.dev_state = DFU_STATE_DFU_IDLE;
 
                     usbd_dfu_cfg.dev_status[1] = 0U;
@@ -376,8 +423,10 @@ static void dfu_request_getstatus(struct usb_setup_packet *setup, uint8_t **data
     memcpy(*data, usbd_dfu_cfg.dev_status, 6);
     *len = 6;
 
-    if (usbd_dfu_cfg.firmwar_flag == 1) {
-        if (dfu_getstatus_special_handler() != 0) {
+    if (usbd_dfu_cfg.firmwar_flag == 1)
+    {
+        if (dfu_getstatus_special_handler() != 0)
+        {
             USB_LOG_ERR("dfu_getstatus_special_handler error \r\n");
         }
         usbd_dfu_cfg.firmwar_flag = 0;
@@ -386,7 +435,8 @@ static void dfu_request_getstatus(struct usb_setup_packet *setup, uint8_t **data
 
 static void dfu_request_clrstatus(void)
 {
-    if (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_ERROR) {
+    if (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_ERROR)
+    {
         usbd_dfu_cfg.dev_state = DFU_STATE_DFU_IDLE;
         usbd_dfu_cfg.dev_status[0] = DFU_STATUS_OK; /* bStatus */
         usbd_dfu_cfg.dev_status[1] = 0U;
@@ -394,7 +444,9 @@ static void dfu_request_clrstatus(void)
         usbd_dfu_cfg.dev_status[3] = 0U;                     /* bwPollTimeout=0ms */
         usbd_dfu_cfg.dev_status[4] = usbd_dfu_cfg.dev_state; /* bState */
         usbd_dfu_cfg.dev_status[5] = 0U;                     /* iString */
-    } else {
+    }
+    else
+    {
         /* State Error */
         usbd_dfu_cfg.dev_state = DFU_STATE_DFU_ERROR;
         usbd_dfu_cfg.dev_status[0] = DFU_STATUS_ERR_UNKNOWN; /* bStatus */
@@ -416,10 +468,11 @@ static void dfu_request_getstate(struct usb_setup_packet *setup, uint8_t **data,
 void dfu_request_abort(void)
 {
     if ((usbd_dfu_cfg.dev_state == DFU_STATE_DFU_IDLE) ||
-        (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_SYNC) ||
-        (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_IDLE) ||
-        (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_MANIFEST_SYNC) ||
-        (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_UPLOAD_IDLE)) {
+            (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_SYNC) ||
+            (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_DNLOAD_IDLE) ||
+            (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_MANIFEST_SYNC) ||
+            (usbd_dfu_cfg.dev_state == DFU_STATE_DFU_UPLOAD_IDLE))
+    {
         usbd_dfu_cfg.dev_state = DFU_STATE_DFU_IDLE;
         usbd_dfu_cfg.dev_status[0] = DFU_STATUS_OK;
         usbd_dfu_cfg.dev_status[1] = 0U;
@@ -438,7 +491,8 @@ static int dfu_class_interface_request_handler(struct usb_setup_packet *setup, u
                 "bRequest 0x%02x\r\n",
                 setup->bRequest);
 
-    switch (setup->bRequest) {
+    switch (setup->bRequest)
+    {
         case DFU_REQUEST_DETACH:
             dfu_request_detach();
             break;
@@ -470,7 +524,8 @@ static int dfu_class_interface_request_handler(struct usb_setup_packet *setup, u
 
 static void dfu_notify_handler(uint8_t event, void *arg)
 {
-    switch (event) {
+    switch (event)
+    {
         case USBD_EVENT_RESET:
             dfu_reset();
             break;
@@ -508,4 +563,4 @@ __WEAK void dfu_leave(void)
 {
 }
 
-#endif /* CONFIG_ENABLE_USBD_DFU */
+#endif  /* CONFIG_ENABLE_USBD_DFU */

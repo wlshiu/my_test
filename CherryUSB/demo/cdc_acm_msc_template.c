@@ -22,7 +22,8 @@
 #define USB_CONFIG_SIZE (9 + CDC_ACM_DESCRIPTOR_LEN + MSC_DESCRIPTOR_LEN)
 
 /*!< global descriptor */
-static const uint8_t cdc_msc_descriptor[] = {
+static const uint8_t cdc_msc_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0xEF, 0x02, 0x01, USBD_VID, USBD_PID, 0x0100, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_CONFIG_SIZE, 0x03, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
     CDC_ACM_DESCRIPTOR_INIT(0x00, CDC_INT_EP, CDC_OUT_EP, CDC_IN_EP, 0x02),
@@ -107,9 +108,9 @@ USB_NOCACHE_RAM_SECTION USB_MEM_ALIGNX uint8_t write_buffer[2048] = { 0x31, 0x32
 volatile bool ep_tx_busy_flag = false;
 
 #ifdef CONFIG_USB_HS
-#define CDC_MAX_MPS 512
+    #define CDC_MAX_MPS 512
 #else
-#define CDC_MAX_MPS 64
+    #define CDC_MAX_MPS 64
 #endif
 
 void usbd_configure_done_callback(void)
@@ -129,21 +130,26 @@ void usbd_cdc_acm_bulk_in(uint8_t ep, uint32_t nbytes)
 {
     USB_LOG_RAW("actual in len:%d\r\n", nbytes);
 
-    if ((nbytes % CDC_MAX_MPS) == 0 && nbytes) {
+    if ((nbytes % CDC_MAX_MPS) == 0 && nbytes)
+    {
         /* send zlp */
         usbd_ep_start_write(CDC_IN_EP, NULL, 0);
-    } else {
+    }
+    else
+    {
         ep_tx_busy_flag = false;
     }
 }
 
 /*!< endpoint call back */
-struct usbd_endpoint cdc_out_ep = {
+struct usbd_endpoint cdc_out_ep =
+{
     .ep_addr = CDC_OUT_EP,
     .ep_cb = usbd_cdc_acm_bulk_out
 };
 
-struct usbd_endpoint cdc_in_ep = {
+struct usbd_endpoint cdc_in_ep =
+{
     .ep_addr = CDC_IN_EP,
     .ep_cb = usbd_cdc_acm_bulk_in
 };
@@ -168,20 +174,25 @@ volatile uint8_t dtr_enable = 0;
 
 void usbd_cdc_acm_set_dtr(uint8_t intf, bool dtr)
 {
-    if (dtr) {
+    if (dtr)
+    {
         dtr_enable = 1;
-    } else {
+    }
+    else
+    {
         dtr_enable = 0;
     }
 }
 
 void cdc_acm_data_send_with_dtr_test(void)
 {
-    if (dtr_enable) {
+    if (dtr_enable)
+    {
         memset(&write_buffer[10], 'a', 2038);
         ep_tx_busy_flag = true;
         usbd_ep_start_write(CDC_IN_EP, write_buffer, 2048);
-        while (ep_tx_busy_flag) {
+        while (ep_tx_busy_flag)
+        {
         }
     }
 }

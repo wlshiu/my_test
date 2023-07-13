@@ -51,7 +51,8 @@
 #define OID_PNP_REMOVE_WAKE_UP_PATTERN 0xFD010104
 #define OID_PNP_ENABLE_WAKE_UP         0xFD010106
 
-enum NDIS_DEVICE_POWER_STATE {
+enum NDIS_DEVICE_POWER_STATE
+{
     NdisDeviceStateUnspecified = 0,
     NdisDeviceStateD0,
     NdisDeviceStateD1,
@@ -60,7 +61,8 @@ enum NDIS_DEVICE_POWER_STATE {
     NdisDeviceStateMaximum
 };
 
-struct NDIS_PM_WAKE_UP_CAPABILITIES {
+struct NDIS_PM_WAKE_UP_CAPABILITIES
+{
     enum NDIS_DEVICE_POWER_STATE MinMagicPacketWakeUp;
     enum NDIS_DEVICE_POWER_STATE MinPatternWakeUp;
     enum NDIS_DEVICE_POWER_STATE MinLinkChangeWakeUp;
@@ -73,17 +75,17 @@ struct NDIS_PM_WAKE_UP_CAPABILITIES {
 
 /*
 struct NDIS_PNP_CAPABILITIES {
-	__le32					Flags;
-	struct NDIS_PM_WAKE_UP_CAPABILITIES	WakeUpCapabilities;
+    __le32                  Flags;
+    struct NDIS_PM_WAKE_UP_CAPABILITIES WakeUpCapabilities;
 };
 
 struct NDIS_PM_PACKET_PATTERN {
-	__le32	Priority;
-	__le32	Reserved;
-	__le32	MaskSize;
-	__le32	PatternOffset;
-	__le32	PatternSize;
-	__le32	PatternFlags;
+    __le32  Priority;
+    __le32  Reserved;
+    __le32  MaskSize;
+    __le32  PatternOffset;
+    __le32  PatternSize;
+    __le32  PatternFlags;
 };
 */
 

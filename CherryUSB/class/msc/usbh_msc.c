@@ -17,9 +17,11 @@ static int usbh_msc_devno_alloc(struct usbh_msc *msc_class)
 {
     int devno;
 
-    for (devno = 0; devno < 26; devno++) {
+    for (devno = 0; devno < 26; devno++)
+    {
         uint32_t bitno = 1 << devno;
-        if ((g_devinuse & bitno) == 0) {
+        if ((g_devinuse & bitno) == 0)
+        {
             g_devinuse |= bitno;
             msc_class->sdchar = 'a' + devno;
             return 0;
@@ -33,7 +35,8 @@ static void usbh_msc_devno_free(struct usbh_msc *msc_class)
 {
     int devno = msc_class->sdchar - 'a';
 
-    if (devno >= 0 && devno < 26) {
+    if (devno >= 0 && devno < 26)
+    {
         g_devinuse &= ~(1 << devno);
     }
 }
@@ -64,7 +67,8 @@ static void usbh_msc_cbw_dump(struct CBW *cbw)
     USB_LOG_DBG("  cblen:    0x%02x\r\n", cbw->bCBLength);
 
     USB_LOG_DBG("CB:\r\n");
-    for (i = 0; i < cbw->bCBLength; i += 8) {
+    for (i = 0; i < cbw->bCBLength; i += 8)
+    {
         USB_LOG_DBG("  0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x\r\n",
                     cbw->CB[i], cbw->CB[i + 1], cbw->CB[i + 2],
                     cbw->CB[i + 3], cbw->CB[i + 4], cbw->CB[i + 5],
@@ -89,7 +93,8 @@ static inline int usbh_msc_bulk_in_transfer(struct usbh_msc *msc_class, uint8_t 
 
     usbh_bulk_urb_fill(urb, msc_class->bulkin, buffer, buflen, timeout, NULL, NULL);
     ret = usbh_submit_urb(urb);
-    if (ret == 0) {
+    if (ret == 0)
+    {
         ret = urb->actual_length;
     }
     return ret;
@@ -103,7 +108,8 @@ static inline int usbh_msc_bulk_out_transfer(struct usbh_msc *msc_class, uint8_t
 
     usbh_bulk_urb_fill(urb, msc_class->bulkout, buffer, buflen, timeout, NULL, NULL);
     ret = usbh_submit_urb(urb);
-    if (ret == 0) {
+    if (ret == 0)
+    {
         ret = urb->actual_length;
     }
     return ret;
@@ -117,26 +123,35 @@ int usbh_bulk_cbw_csw_xfer(struct usbh_msc *msc_class, struct CBW *cbw, struct C
 
     /* Send the CBW */
     nbytes = usbh_msc_bulk_out_transfer(msc_class, (uint8_t *)cbw, USB_SIZEOF_MSC_CBW, CONFIG_USBHOST_MSC_TIMEOUT);
-    if (nbytes < 0) {
+    if (nbytes < 0)
+    {
         USB_LOG_ERR("cbw transfer error\r\n");
         goto __err_exit;
     }
 
-    if (cbw->dDataLength != 0) {
-        if (cbw->CB[0] == SCSI_CMD_WRITE10) {
+    if (cbw->dDataLength != 0)
+    {
+        if (cbw->CB[0] == SCSI_CMD_WRITE10)
+        {
             nbytes = usbh_msc_bulk_out_transfer(msc_class, buffer, cbw->dDataLength, CONFIG_USBHOST_MSC_TIMEOUT);
-        } else if (cbw->CB[0] == SCSI_CMD_READCAPACITY10) {
+        }
+        else if (cbw->CB[0] == SCSI_CMD_READCAPACITY10)
+        {
             nbytes = usbh_msc_bulk_in_transfer(msc_class, buffer, cbw->dDataLength, CONFIG_USBHOST_MSC_TIMEOUT);
-            if (nbytes >= 0) {
+            if (nbytes >= 0)
+            {
                 /* Save the capacity information */
                 msc_class->blocknum = GET_BE32(&buffer[0]) + 1;
                 msc_class->blocksize = GET_BE32(&buffer[4]);
             }
-        } else {
+        }
+        else
+        {
             nbytes = usbh_msc_bulk_in_transfer(msc_class, buffer, cbw->dDataLength, CONFIG_USBHOST_MSC_TIMEOUT);
         }
 
-        if (nbytes < 0) {
+        if (nbytes < 0)
+        {
             USB_LOG_ERR("msc data transfer error\r\n");
             goto __err_exit;
         }
@@ -145,7 +160,8 @@ int usbh_bulk_cbw_csw_xfer(struct usbh_msc *msc_class, struct CBW *cbw, struct C
     /* Receive the CSW */
     memset(csw, 0, USB_SIZEOF_MSC_CSW);
     nbytes = usbh_msc_bulk_in_transfer(msc_class, (uint8_t *)csw, USB_SIZEOF_MSC_CSW, CONFIG_USBHOST_MSC_TIMEOUT);
-    if (nbytes < 0) {
+    if (nbytes < 0)
+    {
         USB_LOG_ERR("csw transfer error\r\n");
         goto __err_exit;
     }
@@ -153,12 +169,14 @@ int usbh_bulk_cbw_csw_xfer(struct usbh_msc *msc_class, struct CBW *cbw, struct C
     usbh_msc_csw_dump(csw);
 
     /* check csw status */
-    if (csw->dSignature != MSC_CSW_Signature) {
+    if (csw->dSignature != MSC_CSW_Signature)
+    {
         USB_LOG_ERR("csw signature error\r\n");
         return -EINVAL;
     }
 
-    if (csw->bStatus != 0) {
+    if (csw->bStatus != 0)
+    {
         USB_LOG_ERR("csw bStatus %d\r\n", csw->bStatus);
         return -EINVAL;
     }
@@ -279,7 +297,8 @@ static int usbh_msc_connect(struct usbh_hubport *hport, uint8_t intf)
     int ret;
 
     struct usbh_msc *msc_class = usb_malloc(sizeof(struct usbh_msc));
-    if (msc_class == NULL) {
+    if (msc_class == NULL)
+    {
         USB_LOG_ERR("Fail to alloc msc_class\r\n");
         return -ENOMEM;
     }
@@ -292,44 +311,56 @@ static int usbh_msc_connect(struct usbh_hubport *hport, uint8_t intf)
     hport->config.intf[intf].priv = msc_class;
 
     ret = usbh_msc_get_maxlun(msc_class, g_msc_buf);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         return ret;
     }
 
     USB_LOG_INFO("Get max LUN:%u\r\n", g_msc_buf[0] + 1);
 
-    for (uint8_t i = 0; i < hport->config.intf[intf].altsetting[0].intf_desc.bNumEndpoints; i++) {
+    for (uint8_t i = 0; i < hport->config.intf[intf].altsetting[0].intf_desc.bNumEndpoints; i++)
+    {
         ep_desc = &hport->config.intf[intf].altsetting[0].ep[i].ep_desc;
-        if (ep_desc->bEndpointAddress & 0x80) {
+        if (ep_desc->bEndpointAddress & 0x80)
+        {
             usbh_hport_activate_epx(&msc_class->bulkin, hport, ep_desc);
-        } else {
+        }
+        else
+        {
             usbh_hport_activate_epx(&msc_class->bulkout, hport, ep_desc);
         }
     }
 
     ret = usbh_msc_scsi_testunitready(msc_class);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         ret = usbh_msc_scsi_requestsense(msc_class);
-        if (ret < 0) {
+        if (ret < 0)
+        {
             USB_LOG_ERR("Fail to scsi_testunitready\r\n");
             return ret;
         }
     }
     ret = usbh_msc_scsi_inquiry(msc_class);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         USB_LOG_ERR("Fail to scsi_inquiry\r\n");
         return ret;
     }
     ret = usbh_msc_scsi_readcapacity10(msc_class);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         USB_LOG_ERR("Fail to scsi_readcapacity10\r\n");
         return ret;
     }
 
-    if (msc_class->blocksize > 0) {
+    if (msc_class->blocksize > 0)
+    {
         USB_LOG_INFO("Capacity info:\r\n");
         USB_LOG_INFO("Block num:%d,block size:%d\r\n", (unsigned int)msc_class->blocknum, (unsigned int)msc_class->blocksize);
-    } else {
+    }
+    else
+    {
         USB_LOG_ERR("Invalid block size\r\n");
         return -ERANGE;
     }
@@ -348,18 +379,22 @@ static int usbh_msc_disconnect(struct usbh_hubport *hport, uint8_t intf)
 
     struct usbh_msc *msc_class = (struct usbh_msc *)hport->config.intf[intf].priv;
 
-    if (msc_class) {
+    if (msc_class)
+    {
         usbh_msc_devno_free(msc_class);
 
-        if (msc_class->bulkin) {
+        if (msc_class->bulkin)
+        {
             usbh_pipe_free(msc_class->bulkin);
         }
 
-        if (msc_class->bulkout) {
+        if (msc_class->bulkout)
+        {
             usbh_pipe_free(msc_class->bulkout);
         }
 
-        if (hport->config.intf[intf].devname[0] != '\0') {
+        if (hport->config.intf[intf].devname[0] != '\0')
+        {
             USB_LOG_INFO("Unregister MSC Class:%s\r\n", hport->config.intf[intf].devname);
             usbh_msc_stop(msc_class);
         }
@@ -379,13 +414,15 @@ __WEAK void usbh_msc_stop(struct usbh_msc *msc_class)
 {
 }
 
-const struct usbh_class_driver msc_class_driver = {
+const struct usbh_class_driver msc_class_driver =
+{
     .driver_name = "msc",
     .connect = usbh_msc_connect,
     .disconnect = usbh_msc_disconnect
 };
 
-CLASS_INFO_DEFINE const struct usbh_class_info msc_class_info = {
+CLASS_INFO_DEFINE const struct usbh_class_info msc_class_info =
+{
     .match_flags = USB_CLASS_MATCH_INTF_CLASS | USB_CLASS_MATCH_INTF_SUBCLASS | USB_CLASS_MATCH_INTF_PROTOCOL,
     .class = USB_DEVICE_CLASS_MASS_STORAGE,
     .subclass = MSC_SUBCLASS_SCSI,

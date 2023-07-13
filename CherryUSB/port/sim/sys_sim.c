@@ -93,7 +93,7 @@ int sys_wait_msg(uint8_t *pBuf, int *pBuf_size)
             case SYS_UMSG_HOST_RX:
                 {
                     int             len = *pBuf_size;
-                    sys_msg_info_t  *pMsg_info = (sys_msg_info_t*)msg.wParam;
+                    sys_msg_info_t  *pMsg_info = (sys_msg_info_t *)msg.wParam;
 
                     len = (pMsg_info->msg_len > len) ? len : pMsg_info->msg_len;
                     memcpy(pBuf, pMsg_info->pMsg_buf, len);

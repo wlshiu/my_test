@@ -17,7 +17,8 @@
 #define USB_HID_CONFIG_DESC_SIZ       34
 #define HID_KEYBOARD_REPORT_DESC_SIZE 63
 
-static const uint8_t hid_descriptor[] = {
+static const uint8_t hid_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0x00, 0x00, 0x00, USBD_VID, USBD_PID, 0x0002, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_HID_CONFIG_DESC_SIZ, 0x01, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
 
@@ -128,7 +129,8 @@ static const uint8_t hid_descriptor[] = {
 };
 
 /* USB HID device Configuration Descriptor */
-static uint8_t hid_desc[9] __ALIGN_END = {
+static uint8_t hid_desc[9] __ALIGN_END =
+{
     /* 18 */
     0x09,                    /* bLength: HID Descriptor size */
     HID_DESCRIPTOR_TYPE_HID, /* bDescriptorType: HID */
@@ -141,7 +143,8 @@ static uint8_t hid_desc[9] __ALIGN_END = {
     0x00,
 };
 
-static const uint8_t hid_keyboard_report_desc[HID_KEYBOARD_REPORT_DESC_SIZE] = {
+static const uint8_t hid_keyboard_report_desc[HID_KEYBOARD_REPORT_DESC_SIZE] =
+{
     0x05, 0x01, // USAGE_PAGE (Generic Desktop)
     0x09, 0x06, // USAGE (Keyboard)
     0xa1, 0x01, // COLLECTION (Application)
@@ -192,7 +195,8 @@ void usbd_hid_int_callback(uint8_t ep, uint32_t nbytes)
     hid_state = HID_STATE_IDLE;
 }
 
-static struct usbd_endpoint hid_in_ep = {
+static struct usbd_endpoint hid_in_ep =
+{
     .ep_cb = usbd_hid_int_callback,
     .ep_addr = HID_INT_EP
 };
@@ -213,11 +217,13 @@ void hid_keyboard_test(void)
     uint8_t sendbuffer[8] = { 0x00, 0x00, HID_KBD_USAGE_A, 0x00, 0x00, 0x00, 0x00, 0x00 }; //A
 
     int ret = usbd_ep_start_write(HID_INT_EP, sendbuffer, 8);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         return;
     }
     hid_state = HID_STATE_BUSY;
-    while (hid_state == HID_STATE_BUSY) {
+    while (hid_state == HID_STATE_BUSY)
+    {
     }
 }
 

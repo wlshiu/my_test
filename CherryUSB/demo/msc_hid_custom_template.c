@@ -30,7 +30,8 @@
 
 #define USB_CONFIG_SIZE                 (9 + MSC_DESCRIPTOR_LEN + 9+ 9 + 7 + 7)
 
-const uint8_t hid_msc_descriptor[] = {
+const uint8_t hid_msc_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0x00, 0x00, 0x00, USBD_VID, USBD_PID, 0x0200, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_CONFIG_SIZE, 0x02, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
     MSC_DESCRIPTOR_INIT(0x00, MSC_OUT_EP, MSC_IN_EP, 0x02),
@@ -178,7 +179,8 @@ int usbd_msc_sector_write(uint32_t sector, uint8_t *buffer, uint32_t length)
 }
 
 /*!< custom hid report descriptor */
-static const uint8_t hid_custom_report_desc[HID_CUSTOM_REPORT_DESC_SIZE] = {
+static const uint8_t hid_custom_report_desc[HID_CUSTOM_REPORT_DESC_SIZE] =
+{
     /* USER CODE BEGIN 0 */
     0x06, 0x00, 0xff, // USAGE_PAGE (Vendor Defined Page 1)
     0x09, 0x01,       // USAGE (Vendor Usage 1)
@@ -197,7 +199,7 @@ static const uint8_t hid_custom_report_desc[HID_CUSTOM_REPORT_DESC_SIZE] = {
     0x75, 0x08,       //   REPORT_SIZE (8)
     0x91, 0x02,       //   OUTPUT (Data,Var,Abs)
     /* USER CODE END 0 */
-    0xC0 /*     END_COLLECTION	             */
+    0xC0 /*     END_COLLECTION               */
 };
 
 /*!< class */
@@ -217,7 +219,8 @@ static void usbd_hid_custom_in_callback(uint8_t ep)
 {
     /*!< endpoint call back */
     /*!< transfer successfully */
-    if (custom_state == HID_STATE_BUSY) {
+    if (custom_state == HID_STATE_BUSY)
+    {
         /*!< update the state  */
         custom_state = HID_STATE_IDLE;
     }
@@ -233,12 +236,14 @@ static void usbd_hid_custom_out_callback(uint8_t ep)
 }
 
 /*!< endpoint call back */
-static struct usbd_interface custom_in_ep = {
+static struct usbd_interface custom_in_ep =
+{
     .ep_cb = usbd_hid_custom_in_callback,
     .ep_addr = HIDRAW_IN_EP
 };
 
-static struct usbd_interface custom_out_ep = {
+static struct usbd_interface custom_out_ep =
+{
     .ep_cb = usbd_hid_custom_out_callback,
     .ep_addr = HIDRAW_OUT_EP
 };
@@ -279,8 +284,10 @@ void hid_msc_descriptor_init(void)
   */
 void hid_custom_send_report(uint8_t ep, uint8_t *data, uint8_t len)
 {
-    if (usb_device_is_configured()) {
-        if (custom_state == HID_STATE_IDLE) {
+    if (usb_device_is_configured())
+    {
+        if (custom_state == HID_STATE_IDLE)
+        {
             /*!< updata the state */
             custom_state = HID_STATE_BUSY;
             /*!< write buffer */

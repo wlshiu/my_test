@@ -15,7 +15,8 @@ static int usbh_mtp_connect(struct usbh_hubport *hport, uint8_t intf)
     int ret;
 
     struct usbh_mtp *mtp_class = usb_malloc(sizeof(struct usbh_mtp));
-    if (mtp_class == NULL) {
+    if (mtp_class == NULL)
+    {
         USB_LOG_ERR("Fail to alloc mtp_class\r\n");
         return -ENOMEM;
     }
@@ -30,12 +31,16 @@ static int usbh_mtp_connect(struct usbh_hubport *hport, uint8_t intf)
     ep_desc = &hport->config.intf[intf].altsetting[0].ep[0].ep_desc;
     usbh_hport_activate_epx(&mtp_class->intin, hport, ep_desc);
 #endif
-    for (uint8_t i = 0; i < hport->config.intf[intf + 1].altsetting[0].intf_desc.bNumEndpoints; i++) {
+    for (uint8_t i = 0; i < hport->config.intf[intf + 1].altsetting[0].intf_desc.bNumEndpoints; i++)
+    {
         ep_desc = &hport->config.intf[intf + 1].altsetting[0].ep[i].ep_desc;
 
-        if (ep_desc->bEndpointAddress & 0x80) {
+        if (ep_desc->bEndpointAddress & 0x80)
+        {
             usbh_hport_activate_epx(&mtp_class->bulkin, hport, ep_desc);
-        } else {
+        }
+        else
+        {
             usbh_hport_activate_epx(&mtp_class->bulkout, hport, ep_desc);
         }
     }
@@ -53,16 +58,20 @@ static int usbh_mtp_disconnect(struct usbh_hubport *hport, uint8_t intf)
 
     struct usbh_mtp *mtp_class = (struct usbh_mtp *)hport->config.intf[intf].priv;
 
-    if (mtp_class) {
-        if (mtp_class->bulkin) {
+    if (mtp_class)
+    {
+        if (mtp_class->bulkin)
+        {
             usbh_pipe_free(mtp_class->bulkin);
         }
 
-        if (mtp_class->bulkout) {
+        if (mtp_class->bulkout)
+        {
             usbh_pipe_free(mtp_class->bulkout);
         }
 
-        if (hport->config.intf[intf].devname[0] != '\0') {
+        if (hport->config.intf[intf].devname[0] != '\0')
+        {
             USB_LOG_INFO("Unregister MTP Class:%s\r\n", hport->config.intf[intf].devname);
         }
 
@@ -73,13 +82,15 @@ static int usbh_mtp_disconnect(struct usbh_hubport *hport, uint8_t intf)
     return ret;
 }
 
-static const struct usbh_class_driver mtp_class_driver = {
+static const struct usbh_class_driver mtp_class_driver =
+{
     .driver_name = "mtp",
     .connect = usbh_mtp_connect,
     .disconnect = usbh_mtp_disconnect
 };
 
-CLASS_INFO_DEFINE const struct usbh_class_info mtp_class_info = {
+CLASS_INFO_DEFINE const struct usbh_class_info mtp_class_info =
+{
     .match_flags = USB_CLASS_MATCH_INTF_CLASS | USB_CLASS_MATCH_INTF_SUBCLASS | USB_CLASS_MATCH_INTF_PROTOCOL,
     .class = USB_MTP_CLASS,
     .subclass = USB_MTP_SUB_CLASS,

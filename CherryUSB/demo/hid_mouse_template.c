@@ -21,7 +21,8 @@
 #define HID_MOUSE_REPORT_DESC_SIZE 74
 
 /*!< global descriptor */
-const uint8_t hid_descriptor[] = {
+const uint8_t hid_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0x00, 0x00, 0x00, USBD_VID, USBD_PID, 0x0002, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_HID_CONFIG_DESC_SIZ, 0x01, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
 
@@ -132,7 +133,8 @@ const uint8_t hid_descriptor[] = {
 };
 
 /*!< hid mouse report descriptor */
-static const uint8_t hid_mouse_report_desc[HID_MOUSE_REPORT_DESC_SIZE] = {
+static const uint8_t hid_mouse_report_desc[HID_MOUSE_REPORT_DESC_SIZE] =
+{
     0x05, 0x01, // USAGE_PAGE (Generic Desktop)
     0x09, 0x02, // USAGE (Mouse)
     0xA1, 0x01, // COLLECTION (Application)
@@ -182,7 +184,8 @@ static const uint8_t hid_mouse_report_desc[HID_MOUSE_REPORT_DESC_SIZE] = {
 };
 
 /*!< mouse report struct */
-struct hid_mouse {
+struct hid_mouse
+{
     uint8_t buttons;
     int8_t x;
     int8_t y;
@@ -210,7 +213,8 @@ static void usbd_hid_int_callback(uint8_t ep, uint32_t nbytes)
 }
 
 /*!< endpoint call back */
-static struct usbd_endpoint hid_in_ep = {
+static struct usbd_endpoint hid_in_ep =
+{
     .ep_cb = usbd_hid_int_callback,
     .ep_addr = HID_INT_EP
 };
@@ -245,11 +249,13 @@ void hid_mouse_test(void)
     mouse_cfg.y = 0;
 
     int ret = usbd_ep_start_write(HID_INT_EP, (uint8_t *)&mouse_cfg, 4);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         return;
     }
     hid_state = HID_STATE_BUSY;
-    while (hid_state == HID_STATE_BUSY) {
+    while (hid_state == HID_STATE_BUSY)
+    {
     }
 }
 

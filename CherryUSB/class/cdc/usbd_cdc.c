@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include "usbd_core.h"
+
+#if defined(CONFIG_ENABLE_USBD_CDC) && (CONFIG_ENABLE_USBD_CDC)
+
 #include "usbd_cdc.h"
 
 const char *stop_name[] = { "1", "1.5", "2" };
@@ -20,7 +23,8 @@ static int cdc_acm_class_interface_request_handler(struct usb_setup_packet *setu
     bool dtr, rts;
     uint8_t intf_num = LO_BYTE(setup->wIndex);
 
-    switch (setup->bRequest) {
+    switch (setup->bRequest)
+    {
         case CDC_REQUEST_SET_LINE_CODING:
 
             /*******************************************************************************/
@@ -50,22 +54,25 @@ static int cdc_acm_class_interface_request_handler(struct usb_setup_packet *setu
 
             /* check if current line coding is the same with last, if they are the same, do not set line coding */
             usbd_cdc_acm_get_line_coding(intf_num, &line_coding_last);
-            if (memcmp(&line_coding_last, &line_coding, sizeof(struct cdc_line_coding))) {
+            if (memcmp(&line_coding_last, &line_coding, sizeof(struct cdc_line_coding)))
+            {
                 usbd_cdc_acm_set_line_coding(intf_num, &line_coding);
             }
 
             break;
 
-        case CDC_REQUEST_SET_CONTROL_LINE_STATE: {
-            dtr = (setup->wValue & 0x0001);
-            rts = (setup->wValue & 0x0002);
-            USB_LOG_DBG("Set intf:%d DTR 0x%x,RTS 0x%x\r\n",
-                        intf_num,
-                        dtr,
-                        rts);
-            usbd_cdc_acm_set_dtr(intf_num, dtr);
-            usbd_cdc_acm_set_rts(intf_num, rts);
-        } break;
+        case CDC_REQUEST_SET_CONTROL_LINE_STATE:
+            {
+                dtr = (setup->wValue & 0x0001);
+                rts = (setup->wValue & 0x0002);
+                USB_LOG_DBG("Set intf:%d DTR 0x%x,RTS 0x%x\r\n",
+                            intf_num,
+                            dtr,
+                            rts);
+                usbd_cdc_acm_set_dtr(intf_num, dtr);
+                usbd_cdc_acm_set_rts(intf_num, rts);
+            }
+            break;
 
         case CDC_REQUEST_GET_LINE_CODING:
             usbd_cdc_acm_get_line_coding(intf_num, &line_coding);
@@ -116,3 +123,4 @@ __WEAK void usbd_cdc_acm_set_dtr(uint8_t intf, bool dtr)
 __WEAK void usbd_cdc_acm_set_rts(uint8_t intf, bool rts)
 {
 }
+#endif  /* CONFIG_ENABLE_USBD_CDC */

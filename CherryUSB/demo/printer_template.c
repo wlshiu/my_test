@@ -16,7 +16,8 @@
 #define USB_CONFIG_SIZE (32)
 
 /*!< global descriptor */
-static const uint8_t printer_descriptor[] = {
+static const uint8_t printer_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_0, 0x00, 0x00, 0x00, USBD_VID, USBD_PID, 0x0000, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_CONFIG_SIZE, 0x01, 0x01, USB_CONFIG_SELF_POWERED, USBD_MAX_POWER),
     USB_INTERFACE_DESCRIPTOR_INIT(0x00, 0x00, 0x02, 0x07, 0x01, 0x02, 0x00),
@@ -122,20 +123,25 @@ void usbd_printer_bulk_in(uint8_t ep, uint32_t nbytes)
 {
     USB_LOG_RAW("actual in len:%d\r\n", nbytes);
 
-    if ((nbytes % PRINTER_IN_EP_SIZE) == 0 && nbytes) {
+    if ((nbytes % PRINTER_IN_EP_SIZE) == 0 && nbytes)
+    {
         /* send zlp */
         usbd_ep_start_write(PRINTER_IN_EP, NULL, 0);
-    } else {
+    }
+    else
+    {
     }
 }
 
 /*!< endpoint call back */
-struct usbd_endpoint printer_out_ep = {
+struct usbd_endpoint printer_out_ep =
+{
     .ep_addr = PRINTER_OUT_EP,
     .ep_cb = usbd_printer_bulk_out
 };
 
-struct usbd_endpoint printer_in_ep = {
+struct usbd_endpoint printer_in_ep =
+{
     .ep_addr = PRINTER_IN_EP,
     .ep_cb = usbd_printer_bulk_in
 };
@@ -144,20 +150,20 @@ struct usbd_interface intf0;
 
 static const uint8_t printer_device_id[] =
 {
-  0x00, 51,
-  'M','F','G',':','C','B','M',';',
-  'C','M','D',':','G','D','I',';',
-  'M','D','L',':','C','B','M','1','0','0','0',';',
-  'C','L','S',':','P','R','I','N','T','E','R',';',
-  'M','O','D','E',':','G','D','I',';'
+    0x00, 51,
+    'M', 'F', 'G', ':', 'C', 'B', 'M', ';',
+    'C', 'M', 'D', ':', 'G', 'D', 'I', ';',
+    'M', 'D', 'L', ':', 'C', 'B', 'M', '1', '0', '0', '0', ';',
+    'C', 'L', 'S', ':', 'P', 'R', 'I', 'N', 'T', 'E', 'R', ';',
+    'M', 'O', 'D', 'E', ':', 'G', 'D', 'I', ';'
 };
 
 void printer_init(void)
 {
-  usbd_desc_register(printer_descriptor);
-  usbd_add_interface(usbd_printer_init_intf(&intf0, printer_device_id, sizeof(printer_device_id)));
-  usbd_add_endpoint(&printer_out_ep);
-  usbd_add_endpoint(&printer_in_ep);
+    usbd_desc_register(printer_descriptor);
+    usbd_add_interface(usbd_printer_init_intf(&intf0, printer_device_id, sizeof(printer_device_id)));
+    usbd_add_endpoint(&printer_out_ep);
+    usbd_add_endpoint(&printer_in_ep);
 
-  usbd_initialize();
+    usbd_initialize();
 }

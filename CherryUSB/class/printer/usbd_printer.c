@@ -6,7 +6,8 @@
 #include "usbd_core.h"
 #include "usbd_printer.h"
 
-struct printer_cfg_priv {
+struct printer_cfg_priv
+{
     const uint8_t *device_id;
     uint8_t device_id_len;
     uint8_t port_status;
@@ -18,7 +19,8 @@ static int printer_class_interface_request_handler(struct usb_setup_packet *setu
                 "bRequest 0x%02x\r\n",
                 setup->bRequest);
 
-    switch (setup->bRequest) {
+    switch (setup->bRequest)
+    {
         case PRINTER_REQUEST_GET_DEVICE_ID:
             memcpy(*data, usbd_printer_cfg.device_id, usbd_printer_cfg.device_id_len);
             *len = usbd_printer_cfg.device_id_len;
@@ -39,7 +41,8 @@ static int printer_class_interface_request_handler(struct usb_setup_packet *setu
 
 static void printer_notify_handler(uint8_t event, void *arg)
 {
-    switch (event) {
+    switch (event)
+    {
         case USBD_EVENT_RESET:
             break;
 

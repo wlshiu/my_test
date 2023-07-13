@@ -3,7 +3,8 @@
 
 #define WCID_VENDOR_CODE 0x01
 
-__ALIGN_BEGIN const uint8_t WCID_StringDescriptor_MSOS[18] __ALIGN_END = {
+__ALIGN_BEGIN const uint8_t WCID_StringDescriptor_MSOS[18] __ALIGN_END =
+{
     ///////////////////////////////////////
     /// MS OS string descriptor
     ///////////////////////////////////////
@@ -16,7 +17,8 @@ __ALIGN_BEGIN const uint8_t WCID_StringDescriptor_MSOS[18] __ALIGN_END = {
     0x00,                                       /* bReserved */
 };
 
-__ALIGN_BEGIN const uint8_t WINUSB_WCIDDescriptor[40] __ALIGN_END = {
+__ALIGN_BEGIN const uint8_t WINUSB_WCIDDescriptor[40] __ALIGN_END =
+{
     ///////////////////////////////////////
     /// WCID descriptor
     ///////////////////////////////////////
@@ -38,7 +40,8 @@ __ALIGN_BEGIN const uint8_t WINUSB_WCIDDescriptor[40] __ALIGN_END = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,             /* bReserved_6 */
 };
 
-struct usb_msosv1_descriptor msosv1_desc = {
+struct usb_msosv1_descriptor msosv1_desc =
+{
     .string = (uint8_t *)WCID_StringDescriptor_MSOS,
     .string_len = 18,
     .vendor_code = WCID_VENDOR_CODE,
@@ -61,7 +64,8 @@ struct usb_msosv1_descriptor msosv1_desc = {
 /*!< config descriptor size */
 #define USB_CONFIG_SIZE (9 + MTP_DESCRIPTOR_LEN)
 
-const uint8_t mtp_descriptor[] = {
+const uint8_t mtp_descriptor[] =
+{
     USB_DEVICE_DESCRIPTOR_INIT(USB_2_1, 0x00, 0x00, 0x00, USBD_VID, USBD_PID, 0x0201, 0x01),
     USB_CONFIG_DESCRIPTOR_INIT(USB_CONFIG_SIZE, 0x01, 0x01, USB_CONFIG_BUS_POWERED, USBD_MAX_POWER),
     MTP_DESCRIPTOR_INIT(0x00, CDC_OUT_EP, CDC_IN_EP, CDC_INT_EP, 2),
@@ -139,7 +143,8 @@ const uint8_t mtp_descriptor[] = {
     0x00
 };
 
-const uint8_t bos_descriptor[] = {
+const uint8_t bos_descriptor[] =
+{
     0x05, 0x0f, 0x16, 0x00, 0x02,
     0x07, 0x10, 0x02, 0x06, 0x00, 0x00, 0x00,
     0x0a, 0x10, 0x03, 0x00, 0x0f, 0x00, 0x01, 0x01, 0xf4, 0x01
@@ -151,7 +156,8 @@ void usbd_configure_done_callback(void)
 
 struct usbd_interface intf0;
 
-struct usb_bos_descriptor bos_desc = {
+struct usb_bos_descriptor bos_desc =
+{
     .string = bos_descriptor,
     .string_len = 22
 };
