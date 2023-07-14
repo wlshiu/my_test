@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_libusb" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_libusb" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DHAVE_CONFIG_H" />
+					<Add directory="libusb" />
+					<Add directory="libusb/include/libusb-1.0" />
+				</Compiler>
+				<Linker>
+					<Add option="-Wl,-u,___mingw_vsnprintf -Wl,--defsym,___ms_vsnprintf=___mingw_vsnprintf" />
+					<Add library="libusb/lib/libusb-1.0.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libadvapi32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libcomctl32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libkernel32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libodbc32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libodbccp32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libole32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/liboleaut32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libolecli32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/liboledlg.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libsetupapi.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libshell32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libuser32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libuuid.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libvfw32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libwinspool.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libmingw32.a" />
+					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libmingwex.a" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_libusb" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="libusb/config.h" />
+		<Unit filename="libusb/examples/listdevs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
