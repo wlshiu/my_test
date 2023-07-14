@@ -169,6 +169,9 @@
 + test_win32_mutex
     > mutex of win32 api
 
++ test_libusb
+    > use static lib on win32
+
 # MS Visual Studio
 
 + include libs
