@@ -172,6 +172,9 @@
 + test_libusb
     > use static lib on win32
 
++ test_recursive_combination
+    > 遞迴方式來搜尋 Pin 的組合
+
 # MS Visual Studio
 
 + include libs
