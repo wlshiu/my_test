@@ -175,6 +175,10 @@
 + test_recursive_combination
     > 遞迴方式來搜尋 Pin 的組合
 
++ test_gen_bin_pattern
+    > generate a binary file and insert other file
+
+
 # MS Visual Studio
 
 + include libs
