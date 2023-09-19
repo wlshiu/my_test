@@ -877,6 +877,32 @@ int main(int argc, char **argv)
                 break;
             }
 
+            if( !_strncasecmp(g_line_buf, "echo", strlen("echo"))  )
+            {
+                char        *pCur = &g_line_buf[strlen("echo")];
+                char        *pEnd = g_line_buf + strlen(g_line_buf);
+
+                while( pCur < pEnd )
+                {
+                    if( *pCur == '\"' || *pCur == '\'' )
+                    {
+                        pCur++;
+                        continue;
+                    }
+                    else if( strncmp(pCur, "\n", strlen("\n")) == 0 )
+                    {
+                        putchar('\n');
+                        pCur += 2;
+                        continue;
+                    }
+
+                    (*pCur);
+                    pCur++;
+                }
+
+                continue;
+            }
+
             if( !_strncasecmp(g_line_buf, "wait", strlen("wait")) ||
                 !_strncasecmp(g_line_buf, "delay", strlen("delay")) )
             {

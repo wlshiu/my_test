@@ -2,10 +2,16 @@
 
 bist rreg
 
+echo "\n==========\n"
+
 loop $i = 0x302, $j = 10; $i < 0x310, $j > 0; $i += 1, $j -=1
 
     rd 0x8040800 $i $j
 endloop
 
 
+wait 10
+
 # send   ./test.bin
+
+exit
