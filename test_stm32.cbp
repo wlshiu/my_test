@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_stm32" />
+		<Option pch_mode="2" />
+		<Option compiler="arm-elf-gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/test_stm32" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj" />
+				<Option type="5" />
+				<Option compiler="arm-elf-gcc" />
+				<Compiler>
+					<Add option="-mcpu=cortex-m3" />
+					<Add option="-g" />
+					<Add option="-gdwarf-2 -mthumb -fomit-frame-pointer -Wall -Wstrict-prototypes -fverbose-asm -Os" />
+					<Add option="-DSTM32F10X_HD" />
+					<Add option="-DUSE_STDPERIPH_DRIVER" />
+					<Add directory="Drivers/CMSIS/Include" />
+					<Add directory="Drivers/STM32F1xx_HAL_Driver" />
+					<Add directory="../test_stm32" />
+				</Compiler>
+				<Linker>
+					<Add option="-mthumb -nostartfiles -Tstm32f103vet6.ld -Wl,-Map=main.map,--cref,--no-warn-mismatch" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="C:\wl\tool_portable\msys64\home\gcc-arm-none-eabi-10-2020-q4-major\bin\arm-none-eabi-objcopy.exe -O ihex ${TARGET_OUTPUT_DIR}${PROJECT_NAME}.sys  ${TARGET_OUTPUT_DIR}${PROJECT_NAME}.hex" />
+					<Add after="C:\wl\tool_portable\msys64\home\gcc-arm-none-eabi-10-2020-q4-major\bin\arm-none-eabi-objcopy.exe -O binary -R .note -R .comment ${TARGET_OUTPUT_DIR}${PROJECT_NAME}.sys  ${TARGET_OUTPUT_DIR}${PROJECT_NAME}.bin" />
+					<Add after='cmd /c &quot;C:\wl\tool_portable\msys64\home\gcc-arm-none-eabi-10-2020-q4-major\bin\arm-none-eabi-objdump.exe&quot; -S ${TARGET_OUTPUT_DIR}${PROJECT_NAME}.sys &gt; ${TARGET_OUTPUT_DIR}${PROJECT_NAME}.asm' />
+					<Add after="C:\wl\tool_portable\msys64\home\gcc-arm-none-eabi-10-2020-q4-major\bin\arm-none-eabi-size.exe ${TARGET_OUTPUT_DIR}${PROJECT_NAME}.sys" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_stm32" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="arm-elf-gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="Drivers/CMSIS/Include/cmsis_gcc.h" />
+		<Unit filename="Drivers/CMSIS/Include/core_cm3.h" />
+		<Unit filename="Drivers/CMSIS/Include/core_cmFunc.h" />
+		<Unit filename="Drivers/CMSIS/Include/core_cmInstr.h" />
+		<Unit filename="Drivers/STM32F1xx_HAL_Driver/stm32f10x.h" />
+		<Unit filename="Drivers/STM32F1xx_HAL_Driver/stm32f10x_gpio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Drivers/STM32F1xx_HAL_Driver/stm32f10x_gpio.h" />
+		<Unit filename="Drivers/STM32F1xx_HAL_Driver/stm32f10x_rcc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Drivers/STM32F1xx_HAL_Driver/stm32f10x_rcc.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="startup_stm32f10x_hd.s" />
+		<Unit filename="stm32f103vet6.ld" />
+		<Unit filename="stm32f10x_conf.h" />
+		<Unit filename="stm32f10x_it.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="stm32f10x_it.h" />
+		<Unit filename="system_stm32f10x.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="system_stm32f10x.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger>
+				<remote_debugging target="Debug">
+					<options conn_type="0" serial_baud="115200" ip_address="localhost " ip_port="1234" additional_cmds="monitor halt&#x0A;load bin/STM32_Hello.elf&#x0A;monitor sleep 1000&#x0A;monitor reset" />
+				</remote_debugging>
+			</debugger>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
