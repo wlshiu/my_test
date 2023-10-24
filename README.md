@@ -178,6 +178,9 @@
 + test_gen_bin_pattern
     > generate a binary file and insert other file
 
++ test_stm32
+    > ARM development environment with CodeBlocks
+
 
 # MS Visual Studio
 
