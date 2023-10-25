@@ -181,6 +181,9 @@
 + test_stm32
     > ARM development environment with CodeBlocks
 
++ test_rsqrt
+    > fast the reciprocal of square root
+
 
 # MS Visual Studio
 
