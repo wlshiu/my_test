@@ -184,6 +184,8 @@
 + test_rsqrt
     > fast the reciprocal of square root
 
++ test_pt
+    > Protothreads
 
 # MS Visual Studio
 
