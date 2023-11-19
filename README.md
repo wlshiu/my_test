@@ -178,6 +178,15 @@
 + test_gen_bin_pattern
     > generate a binary file and insert other file
 
++ test_stm32
+    > ARM development environment with CodeBlocks
+
++ test_rsqrt
+    > fast the reciprocal of square root
+
++ test_pt
+    > Protothreads
+
 + test_pthread_win32
 + test_miniz
     > Miniz is a lossless, high performance data compression library in a single source file that implements the zlib (RFC 1950) and Deflate (RFC 1951) compressed data format specification standards.
