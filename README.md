@@ -178,6 +178,10 @@
 + test_gen_bin_pattern
     > generate a binary file and insert other file
 
++ test_pthread_win32
++ test_miniz
+    > Miniz is a lossless, high performance data compression library in a single source file that implements the zlib (RFC 1950) and Deflate (RFC 1951) compressed data format specification standards.
+    >> [richgel999/miniz](https://github.com/richgel999/miniz/tree/master)
 
 # MS Visual Studio
 
