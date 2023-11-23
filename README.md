@@ -4,6 +4,7 @@
 + test_avi
 + test_bslot
 + test_c_wrap_py
++ test_c_call_py
 + test_combination
 + test_crc32
 + test_crc16
