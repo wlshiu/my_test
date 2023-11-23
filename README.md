@@ -5,6 +5,34 @@
 + test_bslot
 + test_c_wrap_py
 + test_c_call_py
+
+    - install python core
+        > [Python Releases for Windows](https://www.python.org/downloads/windows/)
+
+        1. [Python FTP](https://www.python.org/ftp/python/)
+
+    - Code::Blocks
+
+        1. [Environment] -> [Environment Variables]
+            > Add new variables
+            > + `PYTHONPATH`: `C:\Python38-32\DLLs;C:\Python38-32\Lib;C:\Python38-32\Lib\site-packages`
+            > + `PYTHONHOME`: `.\`
+
+
+        1. [Linker Setting] -> [Link libraries]
+            > Add `...\Python38-32\libs\python38.lib`
+
+        1. [Search directories]
+
+            > `Compiler`
+            >> Add `...\Python38-32\include`
+
+            > `Linker`
+            >> + Add `...\Python38-32\DLLs`
+            >> + Add `...\Python38-32\libs`
+
+        1. Put `python38.dll` to the directory of compiled exe file
+
 + test_combination
 + test_crc32
 + test_crc16
