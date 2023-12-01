@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_qt5_cli" />
+		<Option pch_mode="2" />
+		<Option compiler="qt_gnu_gcc_compiler" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_qt5_cli" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="qt_gnu_gcc_compiler" />
+				<Option parameters="--key 測試 --input 123" />
+				<Compiler>
+					<Add option="-std=c++0x" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="-mconsole" />
+					<Add option="-Wl,-subsystem,console" />
+					<Add library="../../../../../../../../../Qt/QT_5.14.2_static/lib/libqtmain.a" />
+					<Add library="../../../../../../../../../Qt/QT_5.14.2_static/plugins/platforms/libqwindows.a" />
+					<Add library="../../../../../../../../../Qt/QT_5.14.2_static/lib/libqtlibpng.a" />
+					<Add library="../../../../../../../../../Qt/QT_5.14.2_static/lib/libqtharfbuzz.a" />
+					<Add library="../../../../../../../../../Qt/QT_5.14.2_static/lib/libQt5Core.a" />
+					<Add library="../../../../../../../../../Qt/QT_5.14.2_static/lib/libqtpcre2.a" />
+					<Add library="../../../../../../../../../Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libmpr.a" />
+					<Add library="../../../../../../../../../Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libuserenv.a" />
+					<Add library="../../../../../../../../../Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libversion.a" />
+					<Add library="../../../../../../../../../Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libnetapi32.a" />
+					<Add library="../../../../../../../../../Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libws2_32.a" />
+					<Add library="../../../../../../../../../Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libadvapi32.a" />
+					<Add library="../../../../../../../../../Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libkernel32.a" />
+					<Add library="../../../../../../../../../Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libole32.a" />
+					<Add library="../../../../../../../../../Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libshell32.a" />
+					<Add library="../../../../../../../../../Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libuuid.a" />
+					<Add library="../../../../../../../../../Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libuser32.a" />
+					<Add library="../../../../../../../../../Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libwinmm.a" />
+					<Add directory="../../../../../../../../../Qt/QT_5.14.2_static/plugins" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_qt5_cli" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="qt_gnu_gcc_compiler" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/ActiveQt" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtCLucene" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtConcurrent" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtCore" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtDeclarative" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtDesigner" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtDesignerComponents" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtGui" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtHelp" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtMultimedia" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtMultimediaQuick_p" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtMultimediaWidgets" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtNetwork" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtOpenGL" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtOpenGLExtensions" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtPlatformSupport" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtPrintSupport" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtQml" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtQuick" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtQuickParticles" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtQuickTest" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtScript" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtScriptTools" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtSensors" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtSerialPort" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtSql" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtSvg" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtTest" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtUiTools" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtV8" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtWebKit" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtWebKitWidgets" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtWidgets" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtXml" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtXmlPatterns" />
+			<Add directory="C:/Qt/QT_5.14.2_static/include/QtZlib" />
+		</Compiler>
+		<Linker>
+			<Add library="libQt5Core" />
+			<Add library="libQt5Gui" />
+			<Add library="libQt5Widgets" />
+			<Add directory="C:/Qt/QT_5.14.2_static/lib" />
+		</Linker>
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

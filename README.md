@@ -196,6 +196,111 @@
 + test_qt5_cli
     > only use unicode of QT5 to implement CLI
 
+    - Setup CodeBlocks IDE
+        > The default encoding of CodeBlocks console project is ASIC, you should use terminal, which supports UTF8, to execute.
+
+        1. Create toolchain
+            > [Settings]->[Compiler]->[Copy GCC]->
+
+            * Tab [toolchain executables]
+
+            ```
+            compiler's installation directory = 'C:\Qt\Tools\mingw730_32\bin'
+            c compiler              = gcc.exe
+            c++ compiler            = g++.exe
+            linker for dynamic libs = g++.exe
+            linker for static libs  = ar.exe
+            debugger                = [select your gdb for qt]
+            * others no change
+            ```
+
+            * Tab [Search directories]
+
+            > + `Compiler`
+            >> + add `C:\Qt\QT_5.14.2_static\mingw73_32\include`
+            >> + add `C:\Qt\Tools\mingw730_32\include`
+
+            > + `Linker`
+            >> + `C:\Qt\QT_5.14.2_static\mingw73_32\lib`
+            >> + `C:\Qt\Tools\mingw730_32\lib`
+
+            * Tab [Linker Setting]
+            > add libs `C:\Qt\...\lib\libxxx.a`
+
+            ```
+			Qt/QT_5.14.2_static/lib/libQt5Core.a
+			Qt/QT_5.14.2_static/lib/libqtpcre2.a
+			Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libmpr.a
+			Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libuserenv.a
+			Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libversion.a
+			Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libnetapi32.a
+			Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libws2_32.a
+			Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libadvapi32.a
+			Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libkernel32.a
+			Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libole32.a
+			Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libshell32.a
+			Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libuuid.a
+			Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libuser32.a
+			Qt/Tools/mingw730_32/i686-w64-mingw32/lib/libwinmm.a
+            ```
+
+        1. Set global environment variables
+            > [Setting]->[Environment]->[Environment variables]
+
+            * create
+
+            ```
+            key   : PATH
+            value : C:\Qt\Tools\mingw730_32\bin;%PATH%;
+
+            ps. press 'Set now'
+            ```
+
+        1. Set global variables
+            > [Setting]->[Global variables]->[New]
+
+            ```
+            base    = C:\Qt\Tools\mingw730_32\
+            include = C:\Qt\Tools\mingw730_32\include
+            lib     = C:\Qt\Tools\mingw730_32\lib
+            bin     = C:\Qt\Tools\mingw730_32\bin
+            ```
+
+        1. Set debugger
+            > [Setting]->[Debugger]->[GDB/CDB debugger]
+
+            * Create Config
+
+            ```
+            Executable path = C:\Qt\Tools\mingw730_32\bin\gdb.exe
+            ```
+
+        1. Set Qt qmake (if use qmake)
+            > [Tools]->[Configure tools]
+
+            * `qmake -project static`
+
+            ```
+            name                = 'qmake -project static'
+            Executable          = 'C:\Qt\QT_5.14.2_static\bin\qmake.exe'
+            Parameters          = '-project'
+            Working directory   = '${{PROJECT_DIR}}'
+
+            select 'Launch tool hidden with standard output redirected'
+
+            ```
+
+            * `qmake static`
+
+            ```
+            name                = 'qmake static'
+            Executable          = 'C:\Qt\QT_5.14.2_static\bin\qmake.exe'
+            Parameters          = ''
+            Working directory   = '${{PROJECT_DIR}}'
+
+            select 'Launch tool hidden with standard output redirected'
+            ```
+
 # MS Visual Studio
 
 + include libs
@@ -205,10 +310,10 @@
         > Windows Sockets應用程序接口, 用於支持Internet和網絡應用程序
         >>　bsd socket api, WSAxxx api
 
-    ```
-    #include <winsock2.h>
-    #pragma comment (lib, "ws2_32.lib")  //加載 ws2_32.dll
-    ```
+        ```
+        #include <winsock2.h>
+        #pragma comment (lib, "ws2_32.lib")  //加載 ws2_32.dll
+        ```
 
     - `comctl32.lib`
         > 提供各種標準視窗介面元件.它提供對話框如開啟檔案, 存檔及另存新檔, 或視窗元件如按鈕和進度列.它倚靠 user32.dll 和 Gdi32.dll 來建立及管理這些介面元素
