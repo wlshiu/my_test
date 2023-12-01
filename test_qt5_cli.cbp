@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="qt_gnu_gcc_compiler" />
-				<Option parameters="--key 測試 --input 123" />
+				<Option parameters="--key 123 --input 測試檔.bin" />
 				<Compiler>
 					<Add option="-std=c++0x" />
 					<Add option="-g" />
