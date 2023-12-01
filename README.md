@@ -193,6 +193,9 @@
     > Miniz is a lossless, high performance data compression library in a single source file that implements the zlib (RFC 1950) and Deflate (RFC 1951) compressed data format specification standards.
     >> [richgel999/miniz](https://github.com/richgel999/miniz/tree/master)
 
++ test_qt5_cli
+    > only use unicode of QT5 to implement CLI
+
 # MS Visual Studio
 
 + include libs
