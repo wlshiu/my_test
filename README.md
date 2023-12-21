@@ -196,6 +196,9 @@
 + test_qt5_cli
     > only use unicode of QT5 to implement CLI
 
++ test_py_call_c
+    > python call C API with share object
+
 # MS Visual Studio
 
 + include libs
