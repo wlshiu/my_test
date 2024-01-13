@@ -199,6 +199,9 @@
 + test_py_call_c
     > python call C API with share object
 
++ test_SystemC
+    > [systemc-2.3.3](https://github.com/accellera-official/systemc)
+
 # MS Visual Studio
 
 + include libs
