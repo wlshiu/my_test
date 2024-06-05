@@ -15,11 +15,7 @@
 					<Add option="-g" />
 					<Add option="-DWIN32_LEAN_AND_MEAN" />
 					<Add directory="inc" />
-					<Add directory="../../../../_portable/codeblocks-17.12mingw/MinGW/include" />
 				</Compiler>
-				<Linker>
-					<Add library="../../../../_portable/codeblocks-17.12mingw/MinGW/lib/libpthread.a" />
-				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/test_xml2" prefix_auto="1" extension_auto="1" />
@@ -37,6 +33,15 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="ex_create_xml.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ex_parse_xml.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ex_search_xml_node.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
