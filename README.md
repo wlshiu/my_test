@@ -219,6 +219,9 @@
 + test_tinySSL
 + test_easytlv
 
++ test_Qfplib
+    > for arm cortex-m0+
+
 # MS Visual Studio
 
 + include libs
