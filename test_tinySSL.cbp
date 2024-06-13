@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_tinySSL" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_tinySSL" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DTEST_CERT" />
+					<Add directory="tinySSL/include" />
+					<Add directory="tinySSL/src" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_tinySSL" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/include/BN.h" />
+		<Unit filename="tinySSL/include/cert.h" />
+		<Unit filename="tinySSL/include/cipher.h" />
+		<Unit filename="tinySSL/include/md5.h" />
+		<Unit filename="tinySSL/include/rc4.h" />
+		<Unit filename="tinySSL/include/sha1.h" />
+		<Unit filename="tinySSL/include/sha256.h" />
+		<Unit filename="tinySSL/include/ssl.h" />
+		<Unit filename="tinySSL/src/BN.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/cert.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/certSamples.h" />
+		<Unit filename="tinySSL/src/cipher.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/clientMsg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/clientMsg.h" />
+		<Unit filename="tinySSL/src/endian.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/endian.h" />
+		<Unit filename="tinySSL/src/hmac.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/hmac.h" />
+		<Unit filename="tinySSL/src/md5.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/msecret.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/msecret.h" />
+		<Unit filename="tinySSL/src/rc4.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/serverMsg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/serverMsg.h" />
+		<Unit filename="tinySSL/src/sha1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/sha256.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/ssl.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/sslServer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/sslServer.h" />
+		<Unit filename="tinySSL/src/sslTest.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tinySSL/src/sslTest.h" />
+		<Unit filename="tinySSL/src/ssl_int.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
