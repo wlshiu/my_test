@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_flashDB" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_flashDB" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DFDB_USING_KVDB" />
+					<Add option="-DFDB_USING_TSDB" />
+					<Add directory="FlashDB/inc" />
+					<Add directory="port/fal/inc" />
+					<Add directory="../my_test" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_flashDB" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="FlashDB/inc/fdb_def.h" />
+		<Unit filename="FlashDB/inc/fdb_low_lvl.h" />
+		<Unit filename="FlashDB/inc/flashdb.h" />
+		<Unit filename="FlashDB/src/fdb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="FlashDB/src/fdb_file.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="FlashDB/src/fdb_kvdb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="FlashDB/src/fdb_tsdb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="FlashDB/src/fdb_utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="fal_cfg.h" />
+		<Unit filename="fdb_cfg.h" />
+		<Unit filename="kvdb_basic_sample.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="kvdb_type_blob_sample.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="kvdb_type_string_sample.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="port/fal/inc/fal.h" />
+		<Unit filename="port/fal/inc/fal_def.h" />
+		<Unit filename="port/fal/samples/porting/fal_flash_sim_port.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="port/fal/src/fal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="port/fal/src/fal_flash.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="port/fal/src/fal_partition.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tsdb_sample.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
