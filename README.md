@@ -216,6 +216,8 @@
 + test_ppm
     > read ppm file (color image) and convert
 
++ test_tinySSL
++ test_easytlv
 
 # MS Visual Studio
 
