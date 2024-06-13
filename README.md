@@ -26,6 +26,7 @@
     - [reference](https://github.com/wlshiu/tftpx)
 + test_uip
 + test_elf2
++ test_elf_axf
 + test_shell
     - It MUST be on Windows 10 platform
         > support `ENABLE_VIRTUAL_TERMINAL_PROCESSING`
@@ -221,6 +222,10 @@
 
 + test_Qfplib
     > for arm cortex-m0+
+
++ test_flashDB
++ test_mempool
+    > handle malloc/free in a mempool
 
 # MS Visual Studio
 
