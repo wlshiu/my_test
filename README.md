@@ -229,7 +229,8 @@
 
 + test_makefile
     > makefele example
-
+    > + [Make - 作業部落 Cmd Markdown 編輯閱讀器](https://www.zybuluo.com/xiaohaizi/note/2322843)
+    > + [GNU Make 4.4 簡體中文](https://runebook.dev/zh/docs/gnu_make/-index-)
 
 # MS Visual Studio
 
