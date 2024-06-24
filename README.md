@@ -227,6 +227,10 @@
 + test_mempool
     > handle malloc/free in a mempool
 
++ test_makefile
+    > makefele example
+
+
 # MS Visual Studio
 
 + include libs
