@@ -230,6 +230,8 @@
 + test_makefile
     > makefele example
 
++ test_sqrt
+    > implement sqrt version
 
 # MS Visual Studio
 
