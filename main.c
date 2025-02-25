@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 
+extern void cordic_sincos(int theta,
+                   int *sin_result,
+                   int *cos_result,
+                   char iterations);
+
 //#include "cordic-32bit.h"
 #include "cordic-16bit.h"
 
@@ -59,7 +64,8 @@ int gen_cordic_table(void)
 int main(int argc, char **argv)
 {
     double p;
-    int s, c;
+    int sin_rst_1, sin_rst_2;
+    int cos_rst_1, cos_rst_2;
     int i;
 
     gen_cordic_table();
@@ -73,10 +79,11 @@ int main(int argc, char **argv)
 
         theta = p * MUL;
         //use 32 iterations
-        cordic(theta, &s, &c, 32);
+        cordic(theta, &sin_rst_1, &cos_rst_1, 32);
+//        cordic_sincos(theta, &sin_rst_2, &cos_rst_2, 32);
 
         //these values should be nearly equal
-        printf("theta %d: %f vs. %f\n", theta, s / MUL, sin(p));
+        printf("theta %d: %f, %f vs. %f\n", theta, sin_rst_1/MUL, sin(p));
     }
 
     return 0;

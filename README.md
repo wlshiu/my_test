@@ -234,7 +234,8 @@
     > implement sqrt version
     
 + test_sw_cordic
-    > ref. [Simple C source for CORDIC](https://www.dcs.gla.ac.uk/~jhw/cordic/)
+    > + ref. [Simple C source for CORDIC](https://www.dcs.gla.ac.uk/~jhw/cordic/)
+    > + ref. [MSP430-CORDIC-sine-cosine](https://github.com/the0b/MSP430-CORDIC-sine-cosine/blob/master/cordic.c)
 
 # MS Visual Studio
 
