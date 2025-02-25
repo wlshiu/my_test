@@ -232,6 +232,9 @@
 
 + test_sqrt
     > implement sqrt version
+    
++ test_sw_cordic
+    > ref. [Simple C source for CORDIC](https://www.dcs.gla.ac.uk/~jhw/cordic/)
 
 # MS Visual Studio
 
