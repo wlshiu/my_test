@@ -39,7 +39,6 @@
 // Table of arctan's for use with CORDIC algorithm
 // Store in decimal representation N = ((2^16)*angle_deg) / 180
 #define ATAN_TAB_N 16
-
 int atantable[ATAN_TAB_N] = {  0x4000,   //atan(2^0) = 45 degrees
                                0x25C8,   //atan(2^-1) = 26.5651
                                0x13F6,   //atan(2^-2) = 14.0362
@@ -67,9 +66,9 @@ int atantable[ATAN_TAB_N] = {  0x4000,   //atan(2^0) = 45 degrees
 //  *cos_result = pointer to where you want the cosine result
 
 void cordic_sincos(int theta,
+                   char iterations,
                    int *sin_result,
-                   int *cos_result,
-                   char iterations)
+                   int *cos_result)
 {
     int sigma, s, x1, x2, y, i, quadAdj, shift;
     int *atanptr = atantable;

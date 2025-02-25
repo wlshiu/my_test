@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 
     gen_cordic_table();
 
-    printf("codic : math\n");
+    printf("codic vs. math\n");
     for(i = -50; i < 50; i++)
     {
         int     theta = 0;
@@ -80,10 +80,10 @@ int main(int argc, char **argv)
         theta = p * MUL;
         //use 32 iterations
         cordic(theta, &sin_rst_1, &cos_rst_1, 32);
-//        cordic_sincos(theta, &sin_rst_2, &cos_rst_2, 32);
+        cordic_sincos(theta, &sin_rst_2, &cos_rst_2, 32);
 
         //these values should be nearly equal
-        printf("theta %d: %f, %f vs. %f\n", theta, sin_rst_1/MUL, sin(p));
+        printf("theta %d: %f, %f vs. %f\n", theta, sin_rst_1/MUL, sin_rst_2/(float)(1 << 15), sin(p));
     }
 
     return 0;
