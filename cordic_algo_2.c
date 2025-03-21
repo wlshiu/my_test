@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     SinCosSetup();
 
     // 10 degrees, 20 degrees, 30 degrees, and 40 degrees.
-    for (theta_degrees = 10; theta_degrees < 50; theta_degrees += 10)
+    for (theta_degrees = 0; theta_degrees < 360; theta_degrees += 1)
     {
         theta_cau = (theta_degrees * CAU_BASE + 180) / 360;
         SinCos(theta_cau, &sine, &cosine);
@@ -92,7 +92,7 @@ void SinCosSetup(void)
     powr = 1;
     for (i = 0; i < NBITS; i++)
     {
-        ArcTan[i] = (int) (atan(1.0/powr)/(M_PI/2)*CordicBase + 0.5);
+        ArcTan[i] = (int) (atan(1.0/powr) / (M_PI/2) * CordicBase + 0.5);
         powr <<= 1;
     }
 
@@ -123,6 +123,8 @@ void SinCosSetup(void)
     }
     f = 1.0/sqrt(f);
     xInit = (int) (CordicBase * f + 0.5);
+
+    return;
 }
 
 /**
