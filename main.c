@@ -11,7 +11,7 @@
 #define rad2degree(__rad__)         (int)(((__rad__) * 180)/3.141592f)
 #define degree2rad(__degree__)      (((__degree__) * 3.141592f) / 180)
 
-//#define M_PI 3.1415926535897932384626
+#define M_PI 3.1415926535897932384626
 #define K1 0.6072529350088812561694
 
 uint8_t _clz(uint32_t x)
@@ -209,7 +209,7 @@ void cordic_sincos_ex(int32_t q15_degree, int32_t *pSin_q15_val, int32_t *pCos_q
 int main(int argc, char **argv)
 {
     FILE    *fout = 0;
-    float   target_err_rate = 0.1f;
+    float   target_err_rate = 0.2f;
     float   phase;
     int sin_val, cos_val;
 
@@ -220,7 +220,7 @@ int main(int argc, char **argv)
     fprintf(fout, "ideal_sin, sim_sin, ideal_cos, sim_cos\n");
 #endif // 0
 
-#if 1
+#if 0
     for(float degree = 0.0f; degree <= 360.0f; degree += 0.1f)
     {
         float   sim_sin = 0.0f;
@@ -248,12 +248,18 @@ int main(int argc, char **argv)
 
         #if 1
         err_rate = fabs(sim_sin - ideal_sin) * 100 / fabs(ideal_sin);
-        printf("%5d degree sin: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
+        printf("%3.6f degree sin: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
                degree, sim_sin, ideal_sin, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
 
+        if( fabs(err_rate) > target_err_rate )
+            printf("\n");
+
         err_rate = fabs(sim_cos - ideal_cos) * 100 / fabs(ideal_cos);
-        printf("%5d degree cos: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
+        printf("%3.6f degree cos: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
                degree, sim_cos, ideal_cos, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
+
+        if( fabs(err_rate) > target_err_rate )
+            printf("\n");
         #else
         if( fout )
         {
@@ -262,10 +268,11 @@ int main(int argc, char **argv)
         }
 
         #endif
+
     }
 #else
 
-    for(float degree = 0.0f; degree <= 360.0f; degree += 0.1f)
+    for(float degree = 0.0f; degree <= 360.0f; degree += 1.0f)
     {
         float   sim_sin = 0.0f;
         float   ideal_sin = 0.0f;
@@ -328,14 +335,21 @@ int main(int argc, char **argv)
         #endif
 
 
-        #if 0
+        #if 1
         err_rate = fabs(sim_sin - ideal_sin) * 100 / fabs(ideal_sin);
-        printf("%5d degree sin: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
-               degree, sim_sin, ideal_sin, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
+        printf("%3.6f degree sin: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
+               (float)degree, sim_sin, ideal_sin, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
+
+        if( fabs(err_rate) > target_err_rate )
+            printf("\n");
 
         err_rate = fabs(sim_cos - ideal_cos) * 100 / fabs(ideal_cos);
-        printf("%5d degree cos: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
-               degree, sim_cos, ideal_cos, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
+        printf("%3.6f degree cos: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
+               (float)degree, sim_cos, ideal_cos, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
+
+        if( fabs(err_rate) > target_err_rate )
+            printf("\n");
+
         #else
         if( fout )
         {
