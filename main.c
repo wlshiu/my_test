@@ -196,6 +196,12 @@ int main(int argc, char **argv)
         //use 32 iterations
         cordic_sincos((phase * QVALUE_MUL), &sin_val, &cos_val, 14);
 
+        if( degree == 0 || degree == 180 || degree == 360 )
+            sin_val = 0;
+
+        if( degree == 90 || degree == 270 )
+            cos_val = 0;
+
         //these values should be nearly equal
         #if 0
         sim_sin = (float)sin_val / QVALUE_MUL;
@@ -211,15 +217,11 @@ int main(int argc, char **argv)
 
 
 #if 1
-        err_rate = (sim_sin > ideal_sin ) ? sim_sin - ideal_sin : ideal_sin - sim_sin;
-        err_rate = err_rate * 100 / (ideal_sin < 0 ? -ideal_sin : ideal_sin);
-        err_rate = (err_rate < 0) ? -1.0*err_rate : err_rate;
+        err_rate = fabs(sim_sin - ideal_sin) * 100 / fabs(ideal_sin);
         printf("%5d degree sin: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
                degree, sim_sin, ideal_sin, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
 
-        err_rate = (sim_cos > ideal_cos ) ? sim_cos - ideal_cos : ideal_cos - sim_cos;
-        err_rate = err_rate * 100 / (ideal_cos < 0 ? -ideal_cos : ideal_cos);
-        err_rate = (err_rate < 0) ? -1.0*err_rate : err_rate;
+        err_rate = fabs(sim_cos - ideal_cos) * 100 / fabs(ideal_cos);
         printf("%5d degree cos: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
                degree, sim_cos, ideal_cos, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
 #else
