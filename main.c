@@ -191,13 +191,13 @@ void cordic_sincos_ex(int32_t q15_degree, int32_t *pSin_q15_val, int32_t *pCos_q
      }
 
     if( q15_degree == Q15(0) || q15_degree == Q15(180) || q15_degree == Q15(360) )
-        x = 0;
-
-    if( q15_degree == Q15(90) || q15_degree == Q15(270) )
         y = 0;
 
-    if( pCos_q15_val )  *pCos_q15_val = sign_sin * x;
-    if( pSin_q15_val )  *pSin_q15_val = sign_cos * y;
+    if( q15_degree == Q15(90) || q15_degree == Q15(270) )
+        x = 0;
+
+    if( pSin_q15_val )  *pSin_q15_val = sign_sin * y;
+    if( pCos_q15_val )  *pCos_q15_val = sign_cos * x;
 
     return;
 }
@@ -220,7 +220,7 @@ int main(int argc, char **argv)
     fprintf(fout, "ideal_sin, sim_sin, ideal_cos, sim_cos\n");
 #endif // 0
 
-#if 0
+#if 1
     for(float degree = 0.0f; degree <= 360.0f; degree += 0.1f)
     {
         float   sim_sin = 0.0f;
@@ -246,7 +246,7 @@ int main(int argc, char **argv)
         #endif
 
 
-        #if 0
+        #if 1
         err_rate = fabs(sim_sin - ideal_sin) * 100 / fabs(ideal_sin);
         printf("%5d degree sin: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
                degree, sim_sin, ideal_sin, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
