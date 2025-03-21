@@ -92,6 +92,7 @@ int gen_cordic_table(void)
     return 0;
 }
 
+static int32_t      g_theta[2] = {0};
 //========================================================
 /**
  *  CORDIC in 16 bit signed fixed point math
@@ -123,6 +124,10 @@ void cordic_sincos(int32_t q15_theta, int32_t *pSin_q15_val, int32_t *pCos_q15_v
     int32_t x = CORDIC_1K, y = 0;
 
     n = (n > CORDIC_NTAB) ? CORDIC_NTAB : n;
+
+    g_theta[0] = q15_theta;
+
+
     for(int k = 0; k < n; ++k)
     {
         d = q15_theta >> 15;
@@ -140,6 +145,62 @@ void cordic_sincos(int32_t q15_theta, int32_t *pSin_q15_val, int32_t *pCos_q15_v
     *pSin_q15_val = y;
     return;
 }
+
+void cordic_sincos_ex(int32_t q15_degree, int32_t *pSin_q15_val, int32_t *pCos_q15_val, int8_t n)
+{
+    int32_t     d, tx, ty, tz;
+    int32_t     x = CORDIC_1K, y = 0;
+    int32_t     q15_theta;
+    int8_t      sign_sin = 1, sign_cos = 1;
+
+    n = (n > CORDIC_NTAB) ? CORDIC_NTAB : n;
+
+    if( q15_degree >= Q15(0) && q15_degree <= Q15(90) )
+    {
+        q15_theta = q15_degree * M_PI / 180;
+    }
+    else if( q15_degree > Q15(90) && q15_degree <= Q15(180) )
+    {
+        sign_cos = -1;
+        q15_theta = (Q15(180) - q15_degree) * M_PI / 180;
+    }
+    else if( q15_degree > Q15(180) && q15_degree <= Q15(270) )
+    {
+        sign_sin = -1;
+        sign_cos = -1;
+        q15_theta = (q15_degree - Q15(180)) * M_PI / 180;
+    }
+    else if( q15_degree > Q15(270) && q15_degree <= Q15(360) )
+    {
+        q15_theta = (q15_degree - Q15(360)) * M_PI / 180;
+    }
+
+    g_theta[1] = q15_theta;
+
+    for(int k = 0; k < n; ++k)
+    {
+        d = q15_theta >> 15;
+        //get sign. for other architectures, you might want to use the more portable version
+        d = (q15_theta >= 0) ? 0 : -1;
+        tx = x - (((y >> k) ^ d) - d);
+        ty = y + (((x >> k) ^ d) - d);
+        tz = q15_theta - ((g_cordic_ctab[k] ^ d) - d);
+        x = tx;
+        y = ty;
+        q15_theta = tz;
+     }
+
+    if( q15_degree == Q15(0) || q15_degree == Q15(180) || q15_degree == Q15(360) )
+        x = 0;
+
+    if( q15_degree == Q15(90) || q15_degree == Q15(270) )
+        y = 0;
+
+    if( pCos_q15_val )  *pCos_q15_val = sign_sin * x;
+    if( pSin_q15_val )  *pSin_q15_val = sign_cos * y;
+
+    return;
+}
 //========================================================
 
 #define QVALUE_MUL      CORDIC_Q15_MUL
@@ -154,10 +215,57 @@ int main(int argc, char **argv)
 
 //    gen_cordic_table();
 
+#if 1
     fout = fopen("sin_cos.csv", "w");
     fprintf(fout, "ideal_sin, sim_sin, ideal_cos, sim_cos\n");
+#endif // 0
 
-    for(int degree = 0; degree <= 360; degree++)
+#if 0
+    for(float degree = 0.0f; degree <= 360.0f; degree += 0.1f)
+    {
+        float   sim_sin = 0.0f;
+        float   ideal_sin = 0.0f;
+        float   ideal_cos = 0.0f;
+        float   sim_cos = 0.0f;
+        float   err_rate = 0.0f;
+
+        //use 32 iterations
+        cordic_sincos_ex((degree * QVALUE_MUL), &sin_val, &cos_val, 14);
+
+        //these values should be nearly equal
+        #if 0
+        sim_sin = (float)sin_val / QVALUE_MUL;
+        sim_cos = (float)cos_val / QVALUE_MUL;
+        ideal_sin = sin(phase);
+        ideal_cos = cos(phase);
+        #else
+        sim_sin = (float)sin_val;
+        sim_cos = (float)cos_val;
+        ideal_sin = sin(degree2rad(degree)) * QVALUE_MUL;
+        ideal_cos = cos(degree2rad(degree)) * QVALUE_MUL;
+        #endif
+
+
+        #if 0
+        err_rate = fabs(sim_sin - ideal_sin) * 100 / fabs(ideal_sin);
+        printf("%5d degree sin: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
+               degree, sim_sin, ideal_sin, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
+
+        err_rate = fabs(sim_cos - ideal_cos) * 100 / fabs(ideal_cos);
+        printf("%5d degree cos: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
+               degree, sim_cos, ideal_cos, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
+        #else
+        if( fout )
+        {
+            fprintf(fout, "%f, %f, %f, %f\n",
+                    ideal_sin, sim_sin, ideal_cos, sim_cos);
+        }
+
+        #endif
+    }
+#else
+
+    for(float degree = 0.0f; degree <= 360.0f; degree += 0.1f)
     {
         float   sim_sin = 0.0f;
         float   ideal_sin = 0.0f;
@@ -195,6 +303,10 @@ int main(int argc, char **argv)
 
         //use 32 iterations
         cordic_sincos((phase * QVALUE_MUL), &sin_val, &cos_val, 14);
+        cordic_sincos_ex((degree * QVALUE_MUL), 0, 0, 14);
+
+        if( g_theta[0] != g_theta[1] )
+            printf("\n");
 
         if( degree == 0 || degree == 180 || degree == 360 )
             sin_val = 0;
@@ -216,7 +328,7 @@ int main(int argc, char **argv)
         #endif
 
 
-#if 1
+        #if 0
         err_rate = fabs(sim_sin - ideal_sin) * 100 / fabs(ideal_sin);
         printf("%5d degree sin: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
                degree, sim_sin, ideal_sin, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
@@ -224,11 +336,16 @@ int main(int argc, char **argv)
         err_rate = fabs(sim_cos - ideal_cos) * 100 / fabs(ideal_cos);
         printf("%5d degree cos: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
                degree, sim_cos, ideal_cos, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
-#else
-        fprintf(fout, "%f, %f, %f, %f\n",
-                ideal_sin, sim_sin, ideal_cos, sim_cos);
-#endif
+        #else
+        if( fout )
+        {
+            fprintf(fout, "%f, %f, %f, %f\n",
+                    ideal_sin, sim_sin, ideal_cos, sim_cos);
+        }
+        #endif
     }
+
+#endif // 1
 
     if( fout )  fclose(fout);
 
