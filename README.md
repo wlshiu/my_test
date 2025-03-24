@@ -242,6 +242,9 @@
 + test_tim2pwm
     > generate PWM waveform depend on the register values of timer
 
++ test_sw_cordic_arm
+    > use DSP-lib of ARM
+
 # MS Visual Studio
 
 + include libs
