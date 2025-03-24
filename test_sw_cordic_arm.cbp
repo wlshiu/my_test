@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_sw_cordic_arm" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_sw_cordic_arm" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="dsp/inc" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_sw_cordic_arm" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="dsp/arm_abs_q15.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_abs_q31.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_atan2_f32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_atan2_q15.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_atan2_q31.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_common_tables.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_cos_f32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_cos_q15.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_cos_q31.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_divide_q15.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_divide_q31.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_sin_cos_f32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_sin_cos_q31.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_sin_f32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_sin_q15.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_sin_q31.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_sqrt_q15.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/arm_sqrt_q31.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="dsp/inc/arm_common_tables.h" />
+		<Unit filename="dsp/inc/arm_math_types.h" />
+		<Unit filename="dsp/inc/basic_math_functions.h" />
+		<Unit filename="dsp/inc/controller_functions.h" />
+		<Unit filename="dsp/inc/fast_math_functions.h" />
+		<Unit filename="dsp/inc/none.h" />
+		<Unit filename="dsp/inc/utils.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
