@@ -239,6 +239,9 @@
 + test_riscv_isa_sim
     > ref. [Build RISC-V Instruction Set Simulator from scratch](file:///C:/Users/wl_hsu/AppData/Local/Temp/7zO0CB1E7A8/Build%20RISC-V%20Instruction%20Set%20Simulator%20from%20scratch%20-%20HackMD.html)
 
++ test_tim2pwm
+    > generate PWM waveform depend on the register values of timer
+
 # MS Visual Studio
 
 + include libs
