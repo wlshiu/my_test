@@ -93,7 +93,7 @@ static inline float range_to_0_360(float degree)
 //                  Private Function Definition
 //=============================================================================
 
-#define CORDIC_MAXITER  16
+#define CORDIC_MAXITER  16 // 16
 #define CORDIC_PI       0x10000000
 
 int CORDIC_ZTBL[] = {
@@ -102,7 +102,7 @@ int CORDIC_ZTBL[] = {
     0x000145F3, 0x0000A2FA, 0x0000517D, 0x000028BE, 0x0000145F, 0x00000A30
 };
 
-int fxpt_atan2(int y, int x)
+int fxpt_atan2(int32_t y, int32_t x)
 {
 	int k, tx, z = 0, fl = 0;
 
@@ -307,27 +307,24 @@ _test_arm_cordic_rotation(void)
 int main()
 {
 #if 1
-	for (int i = 0; i < 360; i += 1)
+	for(float degree = 0; degree < 360.0f; degree += 0.1f)
     {
-		int16_t     cos_val = 32767.0f * cos((float)i * PI / 180.0f);
-		int16_t     sin_val = 32767.0f * sin((float)i * PI / 180.0f);
-		uint32_t    atan2_clocks = 0;
-		uint32_t    atan2f_clocks = 0;
-		uint32_t    fxpt_at2_clocks = 0;
+		int32_t     cos_val = Q30(cos((float)degree * PI / 180.0f));
+		int32_t     sin_val = Q30(sin((float)degree * PI / 180.0f));
 
-		int16_t at2f = 32767.0f * (float)atan2f((float)sin_val, (float)cos_val) / PI;
+		int16_t     at2f = Q15((float)atan2f((float)sin_val, (float)cos_val) / PI);
 
+		int16_t     fxpt_at2 = fxpt_atan2(sin_val, cos_val) >> 13;
 
-		int16_t fxpt_at2 = fxpt_atan2(sin_val << 15, cos_val << 15) >> 13;
+		float       diff = 100.0f*fabs(at2f - fxpt_at2) /fabs(at2f);
 
+		int16_t     iang = 2 * 32767.0f * degree / 360.0f;
 
-		//float dif = 100.0f*abs(at2-fxpt_at2)/at2;
+		printf(" degree = %3.6f(%i), fxpt_atan2 = %d, atan2f = %d, sin_val= %d cos_val= %d, err_rate= %5.6f\n",
+				(float)degree, iang, fxpt_at2, at2f, sin_val, cos_val, diff);
 
-		int16_t iang = 2 * 32767.0f * i / 360.0f;
-
-		printf(
-				" angle = %i(%i), fxpt_atan2 = %i, atan2f = %i, sn= %i cs=%i \n",
-				i, iang, fxpt_at2, at2f, sin_val, cos_val);
+        if( diff > 0.1f )
+            printf("\n");
 
 	}
 #else
