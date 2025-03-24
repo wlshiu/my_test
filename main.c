@@ -255,6 +255,7 @@ _test_arm_cordic_rotation(void)
     #if 1
 
         #if 1
+        /* something wring....*/
         q31_t   sim_sin = 0, sim_cos = 0;
         float   target_degree = 0.0f;
 
