@@ -94,6 +94,10 @@ int gen_cordic_table(void)
 
 static int32_t      g_theta[2] = {0};
 //========================================================
+#if 0
+
+#else
+
 /**
  *  CORDIC in 16 bit signed fixed point math
  *  Function is valid for arguments in range '-pi/2 < theta < pi/2'
@@ -201,6 +205,7 @@ void cordic_sincos_ex(int32_t q15_degree, int32_t *pSin_q15_val, int32_t *pCos_q
 
     return;
 }
+#endif // 1
 //========================================================
 
 #define QVALUE_MUL      CORDIC_Q15_MUL
@@ -214,14 +219,15 @@ int main(int argc, char **argv)
     int sin_val, cos_val;
 
 //    gen_cordic_table();
+    printf("\n");
 
-#if 1
+#if 0
     fout = fopen("sin_cos.csv", "w");
     fprintf(fout, "ideal_sin, sim_sin, ideal_cos, sim_cos\n");
 #endif // 0
 
 #if 0
-    for(float degree = 0.0f; degree <= 360.0f; degree += 0.1f)
+    for(float degree = 0.0f; degree <= 360.0f; degree += 1.0f)
     {
         float   sim_sin = 0.0f;
         float   ideal_sin = 0.0f;
@@ -260,6 +266,7 @@ int main(int argc, char **argv)
 
         if( fabs(err_rate) > target_err_rate )
             printf("\n");
+
         #else
         if( fout )
         {
@@ -272,7 +279,7 @@ int main(int argc, char **argv)
     }
 #else
 
-    for(float degree = 0.0f; degree <= 360.0f; degree += 1.0f)
+    for(float degree = 0.0f; degree <= 360.0f; degree += 0.1f)
     {
         float   sim_sin = 0.0f;
         float   ideal_sin = 0.0f;
@@ -310,7 +317,13 @@ int main(int argc, char **argv)
 
         //use 32 iterations
         cordic_sincos((phase * QVALUE_MUL), &sin_val, &cos_val, 14);
-        cordic_sincos_ex((degree * QVALUE_MUL), 0, 0, 14);
+        {
+            int     tmp_sin_val, tmp_cos_val;
+
+            cordic_sincos_ex((degree * QVALUE_MUL), &tmp_sin_val, &tmp_cos_val, 14);
+            printf("g_theta[0]= %d, g_theta[1]= %d\n", g_theta[0], g_theta[1]);
+        }
+
 
         if( g_theta[0] != g_theta[1] )
             printf("\n");
@@ -337,14 +350,14 @@ int main(int argc, char **argv)
 
         #if 1
         err_rate = fabs(sim_sin - ideal_sin) * 100 / fabs(ideal_sin);
-        printf("%3.6f degree sin: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
+        printf("%3.6f degree sin: %5.6f : %5.6f    (rate= %2.6f %%)\n",
                (float)degree, sim_sin, ideal_sin, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
 
         if( fabs(err_rate) > target_err_rate )
             printf("\n");
 
         err_rate = fabs(sim_cos - ideal_cos) * 100 / fabs(ideal_cos);
-        printf("%3.6f degree cos: %5.6f : %5.6f\t(rate= %2.6f %%)\n",
+        printf("%3.6f degree cos: %5.6f : %5.6f    (rate= %2.6f %%)\n",
                (float)degree, sim_cos, ideal_cos, fabs(err_rate) > target_err_rate ? fabs(err_rate) : 0);
 
         if( fabs(err_rate) > target_err_rate )
