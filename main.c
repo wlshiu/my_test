@@ -142,13 +142,39 @@ int fxpt_atan2(int32_t y, int32_t x)
 static void
 _test_arm_sin_cos(void)
 {
+#define CONFIG_SIN_COS_Q31          1
+#define CONFIG_SIN_COS_Q15          1
+#define CONFIG_SIN_COS_FLOAT        1
+
+    FILE    *fout = 0;
+
+#if (CONFIG_SIN_COS_Q31)
+    char    *pFilename = "sin_cos_arm_q31.csv";
+#elif (CONFIG_SIN_COS_Q15)
+    char    *pFilename = "sin_cos_arm_q15.csv";
+#elif (CONFIG_SIN_COS_FLOAT)
+    char    *pFilename = "sin_cos_arm_float.csv";
+#endif
+
+
+    if( !(fout = fopen(pFilename, "w")) )
+    {
+        printf("open %s fail ! \n", pFilename);
+        while(1);
+    }
+
+    if( fout )
+    {
+        fprintf(fout, "degree, ideal-sin, ideal-cos, sim-sin, sim-cos, , err-rate-sin (%%), err-rate-cos (%%)\n");
+    }
+
     for(float degree = 0.0f; degree < 360.0f; degree += 0.1f)
     {
         float   ideal_sin = 0.0f, ideal_cos = 0.0f;
         float   sim_sin = 0.0f, sim_cos = 0.0f;
         float   err_rate = 0.0f;
 
-    #if 1
+    #if (CONFIG_SIN_COS_Q31)
         /* '0 ~ 0xFFFFFFFF' map to '0 ~ 2PI' */
         uint64_t    radian = 0;
         radian = (uint64_t)((degree/360) * 0x80000000);
@@ -157,7 +183,7 @@ _test_arm_sin_cos(void)
         sim_sin = (float)arm_sin_q31((q31_t)radian);
         ideal_sin = sin(degree2rad(degree)) * 0x80000000;
         ideal_cos = cos(degree2rad(degree)) * 0x80000000;
-    #elif 1
+    #elif (CONFIG_SIN_COS_Q15)
         /* '0 ~ 0xFFFF' map to '0 ~ 2PI' */
         int32_t     radian = 0;
         radian = (int32_t)((degree/360.0f) * (1<<15));
@@ -166,7 +192,7 @@ _test_arm_sin_cos(void)
         sim_sin = arm_sin_q15((q15_t)radian);
         ideal_sin = Q15(sin(degree2rad(degree)));
         ideal_cos = Q15(cos(degree2rad(degree)));
-    #else
+    #elif (CONFIG_SIN_COS_FLOAT)
         /* float */
         sim_cos = arm_cos_f32(degree2rad(degree));
         sim_sin = arm_sin_f32(degree2rad(degree));
@@ -187,14 +213,52 @@ _test_arm_sin_cos(void)
 
         if( fabs(err_rate) > CONFIG_TARGET_ERR_RATE )
             printf("\n");
+
+        if( fout )
+        {
+            fprintf(fout, "%f, %f, %f, %f, %f, , %f, %f\n",
+                    (float)degree,
+                    ideal_sin, ideal_cos,
+                    sim_sin, sim_cos,
+                    fabs(sim_sin - ideal_sin) * 100 / fabs(ideal_sin),
+                    fabs(sim_cos - ideal_cos) * 100 / fabs(ideal_cos));
+        }
     }
+
+    if( fout )      fclose(fout);
     return;
 }
 
 static void
 _test_arm_atan2(void)
 {
-    for(float degree = -180.0f; degree < 180.0f; degree += 0.1f)
+#define CONFIG_ATAN2_Q31          1
+#define CONFIG_ATAN2_Q15          1
+#define CONFIG_ATAN2_FLOAT        1
+
+    FILE    *fout = 0;
+
+#if (CONFIG_ATAN2_Q31)
+    char    *pFilename = "atan2_arm_q31.csv";
+#elif (CONFIG_ATAN2_Q15)
+    char    *pFilename = "atan2_arm_q15.csv";
+#elif (CONFIG_ATAN2_FLOAT)
+    char    *pFilename = "atan2_arm_float.csv";
+#endif
+
+
+    if( !(fout = fopen(pFilename, "w")) )
+    {
+        printf("open %s fail ! \n", pFilename);
+        while(1);
+    }
+
+    if( fout )
+    {
+        fprintf(fout, "degree, ideal-radian, sim-radian, , err-rate (%%)\n");
+    }
+
+    for(float degree = -180.0f; degree < 180.0f; degree += 0.001f)
     {
         float32_t   ideal_sin = 0.0f, ideal_cos = 0.0f;
         float       ideal_radian = 0.0f;
@@ -207,22 +271,22 @@ _test_arm_atan2(void)
         ideal_cos    = cos(degree2rad(degree));
         ideal_radian = degree2rad(degree);
 
-    #if 0
+    #if (CONFIG_ATAN2_Q31)
         /* Q31 atan2 */
         q31_t   sim_radian = 0;
         ideal_radian = Q29(ideal_radian);
         arm_atan2_q31((q31_t)Q24(ideal_sin), (q31_t)Q24(ideal_cos), &sim_radian);
-    #elif 0
+    #elif (CONFIG_ATAN2_Q15)
         /* Q15 atan2 */
         q15_t   sim_radian = 0;
         ideal_radian = Q13(ideal_radian);
         arm_atan2_q15((q15_t)Q15(ideal_sin), (q15_t)Q15(ideal_cos), &sim_radian);
-    #elif 1
+    #elif 0
         int16_t     sim_radian = 0;
 
         ideal_radian = Q26(ideal_radian);
         sim_radian = fxpt_atan2(Q26(ideal_sin), Q26(ideal_cos));// >> 15;
-    #else
+    #elif (CONFIG_ATAN2_FLOAT)
         /* float */
         float32_t   sim_radian = 0.0f;
         #if 0
@@ -240,28 +304,62 @@ _test_arm_atan2(void)
 
         if( fabs(err_rate) > CONFIG_TARGET_ERR_RATE )
             printf("\n");
+
+        if( fout )
+        {
+            fprintf(fout, "%f, %f, %f, , %f\n",
+                    (float)degree,
+                    (float)ideal_radian, (float)sim_radian,
+                    fabs((float)sim_radian - ideal_radian) * 100 / fabs(ideal_radian));
+        }
     }
+
+    if( fout )      fclose(fout);
     return;
 }
 
 static void
 _test_arm_cordic_rotation(void)
 {
-    for(float degree = 0.0f; degree < 360.0f; degree += 0.1f)
+#define CONFIG_CORDIC_ROT_Q31          1
+#define CONFIG_CORDIC_ROT_Q15          1
+#define CONFIG_CORDIC_ROT_FLOAT        1
+
+    FILE    *fout = 0;
+
+#if (CONFIG_CORDIC_ROT_Q31)
+    char    *pFilename = "cordic_rot_arm_q31.csv";
+#elif (CONFIG_CORDIC_ROT_Q15)
+    char    *pFilename = "cordic_rot_arm_q15.csv";
+#elif (CONFIG_CORDIC_ROT_FLOAT)
+    char    *pFilename = "cordic_rot_arm_float.csv";
+#endif
+
+    if( !(fout = fopen(pFilename, "w")) )
+    {
+        printf("open %s fail ! \n", pFilename);
+        while(1);
+    }
+
+    if( fout )
+    {
+        fprintf(fout, "degree, ideal-sin, ideal-cos, sim-sin, sim-cos, , err-rate-sin (%%), err-rate-cos (%%)\n");
+    }
+
+    for(float degree = 0.0f; degree < 360.0f; degree += 0.001f)
     {
         float       ideal_sin = 0.0f, ideal_cos = 0.0f;
         float       err_rate = 0.0f;
 
-    #if 1
+    #if (CONFIG_CORDIC_ROT_Q31)
 
         #if 1
-        /* something wring....*/
         q31_t   sim_sin = 0, sim_cos = 0;
         float   target_degree = 0.0f;
 
         /* degree: -180 ~ 179 */
         target_degree = (degree < 180) ? degree : degree - 360;
-        target_degree = (int64_t)(0xFFFFFFFF * target_degree/360);
+        target_degree = (0xFFFFFFFF * (double)target_degree/360);
         arm_sin_cos_q31(target_degree, &sim_sin, &sim_cos);
         #else
         uint64_t    radian = 0;
@@ -275,7 +373,18 @@ _test_arm_cordic_rotation(void)
         ideal_sin = sin(degree2rad(degree)) * 0x80000000;
         ideal_cos = cos(degree2rad(degree)) * 0x80000000;
 
-    #else
+    #elif (CONFIG_CORDIC_ROT_Q15)
+        int32_t     radian = 0;
+        q15_t       sim_sin = 0, sim_cos = 0;
+
+        radian = (int32_t)((degree/360.0f) * (1<<15));
+
+        sim_cos = arm_cos_q15((q15_t)radian);
+        sim_sin = arm_sin_q15((q15_t)radian);
+
+        ideal_sin = sin(degree2rad(degree)) * (1 <<15);
+        ideal_cos = cos(degree2rad(degree)) * (1 <<15);
+    #elif (CONFIG_CORDIC_ROT_FLOAT)
         /* float */
         float32_t   sim_sin = 0.0f, sim_cos = 0.0f;
 
@@ -292,14 +401,26 @@ _test_arm_cordic_rotation(void)
         if( fabs(err_rate) > CONFIG_TARGET_ERR_RATE )
             printf("\n");
 
-        err_rate = fabs(sim_cos - ideal_cos) * 100 / fabs(ideal_cos);
+        err_rate = fabs((float)sim_cos - ideal_cos) * 100 / fabs(ideal_cos);
         printf("%3.6f degree cos: %5.6f : %5.6f    (rate= %2.6f %%)\n",
                (float)degree, (float)sim_cos, ideal_cos, fabs(err_rate) > CONFIG_TARGET_ERR_RATE ? fabs(err_rate) : 0);
 
         if( fabs(err_rate) > CONFIG_TARGET_ERR_RATE )
             printf("\n");
+
+
+        if( fout )
+        {
+            fprintf(fout, "%f, %f, %f, %f, %f, , %f, %f\n",
+                    (float)degree,
+                    (float)ideal_sin, (float)ideal_cos,
+                    (float)sim_sin, (float)sim_cos,
+                    fabs((float)sim_sin - ideal_sin) * 100 / fabs(ideal_sin),
+                    fabs((float)sim_cos - ideal_cos) * 100 / fabs(ideal_cos));
+        }
     }
 
+    if( fout )      fclose(fout);
     return;
 }
 //=============================================================================
@@ -307,7 +428,7 @@ _test_arm_cordic_rotation(void)
 //=============================================================================
 int main()
 {
-#if 1
+#if 0
 	for(float degree = 0; degree < 360.0f; degree += 0.1f)
     {
 		int32_t     cos_val = Q30(cos((float)degree * PI / 180.0f));
@@ -332,9 +453,9 @@ int main()
 
 //    _test_arm_sin_cos();
 
-    _test_arm_atan2();
+//    _test_arm_atan2();
 
-//    _test_arm_cordic_rotation();
+    _test_arm_cordic_rotation();
 #endif // 0
     return 0;
 }
