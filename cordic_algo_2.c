@@ -30,6 +30,10 @@ WORD HalfBase;           // CordicBase / 2
 WORD Quad2Boundary;      // 2 * CordicBase
 WORD Quad3Boundary;      // 3 * CordicBase
 
+#define PI                          3.141592f
+
+#define degree2rad(__degree__)      (((__degree__) * PI) / 180)
+
 /*
  *  Output should be:
  *  ------------------------------------------
@@ -46,20 +50,52 @@ WORD Quad3Boundary;      // 3 * CordicBase
  */
 int main(int argc, char* argv[])
 {
-    int cosine = -2;
-    int sine = -2;
-    int theta_degrees;
     int theta_cau;
+
+    FILE    *fout = 0;
+
+    char    *pFilename = "cordic_rot_algo_2.csv";
+
+    if( !(fout = fopen(pFilename, "w")) )
+    {
+        printf("open %s fail ! \n", pFilename);
+        while(1);
+    }
+
+    if( fout )
+    {
+        fprintf(fout, "degree, ideal-sin, ideal-cos, sim-sin, sim-cos, , err-rate-sin (%%), err-rate-cos (%%)\n");
+    }
 
     SinCosSetup();
 
     // 10 degrees, 20 degrees, 30 degrees, and 40 degrees.
-    for (theta_degrees = 0; theta_degrees < 360; theta_degrees += 1)
+    for (float degrees = 0.0f; degrees < 360.0f; degrees += 0.01f)
     {
-        theta_cau = (theta_degrees * CAU_BASE + 180) / 360;
-        SinCos(theta_cau, &sine, &cosine);
-        printf("theta_cau = %d, sin = %5d, cos = %5d\n", theta_cau, sine, cosine);
+        float       ideal_sin = 0.0f, ideal_cos = 0.0f;
+        float       err_rate = 0.0f;
+
+        int         sim_sin = 0, sim_cos = 0;
+
+        ideal_sin    = sin(degree2rad(degrees)) * (1 << 14);
+        ideal_cos    = cos(degree2rad(degrees)) * (1 << 14);
+
+//        theta_cau = (degrees * CAU_BASE + 180) / 360;
+        theta_cau = (int)(degrees * (float)CAU_BASE / 360);
+        SinCos(theta_cau, &sim_sin, &sim_cos);
+
+        if( fout )
+        {
+            fprintf(fout, "%f, %f, %f, %f, %f, , %f, %f\n",
+                    (float)degrees,
+                    (float)ideal_sin, (float)ideal_cos,
+                    (float)sim_sin, (float)sim_cos,
+                    fabs((float)sim_sin - ideal_sin) * 100 / fabs(ideal_sin),
+                    fabs((float)sim_cos - ideal_cos) * 100 / fabs(ideal_cos));
+        }
     }
+
+    if( fout )      fclose(fout);
 
     return 0;
 }

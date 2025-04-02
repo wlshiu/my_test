@@ -58,6 +58,9 @@ integer cordic_hyp_steps[] =
     1, 2, 3, 4, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 13
 };
 
+
+#define degree2rad(__degree__)      (((__degree__) * MY_PI) / 180)
+
 integer     gdirection; // {0: ROTATION, 1: VECTORING}
 integer     gmode;      // {0: CIRCULAR, 1: LINEAR, 2: HYPERBOLIC}
 
@@ -101,6 +104,9 @@ int main(int argc, char **argv)
     integer x1, y1, z1, x2, y2, z2, i, temp;
     integer w1;
 
+    FILE    *fout = 0;
+
+
     // ROTATION, SIN/COS
 #ifndef DATAGEN
     printf("Sine, Cosine\n");
@@ -109,9 +115,58 @@ int main(int argc, char **argv)
     gmode       = CIRCULAR;
     x1 = cordic_1K;
     y1 = 0;
-    for (i = 0; i < 50; i++)
+
+#if 1
+    char    *pFilename = "cordic_rot_kvcordic.csv";
+
+    if( !(fout = fopen(pFilename, "w")) )
     {
-        p = (i / 50.0) * MY_PI / 2;
+        printf("open %s fail ! \n", pFilename);
+        while(1);
+    }
+
+    if( fout )
+    {
+        fprintf(fout, "degree, ideal-sin, ideal-cos, sim-sin, sim-cos, , err-rate-sin (%%), err-rate-cos (%%)\n");
+    }
+
+    for(float degree = 0; degree < 90.0f; degree += 0.01f)
+    {
+        float       ideal_sin = 0.0f, ideal_cos = 0.0f;
+        float       err_rate = 0.0f;
+
+        int         sim_sin = 0, sim_cos = 0;
+
+        p = (degree / 90.0) * MY_PI / 2;
+        z1 = (integer)(p * MUL);
+
+        ideal_sin    = sin(p) * MUL;
+        ideal_cos    = cos(p) * MUL;
+
+        cordic(gdirection, gmode, x1, y1, z1, &x2, &y2, &z2);
+
+        /* Use this to compare floating-point (math.h) against CORDIC fixed-point results. */
+//        printf("%f : cos=%f (%f), sin=%f (%f)\n", p, x2 / MUL, cos(p), y2 / MUL, sin(p));
+
+        sim_sin = y2;
+        sim_cos = x2;
+
+        if( fout )
+        {
+            fprintf(fout, "%f, %f, %f, %f, %f, , %f, %f\n",
+                    (float)degree,
+                    (float)ideal_sin, (float)ideal_cos,
+                    (float)sim_sin, (float)sim_cos,
+                    fabs((float)sim_sin - ideal_sin) * 100 / fabs(ideal_sin),
+                    fabs((float)sim_cos - ideal_cos) * 100 / fabs(ideal_cos));
+        }
+    }
+    if( fout )      fclose(fout); fout = 0;
+#else
+
+    for (i = 0; i < 90; i++)
+    {
+        p = (i / 90.0) * MY_PI / 2;
         z1 = (integer)(p * MUL);
         cordic(gdirection, gmode, x1, y1, z1, &x2, &y2, &z2);
 #ifdef DATAGEN
@@ -120,9 +175,13 @@ int main(int argc, char **argv)
                gdirection, gmode, x1 & 0xffff, y1 & 0xffff, z1 & 0xffff, x2 & 0xffff, y2 & 0xffff, z2 & 0xffff);
 #else
         /* Use this to compare floating-point (math.h) against CORDIC fixed-point results. */
-        printf("%f : cos=%f (%f), sin=%f (%f)\n", p, x2 / MUL, cos(p), y2 / MUL, sin(p));
+        printf("radian %f : cos=%f (%f), sin=%f (%f)\n", p, x2 / MUL, cos(p), y2 / MUL, sin(p));
 #endif
+
     }
+
+#endif // 1
+    return;
 
     // VECTORING, ATAN
 #ifndef DATAGEN
