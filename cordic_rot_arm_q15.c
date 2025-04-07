@@ -32,7 +32,7 @@ typedef int64_t q63_t;
 
 #define degree2rad(__degree__)      (((__degree__) * PI) / 180)
 #define rad2degree(__rad__)         (((__rad__) * 180)/PI)
-
+#define _IQ15(val)          ((q15_t)((val) * 0x00008000L))
 
 __STATIC_FORCEINLINE q31_t clip_q63_to_q31(q63_t x)
 {
@@ -237,11 +237,18 @@ const q15_t sinTable_q15[FAST_MATH_TABLE_SIZE + 1] ARM_DSP_TABLE_ATTRIBUTE =
 
 
 
+/**
+  @brief         Q31 sin_cos function.
+  @param[in]     theta    scaled input value in degrees (0 ~ 2^32) maps to [-180, 179]
+  @param[out]    pSinVal  points to processed sine output
+  @param[out]    pCosVal  points to processed cosine output
 
+  The Q31 input value is in the range [-1 0.999999] and is mapped to a degree value in the range [-180 179].
+ */
 void arm_sin_cos_q31(
-    q31_t theta,
-    q31_t *pSinVal,
-    q31_t *pCosVal)
+    int32_t theta,
+    q31_t   *pSinVal,
+    q31_t   *pCosVal)
 {
     q31_t fract;                                     /* Temporary input, output variables */
     uint16_t indexS, indexC;                         /* Index variable */
@@ -295,11 +302,18 @@ void arm_sin_cos_q31(
     *pSinVal = clip_q63_to_q31((temp >> 31) + (q63_t)f1);
 }
 
+/**
+  @brief         Q15 sin_cos function.
+  @param[in]     theta    scaled input value in degrees, (0 ~ 2^16) maps to [-180, 179]
+  @param[out]    pSinVal  points to processed sine output
+  @param[out]    pCosVal  points to processed cosine output
 
+  The Q15 input value is in the range [-1 0.999999] and is mapped to a degree value in the range [-180 179].
+ */
 void arm_sin_cos_q15(
-    q15_t theta,
-    q15_t *pSinVal,
-    q15_t *pCosVal)
+    int16_t theta,
+    q15_t   *pSinVal,
+    q15_t   *pCosVal)
 {
     q15_t fract;                                     /* Temporary input, output variables */
     uint16_t indexS, indexC;                         /* Index variable */
@@ -381,12 +395,30 @@ int main()
         while(1);
     }
 
+#if 1
+    if( fout )
+    {
+        fprintf(fout, "sim-sin, sim-cos\n");
+    }
+
+    for(int degree = 0; degree < 1 <<16; degree += 1)
+    {
+        q15_t   sim_sin = 0, sim_cos = 0;
+        arm_sin_cos_q15((q15_t)degree, &sim_sin, &sim_cos);
+
+        if( fout )
+        {
+            fprintf(fout, "%d, %d\n", sim_sin, sim_cos);
+        }
+    }
+#else
+
     if( fout )
     {
         fprintf(fout, "degree, ideal-sin, ideal-cos, sim-sin, sim-cos, , err-rate-sin (%%), err-rate-cos (%%)\n");
     }
 
-    for(float degree = 0.0f; degree < 360.0f; degree += 0.001f)
+    for(float degree = 0.0f; degree < 360.0f; degree += 0.01f)
     {
         float       ideal_sin = 0.0f, ideal_cos = 0.0f;
         float       err_rate = 0.0f;
@@ -470,6 +502,7 @@ int main()
                     fabs((float)sim_cos - ideal_cos) * 100 / fabs(ideal_cos));
         }
     }
+#endif // 1
 
     if( fout )      fclose(fout);
     return 0;
