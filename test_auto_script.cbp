@@ -31,17 +31,14 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="auto_script.c">
+		<Unit filename="ARM_Example.h" />
+		<Unit filename="ascript.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="auto_script.h" />
+		<Unit filename="ascript.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="scr2bin.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="scr2bin.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

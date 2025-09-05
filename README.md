@@ -46,7 +46,8 @@
     > import key-pair for authentication
 + test_auto_script
     > configure regiter of H/w module with script
-
++ test_auto_script_2
+    > configure regiter of H/w module with script
 
 # MS Visual Studio
 

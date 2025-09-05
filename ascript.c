@@ -1,24 +1,18 @@
 /**
- * Copyright (c) 2019 Wei-Lun Hsu. All Rights Reserved.
+ * Copyright (c) 2025 Wei-Lun Hsu. All Rights Reserved.
  */
-/** @file auto_script.h
+/** @file ascript.c
  *
  * @author Wei-Lun Hsu
  * @version 0.1
- * @date 2019/12/20
+ * @date 2025/09/06
  * @license
  * @description
  */
 
-#ifndef __auto_script_H_wgJw5pNm_lv0V_HjKa_sVLm_u0fs8Oss4Kq0__
-#define __auto_script_H_wgJw5pNm_lv0V_HjKa_sVLm_u0fs8Oss4Kq0__
+#include <stdio.h>
+#include "ascript.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include <stdint.h>
-#include <stdbool.h>
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -42,14 +36,54 @@ extern "C" {
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
-int
-ascript_exec(
-    uint8_t     *pBuf_script,
-    uint32_t    buf_len);
+void ascript_delay(uint32_t ticks)
+{
+    printf("for(int i = 0; i < ticks; i++);\n");
 
-
-#ifdef __cplusplus
+    return;
 }
-#endif
 
-#endif
+void ascript_reg_write(uint32_t addr, uint32_t value)
+{
+    printf("*((volatile uint32_t*)0x%08X) = 0x%08X\n", addr, value);
+
+    return;
+}
+
+void ascript_reg_write_msk(uint32_t addr, uint32_t mask, uint32_t value)
+{
+    printf("*((volatile uint32_t*)0x%08X) =\n"
+           "    (*((volatile uint32_t*)0x%08X) & ~0x%08X) | (0x%08X & 0x%08X);\n",
+           addr, addr, mask, value, mask);
+
+
+    return;
+}
+
+uint32_t ascript_reg_read_msk(uint32_t addr, uint32_t mask)
+{
+    printf("return *((volatile uint32_t*)0x%08X) & 0x%08X\n", addr, mask);
+    return 0;
+}
+
+void ascript_wait_flags(uint32_t addr, uint32_t flags)
+{
+    printf("while( (*((volatile uint32_t*)0x%08X) & 0x%08X ) != 0x%08X );\n",
+           addr, flags, flags);
+
+    return;
+}
+
+void ascript_set_flags(uint32_t addr, uint32_t flags)
+{
+    printf("*((volatile uint32_t*)0x%08X) |= 0x%08X;\n", addr, flags);
+    return;
+}
+
+void ascript_clr_flags(uint32_t addr, uint32_t flags)
+{
+    printf("*((volatile uint32_t*)0x%08X) &= ~0x%08X;\n", addr, flags);
+
+    return;
+}
+

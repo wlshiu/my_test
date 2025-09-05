@@ -1,23 +1,23 @@
 /**
- * Copyright (c) 2023 Wei-Lun Hsu. All Rights Reserved.
+ * Copyright (c) 2025 Wei-Lun Hsu. All Rights Reserved.
  */
-/** @file scr2raw.h
+/** @file main.h
  *
  * @author Wei-Lun Hsu
  * @version 0.1
- * @date 2023/04/04
+ * @date 2025/09/06
  * @license
  * @description
  */
 
-#ifndef __scr2raw_H_wMuV5nWC_l2lj_HyU7_sQL8_uz8E3vZAzncv__
-#define __scr2raw_H_wMuV5nWC_l2lj_HyU7_sQL8_uz8E3vZAzncv__
+#ifndef __main_H_wNA1H1R0_lWfP_Heod_sD07_usBlQe16Kgwf__
+#define __main_H_wNA1H1R0_lWfP_Heod_sD07_usBlQe16Kgwf__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stdint.h>
+
 //=============================================================================
 //                  Constant Definition
 //=============================================================================
@@ -41,8 +41,6 @@ extern "C" {
 //=============================================================================
 //                  Public Function Definition
 //=============================================================================
-int
-scr_to_bin(char *pLine, uint32_t *pBuf, int *pBuf_len);
 
 #ifdef __cplusplus
 }
