@@ -23,6 +23,22 @@
 # delay(ticks)
 #
 
+# wait_flags(register, flags)
+#   while( (register & flags) == 0 );
+#
+# set_flags(register, flags)
+#   register |= flags
+#
+# clr_flags(register, flags)
+#   register &= ~flags
+#
+
+# inc xxx.svd
+#   open xxx.svd to reference
+#
+
+inc  test.svd
+
 write(0xE0000000, 0x12)
 write(0xE0000004, 0x34)
 write(0xE0000008, 0x56)
