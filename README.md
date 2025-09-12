@@ -247,6 +247,9 @@
 + test_sw_cordic_arm
     > use DSP-lib of ARM
 
++ test_microhttpd
+    > `libmicrohttpd-0.9.50`
+
 # MS Visual Studio
 
 + include libs
