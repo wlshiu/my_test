@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="test_microhttpd" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/test_microhttpd" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="36969" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-D_WIN32" />
+					<Add directory="../test_microhttpd" />
+					<Add directory="libmicrohttpd-0.9.50/include" />
+					<Add directory="libmicrohttpd-0.9.50/src/microhttpd" />
+				</Compiler>
+				<Linker>
+					<Add library="C:/tool_util/codeblocks-17.12mingw-nosetup/MinGW/lib/libkernel32.a" />
+					<Add library="C:/tool_util/codeblocks-17.12mingw-nosetup/MinGW/lib/libmingw32.a" />
+					<Add library="C:/tool_util/codeblocks-17.12mingw-nosetup/MinGW/lib/libpthread.a" />
+					<Add library="C:/tool_util/codeblocks-17.12mingw-nosetup/MinGW/lib/libws2_32.a" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/test_microhttpd" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="fileserver_example.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/include/microhttpd.h" />
+		<Unit filename="libmicrohttpd-0.9.50/include/platform.h" />
+		<Unit filename="libmicrohttpd-0.9.50/include/platform_interface.h" />
+		<Unit filename="libmicrohttpd-0.9.50/include/w32functions.h" />
+		<Unit filename="libmicrohttpd-0.9.50/mingw32/include/microhttpd.h" />
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/base64.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/base64.h" />
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/basicauth.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/connection.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/connection.h" />
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/daemon.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/digestauth.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/internal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/internal.h" />
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/md5.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/md5.h" />
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/memorypool.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/memorypool.h" />
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/mhd_byteorder.h" />
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/mhd_limits.h" />
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/mhd_mono_clock.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/mhd_mono_clock.h" />
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/mhd_str.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/mhd_str.h" />
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/postprocessor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/reason_phrase.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/response.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/response.h" />
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/sysfdsetsize.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libmicrohttpd-0.9.50/src/microhttpd/sysfdsetsize.h" />
+		<Unit filename="libmicrohttpd-0.9.50/src/platform/w32functions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
