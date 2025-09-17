@@ -250,6 +250,11 @@
 + test_microhttpd
     > `libmicrohttpd-0.9.50`
 
++ test_znFAT
+    > [znfat: 振南的znfat](https://gitee.com/dbembed/znfat)
+
+
+
 # MS Visual Studio
 
 + include libs
