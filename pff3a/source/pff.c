@@ -1083,7 +1083,6 @@ FRESULT pf_write (
     UINT wcnt;
     FATFS *fs = FatFs;
 
-
     *bw = 0;
     if (!fs)
         return FR_NOT_ENABLED;     /* Check file system */
@@ -1110,9 +1109,9 @@ FRESULT pf_write (
 
     while (btw)                                     /* Repeat until all data transferred */
     {
-        if ((UINT)fs->fptr % 512 == 0)              /* On the sector boundary? */
+        if (((UINT)fs->fptr & 511) == 0)              /* On the sector boundary? */
         {
-            cs = (BYTE)(fs->fptr / 512 & (fs->csize - 1));  /* Sector offset in the cluster */
+            cs = (BYTE)((fs->fptr >> 9) & (fs->csize - 1));  /* Sector offset in the cluster */
             if (!cs)                                /* On the cluster boundary? */
             {
                 if (fs->fptr == 0)                  /* On the top of the file? */
@@ -1135,7 +1134,7 @@ FRESULT pf_write (
                 ABORT(FR_DISK_ERR);  /* Initiate a sector write operation */
             fs->flag |= FA__WIP;
         }
-        wcnt = 512 - (UINT)fs->fptr % 512;          /* Number of bytes to write to the sector */
+        wcnt = 512 - ((UINT)fs->fptr & 511);          /* Number of bytes to write to the sector */
         if (wcnt > btw)
             wcnt = btw;
         if (disk_writep(p, wcnt))
@@ -1144,10 +1143,10 @@ FRESULT pf_write (
         p += wcnt;                /* Update pointers and counters */
         btw -= wcnt;
         *bw += wcnt;
-        if ((UINT)fs->fptr % 512 == 0)
+        if (((UINT)fs->fptr & 511) == 0)
         {
             if (disk_writep(0, 0))
-                ABORT(FR_DISK_ERR);  /* Finalize the currtent secter write operation */
+                ABORT(FR_DISK_ERR);  /* Finalize the current sector write operation */
             fs->flag &= ~FA__WIP;
         }
     }
@@ -1171,7 +1170,6 @@ FRESULT pf_lseek (
     DWORD bcs, sect, ifptr;
     FATFS *fs = FatFs;
 
-
     if (!fs)
         return FR_NOT_ENABLED;     /* Check file system */
     if (!(fs->flag & FA_OPENED))
@@ -1183,7 +1181,7 @@ FRESULT pf_lseek (
     fs->fptr = 0;
     if (ofs > 0)
     {
-        bcs = (DWORD)fs->csize * 512;       /* Cluster size (byte) */
+        bcs = (DWORD)fs->csize << 9;       /* Cluster size (byte) */
         if (ifptr > 0 &&
                 (ofs - 1) / bcs >= (ifptr - 1) / bcs)   /* When seek to same or following cluster, */
         {
@@ -1209,7 +1207,7 @@ FRESULT pf_lseek (
         sect = clust2sect(clst);        /* Current sector */
         if (!sect)
             ABORT(FR_DISK_ERR);
-        fs->dsect = sect + (fs->fptr / 512 & (fs->csize - 1));
+        fs->dsect = sect + ((fs->fptr >> 9) & (fs->csize - 1));
     }
 
     return FR_OK;

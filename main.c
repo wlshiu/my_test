@@ -68,7 +68,7 @@ int main()
             g_fatfs.fatbase, g_fatfs.dirbase, g_fatfs.database);
 
 
-#if 0
+#if (PF_USE_DIR)
     DIR     dir;        /* Directory object */
     FILINFO fno;        /* File information object */
 
@@ -91,15 +91,15 @@ int main()
     }
 
     if( rval )  err("readdir fail (err_code: %d)!\n", rval);
-#else
+
+#endif // 1
+
+    printf("\n--- Open file ---\n");
 
     rval = (int)pf_open("_SCRIPT");
 
-//    rval = (int)pf_write(&g_buf_wr, sizeof(g_buf_wr), &wbytes);
-//    rval = (int)pf_write(0, 0, &wbytes); // write_end
-
+    printf("--- Read File ---\n");
     rval = (int)pf_read(&g_buf_rd, sizeof(g_buf_rd), &rbytes);
-
     for(int i = 0; i < sizeof(g_buf_rd); i++)
     {
         if( i && !(i & 0xF) )
@@ -107,7 +107,25 @@ int main()
         printf("%02X ", g_buf_rd[i]);
     }
 
-#endif // 1
+    pf_lseek(0);
+
+    printf("\n\n--- Modify File ---\n");
+    rval = (int)pf_write(&g_buf_wr, sizeof(g_buf_wr), &wbytes);
+    rval = (int)pf_write(0, 0, &wbytes); // write_end
+
+    memset(g_buf_rd, 0xAA, sizeof(g_buf_rd));
+    pf_lseek(0);
+
+    printf("--- Re-Read File ---\n");
+    rval = (int)pf_read(&g_buf_rd, sizeof(g_buf_rd), &rbytes);
+    for(int i = 0; i < sizeof(g_buf_rd); i++)
+    {
+        if( i && !(i & 0xF) )
+            printf("\n");
+        printf("%02X ", g_buf_rd[i]);
+    }
+    printf("\n");
+
 
     return 0;
 }

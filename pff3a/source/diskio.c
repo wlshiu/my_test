@@ -129,7 +129,7 @@ DSTATUS disk_initialize (void)
 /*-----------------------------------------------------------------------*/
 
 DRESULT disk_readp (
-    BYTE* buff,     /* Pointer to the destination object */
+    BYTE *buff,     /* Pointer to the destination object */
     DWORD sector,   /* Sector number (LBA) */
     UINT offset,    /* Offset in the sector */
     UINT count      /* Byte count (bit15:destination) */
@@ -137,6 +137,8 @@ DRESULT disk_readp (
 {
     DRESULT     res = RES_OK;
     uint8_t     *pCur = g_pRamDisk;
+
+//    printf("[%s] sector= %d, offset= %d, cnt= %d\n", __func__, sector, offset, count);
 
     pCur = pCur + (sector * CONFIG_1_SECTOR_SIZE) + offset;
 
@@ -152,7 +154,7 @@ DRESULT disk_readp (
 /*-----------------------------------------------------------------------*/
 
 DRESULT disk_writep (
-    const BYTE* buff,   /* Pointer to the data to be written, NULL:Initiate/Finalize write operation */
+    const BYTE *buff,   /* Pointer to the data to be written, NULL:Initiate/Finalize write operation */
     DWORD sc            /* Sector number (LBA) or Number of bytes to send */
 )
 {
@@ -160,6 +162,8 @@ DRESULT disk_writep (
     uint32_t            byte_cnt = 0;
     static uint32_t     target_addr = 0;
 	static uint32_t     write_cnt = 0;
+
+//	printf("[%s] buff= x%x, sc= %d\n", __func__, buff, sc);
 
     if( buff )
     {   /* Send data bytes */
