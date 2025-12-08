@@ -262,6 +262,7 @@
 
 + test_libusb
     > [GitHub - libusb: A cross-platform library to access USB devices](https://github.com/libusb/libusb)
+    >> use `libusb-1.0.dll`
 
 # MS Visual Studio
 
