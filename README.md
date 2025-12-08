@@ -260,6 +260,9 @@
     > [GitHub - LarryRuane/protothread](https://github.com/LarryRuane/protothread/tree/master)
     >> exported from `code.google.com/p/protothread`
 
++ test_libusb
+    > [GitHub - libusb: A cross-platform library to access USB devices](https://github.com/libusb/libusb)
+
 # MS Visual Studio
 
 + include libs
