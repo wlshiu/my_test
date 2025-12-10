@@ -264,6 +264,10 @@
     > [GitHub - libusb: A cross-platform library to access USB devices](https://github.com/libusb/libusb)
     >> use `libusb-1.0.dll`
 
+    - Use `listdevs.c` or `testlibusb.c` to list USB-Device VID/PID
+    - Use `xusb.c` to open USB-Device
+        > `$ ./xusb -i <VID:PID>`
+
 # MS Visual Studio
 
 + include libs

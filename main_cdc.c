@@ -95,15 +95,20 @@ int main(int argc, char *argv[])
     int rc;
     int i = 0;
 
-    rc = libusb_init(NULL);
+    libusb_context  *ctx = NULL;
+
+    rc = libusb_init(&ctx);
     if (rc < 0)
         return rc;
 
     /**
-     *  CH340 (USB to Uart)
-     *  USB\VID_1A86&PID_7523
+     *  + CH340 (USB to Uart)
+     *      > USB\VID_1A86&PID_7523
+     *  + STM32 VCP
+     *      > VID_1A0A&PID_3B90
      */
-    devh = libusb_open_device_with_vid_pid(NULL, 0x1A86, 0x7523);
+    devh = libusb_open_device_with_vid_pid(ctx, 0x1A0A, 0x3B90);
+//    devh = libusb_open_device_with_vid_pid(ctx, 0x1A86, 0x7523);
     if(NULL == devh)
     {
         printf("Open USB device failed\n");
@@ -148,7 +153,7 @@ int main(int argc, char *argv[])
     benchmark_in(endpoint_in);
     while(1)
     {
-        rc = libusb_handle_events(NULL);
+        rc = libusb_handle_events(ctx);
     }
 
     libusb_release_interface(devh, 0);
@@ -157,6 +162,6 @@ out:
     if(devh)
         libusb_close(devh);
 
-    libusb_exit(NULL);
+    libusb_exit(ctx);
     return 0;
 }
