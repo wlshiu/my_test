@@ -10,7 +10,7 @@
  * @description
  */
 
-
+#include <stdio.h>
 #include "libbtn.h"
 
 //=============================================================================
@@ -61,9 +61,9 @@ int btn_init(btn_handle_t *pHBtn)
     {
         pHBtn->pBtn_key[i].state     = BTN_STATE_IDLE;
         pHBtn->pBtn_key[i].btn_event = BTN_EVENT_PRESS_NONE;
-        pHBtn->pBtn_key[i].repeat    = 0;
+        pHBtn->pBtn_key[i].u.repeat  = 0;
         pHBtn->pBtn_key[i].ticks     = 0u;
-        pHBtn->pBtn_key[i].pin_rt_lv = !pHBtn->pBtn_key[i].pin_act_lv;
+        pHBtn->pBtn_key[i].u.pin_rt_lv = !pHBtn->pBtn_key[i].u.pin_act_lv;
     }
 
     return rval;
@@ -98,15 +98,15 @@ int btn_routine(btn_handle_t *pHBtn)
         }
 
         /* Button de-bounce handling */
-        if( pin_rt_state == pBtn_key->pin_rt_lv )
-            pBtn_key->debounce_cnt = 0; // Level not changed, reset counter
+        if( pin_rt_state == pBtn_key->u.pin_rt_lv )
+            pBtn_key->u.debounce_cnt = 0; // Level not changed, reset counter
         else
         {
             // Continue reading same new level for debounce
-            if( g_debounce_ticks < pBtn_key->debounce_cnt++ )
+            if( g_debounce_ticks < pBtn_key->u.debounce_cnt++ )
             {
-                pBtn_key->pin_rt_lv = pin_rt_state;
-                pBtn_key->debounce_cnt   = 0;
+                pBtn_key->u.pin_rt_lv    = pin_rt_state;
+                pBtn_key->u.debounce_cnt = 0;
             }
         }
 
@@ -119,7 +119,7 @@ int btn_routine(btn_handle_t *pHBtn)
                 break;
 
             case BTN_STATE_IDLE:
-                if( pBtn_key->pin_rt_lv != pBtn_key->pin_act_lv )
+                if( pBtn_key->u.pin_rt_lv != pBtn_key->u.pin_act_lv )
                 {
                     pBtn_key->btn_event = BTN_EVENT_PRESS_NONE;
                     break;
@@ -127,15 +127,15 @@ int btn_routine(btn_handle_t *pHBtn)
 
                 // Button press detected
                 pBtn_key->btn_event = BTN_EVENT_PRESS_DOWN;
-
                 CB_BTN_EVENT(pBtn_key);
 
-                pBtn_key->ticks = 0;
-                pBtn_key->state = BTN_STATE_PRESS;
+                pBtn_key->ticks     = 0;
+                pBtn_key->u.repeat  = 1;
+                pBtn_key->state     = BTN_STATE_PRESS;
                 break;
 
             case BTN_STATE_PRESS:
-                if( pBtn_key->pin_rt_lv != pBtn_key->pin_act_lv )
+                if( pBtn_key->u.pin_rt_lv != pBtn_key->u.pin_act_lv )
                 {
                     // Button released
                     pBtn_key->btn_event = BTN_EVENT_PRESS_UP;
@@ -155,15 +155,15 @@ int btn_routine(btn_handle_t *pHBtn)
                 break;
 
             case BTN_STATE_RELEASE:
-                if( pBtn_key->pin_rt_lv == pBtn_key->pin_act_lv )
+                if( pBtn_key->u.pin_rt_lv == pBtn_key->u.pin_act_lv )
                 {
                     // Button pressed again
                     pBtn_key->btn_event = BTN_EVENT_PRESS_DOWN;
                     CB_BTN_EVENT(pBtn_key);
 
-                    if( pBtn_key->repeat < CONFIG_PRESS_REPEAT_MAX_NUM )
+                    if( pBtn_key->u.repeat < CONFIG_PRESS_REPEAT_MAX_NUM )
                     {
-                        pBtn_key->repeat++;
+                        pBtn_key->u.repeat++;
                     }
 
                     pBtn_key->btn_event = BTN_EVENT_PRESS_REPEAT;
@@ -175,12 +175,12 @@ int btn_routine(btn_handle_t *pHBtn)
                 else if( pBtn_key->ticks > g_tick_short_press )
                 {
                     // Timeout reached, determine click type
-                    if( pBtn_key->repeat == 1 )
+                    if( pBtn_key->u.repeat == 1 )
                     {
                         pBtn_key->btn_event = BTN_EVENT_CLICK_SINGLE;
                         CB_BTN_EVENT(pBtn_key);
                     }
-                    else if( pBtn_key->repeat == 2 )
+                    else if( pBtn_key->u.repeat == 2 )
                     {
                         pBtn_key->btn_event = BTN_EVENT_CLICK_DOUBLE;
                         CB_BTN_EVENT(pBtn_key);
@@ -191,13 +191,13 @@ int btn_routine(btn_handle_t *pHBtn)
                 break;
 
             case BTN_STATE_REPEAT:
-                if( pBtn_key->pin_rt_lv != pBtn_key->pin_act_lv )
+                if( pBtn_key->u.pin_rt_lv != pBtn_key->u.pin_act_lv )
                 {
                     // Button released
                     pBtn_key->btn_event = BTN_EVENT_PRESS_UP;
                     CB_BTN_EVENT(pBtn_key);
 
-                    if( pBtn_key->ticks > g_tick_short_press )
+                    if( pBtn_key->ticks < g_tick_short_press )
                     {
                         pBtn_key->ticks = 0;
                         pBtn_key->state = BTN_STATE_RELEASE;    // Continue waiting for more presses
@@ -216,7 +216,7 @@ int btn_routine(btn_handle_t *pHBtn)
                 break;
 
             case BTN_STATE_LONG_HOLD:
-                if( pBtn_key->pin_rt_lv != pBtn_key->pin_act_lv )
+                if( pBtn_key->u.pin_rt_lv != pBtn_key->u.pin_act_lv )
                 {
                     // Released from long press
                     pBtn_key->btn_event = BTN_EVENT_PRESS_UP;

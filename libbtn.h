@@ -72,15 +72,18 @@ typedef int (*cb_btn_event_t)(struct btn_key *pBtn_key);
 typedef struct btn_key
 {
     uint16_t        ticks;      /*<! tick counter */
-    uint8_t         state;      /*<! internal state machine */
-    uint8_t         repeat;     /*<! repeat counter */
 
     union {
-        uint8_t     debounce_cnt : 3; /*<! de-bounce counter (0-7) */
-        uint8_t     pin_rt_lv    : 1; /*<! the run-time level of the specific pin  */
-        uint8_t     pin_act_lv   : 1; /*<! the active level of the specific pin    */
+        uint8_t     value;
+        struct {
+            uint8_t     debounce_cnt : 3; /*<! de-bounce counter */
+            uint8_t     pin_rt_lv    : 1; /*<! the run-time level of the specific pin  */
+            uint8_t     pin_act_lv   : 1; /*<! the active level of the specific pin    */
+            uint8_t     repeat       : 3;     /*<! repeat counter */
+        } u;
     };
 
+    uint8_t         state;      /*<! internal state machine */
     btn_event_t     btn_event;
 
     cb_get_pin_state_t      cb_get_pin_state;
