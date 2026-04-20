@@ -167,6 +167,9 @@
 + test_overlay
     > Keil example of overlay section of scatter
 
++ test_overlay_gnu
+    > sifive example of overlay section of link-script
+
 + test_CherryUSB
     > simulate CherryUSB v0.9.0 (Only USB protocol layer)
 
