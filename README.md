@@ -280,6 +280,11 @@
 
 + test_cos
 
++ test_cregex
+    > [GitHub - jserv/cregex: A small implementation of regular expression matching engine in C](https://github.com/jserv/cregex/tree/master)
+
+
+
 # MS Visual Studio
 
 + include libs
