@@ -1232,7 +1232,10 @@ re_node_set_merge (re_node_set *dest, const re_node_set *src)
        is = src->nelem - 1, id = dest->nelem - 1; is >= 0 && id >= 0; )
     {
       if (dest->elems[id] == src->elems[is])
-	is--, id--;
+	{
+	  is--;
+	  id--;
+	}
       else if (dest->elems[id] < src->elems[is])
 	dest->elems[--sbase] = src->elems[is--];
       else /* if (dest->elems[id] > src->elems[is]) */
@@ -1445,13 +1448,7 @@ re_dfa_add_node (re_dfa_t *dfa, re_token_t token)
       new_eclosures = re_realloc (dfa->eclosures, re_node_set, new_nodes_alloc);
       if (BE (new_nexts == NULL || new_indices == NULL
 	      || new_edests == NULL || new_eclosures == NULL, 0))
-	{
-	   re_free (new_nexts);
-	   re_free (new_indices);
-	   re_free (new_edests);
-	   re_free (new_eclosures);
-	   return -1;
-	}
+	return -1;
       dfa->nexts = new_nexts;
       dfa->org_indices = new_indices;
       dfa->edests = new_edests;
@@ -1622,7 +1619,7 @@ free_state (re_dfastate_t *state)
   re_free (state);
 }
 
-/* Create the new state which is independ of contexts.
+/* Create the new state which is independent of contexts.
    Return the new state if succeeded, otherwise return NULL.  */
 
 static re_dfastate_t *
@@ -1634,7 +1631,7 @@ create_ci_newstate (const re_dfa_t *dfa, const re_node_set *nodes,
   reg_errcode_t err;
   re_dfastate_t *newstate;
 
-  newstate = (re_dfastate_t *) calloc (sizeof (re_dfastate_t), 1);
+  newstate = (re_dfastate_t *) calloc (1, sizeof (re_dfastate_t));
   if (BE (newstate == NULL, 0))
     return NULL;
   err = re_node_set_init_copy (&newstate->nodes, nodes);
@@ -1684,7 +1681,7 @@ create_cd_newstate (const re_dfa_t *dfa, const re_node_set *nodes,
   reg_errcode_t err;
   re_dfastate_t *newstate;
 
-  newstate = (re_dfastate_t *) calloc (sizeof (re_dfastate_t), 1);
+  newstate = (re_dfastate_t *) calloc (1, sizeof (re_dfastate_t));
   if (BE (newstate == NULL, 0))
     return NULL;
   err = re_node_set_init_copy (&newstate->nodes, nodes);

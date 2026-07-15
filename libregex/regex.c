@@ -17,9 +17,11 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-//#ifdef HAVE_CONFIG_H
+#pragma GCC diagnostic ignored "-Wsign-compare"
+
+#ifdef HAVE_CONFIG_H
 #include "config.h"
-//#endif
+#endif
 
 /* Make sure no one compiles this code with a C++ compiler.  */
 #ifdef __cplusplus
@@ -60,6 +62,7 @@
    #undefs RE_DUP_MAX and sets it to the right value.  */
 #include <limits.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #ifdef GAWK
 #undef alloca

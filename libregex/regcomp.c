@@ -17,6 +17,16 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+#if defined __TANDEM
+ /* This is currently duplicated from git-compat-utils.h */
+# ifdef NO_INTPTR_T
+ typedef long intptr_t;
+ typedef unsigned long uintptr_t;
+# endif
+#endif
+
 static reg_errcode_t re_compile_internal (regex_t *preg, const char * pattern,
 					  size_t length, reg_syntax_t syntax);
 static void re_compile_fastmap_iter (regex_t *bufp,
@@ -840,7 +850,7 @@ init_dfa (re_dfa_t *dfa, size_t pat_len)
 {
   unsigned int table_size;
 #ifndef _LIBC
-  char *codeset_name;
+  const char *codeset_name;
 #endif
 
   memset (dfa, '\0', sizeof (re_dfa_t));
@@ -860,7 +870,7 @@ init_dfa (re_dfa_t *dfa, size_t pat_len)
     if (table_size > pat_len)
       break;
 
-  dfa->state_table = calloc (sizeof (struct re_state_table_entry), table_size);
+  dfa->state_table = calloc (table_size, sizeof (struct re_state_table_entry));
   dfa->state_hash_mask = table_size - 1;
 
   dfa->mb_cur_max = MB_CUR_MAX;
@@ -928,7 +938,7 @@ init_dfa (re_dfa_t *dfa, size_t pat_len)
 	{
 	  int i, j, ch;
 
-	  dfa->sb_char = (re_bitset_ptr_t) calloc (sizeof (bitset_t), 1);
+	  dfa->sb_char = (re_bitset_ptr_t) calloc (1, sizeof (bitset_t));
 	  if (BE (dfa->sb_char == NULL, 0))
 	    return REG_ESPACE;
 
@@ -2156,11 +2166,7 @@ parse_reg_exp (re_string_t *regexp, regex_t *preg, re_token_t *token,
 	{
 	  branch = parse_branch (regexp, preg, token, syntax, nest, err);
 	  if (BE (*err != REG_NOERROR && branch == NULL, 0))
-	    {
-	      if (tree != NULL)
-		postorder (tree, free_tree, NULL);
-	      return NULL;
-	    }
+	    return NULL;
 	}
       else
 	branch = NULL;
@@ -2416,22 +2422,14 @@ parse_expression (re_string_t *regexp, regex_t *preg, re_token_t *token,
   while (token->type == OP_DUP_ASTERISK || token->type == OP_DUP_PLUS
 	 || token->type == OP_DUP_QUESTION || token->type == OP_OPEN_DUP_NUM)
     {
-      bin_tree_t *dup_tree = parse_dup_op (tree, regexp, dfa, token,
-					   syntax, err);
-      if (BE (*err != REG_NOERROR && dup_tree == NULL, 0))
-	{
-	  if (tree != NULL)
-	    postorder (tree, free_tree, NULL);
-	  return NULL;
-	}
-      tree = dup_tree;
+      tree = parse_dup_op (tree, regexp, dfa, token, syntax, err);
+      if (BE (*err != REG_NOERROR && tree == NULL, 0))
+	return NULL;
       /* In BRE consecutive duplications are not allowed.  */
       if ((syntax & RE_CONTEXT_INVALID_DUP)
 	  && (token->type == OP_DUP_ASTERISK
 	      || token->type == OP_OPEN_DUP_NUM))
 	{
-	  if (tree != NULL)
-	    postorder (tree, free_tree, NULL);
 	  *err = REG_BADRPT;
 	  return NULL;
 	}
@@ -2716,11 +2714,7 @@ build_range_exp (bitset_t sbcset, bracket_elem_t *start_elem,
 					new_nranges);
 
 	    if (BE (new_array_start == NULL || new_array_end == NULL, 0))
-	      {
-		re_free (new_array_start);
-		re_free (new_array_end);
-		return REG_ESPACE;
-	      }
+	      return REG_ESPACE;
 
 	    mbcset->range_starts = new_array_start;
 	    mbcset->range_ends = new_array_end;
@@ -3087,9 +3081,9 @@ parse_bracket_exp (re_string_t *regexp, re_dfa_t *dfa, re_token_t *token,
 						   _NL_COLLATE_SYMB_EXTRAMB);
     }
 #endif
-  sbcset = (re_bitset_ptr_t) calloc (sizeof (bitset_t), 1);
+  sbcset = (re_bitset_ptr_t) calloc (1, sizeof (bitset_t));
 #ifdef RE_ENABLE_I18N
-  mbcset = (re_charset_t *) calloc (sizeof (re_charset_t), 1);
+  mbcset = (re_charset_t *) calloc (1, sizeof (re_charset_t));
 #endif /* RE_ENABLE_I18N */
 #ifdef RE_ENABLE_I18N
   if (BE (sbcset == NULL || mbcset == NULL, 0))
@@ -3470,7 +3464,7 @@ build_equiv_class (bitset_t sbcset, const unsigned char *name)
 	/* This isn't a valid character.  */
 	return REG_ECOLLATE;
 
-      /* Build single byte matcing table for this equivalence class.  */
+      /* Build single byte matching table for this equivalence class.  */
       char_buf[1] = (unsigned char) '\0';
       len = weights[idx1 & 0xffffff];
       for (ch = 0; ch < SBC_MAX; ++ch)
@@ -3634,22 +3628,27 @@ build_charclass_op (re_dfa_t *dfa, RE_TRANSLATE_TYPE trans,
   re_token_t br_token;
   bin_tree_t *tree;
 
-  sbcset = (re_bitset_ptr_t) calloc (sizeof (bitset_t), 1);
-  if (BE (sbcset == NULL, 0))
-    {
-      *err = REG_ESPACE;
-      return NULL;
-    }
+  sbcset = (re_bitset_ptr_t) calloc (1, sizeof (bitset_t));
 #ifdef RE_ENABLE_I18N
-  mbcset = (re_charset_t *) calloc (sizeof (re_charset_t), 1);
-  if (BE (mbcset == NULL, 0))
+  mbcset = (re_charset_t *) calloc (1, sizeof (re_charset_t));
+#endif /* RE_ENABLE_I18N */
+
+#ifdef RE_ENABLE_I18N
+  if (BE (sbcset == NULL || mbcset == NULL, 0))
+#else /* not RE_ENABLE_I18N */
+  if (BE (sbcset == NULL, 0))
+#endif /* not RE_ENABLE_I18N */
     {
-      re_free (sbcset);
       *err = REG_ESPACE;
       return NULL;
     }
-  mbcset->non_match = non_match;
-#endif /* RE_ENABLE_I18N */
+
+  if (non_match)
+    {
+#ifdef RE_ENABLE_I18N
+      mbcset->non_match = 1;
+#endif /* not RE_ENABLE_I18N */
+    }
 
   /* We don't care the syntax in this case.  */
   ret = build_charclass (trans, sbcset,
