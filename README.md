@@ -278,6 +278,7 @@
     >> This is the GNU regular expression library used by git-grep.
     The original path in Git source code is compat/regex.
 
++ test_cos
 
 # MS Visual Studio
 
