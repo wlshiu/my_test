@@ -275,9 +275,8 @@
 
 + test_libregex
     > [linusyang92/libregex: GNU Regular Expression Library](https://github.com/linusyang92/libregex/tree/master)
-
-
-
+    >> This is the GNU regular expression library used by git-grep.
+    The original path in Git source code is compat/regex.
 
 
 # MS Visual Studio
